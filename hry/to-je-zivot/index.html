@@ -2,7 +2,7 @@
 <title>To je život</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600&family=Nunito:wght@600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700&family=Nunito:wght@600;700;800&display=swap" rel="stylesheet">
 <style>
 /* Layout: pixelová krajina s vesničkou jako pozadí, nad ní pár karet jako na stole, dole dlouhá osa dne – hlavní dominanta */
 :root{
@@ -10,7 +10,7 @@
   --day:#EFE9D9; --night:#DCDCE4; --accent:#5D86A8;
   --good:#4F9A5E; --bad:#C9554E;
   --hp:#D9706C; --en:#E2B04A; --st:#8A8597;
-  --display:'Fredoka',ui-rounded,'Segoe UI',system-ui,sans-serif;
+  --display:'Baloo 2',ui-rounded,'Segoe UI',system-ui,sans-serif;
   --body:'Nunito',ui-rounded,system-ui,-apple-system,'Segoe UI',sans-serif;
   color-scheme:light;
 }
@@ -246,6 +246,97 @@ button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 .moment b{display:block;font-family:var(--display);font-weight:600;font-size:17px}
 .moment small{font-size:12.5px;font-weight:800;color:var(--muted)}
 @keyframes momIn{from{opacity:0;transform:translate(-50%,-14px) scale(.9)}}
+.ov.title{background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .2 0 0 0 0 .19 0 0 0 0 .18 0 0 0 .07 0'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E"),radial-gradient(circle at 1px 1px,rgba(51,48,46,.07) 1px,transparent 1.5px) 0 0/14px 14px,radial-gradient(ellipse at 50% 40%,#F6F4EF,#E8E5DE);backdrop-filter:none}
+.ov.title .card{background:transparent;border:0;box-shadow:none;max-width:640px;text-align:center}
+.hero{display:flex;flex-direction:column;align-items:center;gap:14px;padding:10px}
+.hero .pre{margin:0;font-size:13px;letter-spacing:.3em;text-transform:uppercase;font-weight:800;color:var(--muted)}
+.hero h1{margin:0;font-family:var(--display);font-weight:600;font-size:clamp(48px,9vw,96px);line-height:1.15;padding-top:.08em;color:var(--paper);
+  text-shadow:0 4px 0 var(--ink),3px 0 0 var(--ink),-3px 0 0 var(--ink),0 -3px 0 var(--ink),3px 4px 0 var(--ink),-3px 4px 0 var(--ink);letter-spacing:.01em}
+.hero h1.mid{font-size:clamp(36px,6vw,60px)}
+.hero .tag{margin:6px 0 10px;background:var(--paper);border:2.5px solid var(--ink);border-radius:10px;box-shadow:0 4px 0 var(--ink);padding:14px 22px;font-size:16px;line-height:1.6;font-weight:700;color:var(--ink)}
+.hero .tag b{font-family:var(--display);font-weight:600;font-size:17px}
+.btn.big{font-size:18px;padding:11px 30px;font-family:var(--display);font-weight:600}
+.hero .births{justify-content:center}
+#actsBtn{display:none}
+.rotate{display:none}
+@media (orientation:portrait) and (max-width:720px){
+  .rotate{display:flex;position:fixed;inset:0;z-index:100;flex-direction:column;align-items:center;justify-content:center;gap:14px;text-align:center;padding:24px;
+    background:radial-gradient(ellipse at 50% 40%,#F6F4EF,#E8E5DE);font-family:var(--display);font-size:22px;font-weight:600;color:var(--ink)}
+  .rotate i{font-style:normal;font-size:48px;display:inline-block;animation:rot 2.4s ease-in-out infinite}
+  @keyframes rot{0%,30%{transform:rotate(0)}60%,100%{transform:rotate(-90deg)}}
+}
+@media (max-height:520px){
+  html,body{height:100%}
+  #app{min-height:0;height:100%}
+  .head{padding:4px 8px 0}
+  .brand{display:none}
+  .head{justify-content:flex-end;flex-wrap:nowrap;position:relative;z-index:6}
+  .ctrl{gap:4px}
+  .offers{top:0}
+  .speed button,.helpb{padding:3px 8px;font-size:11.5px}
+  .sky{min-height:0}
+  .offers{left:8px;right:8px;top:2px;bottom:28px;gap:6px 8px}
+  .oc{width:68px;height:90px;border-width:2px;box-shadow:0 3px 0 var(--line)}
+  .oc .hd{font-size:9.5px;padding:2px 5px;border-bottom-width:2px}
+  .oc .bd{padding-top:5px}
+  .ring{width:38px;height:38px}
+  .ring span{width:32px;height:32px;font-size:19px}
+  .ring span.two{font-size:16px}
+  .daybar{width:54px;margin-top:4px}
+  .daybar i{height:4px}
+  .bdg{font-size:10.5px;bottom:4px}
+  .bdg.hrs{left:4px;padding:3px 5px}
+  .bdg.mon{right:3px;padding:1px 3px;font-size:9.5px}
+  .bdg.hrs{font-size:9.5px}
+  .oc .req{font-size:10px;left:3px;top:3px}
+  .lockb{width:20px;height:20px;top:-8px;right:-8px;font-size:11px}
+  .acts{display:none}
+  #actsBtn{display:block}
+  .actgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(64px,1fr));gap:6px}
+  .actgrid .act{width:auto;height:46px}
+  .act{width:50px;height:38px;font-size:8.5px;gap:1px;padding:2px}
+  .act .ai{font-size:15px}
+  .act span:last-child{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:46px}
+  .chipsrow{left:8px;bottom:4px;gap:5px}
+  .cm,.recentBtn{font-size:10.5px;padding:2px 8px}
+  .toasts{top:2px;right:8px}
+  .toast{font-size:11px;padding:4px 8px}
+  .moment{padding:4px 12px 4px 4px;gap:8px}.moment .mi{width:30px;height:30px;font-size:16px}.moment b{font-size:13px}.moment small{font-size:11px}
+  .dock{padding:0 8px 6px}
+  .panel{padding:5px 10px;gap:4px;margin-top:4px}
+  .hud{gap:3px 8px;font-size:10.5px}
+  .hud .lab,.hud .sep{display:none}
+  .hap{font-size:13px;padding:1px 8px 1px 5px}
+  .meter .tk{width:40px;height:8px}
+  .skc{width:22px;height:22px;font-size:11px;border-width:1.5px}
+  .mt{font-size:11px;padding:0 6px 0 4px}
+  .lab{font-size:9px}
+  .agerow{padding-top:12px;gap:8px}
+  .agen{font-size:14px;min-width:48px}
+  #kid{width:28px;height:28px}
+  .season{font-size:10.5px}
+  .tl{min-width:560px}
+  #track{height:56px;border-width:2px}
+  .lbl .ic{width:24px;height:24px;font-size:13px}
+  .lbl .t b{font-size:12px}
+  .lbl .t small{display:none}
+  .lbl .mob,.lbl .gap{font-size:9px;padding:1px 3px}
+  .axis{height:14px;margin-top:2px}
+  .axis span{font-size:9.5px}
+  .restlbl{font-size:10px}
+  .qolrow{gap:6px}
+  .q{width:20px;height:20px;font-size:10px}
+  .qinfo{font-size:10.5px;min-width:0}
+  .btn{padding:4px 10px;font-size:12px}
+  .card{padding:16px 18px}
+  .card h2{font-size:24px}.card h3{font-size:19px}
+  .card p.lead{font-size:13px;margin-bottom:10px}
+  .opt{padding:6px 10px}.opt b{font-size:14px}.opt span,.opt small{font-size:11px}
+  .hero{gap:8px}.hero h1{font-size:44px}.hero h1.mid{font-size:32px}.hero .tag{font-size:13px;padding:8px 14px;margin:2px 0 4px}.btn.big{font-size:15px;padding:7px 20px}
+  .tip{font-size:11px;padding:7px 9px;max-width:210px}
+  .story p{font-size:12.5px}.sumchart{max-height:120px}
+  .win span{font-size:10px}
+}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
 
@@ -255,7 +346,7 @@ button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
     <div class="brand box">To je život</div>
     <div class="ctrl">
       <div class="speed box" id="speed"><button data-s="0">Pauza</button><button data-s="1" class="on">1×</button><button data-s="2">2×</button><button data-s="4">4×</button></div>
-      <button class="helpb box" id="sndBtn"></button><button class="helpb box" id="helpBtn">Jak hrát</button>
+      <button class="helpb box" id="actsBtn">Akce</button><button class="helpb box" id="sndBtn"></button><button class="helpb box" id="helpBtn">Jak hrát</button>
     </div>
   </div>
   <div class="sky">
@@ -293,6 +384,7 @@ button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
     </div>
   </div>
 </div>
+<div class="rotate"><i>📱</i>Otoč telefon na šířku</div>
 <div class="tip box" id="tip" hidden></div>
 <div class="ov" id="ov" hidden></div>
 
@@ -1024,21 +1116,15 @@ $('#hapIco').innerHTML=ICO.hap;$('#coinIco').innerHTML=ICO.coin;$('#hpIco').inne
 function toast(t,kind=''){t=gtxt(t);const box=$('#toasts');const el=document.createElement('div');el.className='toast box '+kind;el.innerHTML='<i></i><span></span>';el.lastChild.textContent=t;
   box.appendChild(el);while(box.children.length>2)box.firstChild.remove();setTimeout(()=>el.classList.add('out'),7000);setTimeout(()=>el.remove(),8600)}
 function showOverlay(h,wide){const o=$('#ov');o.innerHTML=`<div class="card box ${wide?'wide':''}">${gtxt(h)}</div>`;o.hidden=false}
-function hideOverlay(){$('#ov').hidden=true}
+function hideOverlay(){$('#ov').hidden=true;$('#ov').classList.remove('title')}
 function intro(first){paused=true;setSpeedUI();
-  const r=(k,txt)=>`<li><span class="e" style="background:${CATS[k].c}">${ICO[k]}</span><span>${txt}</span></li>`;
-  showOverlay(`<h2>To je život</h2><p class="lead">Rok trvá minutu a půl. Občas přijde příležitost a ty se rozhodneš, čemu dáš svůj čas.</p>
-    <ul class="rules">
-      ${r('P','Barva a symbol ukazují téma. Číslo vlevo dole je počet hodin denně, proužek pod symbolem ukazuje, kdy během dne se to dá dělat.')}
-      ${r('S','Přetáhni kartu na <b>osu dne</b>. Kartu můžeš posunout, nebo ji pustit mimo osu a skončit s ní.')}
-      ${r('Z','Prázdné hodiny jsou <b>odpočinek</b>. Nejlíp se spí v noci a v kuse. Energie se mění pomalu, takže dlouhodobý nedostatek spánku poznáš až časem. Najeď myší na ukazatel a uvidíš, co ho ovlivňuje.')}
-      ${r('F','<b>Překrývání</b>: nemůžeš být na dvou místech najednou. Překryté hodiny nefungují u žádné karty, zbytek funguje hůř a přibývá stres.')}
-      ${r('V','<b>Úrovně</b> 0–10 rostou pomalu. Pětka je profesionál, desítka celoživotní mistr. Co tě baví, se učíš rychleji. Kartu nad svou úroveň vzít můžeš, ale stojí to stres.')}
-      ${r('K','<b>Štěstí</b> přibývá za čas strávený tím, co tě baví. A co tě baví, se během života mění.')}
-    </ul>${first?'<div class="births"><button class="btn" id="gf">Narodit se jako holka</button><button class="btn" id="gm">Narodit se jako kluk</button></div>':'<button class="btn" id="go">Pokračovat</button>'}`);
-  if(first){$('#gf').onclick=()=>birth('f');$('#gm').onclick=()=>birth('m')}else $('#go').onclick=()=>{audioInit();hideOverlay();paused=false;setSpeedUI()}}
-function birth(g){audioInit();S.gender=g;newLife();hideOverlay();paused=false;setSpeedUI()}
-function birthChoice(){showOverlay(`<h2>Nový život</h2><p class="lead">Kým se narodíš tentokrát?</p><div class="births"><button class="btn" id="gf">Holka</button><button class="btn" id="gm">Kluk</button></div>`);$('#gf').onclick=()=>birth('f');$('#gm').onclick=()=>birth('m')}
+  if(first){$('#ov').classList.add('title');showOverlay(`<div class="hero"><p class="pre">hra o čase</p><h1>To je život</h1>
+    <p class="tag">Jeden rok trvá minutu a půl.<br>Příležitosti přicházejí a odcházejí.<br>Některé chytíš, jiné necháš plout.<br><b>Čemu dáš svůj čas, to se z tebe stane.</b></p>
+    <button class="btn big" id="start">Začít hru</button></div>`);$('#start').onclick=()=>{audioInit();birthChoice()};return}
+  showOverlay(`<h2>Jak hrát</h2><p class="lead">Přetáhni příležitost na osu dne. Prázdné hodiny jsou odpočinek. Najeď myší na cokoliv, co tě zajímá.</p><p class="lead">Zbytek je na tobě.</p><button class="btn" id="go">Pokračovat</button>`);
+  $('#go').onclick=()=>{hideOverlay();paused=false;setSpeedUI()}}
+function birth(g){audioInit();S.gender=g;newLife();$('#ov').classList.remove('title');hideOverlay();paused=false;setSpeedUI()}
+function birthChoice(){$('#ov').classList.add('title');showOverlay(`<div class="hero"><p class="pre">${S&&S.dead?'nový začátek':'první nádech'}</p><h1 class="mid">Kým se narodíš?</h1><div class="births"><button class="btn big" id="gf">Holka</button><button class="btn big" id="gm">Kluk</button></div></div>`);$('#gf').onclick=()=>birth('f');$('#gm').onclick=()=>birth('m')}
 function setSpeedUI(){document.querySelectorAll('#speed button').forEach(b=>{const s=+b.dataset.s;b.classList.toggle('on',paused?s===0:s===speed)})}
 $('#speed').addEventListener('click',e=>{const b=e.target.closest('button');if(!b||S.dead)return;const s=+b.dataset.s;if(s===0)paused=true;else{speed=s;paused=false}setSpeedUI()});
 $('#helpBtn').onclick=()=>{if(!S.dead)intro(false)};
@@ -1046,6 +1132,13 @@ addEventListener('keydown',e=>{if(!$('#ov').hidden||S.dead)return;
   if(e.code==='Space'){e.preventDefault();paused=!paused;setSpeedUI()}
   if(e.key==='1'){speed=1;paused=false;setSpeedUI()}if(e.key==='2'){speed=2;paused=false;setSpeedUI()}if(e.key==='3'||e.key==='4'){speed=4;paused=false;setSpeedUI()}});
 
+
+/* ============ DOTYK ============ */
+const isTouch=matchMedia('(hover:none)').matches;
+if(isTouch){
+  document.querySelectorAll('[data-stat]').forEach(el=>el.addEventListener('pointerdown',e=>{statTip(el.dataset.stat,e);e.stopPropagation()}));
+  addEventListener('pointerdown',e=>{if(!e.target.closest('[data-stat]'))setTimeout(()=>{if(!D)tip.hidden=true},1600)});
+}
 /* ============ PIXELOVÁ KRAJINA ============ */
 const PLACE_NAMES={vesnice:'vesnice',venkov:'venkov',mesto:'město',velkomesto:'velkoměsto'};
 function setPlace(p,fade){if(p===PLACE)return;if(fade&&cv.width){fadeCv=document.createElement('canvas');fadeCv.width=cv.width;fadeCv.height=cv.height;fadeCv.getContext('2d').drawImage(cv,0,0);fadeT=1}
@@ -1252,6 +1345,9 @@ $('#acts').addEventListener('click',e=>{const b=e.target.closest('.act');if(!b||
 $('#acts').addEventListener('pointermove',e=>{const b=e.target.closest('.act');if(!b){tip.hidden=true;return}const a=ACTS.find(x=>x.id===b.dataset.a);
   tip.innerHTML=`<h4>${a.name}</h4><div>${a.tip}</div>${a.ok()?'':`<div class="k">${a.why()}</div>`}`;tip.hidden=false;posTip(e)});
 $('#acts').addEventListener('pointerleave',()=>tip.hidden=true);
+$('#actsBtn').onclick=()=>{if(S.dead)return;const vis=ACTS.filter(a=>!a.show||a.show());
+  modal(`<h3>Akce</h3><div class="actgrid">${vis.length?vis.map(a=>`<button class="act box ${a.ok()?'':'off'}" data-a="${a.id}"><span class="ai">${AICO[a.id]}</span><span>${a.name}</span></button>`).join(''):'<p class="lead">Zatím nic. Přijde s věkem.</p>'}</div>`,()=>{
+    document.querySelectorAll('.actgrid .act').forEach(b=>b.onclick=()=>{const a=ACTS.find(x=>x.id===b.dataset.a);closeModal();if(!a.ok()){toast(a.why());return}a.run()})})};
 
 let wasPaused=false;
 function modal(html,wire){wasPaused=paused;paused=true;setSpeedUI();showOverlay(`<button class="x" id="mx" aria-label="Zavřít">×</button>${html}`);$('#mx').onclick=closeModal;wire&&wire()}
