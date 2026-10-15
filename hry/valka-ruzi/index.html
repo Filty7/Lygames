@@ -1,0 +1,3040 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Válka růží — proti botům</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #15110c;
+  --surface: #1f1912;
+  --surface2: #2a2118;
+  --surface3: #362b1e;
+  --text: #ede6d6;
+  --text-dim: #a89a82;
+  --border: #3a2f22;
+  --accent: #c9a227;
+  --accent-text: #1a1408;
+  --danger: #a6342b;
+  --good: #4a7a52;
+
+  --house-r: #b23b2f;
+  --house-g: #47734f;
+  --house-y: #c9a227;
+  --house-b: #35578a;
+  --house-s: #7a7f87;
+  --house-n: #5c5347;
+
+  --shadow: 0 6px 20px rgba(0,0,0,0.45);
+  --radius: 10px;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #15110c; --surface: #1f1912; --surface2: #2a2118; --surface3: #362b1e;
+    --text: #ede6d6; --text-dim: #a89a82; --border: #3a2f22;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #15110c; --surface: #1f1912; --surface2: #2a2118; --surface3: #362b1e;
+  --text: #ede6d6; --text-dim: #a89a82; --border: #3a2f22;
+}
+:root[data-theme="light"] {
+  --bg: #f2ead9; --surface: #fbf6ea; --surface2: #efe4cd; --surface3: #e6d8b8;
+  --text: #241c12; --text-dim: #6b5d47; --border: #d9c89e;
+}
+
+* { box-sizing: border-box; }
+html, body {
+  margin: 0; padding: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  font-size: 15px;
+  line-height: 1.5;
+}
+
+h1, h2, h3, .display {
+  font-family: 'Cinzel', Georgia, serif;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  margin: 0;
+}
+
+#app { max-width: 1180px; margin: 0 auto; padding: 18px 16px 120px; }
+
+header.topbar {
+  display: flex; align-items: baseline; justify-content: space-between;
+  flex-wrap: wrap; gap: 8px 20px;
+  padding-bottom: 14px; margin-bottom: 18px;
+  border-bottom: 1px solid var(--border);
+}
+header.topbar h1 { font-size: 1.5rem; color: var(--accent); }
+header.topbar .subtitle { color: var(--text-dim); font-size: 0.88rem; }
+#status-line { color: var(--text-dim); font-size: 0.92rem; }
+#status-line strong { color: var(--text); font-weight: 600; }
+
+section.panel {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 14px 16px;
+  margin-bottom: 16px;
+}
+section.panel > h2 {
+  font-size: 0.78rem;
+  text-transform: none;
+  color: var(--text-dim);
+  margin-bottom: 10px;
+  font-family: 'Inter', sans-serif;
+  font-weight: 600;
+}
+
+/* Stůl: hráči a herní pole ve společné mřížce - hráči 1-2 nahoře, pole uprostřed v jedné řadě,
+   hráči 4-3 dole (po směru hodinových ručiček), ať je vše vidět bez scrollování. */
+#table-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 10px;
+}
+/* min-width:0 na obou - jinak by širší (nezalamovaná) řada polí protlačila šířku přes celou
+   stránku místo toho, aby se sama v sobě scrollovala vodorovně (viz overflow-x na #board-tiles). */
+.board-wrap { order: 3; grid-column: 1 / -1; min-width: 0; display: flex; flex-direction: column; gap: 4px; }
+#board-tiles {
+  display: flex; flex-wrap: nowrap; gap: 6px; justify-content: center;
+  overflow-x: auto; -webkit-overflow-scrolling: touch; padding-bottom: 2px;
+  min-width: 0;
+}
+#board-hint { color: var(--text-dim); font-size: 0.74rem; text-align: center; }
+.tile {
+  position: relative;
+  flex: 0 0 56px; min-height: 62px;
+  border-radius: 6px;
+  padding: 4px;
+  display: flex; flex-direction: column; align-items: center; justify-content: space-between;
+  border: 1px solid rgba(0,0,0,0.25);
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,0.06);
+}
+.tile .tile-label { font-size: 0.56rem; color: rgba(255,255,255,0.85); font-weight: 600; text-align: center; line-height: 1.1; }
+.tile .tile-occupants { display: flex; gap: 2px; flex-wrap: wrap; justify-content: center; }
+.occ-chip {
+  width: 15px; height: 15px; border-radius: 50%;
+  background: rgba(0,0,0,0.55);
+  color: #fff; font-size: 0.55rem; font-weight: 700;
+  display: flex; align-items: center; justify-content: center;
+  border: 1px solid rgba(255,255,255,0.5);
+}
+.occ-chip.me { background: var(--accent); color: var(--accent-text); border-color: rgba(0,0,0,0.3); }
+.tile.selectable { cursor: pointer; transition: transform 0.12s ease; }
+.tile.selectable:hover { transform: translateY(-3px); box-shadow: 0 4px 14px rgba(0,0,0,0.4); }
+
+.house-R { background: var(--house-r); }
+.house-G { background: var(--house-g); }
+.house-Y { background: var(--house-y); }
+.house-B { background: var(--house-b); }
+.house-S { background: var(--house-s); }
+.house-N { background: var(--house-n); }
+
+/* Hráči - stejná mřížka jako herní pole (#table-grid výše), pořadí po směru hodinových ručiček
+   podle místa (seat), s herním polem vloženým jako jedna široká řada mezi ně:
+   seat 0 - seat 1
+        herní pole
+   seat 3 - seat 2 */
+.player-card[data-seat="0"] { order: 1; }
+.player-card[data-seat="1"] { order: 2; }
+.player-card[data-seat="3"] { order: 4; }
+.player-card[data-seat="2"] { order: 5; }
+/* Varianta pro 3 hráče (#table-grid.players-3, viz ui.js) - žádný seat 3, takže seat 2 je osamocený
+   třetí hráč a jde samotný na celou šířku pod herní pole:
+   seat 0 - seat 1
+        herní pole
+        seat 2
+   Vyšší specificita (dvě podmínky) tohle přebije nad základním pravidlem výše i nad mobilní
+   mediální query níže, takže není třeba nic zvlášť duplikovat pro mobil. */
+#table-grid.players-3 .player-card[data-seat="2"] { order: 4; grid-column: 1 / -1; }
+.player-card {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 12px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0; /* jinak by dlouhý název hrdiny (viz .hero-chip) protlačil šířku celé mřížky */
+}
+.player-card.is-turn { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent); }
+.player-card.is-me { background: var(--surface3); }
+.player-card .pname { font-weight: 700; font-size: 1rem; display: flex; align-items: center; gap: 6px; margin-bottom: 4px; }
+.player-card .pname .starter-icon { font-size: 0.95em; line-height: 1; }
+.player-card .pname .badge {
+  font-size: 0.62rem; font-weight: 600; padding: 1px 6px; border-radius: 20px;
+  background: var(--accent); color: var(--accent-text);
+}
+.player-card .prow { display: flex; align-items: center; gap: 6px; font-size: 0.78rem; color: var(--text-dim); margin-top: 5px; flex-wrap: wrap; }
+.player-card .p-standing { font-size: 0.82rem; }
+.standing-chip {
+  display: inline-flex; align-items: center; padding: 2px 9px; border-radius: 20px;
+  color: #fff; font-weight: 700; font-size: 0.74rem; text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+}
+.mini-dot { width: 13px; height: 13px; border-radius: 3px; display: inline-block; }
+.pool-group { display: inline-flex; align-items: center; gap: 3px; background: rgba(0,0,0,0.15); border-radius: 5px; padding: 2px 5px; }
+.pool-group span.n { font-size: 0.72rem; color: var(--text); font-weight: 600; }
+.status-pill { font-size: 0.68rem; padding: 1px 7px; border-radius: 20px; border: 1px solid var(--border); color: var(--text-dim); }
+.status-pill.passed { color: var(--danger); border-color: var(--danger); }
+.status-pill.eliminated { color: var(--danger); border-color: var(--danger); background: rgba(166,52,43,0.15); }
+
+/* Rozehráno v kole - sloučeno přímo do boxu hráče. */
+.player-card .p-round {
+  margin-top: 8px; padding-top: 8px; border-top: 1px dashed var(--border);
+  align-items: center; flex-wrap: nowrap;
+}
+.p-round .rp-cards { display: flex; flex-direction: column; gap: 4px; flex: 1; }
+.p-round .rp-cards-row { display: flex; gap: 5px; flex-wrap: wrap; }
+.p-round .rp-sum { margin-left: auto; font-weight: 700; color: var(--accent); font-size: 1.1rem; flex-shrink: 0; }
+/* Záporné karty (zamčený žlutý úplatek s mínusovou hodnotou) jdou do vlastního druhého řádku a
+   jsou o trochu menší - v analogii k fyzické hře, kde by se taková karta vyložila otočená bokem. */
+.card.negative { width: 32px; height: 44px; font-size: 0.85rem; color: var(--danger); border-color: var(--danger); }
+
+/* Ruka + zbytek dobíracího balíčku vedle sebe u každého hráče. */
+.hand-fan-wrap { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+.draw-pile-count { font-size: 0.72rem; color: var(--text-dim); display: inline-flex; align-items: center; gap: 3px; }
+.draw-pile-count .n { font-weight: 700; color: var(--text); }
+
+/* Cards */
+.card {
+  position: relative;
+  width: 40px; height: 56px; border-radius: 6px;
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Cinzel', serif; font-weight: 700; font-size: 1.05rem;
+  color: #fff; text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+  border: 1px solid rgba(0,0,0,0.35);
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,0.08);
+  flex-shrink: 0;
+}
+.card.card-N { color: #f0e9da; }
+.card.facedown {
+  background: repeating-linear-gradient(45deg, #241c12, #241c12 4px, #2f2515 4px, #2f2515 8px);
+  border-color: var(--accent);
+  color: var(--accent);
+  font-size: 0.85rem;
+}
+/* Zničená (zabitá) karta: číslo zůstává čitelné, jen lehce odsyceno, a navíc přeškrtnuté
+   poloprůhledným křížkem - ať se to na první pohled nesplete s neutrální/lícem-dolů kartou. */
+.card.inactive { filter: grayscale(0.45); opacity: 0.8; }
+.card.inactive::before,
+.card.inactive::after {
+  content: '';
+  position: absolute;
+  top: 50%; left: 50%;
+  width: 72%; height: 2px;
+  background: rgba(230, 70, 60, 0.8);
+  box-shadow: 0 0 1px rgba(0,0,0,0.6);
+}
+.card.inactive::before { transform: translate(-50%, -50%) rotate(45deg); }
+.card.inactive::after  { transform: translate(-50%, -50%) rotate(-45deg); }
+.card.big.inactive::before, .card.big.inactive::after { width: 78%; height: 2.5px; }
+.card.clickable { cursor: pointer; transition: transform 0.12s ease, box-shadow 0.12s ease; }
+.card.clickable:hover { transform: translateY(-4px); box-shadow: 0 4px 10px rgba(0,0,0,0.4); }
+.card.selected { outline: 3px solid var(--accent); outline-offset: 2px; transform: translateY(-4px); }
+.card.big { width: 54px; height: 74px; font-size: 1.3rem; }
+/* Vlastní banknutá karta: zůstává lícem dolů, ale po najetí myší "prosvítí" skutečná barva
+   a hodnota na 75% opacity - jen ty ji vidíš, protihráčům se peek vůbec nevykresluje. */
+.card.peekable { cursor: help; }
+.card-peek {
+  position: absolute; inset: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Cinzel', serif; font-weight: 700; font-size: 1.05rem;
+  color: #fff; text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+  opacity: 0;
+  transition: opacity 0.15s ease;
+  pointer-events: none;
+}
+.card.big .card-peek { font-size: 1.3rem; }
+.card.peekable:hover .card-peek { opacity: 0.75; }
+
+/* Karta se štítem (zelená schopnost): plně netargetovatelná do konce kola - zvýrazněna modrým
+   dvojitým okrajem a ikonou štítu, ať je na první pohled jasné, že na ni nic nezabírá. */
+.card.shielded { border: 2px solid #6fb7e0; box-shadow: 0 0 0 2px rgba(111,183,224,0.35), inset 0 0 0 1px rgba(0,0,0,0.3); }
+.card.shielded::after {
+  content: '🛡️';
+  position: absolute;
+  top: -7px; right: -7px;
+  font-size: 0.62rem;
+  line-height: 1;
+  background: var(--surface);
+  border: 1px solid #6fb7e0;
+  border-radius: 50%;
+  width: 16px; height: 16px;
+  display: flex; align-items: center; justify-content: center;
+}
+
+/* Karta, jejíž zobrazená hodnota se liší od té, se kterou byla zahraná/banknutá (typicky vlivem
+   hrdiny, např. Edward IV.) - po najetí myší se ukáže původní hodnota na 100% opacity, ať už jde
+   o vlastní kartu, nebo soupeřovu. Nezávislé na .card-peek (ten je jen pro vlastní banknuté karty). */
+.card.origable { cursor: help; }
+.card-orig {
+  position: absolute; inset: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Cinzel', serif; font-weight: 700; font-size: 1.05rem;
+  color: #fff; text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+  background: rgba(20,16,10,0.92);
+  border-radius: 5px;
+  opacity: 0;
+  transition: opacity 0.15s ease;
+  pointer-events: none;
+}
+.card.big .card-orig { font-size: 1.3rem; }
+.card.origable:hover .card-orig { opacity: 1; }
+/* Úplatky (žlutá): odečtená neutrální karta, na kterou nejde žádným způsobem cílit (zničit,
+   vrátit, prohodit) - jde do konce kola. Zvýrazněno přerušovaným zlatým okrajem a ikonou zámku,
+   analogie k fyzické hře, kde by se taková karta vyložila otočená bokem. */
+.card.locked { border: 2px dashed var(--accent); box-shadow: inset 0 0 0 1px rgba(0,0,0,0.3); }
+.card.locked::after {
+  content: '🔒';
+  position: absolute;
+  top: -7px; right: -7px;
+  font-size: 0.62rem;
+  line-height: 1;
+  background: var(--surface);
+  border: 1px solid var(--accent);
+  border-radius: 50%;
+  width: 16px; height: 16px;
+  display: flex; align-items: center; justify-content: center;
+}
+
+/* Hand */
+#hand-bar {
+  position: sticky; bottom: 0; left: 0; right: 0;
+  background: var(--surface); border-top: 1px solid var(--border);
+  /* #hand-bar je sourozenec #app přímo pod <body>, ne jeho potomek - je tedy už přirozeně na
+     šířku celé stránky bez potřeby záporného okraje (ten dřív zbytečně přidával pár px
+     vodorovného scrollu navíc, hlavně patrné na mobilu). */
+  padding: 12px 16px;
+  box-shadow: 0 -8px 20px rgba(0,0,0,0.35);
+}
+#hand-cards { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 10px; min-height: 60px; }
+#hand-actions { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+#hand-hint { color: var(--text-dim); font-size: 0.82rem; margin-right: auto; }
+#hero-actions { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 8px; }
+#hero-actions:empty { display: none; margin: 0; }
+.hero-btn { border-color: var(--accent); color: var(--accent); }
+.hero-btn:hover:not(:disabled) { background: var(--accent); color: var(--accent-text); }
+
+/* Hrdinové v boxu hráče. */
+.p-heroes { font-size: 0.76rem; }
+.hero-chip {
+  display: inline-flex; align-items: center; padding: 2px 8px; border-radius: 20px;
+  border: 1px solid var(--accent); color: var(--accent); font-size: 0.7rem; font-weight: 600;
+  max-width: 100%; white-space: normal; text-align: center; line-height: 1.25;
+}
+.hero-chip.used { border-color: var(--border); color: var(--text-dim); text-decoration: line-through; }
+
+/* Karta, jejíž hodnota je dočasně zakázaná pro hraní lícem nahoru (York/Edmund) - jde ale
+   pořád banknout, proto jen tlumený varovný okraj, ne úplné zašednutí jako u zničené karty. */
+.card.value-banned { border: 2px dashed var(--danger); opacity: 0.6; }
+
+/* Ruka hráče jako částečně překryté ruby karet - místo pouhého čísla, pod jménem hráče. */
+/* flex-wrap: wrap - u výjimečně velké ruky (víc než se vejde na řádek) se ruby karet zalomí na
+   další řádek místo toho, aby přetekly přes okraj boxu hráče. */
+.hand-fan { display: inline-flex; flex-wrap: wrap; align-items: center; row-gap: 3px; min-height: 30px; margin: 1px 0 2px; max-width: 100%; }
+.card-back-mini {
+  width: 18px; height: 26px; border-radius: 3px; flex-shrink: 0;
+  background: repeating-linear-gradient(45deg, #241c12, #241c12 3px, #2f2515 3px, #2f2515 6px);
+  border: 1px solid var(--accent);
+  margin-left: -10px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.4);
+}
+.card-back-mini:first-child { margin-left: 0; }
+.hand-fan-count {
+  margin-left: 8px; font-size: 0.78rem; font-weight: 700; color: var(--text);
+  background: rgba(0,0,0,0.2); border-radius: 20px; padding: 1px 7px;
+}
+
+/* Žetony přízně - větší, jasně čitelné ikony místo drobného řetězce emoji. */
+.p-favor { align-items: center; }
+.favor-token { font-size: 1.4rem; line-height: 1; filter: drop-shadow(0 1px 1px rgba(0,0,0,0.5)); }
+.favor-label { font-size: 0.76rem; color: var(--text-dim); margin-left: 2px; }
+.favor-label.muted { opacity: 0.75; }
+
+/* Nepoužitý hrdina soupeře - tajná identita, jen dráždivá otázka místo jména. */
+.hero-chip.hidden { border-style: dashed; opacity: 0.8; }
+
+/* Aktivní hrdina tohoto kola, vyložený do play area hráče - odlišný od běžných karet. */
+.hero-tile {
+  position: relative;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  width: 46px; height: 56px; border-radius: 6px; flex-shrink: 0;
+  background: linear-gradient(160deg, var(--surface3), var(--surface2));
+  border: 2px solid var(--accent);
+  box-shadow: 0 0 8px rgba(201,162,39,0.4);
+}
+.hero-tile-icon { font-size: 1.1rem; line-height: 1; }
+.hero-tile-name {
+  font-size: 0.5rem; font-weight: 700; text-align: center; color: var(--accent);
+  line-height: 1.05; padding: 0 2px; margin-top: 2px;
+  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+}
+
+/* Trvalý odznak na kartě, u které byl použit žeton přízně - zůstává do konce kola. */
+.favor-badge {
+  position: absolute; bottom: -6px; right: -6px;
+  font-size: 0.62rem; line-height: 1;
+  background: var(--surface); border: 1px solid var(--accent); border-radius: 50%;
+  width: 16px; height: 16px; display: flex; align-items: center; justify-content: center;
+}
+
+/* Tempo hry: krátké, jasně odlišené "záblesky" po jednotlivých krocích tahu (zahráno →
+   schopnost → vrácení karty), ať je vidět co se právě stalo, než přijde na řadu další hráč. */
+@keyframes flashPlay   { 0%,100% { box-shadow: 0 0 0 0 rgba(201,162,39,0); } 30% { box-shadow: 0 0 0 5px rgba(201,162,39,0.85); } }
+@keyframes flashAdd    { 0%,100% { box-shadow: 0 0 0 0 rgba(53,87,138,0); }  30% { box-shadow: 0 0 0 5px rgba(88,140,214,0.85); } }
+@keyframes flashHit    { 0%,100% { box-shadow: 0 0 0 0 rgba(166,52,43,0); } 30% { box-shadow: 0 0 0 5px rgba(230,70,60,0.9); } }
+@keyframes flashSwap   { 0%,100% { box-shadow: 0 0 0 0 rgba(122,66,135,0); } 30% { box-shadow: 0 0 0 5px rgba(178,110,196,0.85); } }
+@keyframes flashReturn { 0%,100% { box-shadow: 0 0 0 0 rgba(196,120,40,0); } 30% { box-shadow: 0 0 0 5px rgba(230,150,60,0.9); } }
+.card.flash-play           { animation: flashPlay 0.9s ease-out 1; z-index: 2; }
+.card.flash-add            { animation: flashAdd 0.9s ease-out 1; z-index: 2; }
+.card.flash-hit            { animation: flashHit 0.9s ease-out 1; z-index: 2; }
+.card.flash-swap           { animation: flashSwap 0.9s ease-out 1; z-index: 2; }
+.card.flash-return         { animation: flashReturn 0.9s ease-out 1; z-index: 2; }
+.hero-tile.flash-hero-appear { animation: flashPlay 0.9s ease-out 1; }
+
+.hit-mark {
+  position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+  font-size: 1.4rem; font-weight: 900; color: #fff;
+  text-shadow: 0 0 4px rgba(0,0,0,0.9), 0 0 8px rgba(230,70,60,0.9);
+  pointer-events: none;
+  animation: hitMarkPop 0.9s ease-out 1;
+}
+@keyframes hitMarkPop {
+  0% { transform: scale(0.4); opacity: 0; }
+  25% { transform: scale(1.3); opacity: 1; }
+  60% { transform: scale(1); opacity: 1; }
+  100% { transform: scale(1); opacity: 0; }
+}
+
+button {
+  font-family: 'Inter', sans-serif; font-size: 0.86rem; font-weight: 600;
+  padding: 9px 16px; border-radius: 7px; border: 1px solid var(--border);
+  background: var(--surface3); color: var(--text); cursor: pointer;
+}
+button:hover:not(:disabled) { border-color: var(--accent); }
+button:disabled { opacity: 0.4; cursor: not-allowed; }
+button.primary { background: var(--accent); color: var(--accent-text); border-color: var(--accent); }
+button.primary:hover:not(:disabled) { filter: brightness(1.08); }
+button.ghost { background: transparent; }
+
+/* Log */
+#log-list { max-height: 220px; overflow-y: auto; font-size: 0.82rem; display: flex; flex-direction: column-reverse; }
+#log-list .entry { padding: 3px 0; border-bottom: 1px dashed var(--border); color: var(--text-dim); }
+#log-list .entry:first-child { border-bottom: none; }
+#log-list .entry.winner { color: var(--accent); font-weight: 600; }
+#log-list .entry.round-header { color: var(--text); font-weight: 700; margin-top: 4px; }
+#log-list .entry.claim { color: var(--good); }
+#log-list .entry.eliminated { color: var(--danger); font-weight: 600; }
+
+/* Modal */
+#modal-overlay {
+  position: fixed; inset: 0; background: rgba(0,0,0,0.6);
+  display: flex; align-items: flex-end; justify-content: center;
+  z-index: 50; padding: 0;
+}
+#modal-overlay.hidden { display: none; }
+#modal-box {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 14px 14px 0 0;
+  padding: 18px 18px 22px; width: 100%; max-width: 560px;
+  box-shadow: var(--shadow);
+  max-height: 80vh; overflow-y: auto;
+}
+@media (min-width: 640px) {
+  #modal-overlay { align-items: center; }
+  #modal-box { border-radius: 14px; margin-bottom: 40px; }
+}
+#modal-title { font-weight: 700; margin-bottom: 12px; font-size: 0.98rem; }
+#modal-options { display: flex; flex-wrap: wrap; gap: 8px; }
+.opt-btn {
+  display: flex; flex-direction: column; align-items: center; gap: 6px;
+  padding: 10px 12px; border-radius: 8px; border: 1px solid var(--border);
+  background: var(--surface2); color: var(--text); cursor: pointer; font-size: 0.82rem;
+  font-weight: 600; text-align: center;
+}
+.opt-btn:hover { border-color: var(--accent); }
+
+/* Game over */
+#gameover-overlay {
+  position: fixed; inset: 0; background: rgba(10,8,5,0.92);
+  z-index: 60; display: flex; align-items: center; justify-content: center; padding: 20px;
+}
+#gameover-overlay.hidden { display: none; }
+#gameover-box {
+  background: var(--surface); border: 1px solid var(--accent);
+  border-radius: 14px; padding: 28px; max-width: 640px; width: 100%;
+  max-height: 88vh; overflow-y: auto; box-shadow: var(--shadow);
+}
+#gameover-box h2 { font-size: 1.6rem; color: var(--accent); margin-bottom: 4px; }
+.score-table { width: 100%; border-collapse: collapse; margin: 16px 0; font-size: 0.85rem; }
+.score-table th, .score-table td { padding: 6px 8px; text-align: center; border-bottom: 1px solid var(--border); }
+.score-table th { color: var(--text-dim); font-weight: 600; font-size: 0.75rem; }
+.score-table td.pname { text-align: left; font-weight: 700; }
+.score-table tr.win td { color: var(--accent); font-weight: 700; }
+.score-total { font-size: 1.05rem; }
+
+/* Přehledová tabulka schopností barev/hrdinů pod herním logem - referenční, sbalitelná. */
+#abilities-panel summary { cursor: pointer; font-weight: 700; color: var(--accent); padding: 4px 0; }
+.abilities-table { width: 100%; border-collapse: collapse; margin-top: 8px; font-size: 0.8rem; }
+.abilities-table th, .abilities-table td { padding: 5px 7px; text-align: left; border-bottom: 1px solid var(--border); vertical-align: top; }
+.abilities-table th { color: var(--text-dim); font-weight: 600; font-size: 0.72rem; }
+.abilities-table td.ab-name { font-weight: 700; white-space: nowrap; }
+.abilities-table tr.ab-color-R td.ab-name { color: #c0473f; }
+.abilities-table tr.ab-color-G td.ab-name { color: #6fae5a; }
+.abilities-table tr.ab-color-Y td.ab-name { color: #d1a13a; }
+.abilities-table tr.ab-color-B td.ab-name { color: #4f8fc0; }
+.abilities-table tr.ab-color-S td.ab-name { color: #b087c9; }
+.abilities-table + .abilities-table { margin-top: 18px; }
+
+.hidden { display: none !important; }
+.emoji { font-size: 1.1em; }
+
+@media (max-width: 600px) {
+  #app { padding: 12px 10px 130px; }
+  .tile { flex-basis: 44px; min-height: 52px; }
+  .tile .tile-label { font-size: 0.5rem; }
+  .card { width: 36px; height: 50px; font-size: 0.95rem; }
+  /* Boxy hráčů teď nesou víc informací (pole, rozehráno, součet) - na úzkém displeji
+     je čitelnější je řadit pod sebe (pořád ve stejném pořadí po směru hodinových ručiček,
+     s herním polem uprostřed) než mačkat do dvou úzkých sloupců. */
+  #table-grid { grid-template-columns: 1fr; }
+  .board-wrap { order: 3; }
+  .player-card[data-seat="1"] { order: 2; }
+  .player-card[data-seat="3"] { order: 4; }
+  .player-card[data-seat="2"] { order: 5; }
+  .hero-tile { width: 40px; height: 50px; }
+  .card-back-mini { width: 15px; height: 22px; }
+}
+
+</style>
+</head>
+<body>
+<div id="app">
+  <header class="topbar">
+    <div>
+      <h1>🌹 Válka růží</h1>
+      <div class="subtitle" id="mode-subtitle">varianta pro 4 hráče — proti třem botům</div>
+    </div>
+    <div id="status-line">Kolo <strong id="round-num">1</strong> · začíná <strong id="starting-player">—</strong></div>
+  </header>
+
+  <section class="panel table-panel">
+    <h2>Stůl</h2>
+    <div id="table-grid">
+      <div id="board-wrap" class="board-wrap">
+        <div id="board-tiles"></div>
+        <div id="board-hint"></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="panel">
+    <h2>Průběh hry</h2>
+    <div id="log-list"></div>
+  </section>
+
+  <section class="panel" id="abilities-panel">
+    <details>
+      <summary>📖 Přehled schopností (barvy polí + hrdinové)</summary>
+      <div id="abilities-tables"></div>
+    </details>
+  </section>
+</div>
+
+<div id="hand-bar">
+  <div id="hand-cards"></div>
+  <div id="hero-actions"></div>
+  <div id="hand-actions">
+    <span id="hand-hint"></span>
+    <button id="btn-play" class="primary" disabled>Zahrát</button>
+    <button id="btn-bank" disabled>Banknout</button>
+    <button id="btn-pass" class="ghost" disabled>Passnout</button>
+  </div>
+</div>
+
+<div id="modal-overlay" class="hidden">
+  <div id="modal-box">
+    <div id="modal-title"></div>
+    <div id="modal-options"></div>
+  </div>
+</div>
+
+<div id="gameover-overlay" class="hidden">
+  <div id="gameover-box"></div>
+</div>
+
+<script>
+// ===================== VÁLKA RŮŽÍ — herní engine =====================
+
+const COLORS = ['R', 'G', 'Y', 'B', 'S'];
+const HAND_LIMIT = 10;
+const COLOR_NAME = { R: 'Červená', G: 'Zelená', Y: 'Žlutá', B: 'Modrá', S: 'Šedá', N: 'Neutrální' };
+const COLOR_ABILITY_NAME = { R: 'Vražda', G: 'Špionáž', Y: 'Úplatky', B: 'Podpora církve', S: 'Svatba' };
+const COLOR_ABILITY_DESC = {
+  R: 'Vyber soupeře a znič jednu jeho vyloženou (lícem nahoru) kartu.',
+  G: 'Vyber jednu svou vyloženou kartu a umísti na ni štít - do konce kola je netargetovatelná (nejde zničit, prohodit ani vynutit vrácení na ruku) a pokud jí hrdina změnil hodnotu, štít ji vrátí do původní.',
+  Y: 'Vyber banknutou kartu soupeře, odhal ji a otoč na mínus - karta se navždy zamkne se zápornou hodnotou.',
+  B: 'Lízni si vrchní kartu z neutrálního balíčku a přidej si její hodnotu do součtu kola.',
+  S: 'Vyber soupeře a prohoďte si po jedné vyložené kartě (svatba).',
+};
+
+let uidCounter = 0;
+function uid(prefix) { uidCounter += 1; return `${prefix}_${uidCounter}`; }
+
+function shuffle(arr) {
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
+
+let BOT_DELAY_MS = 450;
+let PLACEMENT_DELAY_MS = 220;
+let ROUNDEND_DELAY_MS = 260;
+let TURN_STEP_MS = 900; // tempo hry: jak dlouho "svítí" indikátor zahrané karty / schopnosti / vrácení
+function sleep(ms) { return new Promise(res => setTimeout(res, ms)); }
+
+// Na chvíli označí dané playedThisRound záznamy vizuálním příznakem (viz ui.js cardEl "flash" opt),
+// překreslí a počká, pak příznak zase smaže. Používá se k tomu, aby šlo vidět "co se právě stalo"
+// (zahraná karta, zásah schopností, vrácení karty na ruku...) v jasně oddělených krocích, ne
+// všechno najednou. V headless testech je TURN_STEP_MS nastaven na 0, takže žádné reálné čekání.
+async function flashEntries(game, entries, cls, ms) {
+  const list = (entries || []).filter(Boolean);
+  if (list.length === 0) return;
+  for (const e of list) e.uiFlash = cls;
+  uiRender(game);
+  await sleep(ms == null ? TURN_STEP_MS : ms);
+  for (const e of list) e.uiFlash = null;
+}
+
+// Stejný princip, ale pro hrdinu právě vyloženého do "play area" hráče (viz player.activeHeroThisRound).
+async function flashHero(game, player, cls, ms) {
+  if (!player.activeHeroThisRound) return;
+  player.activeHeroThisRound.uiFlash = cls;
+  uiRender(game);
+  await sleep(ms == null ? TURN_STEP_MS : ms);
+  player.activeHeroThisRound.uiFlash = null;
+}
+
+function freshDeck() {
+  const deck = [];
+  for (const c of COLORS) {
+    for (let v = 1; v <= 5; v++) deck.push({ id: uid('card'), color: c, value: v });
+  }
+  for (let v = 0; v <= 6; v++) deck.push({ id: uid('card'), color: 'N', value: v });
+  return shuffle(deck);
+}
+
+function makeTilePool() {
+  const pool = [];
+  for (const c of COLORS) {
+    for (let i = 0; i < 3; i++) pool.push({ id: uid('tile'), color: c });
+  }
+  shuffle(pool);
+  // 11 polí pro obě varianty (3 i 4 hráči) - pozor, tohle už matematicky NEGARANTUJE, že někdo
+  // dosáhne vítězného počtu polí dřív, než se zásoba vyčerpá (4 hráči × 3 pole = 12 > 11, 3 hráči ×
+  // 4 pole = 12 > 11) - viz fallback konec hry při vyčerpání zásoby v resolveRoundEnd().
+  return pool.slice(0, 11).map(t => ({
+    id: t.id, color: t.color, status: 'inplay', ownerId: null, occupants: []
+  }));
+}
+
+function emptyColorMap() { return { R: 0, G: 0, Y: 0, B: 0, S: 0, N: 0 }; }
+
+function freshNeutralDeck() {
+  // 16 neutrálních karet, nový poměr: 7x3, 5x4, 4x5. Tenhle balíček teď slouží výhradně modré
+  // schopnosti (Podpora církve) - žlutá (Úplatky) z něj po přepracování už vůbec nečerpá.
+  const vals = [3, 3, 3, 3, 3, 3, 3, 4, 4, 4, 4, 4, 5, 5, 5, 5];
+  return shuffle(vals.map(v => ({ id: uid('neutral'), value: v })));
+}
+
+function drawNeutralCard(game) {
+  if (game.neutralDeck.length === 0) {
+    if (game.neutralDiscard.length === 0) return { id: uid('neutral'), value: 0 };
+    game.neutralDeck = shuffle(game.neutralDiscard);
+    game.neutralDiscard = [];
+  }
+  return game.neutralDeck.pop();
+}
+
+function makePlayer(seat, name, isHuman, strategyType, genome, difficulty) {
+  return {
+    id: uid('player'),
+    seat,
+    name,
+    isHuman,
+    strategyType: strategyType || 'balanced', // jen štítek pro UI/log/diagnostiku - rozhodovací logika čte player.genome, ne tohle
+    genome: clampGenome(genome || GENOME_DEFAULT),
+    difficulty: (difficulty == null) ? 100 : difficulty, // 0-100, viz withDifficulty výše
+    hand: [],
+    drawPile: freshDeck(),
+    discardPile: [],
+    playedThisRound: [],
+    bankedPool: emptyColorMap(),
+    tilesPool: emptyColorMap(),
+    favorTokens: 3,
+    currentTileId: null,
+    passedThisRound: false,
+    activeHeroThisRound: null, // hrdina vyložený tento hráčem toto kolo (viditelný v play area, viz ui.js)
+  };
+}
+
+function drawCards(player, n) {
+  let drawn = 0;
+  for (let i = 0; i < n; i++) {
+    if (player.drawPile.length === 0) break;
+    player.hand.push(player.drawPile.pop());
+    drawn++;
+  }
+  return drawn;
+}
+
+// Limit karet na ruce je HAND_LIMIT (10). Pokud hráč po dobírání na začátku kola přesáhne limit
+// (typicky když si předchozí kola šetřil a nehrál/nebankoval moc karet), musí dobrovolně odhodit
+// přebytek, dokud není zpátky na limitu - jinak by ruka mohla neomezeně růst.
+async function enforceHandLimit(game, player) {
+  while (player.hand.length > HAND_LIMIT) {
+    let discardId;
+    if (player.isHuman) {
+      discardId = await uiHumanChooseHandCard(game, player, `Máš víc než ${HAND_LIMIT} karet na ruce (limit je ${HAND_LIMIT}) — vyber kartu k odhození.`);
+    } else {
+      discardId = botLowestCardId(player.hand);
+    }
+    const idx = player.hand.findIndex(c => c.id === discardId);
+    if (idx < 0) break; // pojistka proti nekonečné smyčce, kdyby vrácené id neexistovalo
+    const [card] = player.hand.splice(idx, 1);
+    player.discardPile.push(card);
+    uiLog(`${player.name} má víc než ${HAND_LIMIT} karet na ruce a odhazuje.`, 'muted');
+  }
+}
+
+function roundSum(player) {
+  return player.playedThisRound
+    .filter(e => e.active)
+    .reduce((s, e) => s + e.value, 0);
+}
+
+function tilesTotal(player) {
+  return COLORS.reduce((s, c) => s + player.tilesPool[c], 0);
+}
+
+function finalScore(player) {
+  // Každé vlastněné pole je samo o sobě 1 bod, plus násobek banknutých karet té barvy:
+  // pole × (1 + banknuté karty té barvy), sečteno přes všechny barvy.
+  return COLORS.reduce((s, c) => s + player.tilesPool[c] * (1 + player.bankedPool[c]), 0);
+}
+
+function findTile(game, tileId) {
+  return game.tiles.find(t => t.id === tileId);
+}
+
+function inPlayTiles(game) {
+  return game.tiles.filter(t => t.status === 'inplay');
+}
+
+function otherActivePlayers(game, player) {
+  return game.players.filter(p => p.id !== player.id && !p.eliminated);
+}
+
+// ===================== HERNÍ TAH — hlavní tok =====================
+// UI vrstva musí poskytnout tyto globální async funkce (viz ui.js):
+//   uiLog(text, cls)
+//   uiRender(game)
+//   uiHumanChooseAction(game, player) -> {type:'play'|'bank'|'pass', cardId}
+//   uiHumanChooseOpponent(game, player, candidates, promptText) -> playerId
+//   uiHumanChooseCard(game, player, ownerPlayer, promptText) -> cardEntryId (z playedThisRound)
+//   uiHumanChooseFromEntries(game, player, promptText, entries) -> entryId (z předem dané nabídky)
+//   uiHumanChooseHandCard(game, player, promptText) -> cardId (z ruky)
+//   uiHumanYesNo(game, player, promptText) -> boolean
+//   uiHumanChooseTile(game, player, tileCandidates, promptText) -> tileId
+//   uiHumanChooseEntryPayment(game, player, promptText) -> 'hand' | 'deck'
+//   uiAnnounceRoundEnd(game, ranked, winner)
+//   uiAnnounceGameEnd(game, scores)
+
+// Obecná stavba hry z libovolného seznamu sedadel ({name, isHuman, strategyType}) - umožňuje víc
+// než jednoho lidského hráče najednou (viz online.js), zatímco initGame() níže zůstává beze změny
+// chování pro dosavadní lokální režim (jeden člověk + boti).
+async function initGameCustom(seatDefs, heroCount) {
+  const numPlayers = seatDefs.length === 3 ? 3 : 4;
+  heroCount = (heroCount === 0 || heroCount === 1) ? heroCount : 2;
+  const players = seatDefs.map((s, i) => makePlayer(i, s.name, !!s.isHuman, s.strategyType || (s.isHuman ? 'human' : 'balanced'), s.genome, s.difficulty));
+  const game = {
+    __gid: uid('game'),
+    players,
+    tiles: makeTilePool(),
+    neutralDeck: freshNeutralDeck(),
+    neutralDiscard: [],
+    round: 1,
+    startingPlayerIdx: Math.floor(Math.random() * numPlayers),
+    log: [],
+    phase: 'placement',
+    winTiles: numPlayers === 3 ? 5 : 4,
+  };
+  for (const p of game.players) drawCards(p, 10);
+  assignHeroes(game, heroCount);
+  game.heroFlags = freshHeroFlags();
+  return game;
+}
+
+async function initGame(humanName, numPlayers, heroCount, botDifficulty) {
+  // Varianta pro 3 hráče (ty + 2 boti, bez Nevilla): stejná pravidla, jen se hraje na 5 vítězných
+  // polí místo 4 (viz resolveRoundEnd).
+  numPlayers = numPlayers === 3 ? 3 : 4;
+  // Boti tu VĖDOMĖ nedostávají genome z GENOME_PRESETS podle jména/štítku - všichni hrají s
+  // GENOME_DEFAULT (= nejlepší dosud natrénovaný genom, viz claude/simulace-1000-her-balance.md),
+  // jen s volitelně nižší obtížností (viz withDifficulty). Jména York/Lancaster/Neville a jejich
+  // strategyType jsou čistě kosmetický štítek, žádné 3 odlišné "osobnosti" už neexistují.
+  const diff = (botDifficulty == null) ? 100 : botDifficulty;
+  const seatDefs = [
+    { name: humanName || 'Ty', isHuman: true, strategyType: 'human' },
+    { name: 'York', isHuman: false, strategyType: 'bot', difficulty: diff },
+    { name: 'Lancaster', isHuman: false, strategyType: 'bot', difficulty: diff },
+  ];
+  if (numPlayers === 4) seatDefs.push({ name: 'Neville', isHuman: false, strategyType: 'bot', difficulty: diff });
+  return initGameCustom(seatDefs, heroCount);
+}
+
+function seatOrderFrom(game, startSeat) {
+  const n = game.players.length;
+  const order = [];
+  for (let i = 0; i < n; i++) order.push(game.players.find(p => p.seat === (startSeat + i) % n));
+  return order.filter(p => !p.eliminated);
+}
+
+async function initialPlacementPhase(game) {
+  uiLog(`Rozmístění: hráči si postupně vybírají startovní pole (začíná ${game.players[game.startingPlayerIdx].name}).`, 'info');
+  const order = seatOrderFrom(game, game.startingPlayerIdx);
+  for (const player of order) {
+    const candidates = inPlayTiles(game);
+    let tileId;
+    if (player.isHuman) {
+      tileId = await uiHumanChooseTile(game, player, candidates, 'Vyber startovní pole pro svou figurku.');
+    } else {
+      tileId = botChooseTile(game, player, candidates, true);
+    }
+    await placeOnTile(game, player, tileId, true);
+    uiRender(game);
+    await sleep(PLACEMENT_DELAY_MS);
+  }
+  game.phase = 'round';
+}
+
+async function placeOnTile(game, player, tileId, isInitialPlacement) {
+  const tile = findTile(game, tileId);
+  const occupied = tile.occupants.length > 0;
+  if (occupied) {
+    const canPayHand = player.hand.length > 0;
+    const canPayDeck = player.drawPile.length >= 3;
+    let method = null;
+    if (canPayHand && canPayDeck) {
+      // Obě cesty jsou dostupné - hráč má skutečnou volbu mezi odhozením karty z ruky a odhozením
+      // 3 karet z vrchu vlastního balíčku. Bot zatím vždy volí ruku (nemění se dosavadní chování
+      // botů), člověku se ptáme skutečně.
+      if (player.isHuman) {
+        method = await uiHumanChooseEntryPayment(game, player, `Pole ${COLOR_NAME[tile.color]} už někdo obsazuje. Jak zaplatíš vstup?`);
+      } else {
+        method = 'hand';
+      }
+    } else if (canPayHand) {
+      method = 'hand';
+    } else if (canPayDeck) {
+      method = 'deck';
+    }
+    if (method === 'hand') {
+      let discardCardId;
+      if (player.isHuman) {
+        discardCardId = await uiHumanChooseHandCard(game, player, `Pole ${COLOR_NAME[tile.color]} už někdo obsazuje. Vyber kartu, kterou za vstup odhodíš.`);
+      } else {
+        discardCardId = botLowestCardId(player.hand);
+      }
+      const idx = player.hand.findIndex(c => c.id === discardCardId);
+      if (idx >= 0) {
+        const [card] = player.hand.splice(idx, 1);
+        player.discardPile.push(card);
+        uiLog(`${player.name} vstupuje na obsazené pole ${COLOR_NAME[tile.color]} a odhazuje kartu.`, 'muted');
+      }
+    } else if (method === 'deck') {
+      const fromDraw = [];
+      for (let i = 0; i < 3 && player.drawPile.length > 0; i++) fromDraw.push(player.drawPile.pop());
+      player.discardPile.push(...fromDraw);
+      uiLog(`${player.name} odhazuje 3 karty z vrchu balíčku za vstup na pole ${COLOR_NAME[tile.color]}.`, 'muted');
+    } else {
+      // ani ruka, ani balíček (aspoň 3 karty) nestačí: nejde zaplatit ani jednu z cen. Pokud ještě
+      // existuje volné pole kdekoliv na stole, hráč se na něj zdarma přesměruje - vyřazen je jen
+      // tehdy, když fakt není kam jinam jít.
+      const freeTiles = inPlayTiles(game).filter(t => t.occupants.length === 0 && t.id !== tile.id);
+      if (freeTiles.length > 0) {
+        uiLog(`${player.name} nemá čím zaplatit vstup na obsazené pole ${COLOR_NAME[tile.color]} — přesouvá se zdarma na volné pole.`, 'muted');
+        let freeTileId;
+        if (player.isHuman) {
+          freeTileId = await uiHumanChooseTile(game, player, freeTiles, 'Nemáš čím zaplatit vstup na obsazené pole — vyber si volné pole zdarma.');
+        } else {
+          freeTileId = botChooseTile(game, player, freeTiles, isInitialPlacement);
+        }
+        await placeOnTile(game, player, freeTileId, isInitialPlacement);
+        return;
+      }
+      player.eliminated = true;
+      player.currentTileId = null;
+      uiLog(`${player.name} nemá čím zaplatit vstup na obsazené pole a nezbývá žádné volné pole — je vyřazen ze zbytku hry!`, 'eliminated');
+      return;
+    }
+  } else {
+    uiLog(`${player.name} se umisťuje na pole ${COLOR_NAME[tile.color]}.`, 'muted');
+  }
+  tile.occupants.push(player.id);
+  player.currentTileId = tile.id;
+}
+
+// ===================== SCHOPNOSTI BAREV =====================
+
+// Sjednocená kontrola "na tuhle kartu nejde žádným způsobem cílit": buď jde o napořád zamčený
+// žlutý úplatek/prokletí (untargetable), nebo o kartu se štítem ze zelené schopnosti (shielded).
+// Používá se všude, kde dřív stačilo kontrolovat jen untargetable (zničení, svatba, vrácení na
+// ruku, změna hodnoty hrdinou).
+function isProtected(e) {
+  return !!(e.untargetable || e.shielded);
+}
+
+async function chooseOpponent(game, actingPlayer, candidates, promptText, botScoreFn) {
+  if (candidates.length === 0) return null;
+  if (candidates.length === 1) return candidates[0].id;
+  if (actingPlayer.isHuman) {
+    return await uiHumanChooseOpponent(game, actingPlayer, candidates, promptText);
+  }
+  // bot: standardně cílí na hráče s nejvyšším součtem v tomto kole (aktuálně nejvíc ohrožující),
+  // volitelně lze předat vlastní scoreFn (např. žlutá cílí spíš na majitele nejvíc polí)
+  const scoreFn = botScoreFn || roundSum;
+  let best = candidates[0];
+  for (const c of candidates) if (scoreFn(c) > scoreFn(best)) best = c;
+  return best.id;
+}
+
+async function triggerAbility(game, color, actingPlayer, fromFavorToken) {
+  if (abilitiesDisabled(game)) {
+    uiLog('Schopnost nelze spustit - do konce kola platí Příměří (Margaret Beaufort).', 'muted');
+    return;
+  }
+  if (color === 'R') {
+    const candidates = otherActivePlayers(game, actingPlayer).filter(p => p.playedThisRound.some(e => e.active && !isProtected(e)));
+    if (candidates.length === 0) { uiLog('Vražda nemá cíl, schopnost propadá.', 'muted'); return; }
+    const targetId = await chooseOpponent(game, actingPlayer, candidates, 'Vyber soupeře, kterému zničíš vyloženou kartu.');
+    const target = game.players.find(p => p.id === targetId);
+    const activeCards = target.playedThisRound.filter(e => e.active && !isProtected(e));
+    let cardEntryId;
+    if (actingPlayer.isHuman) {
+      cardEntryId = await uiHumanChooseCard(game, actingPlayer, target, 'Vyber kartu, kterou zničíš.');
+    } else {
+      cardEntryId = activeCards.reduce((a, b) => (b.value > a.value ? b : a)).id;
+    }
+    const entry = target.playedThisRound.find(e => e.id === cardEntryId);
+    entry.active = false;
+    uiLog(`${actingPlayer.name} vraždí: ničí kartu hráče ${target.name}.`, 'ability-R');
+    await flashEntries(game, [entry], 'hit');
+  }
+
+  else if (color === 'Y') {
+    // Úplatky (přepracováno): vyber banknutou kartu soupeře, odhal ji a otoč na mínus - karta se
+    // navždy zamkne (untargetable) se zápornou hodnotou stejně jako dřívější žlutý úplatek, jen
+    // teď jde o SKUTEČNOU banknutou kartu soupeře místo nové karty z neutrálního balíčku (ten už
+    // žlutá vůbec nepoužívá - slouží výhradně modré schopnosti).
+    const candidates = otherActivePlayers(game, actingPlayer).filter(p => p.playedThisRound.some(e => e.active && e.facedown && !isProtected(e)));
+    if (candidates.length === 0) { uiLog('Úplatky nemají koho podplatit - žádný soupeř tohle kolo nemá banknutou kartu, schopnost propadá.', 'muted'); return; }
+    // bot cílí primárně na hráče s nejvíc banknutými kartami (nejvíc co ztratit), teprve pak na
+    // nejvyšší součet kola - skutečnou hodnotu soupeřovy banknuté karty bot nezná (je tajná).
+    const targetId = await chooseOpponent(game, actingPlayer, candidates, 'Vyber soupeře, kterému odhalíš a znehodnotíš banknutou kartu.',
+      (p) => p.playedThisRound.filter(e => e.active && e.facedown && !isProtected(e)).length * 100 + roundSum(p));
+    const target = game.players.find(p => p.id === targetId);
+    const theirBanked = target.playedThisRound.filter(e => e.active && e.facedown && !isProtected(e));
+    let entryId;
+    if (actingPlayer.isHuman) {
+      entryId = await uiHumanChooseFromEntries(game, actingPlayer, `Úplatky: vyber banknutou kartu hráče ${target.name}, kterou odhalíš a otočíš na mínus.`, theirBanked);
+    } else {
+      entryId = botChooseYellowTarget(game, actingPlayer, theirBanked);
+    }
+    const entry = theirBanked.find(e => e.id === entryId);
+    entry.facedown = false;
+    entry.color = entry.realColor;
+    entry.value = -entry.realValue;
+    entry.untargetable = true;
+    entry.originalValue = entry.value; // od teď je tohle jeho "přirozená" hodnota, ne stará banknutá 1
+    uiLog(`${actingPlayer.name} podplácí: odhaluje banknutou kartu hráče ${target.name} (${COLOR_NAME[entry.color]} ${entry.realValue}) a mění ji na trvale zamčené mínus ${entry.realValue}.`, 'ability-Y');
+    await flashEntries(game, [entry], 'hit');
+  }
+
+  else if (color === 'G') {
+    // Špionáž (přepracováno potřetí - štít): vyber jednu svou VYLOŽENOU (lícem nahoru) kartu z
+    // tohohle kola a umísti na ni štít. Karta se štítem je do konce kola netargetovatelná - nejde
+    // zničit, prohodit svatbou, ani ji vynutí vrácení kartou 1. Pokud jí nějaký hrdina už změnil
+    // hodnotu (typicky Edward IV.), štít ji zároveň vrátí do původní hodnoty. Banknuté karty štítem
+    // chránit nejde (ty stejně nejde cílit ničím jiným než žlutou/Henrym VI.) - jen běžně zahrané.
+    const eligible = actingPlayer.playedThisRound.filter(e => e.active && !e.facedown && !isProtected(e));
+    if (eligible.length === 0) {
+      uiLog('Špionáž nemá co ochránit - nemáš tohle kolo žádnou vyloženou kartu, schopnost propadá.', 'muted');
+      return;
+    }
+    let entryId;
+    if (actingPlayer.isHuman) {
+      entryId = await uiHumanChooseFromEntries(game, actingPlayer, 'Špionáž: vyber svou vyloženou kartu, na kterou umístíš štít (do konce kola netargetovatelná).', eligible);
+    } else {
+      entryId = botChooseShieldCard(game, actingPlayer, eligible);
+    }
+    const entry = eligible.find(e => e.id === entryId);
+    entry.shielded = true;
+    if (entry.value !== entry.originalValue) entry.value = entry.originalValue;
+    uiLog(`${actingPlayer.name} umisťuje štít na kartu ${COLOR_NAME[entry.color]} ${entry.value} - do konce kola je netargetovatelná.`, 'ability-G');
+    await flashEntries(game, [entry], 'add');
+  }
+
+  else if (color === 'B') {
+    if (game.heroFlags && game.heroFlags.noNeutralCards) { uiLog('Podpora církve propadá - bezbarvé karty jsou dočasně zakázané (Henry VI.).', 'muted'); return; }
+    const neutralCard = drawNeutralCard(game);
+    const newEntry = {
+      id: uid('play'), color: 'N', realColor: 'N', value: neutralCard.value, originalValue: neutralCard.value, active: true, facedown: false,
+      isNeutralSource: true, neutralValue: neutralCard.value,
+    };
+    actingPlayer.playedThisRound.push(newEntry);
+    uiLog(`${actingPlayer.name} čerpá podporu církve: +${neutralCard.value}.`, 'ability-B');
+    await flashEntries(game, [newEntry], 'add');
+  }
+
+  else if (color === 'S') {
+    if (!actingPlayer.playedThisRound.some(e => e.active && !isProtected(e))) { uiLog('Svatba nemá co prohodit na tvé straně, propadá.', 'muted'); return; }
+    const candidates = otherActivePlayers(game, actingPlayer).filter(p => p.playedThisRound.some(e => e.active && !isProtected(e)));
+    if (candidates.length === 0) { uiLog('Svatba nemá cíl, propadá.', 'muted'); return; }
+    const targetId = await chooseOpponent(game, actingPlayer, candidates, 'Vyber soupeře pro svatbu (výměnu karet).');
+    const target = game.players.find(p => p.id === targetId);
+    let myEntryId, theirEntryId;
+    if (actingPlayer.isHuman) {
+      myEntryId = await uiHumanChooseCard(game, actingPlayer, actingPlayer, 'Vyber svou kartu, kterou nabídneš k výměně.');
+      theirEntryId = await uiHumanChooseCard(game, actingPlayer, target, 'Vyber soupeřovu kartu, kterou chceš získat.');
+    } else {
+      myEntryId = botPickGreyGiveEntry(actingPlayer);
+      theirEntryId = botPickGreyTakeEntry(actingPlayer, target);
+    }
+    const myIdx = actingPlayer.playedThisRound.findIndex(e => e.id === myEntryId);
+    const theirIdx = target.playedThisRound.findIndex(e => e.id === theirEntryId);
+    const [myEntry] = actingPlayer.playedThisRound.splice(myIdx, 1);
+    const [theirEntry] = target.playedThisRound.splice(theirIdx, 1);
+    actingPlayer.playedThisRound.push(theirEntry);
+    target.playedThisRound.push(myEntry);
+    uiLog(`${actingPlayer.name} a ${target.name} si prohodili vyložené karty (svatba).`, 'ability-S');
+    await flashEntries(game, [theirEntry, myEntry], 'swap');
+  }
+}
+
+// ===================== HRDINOVÉ =====================
+// Každý hráč dostane na začátku hry 2 hrdiny (z 8 celkem - pro 4 hráče se tak rozdají všichni, pro
+// 3 hráče se náhodně rozdá 6 z 8 a zbylí 2 hrdinové ve hře vůbec nefigurují) a
+// může každého z nich kdykoliv v průběhu CELÉ hry zahrát jako svůj tah (jednorázově, jeden hrdina
+// = jedno použití na celou hru). Kdo drží kterého hrdinu je tajné až do chvíle, kdy ho zahraje -
+// soupeři vidí jen POČET nepoužitých hrdinů, ne jejich identitu.
+
+const HERO_LIST = [
+  { id: 'york', name: 'Richard z Yorku', desc: 'Zničí všechny vyložené karty s hodnotou 4-6 (u všech hráčů) a do konce kola zakáže hrát karty s touto hodnotou lícem nahoru (bankovat je lze normálně dál).' },
+  { id: 'edmund', name: 'Edmund Beaufort', desc: 'Zničí všechny vyložené karty s hodnotou 2-4 (u všech hráčů) a do konce kola zakáže hrát karty s touto hodnotou lícem nahoru (bankovat je lze normálně dál).' },
+  { id: 'edwardIV', name: 'Edward IV.', desc: 'Všechny vyložené karty (u všech hráčů), včetně nově zahraných, mají do konce kola hodnotu 1. Všechny banknuté karty (staré i nově banknuté) mají do konce kola hodnotu 0.' },
+  { id: 'henryVI', name: 'Henry VI.', desc: 'Zničí všechny bezbarvé karty na stole (ať zahrané z ruky, nebo z podpory církve) i všechny banknuté karty (u všech hráčů) - zamčené žluté úplatky přežijí. Do konce kola nelze hrát bezbarvé karty z ruky ani bankovat.' },
+  { id: 'cecily', name: 'Cecily Nevillová', desc: 'Každý hráč (včetně tebe) má už jen jeden další tah, poté musí passnout.' },
+  { id: 'margaretAnjou', name: 'Margaret z Anjou', desc: 'Každý hráč (včetně tebe) zničí své dvě nejvyšší vyložené karty. Při shodě hodnot volí majitel, kterou zničí.' },
+  { id: 'neville', name: 'Richard Neville — Kingmaker', desc: 'Toto kolo vyhrává hráč s nejnižším součtem místo nejvyšším.' },
+  { id: 'margaretBeaufort', name: 'Margaret Beaufort — Příměří', desc: 'Do konce kola nelze spustit žádnou schopnost karet (ani zdarma podle pole, ani přes žeton přízně) a nelze vracet kartu na ruku podle pravidla karty s hodnotou 1. Bankovat lze normálně dál.' },
+];
+function heroDef(id) { return HERO_LIST.find(h => h.id === id); }
+
+function assignHeroes(game, heroCount) {
+  // heroCount 2/1/0 karet hrdinů na hráče, vybraných náhodně z 8 celkem. Při heroCount 2 (výchozí)
+  // pro 4 hráče se tak rozdají všichni, pro 3 hráče 6 z 8 (zbylí 2 ve hře vůbec nefigurují) - viz
+  // komentář u HERO_LIST. Při 1 nebo 0 zbývá ještě víc nepoužitých hrdinů mimo hru.
+  const n = heroCount == null ? 2 : heroCount;
+  const ids = shuffle(HERO_LIST.map(h => h.id));
+  for (const p of game.players) {
+    const heroes = [];
+    for (let i = 0; i < n; i++) heroes.push({ id: ids.pop(), used: false });
+    p.heroes = heroes;
+  }
+}
+
+function hasUnusedHero(player) {
+  return (player.heroes || []).some(h => !h.used);
+}
+
+function freshHeroFlags() {
+  return {
+    banRanges: [],          // [[min,max], ...] - do konce kola nelze hrát (lícem nahoru) hodnoty v tomto rozsahu
+    forceValueOne: false,   // Edward IV. - všechny vyložené karty (staré i nové) mají hodnotu 1
+    forceBankedZero: false, // Edward IV. - všechny banknuté karty (staré i nově banknuté) mají hodnotu 0 do konce kola
+    noNeutralCards: false,  // Henry VI. - modrá schopnost propadá, nelze hrát bezbarvou kartu z ruky
+    noBanking: false,       // Henry VI. - akce "bank" propadá
+    noAbilities: false,     // Margaret Beaufort (Příměří) - žádná schopnost (ani žetonem) ani vrácení karty 1
+    invertedWinner: false,  // Neville - kolo vyhrává nejnižší součet místo nejvyššího
+    lastCallIds: null,      // Cecily - Set id hráčů, kterým po jejich příštím tahu skončí kolo
+  };
+}
+
+function abilitiesDisabled(game) {
+  return !!(game.heroFlags && game.heroFlags.noAbilities);
+}
+
+function heroValueBanned(game, value) {
+  if (!game.heroFlags) return false;
+  return game.heroFlags.banRanges.some(([lo, hi]) => value >= lo && value <= hi);
+}
+
+// Smí se tahle karta z ruky zahrát lícem nahoru? Bere v potaz jak zákaz podle hodnoty
+// (Richard z Yorku / Edmund Beaufort), tak zákaz bezbarvých karet (Jindřich VI.) - bankování
+// řeší samostatně příznak noBanking, tady jde jen o hraní "face up".
+function cardPlayBanned(game, card) {
+  if (heroValueBanned(game, card.value)) return true;
+  if (game.heroFlags && game.heroFlags.noNeutralCards && card.color === 'N') return true;
+  return false;
+}
+
+async function playHero(game, player, heroId) {
+  const rec = (player.heroes || []).find(h => h.id === heroId && !h.used);
+  if (!rec) return;
+  rec.used = true;
+  const def = heroDef(heroId);
+  uiLog(`🎭 ${player.name} odhaluje a hraje hrdinu: ${def.name}!`, 'hero');
+  // Hrdina se vyloží do "play area" před hráče - viditelně pro všechny, dokud kolo neskončí -
+  // aby bylo jasné, čí schopnost je právě aktivní.
+  player.activeHeroThisRound = { id: heroId, name: def.name };
+  await flashHero(game, player, 'hero-appear');
+  await resolveHero(game, player, heroId);
+}
+
+async function resolveHero(game, actingPlayer, heroId) {
+  if (heroId === 'york') return heroDestroyAndBanRange(game, 4, 6, 'Richard z Yorku');
+  if (heroId === 'edmund') return heroDestroyAndBanRange(game, 2, 4, 'Edmund Beaufort');
+  if (heroId === 'edwardIV') return heroEdwardIV(game);
+  if (heroId === 'henryVI') return heroHenryVI(game);
+  if (heroId === 'cecily') return heroCecily(game, actingPlayer);
+  if (heroId === 'margaretAnjou') return heroMargaretAnjou(game);
+  if (heroId === 'neville') return heroNeville(game);
+  if (heroId === 'margaretBeaufort') return heroMargaretBeaufort(game);
+}
+
+async function heroDestroyAndBanRange(game, lo, hi, label) {
+  game.heroFlags.banRanges.push([lo, hi]);
+  const destroyed = [];
+  for (const p of game.players) {
+    for (const e of p.playedThisRound) {
+      if (e.active && !e.facedown && !isProtected(e) && e.value >= lo && e.value <= hi) {
+        e.active = false;
+        destroyed.push(e);
+      }
+    }
+  }
+  uiLog(`${label}: zničeny všechny vyložené karty s hodnotou ${lo}-${hi} (${destroyed.length}×) a do konce kola je nelze hrát lícem nahoru (bankovat lze dál).`, 'hero');
+  await flashEntries(game, destroyed, 'hit');
+}
+
+async function heroEdwardIV(game) {
+  game.heroFlags.forceValueOne = true;
+  game.heroFlags.forceBankedZero = true;
+  const changed = [];
+  for (const p of game.players) {
+    for (const e of p.playedThisRound) {
+      if (!e.active || isProtected(e)) continue;
+      if (!e.facedown) {
+        if (e.value !== 1) changed.push(e);
+        e.value = 1;
+      } else {
+        if (e.value !== 0) changed.push(e);
+        e.value = 0;
+      }
+    }
+  }
+  uiLog('Edward IV.: všechny vyložené karty mají do konce kola hodnotu 1 a všechny banknuté karty hodnotu 0 (štít i zamčený žlutý úplatek jsou vůči tomu chráněné).', 'hero');
+  await flashEntries(game, changed, 'add');
+}
+
+async function heroHenryVI(game) {
+  game.heroFlags.noNeutralCards = true;
+  game.heroFlags.noBanking = true;
+  const destroyed = [];
+  for (const p of game.players) {
+    for (const e of p.playedThisRound) {
+      // Jakákoliv bezbarvá karta na stole jde zničit - ať šlo o neutrální kartu zahranou přímo
+      // z ruky, o podporu církve (modrá), nebo o banknutou kartu (ta má barvu vždy 'N', ať byla
+      // banknuta karta jakékoliv skutečné barvy). Banknuté karty MAJÍ vždy color:'N', takže je
+      // tahle jediná podmínka (barva 'N') pokrývá zároveň s ostatními bezbarvými kartami - dřívější
+      // verze omylem kontrolovala jen isNeutralSource, což vynechávalo neutrální karty zahrané
+      // normálně z ruky. Zamčený žlutý úplatek i štítovaná karta (obojí isProtected) přežijí.
+      if (e.active && !isProtected(e) && e.color === 'N') {
+        e.active = false;
+        destroyed.push(e);
+      }
+    }
+  }
+  uiLog(`Henry VI.: zničeny všechny bezbarvé karty na stole (ze hry i z podpory církve) i všechny banknuté karty (${destroyed.length}×). Zamčené žluté úplatky přežily. Do konce kola nelze hrát bezbarvé karty z ruky ani bankovat.`, 'hero');
+  await flashEntries(game, destroyed, 'hit');
+}
+
+async function heroCecily(game, actingPlayer) {
+  // Včetně actingPlayer samotného - ten teď dohrává svůj BĚŽNÝ tah (jen se v něm rozhodl zahrát
+  // hrdinu místo karty), ne ten "poslední" navíc. Playtoutce v playRound díky snapshotu před
+  // taháhem pozná, že actingPlayer do setu přibyl až během TOHOTO tahu, a nedonutí ho passnout
+  // hned teď - dostane ještě jeden regulérní tah navíc jako všichni ostatní, a passne až po něm.
+  const ids = new Set(game.players.filter(p => !p.eliminated && !p.passedThisRound).map(p => p.id));
+  game.heroFlags.lastCallIds = ids;
+  uiLog(`Cecily Nevillová: každý hráč (${actingPlayer.name} včetně) má už jen jeden další tah, poté musí passnout.`, 'hero');
+}
+
+async function destroyTopTwo(game, player) {
+  let needed = 2;
+  const active = player.playedThisRound.filter(e => e.active && !isProtected(e));
+  const byValue = {};
+  for (const e of active) { (byValue[e.value] = byValue[e.value] || []).push(e); }
+  const values = Object.keys(byValue).map(Number).sort((a, b) => b - a);
+  const toDestroy = [];
+  for (const v of values) {
+    if (needed <= 0) break;
+    const group = byValue[v];
+    if (group.length <= needed) {
+      toDestroy.push(...group);
+      needed -= group.length;
+    } else {
+      let chosen;
+      if (player.isHuman) {
+        chosen = [];
+        let pool = [...group];
+        for (let i = 0; i < needed; i++) {
+          const id = await uiHumanChooseFromEntries(game, player, `Margaret z Anjou: vyber, kterou ze svých karet (hodnota ${v}) zničíš.`, pool);
+          const idx = pool.findIndex(e => e.id === id);
+          chosen.push(pool[idx]);
+          pool.splice(idx, 1);
+        }
+      } else {
+        chosen = group.slice(0, needed);
+      }
+      toDestroy.push(...chosen);
+      needed = 0;
+    }
+  }
+  for (const e of toDestroy) e.active = false;
+  await flashEntries(game, toDestroy, 'hit');
+  return toDestroy.length;
+}
+
+async function heroMargaretAnjou(game) {
+  let total = 0;
+  for (const p of game.players) {
+    if (p.eliminated) continue;
+    total += await destroyTopTwo(game, p);
+  }
+  uiLog(`Margaret z Anjou: každý hráč zničil své dvě nejvyšší karty (celkem ${total}× zničeno).`, 'hero');
+}
+
+async function heroNeville(game) {
+  game.heroFlags.invertedWinner = true;
+  uiLog('Richard Neville (Kingmaker): toto kolo vyhrává hráč s nejnižším součtem místo nejvyšším.', 'hero');
+}
+
+async function heroMargaretBeaufort(game) {
+  // Příměří: do konce kola nejde spustit žádná schopnost (ani zdarma podle pole, ani přes žeton
+  // přízně) a neplatí ani pravidlo vracení karty s hodnotou 1 - viz abilitiesDisabled() a jeho
+  // použití v triggerAbility/takeTurn. Bankování samotné (karta lícem dolů) zůstává povolené.
+  game.heroFlags.noAbilities = true;
+  uiLog('Margaret Beaufort (Příměří): do konce kola nelze spustit žádnou schopnost karet (ani přes žeton přízně) a nelze vracet kartu podle pravidla karty s hodnotou 1. Bankovat lze normálně dál.', 'hero');
+}
+
+// ---- bot: vyhodnocení kdy hrdinu zahrát ----
+// Cíl: co nejmíň ublížit sobě, co nejvíc soupeřům, ideálně si tím pomoct vyhrát kolo / získat body
+// / zabránit soupeři v bodech (např. zničením jeho banknutých karet). Boti navíc hrdiny nezahrávají
+// hned v 1. kole - i jen vědomí, že soupeř nějakého hrdinu má, je samo o sobě "strašidelné", a tahle
+// nejistota by se zbytečně brzo rozplynula.
+
+function evalHeroScore(game, player, heroId) {
+  const others = otherActivePlayers(game, player);
+  if (heroId === 'york' || heroId === 'edmund') {
+    const [lo, hi] = heroId === 'york' ? [4, 6] : [2, 4];
+    const tableVal = (p) => p.playedThisRound.filter(e => e.active && !e.facedown && e.value >= lo && e.value <= hi).reduce((s, e) => s + e.value, 0);
+    const myHandPenalty = player.hand.filter(c => c.value >= lo && c.value <= hi).length * 0.4;
+    let score = -tableVal(player) - myHandPenalty;
+    for (const o of others) score += tableVal(o);
+    return score;
+  }
+  if (heroId === 'edwardIV') {
+    // Ztráta = (vyložené karty klesnou na 1) + (banknuté karty klesnou na 0, tj. ztratí svou
+    // dosavadní placeholder hodnotu 1 v součtu kola - samotný bankovní multiplikátor na konci kola
+    // tím není dotčen, jde jen o dočasný pokles příspěvku do součtu TOHOHLE kola).
+    const netTableLoss = (p) => p.playedThisRound.filter(e => e.active && !isProtected(e))
+      .reduce((s, e) => s + (e.facedown ? e.value : (e.value - 1)), 0);
+    let score = -netTableLoss(player);
+    for (const o of others) score += netTableLoss(o);
+    return score;
+  }
+  if (heroId === 'henryVI') {
+    const W = 3; // odhad hodnoty jedné banknuté karty (skutečnou hodnotu soupeřovy banknuté karty bot nezná)
+    const netVal = (p) => p.playedThisRound.filter(e => e.active && e.color === 'N' && !e.facedown && !isProtected(e)).reduce((s, e) => s + Math.abs(e.value), 0)
+      + p.playedThisRound.filter(e => e.active && e.facedown).length * W;
+    let score = -netVal(player);
+    for (const o of others) score += netVal(o);
+    return score;
+  }
+  if (heroId === 'cecily') {
+    const mySum = roundSum(player);
+    const othersMax = others.length ? Math.max(...others.map(roundSum)) : 0;
+    const stillPlayingBonus = others.filter(o => !o.passedThisRound).length * 0.5;
+    return (mySum - othersMax) + stillPlayingBonus;
+  }
+  if (heroId === 'margaretAnjou') {
+    const top2 = (p) => p.playedThisRound.filter(e => e.active).map(e => e.value).sort((a, b) => b - a).slice(0, 2).reduce((s, v) => s + v, 0);
+    let score = -top2(player);
+    for (const o of others) score += top2(o);
+    return score;
+  }
+  if (heroId === 'neville') {
+    const mySum = roundSum(player);
+    const sums = others.map(roundSum);
+    const minOther = sums.length ? Math.min(...sums) : Infinity;
+    if (mySum > minOther) return -10; // nejsem nejnižší, nevyplatí se
+    const lateness = others.filter(o => o.passedThisRound).length; // víc pasnutých = pozdější fáze kola
+    return (minOther - mySum) + lateness;
+  }
+  if (heroId === 'margaretBeaufort') {
+    // Příměří se vyplatí zamknout, když už vedeš v součtu kola (nikdo tě pak nemůže připravit o
+    // vedení vraždou ani svatbou a ty se nemusíš bát, že tě někdo dožene komboem schopnosti), a
+    // když máš v ruce dost jedniček, které chceš zahrát bez trestu vracení karty. Vlastní
+    // nevyužité žetony přízně jsou naopak drobná cena - o možnost je ještě použít přijdeš taky.
+    const mySum = roundSum(player);
+    const othersMax = others.length ? Math.max(...others.map(roundSum)) : 0;
+    const myOnes = player.hand.filter(c => c.value === 1).length;
+    return (mySum - othersMax) + myOnes * 1.2 - player.favorTokens * 0.3;
+  }
+  return -Infinity;
+}
+
+// Kolik aktivních (nezničených) karet je právě rozehráno na stole napříč všemi hráči - hrubý
+// ukazatel, jak "vyzrálé" už tohle kolo je. Používá se k tomu, aby hrdinové, jejichž síla roste
+// s tím, co je na stole (ničí/přepisují vyložené karty), nebyli pálení zbytečně brzy na skoro
+// prázdný stůl (typicky 1 osamocená karta) - lepší počkat na víc materiálu a mít pak větší dopad.
+function totalActiveEntries(game) {
+  let n = 0;
+  for (const p of game.players) {
+    if (p.eliminated) continue;
+    n += p.playedThisRound.filter(e => e.active).length;
+  }
+  return n;
+}
+
+const TABLE_SCALING_HEROES = new Set(['york', 'edmund', 'edwardIV', 'henryVI', 'margaretAnjou']);
+
+// ===================== GENOM BOTA (evolučně laditelné parametry) =====================
+// Všechny číselné prahy/váhy/pravděpodobnosti, které řídí rozhodování bota, jsou soustředěné
+// tady do jednoho "genomu" - ploché mapy název→číslo. Dřív byly částečně rozeseté přímo v kódu
+// rozhodování jako `strategy === 'aggressive' ? X : strategy === 'hoarder' ? Y : Z` (3 pevné,
+// jmenovité archetypy - viz historie v claude/simulace-1000-her-balance.md). Teď každý bot nese
+// vlastní genom (player.genome, vždy kompletní objekt se VŠEMI klíči níže) a žádný kus
+// rozhodovací logiky už se neptá "jaký je můj strategyType" - jen čte čísla ze svého genomu.
+// `strategyType` zůstává jen ŠTÍTEK pro zobrazení/log/diagnostiku, nikdy se nečte uvnitř
+// botConsiderHero/botDecideAction/botUseFavorToken/tileScoreForBot.
+//
+// GENOME_LEGACY_BALANCED je přesná kopie toho, co dřív dělal styl 'balanced' (= dosavadní výchozí
+// bot před evolučním tréninkem) - uchováváno jako pevný historický bod pro srovnání/budoucí
+// šampionáty, ne jako aktivní výchozí nastavení. GENOME_PRESETS (aggressive/balanced/hoarder) z
+// něj vycházejí a existují JEN jako volitelné počáteční hodnoty pro rozsetí populace v evoluční
+// trénovací smyčce (train_evolution.js) - samotná hra je nikdy nepoužije automaticky (viz initGame
+// níže, ten bere čistý GENOME_DEFAULT).
+const GENOME_LEGACY_BALANCED = {
+  // --- hrdinové (botConsiderHero) ---
+  heroFreeThreshold: 3.5, heroForcedThreshold: 1.2, heroMaturityGate: 1.0,
+  heroMaturityBase: 0.6, heroMaturitySlope: 0.35, heroMaturityCap: 1.3,
+  // --- odhad hodnoty schopnosti pole (estimateAbilityValue) ---
+  redTopCoeff: 0.5, redCloseBonus: 1.5, blueCloseValue: 2.5, blueFarValue: 0.5,
+  yellowTilesCoeff: 1.2, greenBestCoeff: 0.5, greenGapBonus: 1.0, greenGapThreshold: -2,
+  greyBestTargetCoeff: 0.5, abilityWorthChasingThreshold: 2.5,
+  // --- hraní/bankování/vzdávání kola (botDecideAction) ---
+  bankChanceBase: 0.55, bankChanceAbilityLowBump: 0.25, bankChanceCap: 0.9,
+  bankChanceAbilityHighDrop: 0.3, bankChanceFloor: 0.05, bankChanceYellowMult: 0.15,
+  conserveChanceBase: 0.12, fatigueHandThreshold: 6, fatigueSlope: 0.12, fatigueCap: 0.5,
+  firstRoundCaution: 0.12, riskChanceWhenThreatened: 0.08, aheadMargin: 3,
+  hoardingTendency: 0, hoardingTileGate: 3,
+  // --- žetony přízně (botUseFavorToken) ---
+  redTokenMargin: 0, blueTokenMargin: 0, yellowTokenTileThreshold: 2, yellowTokenSumMargin: 2,
+  shieldValueThreshold: 4, shieldMaxDeficit: 5, shieldMinLead: -1, greyTradeMargin: 1,
+  // --- výběr pole (tileScoreForBot) ---
+  tileSynergyTilesWeight: 3, tileSynergyBankedWeight: 2, tileOccupantPenalty: 2, tileRandomJitter: 0.5,
+};
+
+// GENOME_DEFAULT = vítěz evolučního tréninku self-play (2026-10-05, viz
+// claude/simulace-1000-her-balance.md Update VII) - 3 nezávislé běhy (~25-40 tisíc her každý,
+// populace 32-40 genomů, 137-175 generací), jejich nejlepší kandidáti pak proti sobě navzájem a
+// proti historickým presetům v jednom velkém ověřovacím šampionátu (grand_championship.js,
+// ~1750 her, úzké konfidenční intervaly ±3pp). Vyhrál s winrate 35.2 % oproti 24.0 % pro dřívější
+// 'balanced' výchozí nastavení (GENOME_LEGACY_BALANCED výše) v tomtéž šampionátu - měřitelně a
+// opakovaně silnější, ne jen šťastná náhoda jednoho běhu.
+const GENOME_DEFAULT = {
+  heroFreeThreshold: 2.2752, heroForcedThreshold: 3, heroMaturityGate: 0.6621,
+  heroMaturityBase: 0.7448, heroMaturitySlope: 0.414, heroMaturityCap: 1.5147,
+  redTopCoeff: 0.5714, redCloseBonus: 1.2952, blueCloseValue: 2.866, blueFarValue: 1.277,
+  yellowTilesCoeff: 0.6835, greenBestCoeff: 0.7532, greenGapBonus: 0.3531, greenGapThreshold: 0,
+  greyBestTargetCoeff: 0.3602, abilityWorthChasingThreshold: 2.2502,
+  bankChanceBase: 0.9, bankChanceAbilityLowBump: 0.4, bankChanceCap: 0.8082,
+  bankChanceAbilityHighDrop: 0.1925, bankChanceFloor: 0.119, bankChanceYellowMult: 0.0574,
+  conserveChanceBase: 0.0708, fatigueHandThreshold: 3.6497, fatigueSlope: 0.05, fatigueCap: 0.5908,
+  firstRoundCaution: 0.3, riskChanceWhenThreatened: 0.1144, aheadMargin: 3.6844,
+  hoardingTendency: 0.5832, hoardingTileGate: 1,
+  redTokenMargin: 2, blueTokenMargin: 0.2538, yellowTokenTileThreshold: 1, yellowTokenSumMargin: 0.4622,
+  shieldValueThreshold: 3.5601, shieldMaxDeficit: 2, shieldMinLead: -2.0786, greyTradeMargin: 1.0733,
+  tileSynergyTilesWeight: 4.2302, tileSynergyBankedWeight: 4.3395, tileOccupantPenalty: 2.1216, tileRandomJitter: 1.179,
+};
+
+// [min, max] rozsah pro každý klíč - používá se k ořezání (clampGenome) i k mutaci/randomizaci
+// v train_evolution.js. Udržováno tady, ne v trénovacím skriptu, aby šel genom ověřit/ořezat i
+// kdyby přišel z nedůvěryhodného zdroje.
+const GENOME_RANGES = {
+  heroFreeThreshold: [1, 6], heroForcedThreshold: [0, 3], heroMaturityGate: [0, 2],
+  heroMaturityBase: [0.3, 1.0], heroMaturitySlope: [0.1, 0.6], heroMaturityCap: [1.0, 2.0],
+  redTopCoeff: [0.2, 1.0], redCloseBonus: [0, 3], blueCloseValue: [1, 4], blueFarValue: [0, 2],
+  yellowTilesCoeff: [0.5, 2], greenBestCoeff: [0.2, 1], greenGapBonus: [0, 2], greenGapThreshold: [-4, 0],
+  greyBestTargetCoeff: [0.2, 1], abilityWorthChasingThreshold: [1, 4],
+  bankChanceBase: [0.1, 0.9], bankChanceAbilityLowBump: [0, 0.4], bankChanceCap: [0.6, 1.0],
+  bankChanceAbilityHighDrop: [0, 0.5], bankChanceFloor: [0, 0.3], bankChanceYellowMult: [0, 1],
+  conserveChanceBase: [0, 0.3], fatigueHandThreshold: [3, 8], fatigueSlope: [0.05, 0.25], fatigueCap: [0.2, 0.7],
+  firstRoundCaution: [0, 0.3], riskChanceWhenThreatened: [0, 0.3], aheadMargin: [1, 6],
+  hoardingTendency: [0, 1], hoardingTileGate: [1, 5],
+  redTokenMargin: [-1, 2], blueTokenMargin: [-2, 2], yellowTokenTileThreshold: [1, 4], yellowTokenSumMargin: [0, 5],
+  shieldValueThreshold: [2, 6], shieldMaxDeficit: [2, 8], shieldMinLead: [-4, 2], greyTradeMargin: [0, 3],
+  tileSynergyTilesWeight: [1, 6], tileSynergyBankedWeight: [0, 5], tileOccupantPenalty: [0, 5], tileRandomJitter: [0, 2],
+};
+
+const GENOME_PRESETS = {
+  aggressive: Object.assign({}, GENOME_LEGACY_BALANCED, { bankChanceBase: 0.35, conserveChanceBase: 0.06, aheadMargin: 4, hoardingTendency: 0 }),
+  balanced: Object.assign({}, GENOME_LEGACY_BALANCED),
+  hoarder: Object.assign({}, GENOME_LEGACY_BALANCED, { bankChanceBase: 0.75, conserveChanceBase: 0.18, aheadMargin: 2, hoardingTendency: 1 }),
+};
+
+function clampGenome(g) {
+  const out = {};
+  for (const k of Object.keys(GENOME_DEFAULT)) {
+    const v = (g && typeof g[k] === 'number' && !isNaN(g[k])) ? g[k] : GENOME_DEFAULT[k];
+    const range = GENOME_RANGES[k];
+    out[k] = range ? Math.min(range[1], Math.max(range[0], v)) : v;
+  }
+  return out;
+}
+
+// Postaví kompletní genom z volitelného jmenovaného presetu (jen pro úvodní rozsetí populace
+// v tréninku, viz komentář výše) + volitelného přepsání konkrétními hodnotami.
+function makeGenome(presetName, overrides) {
+  const preset = GENOME_PRESETS[presetName] || {};
+  return clampGenome(Object.assign({}, GENOME_DEFAULT, preset, overrides || {}));
+}
+
+// ===================== OBTÍŽNOST BOTA =====================
+// player.difficulty (0-100, výchozí 100) určuje, jak často bot skutečně použije svůj genom (=
+// nejlepší rozhodnutí, které umí) místo ÚPLNĚ NÁHODNÉ, ale vždy pravidly povolené alternativy.
+// 100 = vždy podle genomu (využívá celý svůj potenciál), 50 = v průměru polovina rozhodnutí je
+// čistě náhodná mezi legálními možnostmi - snazší soupeř, co ale nikdy nedělá nic nelegálního.
+function withDifficulty(player, genomeChoiceFn, legalChoicesFn) {
+  const difficulty = (player.difficulty == null) ? 100 : player.difficulty;
+  if (difficulty >= 100 || Math.random() * 100 < difficulty) return genomeChoiceFn();
+  const legal = legalChoicesFn();
+  if (!legal || legal.length === 0) return genomeChoiceFn();
+  return legal[Math.floor(Math.random() * legal.length)];
+}
+
+// Kompletní výčet legálních akcí pro daný tah (pro difficulty override) - vědomě ignoruje jen
+// "měkké" preference bota (zralost stolu pro hrdiny škálující se stolem, counterplay, ...), ale
+// nikdy nic, co by samotná PRAVIDLA hry zakazovala (hrdinové v 1. kole, zakázané hodnoty karet
+// po Yorkovi/Edmundovi, bankování pod noBanking flagem).
+function enumerateLegalActions(game, player) {
+  const actions = [];
+  const noBanking = !!(game.heroFlags && game.heroFlags.noBanking);
+  for (const c of player.hand) {
+    if (!cardPlayBanned(game, c)) actions.push({ type: 'play', cardId: c.id });
+    if (!noBanking) actions.push({ type: 'bank', cardId: c.id });
+  }
+  if (game.round > 1) {
+    for (const h of (player.heroes || [])) {
+      if (!h.used) actions.push({ type: 'hero', heroId: h.id });
+    }
+  }
+  actions.push({ type: 'pass' });
+  return actions;
+}
+
+function botConsiderHero(game, player, forced) {
+  const unused = (player.heroes || []).filter(h => !h.used);
+  if (unused.length === 0) return null;
+  // V 1. kole boti hrdiny nezahrávají vůbec, ani když jim došly karty na ruce (radši passnou) -
+  // nejistota, kdo co drží, má vydržet přinejmenším přes celé první kolo.
+  if (game.round <= 1) return null;
+  const G = player.genome;
+  const activePlayers = game.players.filter(p => !p.eliminated).length;
+  const maturity = totalActiveEntries(game) / Math.max(1, activePlayers);
+  let best = null, bestScore = -Infinity;
+  for (const h of unused) {
+    // Hrdinové, kteří ničí/přepisují vyložené karty, ať vydrží aspoň do chvíle, kdy je stůl
+    // dostatečně zralý (G.heroMaturityGate) - jinak jde o plýtvání (typicky "zničit 2 nejvyšší
+    // karty", když je na stole jen jedna osamocená karta). Dokud stůl takhle nedozraje, tyhle
+    // hrdiny vůbec neuvažujeme.
+    if (TABLE_SCALING_HEROES.has(h.id) && maturity < G.heroMaturityGate) continue;
+    let score = evalHeroScore(game, player, h.id);
+    if (TABLE_SCALING_HEROES.has(h.id)) {
+      // I nad rámec minimálního prahu výše: čím zralejší stůl, tím větší "wow moment" dopad -
+      // odměň vyčkávání násobkem rostoucím se zralostí stolu (stropováno, ať se nevyplatí čekat
+      // donekonečna a propásnout okno úplně).
+      score *= Math.min(G.heroMaturityCap, G.heroMaturityBase + maturity * G.heroMaturitySlope);
+    }
+    if (score > bestScore) { bestScore = score; best = h.id; }
+  }
+  const threshold = forced ? G.heroForcedThreshold : G.heroFreeThreshold;
+  if (best != null && bestScore >= threshold) return { type: 'hero', heroId: best };
+  return null;
+}
+
+async function maybeReturnOne(game, player) {
+  // untargetable (žlutý odpočet) nejde vrátit na ruku ani jinak - v praxi na to už chrání i to,
+  // že jeho hodnota je vždy záporná (nikdy nesplní value >= 2), ale kontrola je tu explicitně,
+  // aby to platilo i kdyby se pravidlo/hodnoty někdy změnily. Štítovaná karta (shielded) je chráněná
+  // stejně.
+  const eligible = player.playedThisRound.filter(e => e.active && e.value >= 2 && !e.facedown && !isProtected(e));
+  if (eligible.length === 0) return;
+  let chosenId;
+  if (eligible.length === 1) {
+    chosenId = eligible[0].id;
+  } else if (player.isHuman) {
+    chosenId = await uiHumanChooseReturnCard(game, player, eligible, 'Karta s hodnotou 1 tě nutí vrátit si jednu vyloženou kartu (2+) zpět na ruku. Vyber kterou.');
+  } else {
+    chosenId = botChooseReturnCard(game, player, eligible);
+  }
+  const idx = player.playedThisRound.findIndex(e => e.id === chosenId);
+  const entry = player.playedThisRound[idx];
+  // Karta se nejdřív na chvíli zvýrazní (jinak než při zahrání/schopnosti), pak teprve zmizí ze
+  // stolu a vrátí se na ruku.
+  await flashEntries(game, [entry], 'return');
+  player.playedThisRound.splice(idx, 1);
+  player.hand.push({ id: uid('card'), color: entry.color, value: entry.value });
+  uiLog(`${player.name} musí vrátit kartu ${COLOR_NAME[entry.color]} ${entry.value} zpět na ruku (karta 1).`, 'return-one');
+}
+
+// ===================== KOLO =====================
+
+async function playRound(game) {
+  const isFirstRound = game.round === 1;
+  for (const p of game.players) { p.playedThisRound = []; p.passedThisRound = false; p.activeHeroThisRound = null; }
+  game.heroFlags = freshHeroFlags();
+  uiLog(`— Kolo ${game.round} — začíná ${game.players[game.startingPlayerIdx].name} —`, 'round-header');
+  uiRender(game);
+
+  let queue = seatOrderFrom(game, game.startingPlayerIdx);
+  let __turnGuard = 0;
+  while (queue.length > 0) {
+    __turnGuard++;
+    if (__turnGuard > 400) {
+      // pojistka proti nekonečné smyčce - vynutí konec kola
+      for (const p of queue) p.passedThisRound = true;
+      uiLog('Kolo bylo nouzově ukončeno (pojistka proti zacyklení).', 'muted');
+      break;
+    }
+    const player = queue.shift();
+    if (player.passedThisRound) continue;
+    // Snapshot PŘED tahem - kdyby hráč právě během tohoto tahu zahrál Cecily, přibude do
+    // lastCallIds až uvnitř takeTurn (viz heroCecily) a tenhle snapshot ho ještě nezachytí.
+    // Díky tomu dostane i samotný sesílatel Cecily ještě jeden regulérní tah navíc (přesně jako
+    // všichni ostatní) a je donucen passnout až po něm - ne hned po tahu, kdy Cecily zahrál.
+    const wasLastCall = !!(game.heroFlags.lastCallIds && game.heroFlags.lastCallIds.has(player.id));
+    await takeTurn(game, player, isFirstRound);
+    uiRender(game);
+    // Cecily Nevillová: kdo byl "na řadě" už v okamžiku zahrání (viz snapshot výše), dostal přesně
+    // tenhle jeden tah navíc, a hned poté je donucen passnout, i kdyby jinak chtěl pokračovat.
+    if (wasLastCall) {
+      if (game.heroFlags.lastCallIds) game.heroFlags.lastCallIds.delete(player.id);
+      player.passedThisRound = true;
+    }
+    if (!player.passedThisRound) queue.push(player);
+  }
+
+  await resolveRoundEnd(game, isFirstRound);
+}
+
+function rankPlayers(game) {
+  const n = game.players.length;
+  const dist = (seat) => (seat - game.startingPlayerIdx + n) % n;
+  const inverted = !!(game.heroFlags && game.heroFlags.invertedWinner);
+  return [...game.players].filter(p => !p.eliminated).sort((a, b) => {
+    const sa = roundSum(a), sb = roundSum(b);
+    const cmp = inverted ? (sa - sb) : (sb - sa);
+    if (cmp !== 0) return cmp;
+    return dist(a.seat) - dist(b.seat);
+  });
+}
+
+async function resolveRoundEnd(game, isFirstRound) {
+  const ranked = rankPlayers(game);
+  const winner = ranked[0];
+  uiLog(`Kolo vyhrává ${winner.name} (součet ${roundSum(winner)}).`, 'winner');
+
+  // bankované karty jdou natrvalo do victory poolu majitele (pouze pokud přežily kolo - zničená
+  // banknutá karta se počítá jako běžné zničení a jde na discard, ne do victory poolu)
+  for (const p of game.players) {
+    for (const e of p.playedThisRound) {
+      if (e.facedown && e.active) {
+        p.bankedPool[e.realColor] += 1;
+      }
+    }
+  }
+
+  // vítěz bere pole, na kterém stál
+  let claimedTileId = null;
+  const winnerTile = winner.currentTileId ? findTile(game, winner.currentTileId) : null;
+  if (winnerTile) {
+    claimedTileId = winnerTile.id;
+    winnerTile.status = 'claimed';
+    winnerTile.ownerId = winner.id;
+    winner.tilesPool[winnerTile.color] += 1;
+    winner.currentTileId = null;
+    uiLog(`${winner.name} získává pole ${COLOR_NAME[winnerTile.color]} do svého victory poolu.`, 'claim');
+  }
+
+  // vyklizení - vyhozené karty pryč, playedThisRound se vyprázdní
+  for (const p of game.players) {
+    for (const e of p.playedThisRound) {
+      if (e.facedown && e.active) continue; // přežilo kolo, už odešlo do victory poolu výše
+      if (e.isNeutralSource) {
+        game.neutralDiscard.push({ id: e.id, value: e.neutralValue });
+      } else {
+        // zahrnuje: normální zahrané karty (zničené i přeživší) i zničené banknuté karty
+        p.discardPile.push({ id: e.id, color: e.facedown ? e.realColor : e.color, value: e.value });
+      }
+    }
+    p.playedThisRound = [];
+  }
+
+  uiRender(game);
+  await sleep(ROUNDEND_DELAY_MS);
+
+  if (tilesTotal(winner) >= (game.winTiles || 4)) {
+    game.phase = 'gameover';
+    await finishGame(game);
+    return;
+  }
+
+  // Zásoba polí došla dřív, než kdokoliv dosáhl vítězného počtu polí (s 11 poli to už není
+  // matematicky garantované jako dřív s 13) - hra končí a rozhoduje se stejně jako běžná výhra,
+  // podle celkového skóre.
+  if (inPlayTiles(game).length === 0) {
+    uiLog('Všechna pole už byla obsazena, aniž by kdokoliv dosáhl vítězného počtu — hra končí, rozhoduje se skóre!', 'game-end');
+    game.phase = 'gameover';
+    await finishGame(game);
+    return;
+  }
+
+  // vítěz se přesouvá na nové pole
+  const freeCandidates = inPlayTiles(game);
+  if (freeCandidates.length > 0) {
+    let tileId;
+    if (winner.isHuman) {
+      tileId = await uiHumanChooseTile(game, winner, freeCandidates, 'Vybral jsi kolo! Vyber pole, na které se nyní přesuneš.');
+    } else {
+      tileId = botChooseTile(game, winner, freeCandidates, false);
+    }
+    await placeOnTile(game, winner, tileId, false);
+  }
+
+  // hráči, kterým bylo právě odebráno pole (sdíleli ho s vítězem), se musí přesunout jinam - za
+  // STEJNÝCH podmínek jako kterýkoliv jiný vstup na pole (karta z ruky, nebo 3 z balíčku, pokud je
+  // cílové pole obsazené) - vytlačení nikoho neosvobozuje od běžné ceny vstupu, viz placeOnTile.
+  if (claimedTileId) {
+    const displaced = ranked.filter(p => p.id !== winner.id && p.currentTileId === claimedTileId);
+    for (const p of displaced) {
+      p.currentTileId = null;
+    }
+    for (const p of displaced) {
+      const cands = inPlayTiles(game);
+      if (cands.length === 0) continue;
+      let tileId;
+      if (p.isHuman) {
+        tileId = await uiHumanChooseTile(game, p, cands, 'Přišel jsi o pole — vyber si nové pole.');
+      } else {
+        tileId = botChooseTile(game, p, cands, false);
+      }
+      uiLog(`${p.name} byl vytlačen ze svého pole a musí se přesunout.`, 'displaced');
+      await placeOnTile(game, p, tileId, false);
+    }
+  }
+
+  // dobírání
+  for (const p of game.players) if (!p.eliminated) drawCards(p, 2);
+  // limit karet na ruce - kdo si přes šetření/passování nahromadil víc než HAND_LIMIT, musí přebytek
+  // dobrovolně odhodit hned po dobrání, ještě než začne další kolo.
+  for (const p of game.players) if (!p.eliminated) await enforceHandLimit(game, p);
+
+  game.startingPlayerIdx = winner.seat;
+  game.round += 1;
+  uiRender(game);
+}
+
+async function finishGame(game) {
+  // Při shodě celkového skóre platí stejné pravidlo jako při shodě součtu na konci kola (viz
+  // rankPlayers) - rozhoduje pořadí po směru hodinových ručiček od AKTUÁLNÍHO začínajícího hráče,
+  // ne ledajaké pořadí v poli hráčů. Bez tohohle by .sort() nechal remízy na svém (stabilním, ale
+  // pravidly neopodstatněném) pořadí - a remíza v celkovém skóre není vzácná (v simulacích vychází
+  // na cca 1 z 12-15 her), takže by šlo o reálně špatně určeného vítěze, ne jen teoretickou hranu.
+  const n = game.players.length;
+  const dist = (seat) => (seat - game.startingPlayerIdx + n) % n;
+  const scores = game.players.map(p => ({
+    player: p,
+    breakdown: COLORS.map(c => ({ color: c, tiles: p.tilesPool[c], banked: p.bankedPool[c], points: p.tilesPool[c] * (1 + p.bankedPool[c]) })),
+    total: finalScore(p),
+  })).sort((a, b) => {
+    if (b.total !== a.total) return b.total - a.total;
+    return dist(a.player.seat) - dist(b.player.seat);
+  });
+  uiLog('Hra končí — sečítáme skóre!', 'game-end');
+  await uiAnnounceGameEnd(game, scores);
+}
+
+// ===================== AI BOTŮ =====================
+
+// Karta hodnoty 1 má schopnost vrátit si vlastní vyloženou kartu (2+) zpět na ruku - to je reálně
+// silnější nástroj než karta hodnoty 2 (viz maybeReturnOne), takže se nemá chovat jako "nejlevnější
+// možná" karta na bezmyšlenkovité odhození/zahození. Používá se všude, kde bot vybírá kartu jen
+// podle toho, že je "nejlevnější" (platba za vstup na obsazené pole, odhození nad limit ruky,
+// bezpečné zahrání proti hrozbě) - všude jinde než v přímém rozhodování hrát/banknout, kde je
+// hodnota schopnosti zvažována explicitně.
+function discardRank(card) {
+  return card.value === 1 ? 2.5 : card.value;
+}
+
+function botLowestCardId(hand) {
+  return hand.reduce((a, b) => (discardRank(b) < discardRank(a) ? b : a)).id;
+}
+
+function botChooseReturnCard(game, player, eligible) {
+  return withDifficulty(player,
+    () => botChooseReturnCardByGenome(game, player, eligible),
+    () => eligible.map(e => e.id));
+}
+
+function botChooseReturnCardByGenome(game, player, eligible) {
+  const tile = findTile(game, player.currentTileId);
+  const currentColor = tile ? tile.color : null;
+  // Preferuje vrátit kartu barvy pole, na kterém právě stojí - tu totiž může znovu zahrát a
+  // spustit tak schopnost pole ještě jednou (kombo). Jinak vezme zpět nejcennější kartu - buď
+  // aby ji zahrál pořádně později, nebo aby s ní vybaitil soupeře do zbytečně vysoké výhry kola.
+  const comboCandidates = eligible.filter(e => e.color === currentColor);
+  if (comboCandidates.length > 0) {
+    return comboCandidates.reduce((a, b) => (b.value > a.value ? b : a)).id;
+  }
+  return eligible.reduce((a, b) => (b.value > a.value ? b : a)).id;
+}
+
+function colorSupply(game, color) {
+  return inPlayTiles(game).filter(t => t.color === color).length;
+}
+
+// Které barvy polí právě "hrozí" - aktivní (nepassnutí) soupeři na nich stojí, takže jejich
+// schopnost může tohle kolo ještě zdarma zasáhnout. Veřejná informace (pozice na poli je vidět),
+// žádné hádání - používá se pro counterplay (nehrát/nebankovat naslepo do hrozby).
+function dangerousOpponentColors(game, player) {
+  const colors = new Set();
+  for (const p of otherActivePlayers(game, player)) {
+    if (p.passedThisRound) continue;
+    const t = findTile(game, p.currentTileId);
+    if (t) colors.add(t.color);
+  }
+  return colors;
+}
+
+// Odhad, jak moc by se PRÁVĚ TEĎ vyplatilo spustit schopnost daného pole - používá se k tomu, aby
+// bot neprioritizoval hraní karty jen proto, že "je zadarmo", ale jen když z toho reálně něco má.
+// Vyšší číslo = větší cena za nevyužití. Škála je hrubá (řádově 0-5), srovnatelná napříč barvami.
+function estimateAbilityValue(game, player, color) {
+  const others = otherActivePlayers(game, player);
+  if (others.length === 0) return 0;
+  const G = player.genome;
+  const mySum = roundSum(player);
+  const leaderSum = Math.max(...others.map(roundSum));
+
+  if (color === 'R') {
+    // Vražda - hodnota roste s tím, kolik bych soupeři sundal a jak blízko jsem mu v součtu.
+    const leader = others.reduce((a, b) => (roundSum(b) > roundSum(a) ? b : a));
+    const theirActive = leader.playedThisRound.filter(e => e.active && !isProtected(e));
+    if (theirActive.length === 0) return 0;
+    const theirTop = theirActive.reduce((a, b) => (b.value > a.value ? b : a));
+    return Math.min(5, theirTop.value * G.redTopCoeff + (mySum <= leaderSum ? G.redCloseBonus : 0));
+  }
+  if (color === 'B') {
+    // Špionáž - hodnota podle toho, jestli právě dotahuju na vedoucího.
+    return mySum <= leaderSum ? G.blueCloseValue : G.blueFarValue;
+  }
+  if (color === 'Y') {
+    const candidates = others.filter(p => p.playedThisRound.some(e => e.active && e.facedown && !isProtected(e)));
+    if (candidates.length === 0) return 0;
+    const threat = candidates.reduce((a, b) => (tilesTotal(b) > tilesTotal(a) ? b : a));
+    return Math.min(5, tilesTotal(threat) * G.yellowTilesCoeff);
+  }
+  if (color === 'G') {
+    const eligible = player.playedThisRound.filter(e => e.active && !e.facedown && !isProtected(e));
+    if (eligible.length === 0) return 0;
+    const best = eligible.reduce((a, b) => (b.value > a.value ? b : a));
+    const gapToLeader = leaderSum - mySum;
+    return Math.min(5, best.value * G.greenBestCoeff + (gapToLeader > G.greenGapThreshold ? G.greenGapBonus : 0));
+  }
+  if (color === 'S') {
+    let bestTargetValue = 0;
+    for (const p of others) {
+      const theirs = p.playedThisRound.filter(e => e.active && !isProtected(e) && !e.facedown);
+      if (theirs.length === 0) continue;
+      const top = theirs.reduce((a, b) => (b.value > a.value ? b : a));
+      if (top.value > bestTargetValue) bestTargetValue = top.value;
+    }
+    return Math.min(5, bestTargetValue * G.greyBestTargetCoeff);
+  }
+  return 0;
+}
+
+function roundWinConfidence(game, player) {
+  // hrubý odhad, jak jistá je výhra tohoto kola: 'high' | 'medium' | 'low'
+  const mySum = roundSum(player);
+  const others = otherActivePlayers(game, player);
+  if (others.length === 0) return 'high';
+  const leaderSum = Math.max(...others.map(roundSum));
+  const stillActive = others.filter(p => !p.passedThisRound).length;
+  if (mySum > leaderSum) {
+    if (stillActive === 0) return 'high'; // všichni ostatní už passli, součet je zamčený v můj prospěch
+    return (mySum - leaderSum >= 3) ? 'high' : 'medium';
+  }
+  return 'low';
+}
+
+function botPickGreyGiveEntry(player) {
+  const mine = player.playedThisRound.filter(e => e.active && !isProtected(e));
+  return withDifficulty(player,
+    () => botPickGreyGiveEntryByGenome(player, mine),
+    () => mine.map(e => e.id));
+}
+
+function botPickGreyGiveEntryByGenome(player, mine) {
+  // Nejradši dá pryč banknutou kartu, která je stejně k ničemu (bezbarvý bluff, nebo barva, do
+  // které vůbec neinvestuje) - nezničí tím žádnou reálnou šanci na body.
+  const uselessBanked = mine.filter(e => e.facedown && (e.realColor === 'N' || player.tilesPool[e.realColor] === 0));
+  if (uselessBanked.length > 0) return uselessBanked[0].id;
+  // Jinak dá pryč nejnižší AKTIVNÍ (nebanknutou) kartu - nikdy neobětuje reálnou banknutou investici.
+  const nonFacedown = mine.filter(e => !e.facedown);
+  if (nonFacedown.length > 0) return nonFacedown.reduce((a, b) => (b.value < a.value ? b : a)).id;
+  // Jako poslední možnost (samé banknuté karty) vezme tu s nejnižší skutečnou hodnotou.
+  return mine.reduce((a, b) => ((a.realValue ?? a.value) <= (b.realValue ?? b.value) ? a : b)).id;
+}
+
+function botPickGreyTakeEntry(actingPlayer, target) {
+  const theirs = target.playedThisRound.filter(e => e.active && !isProtected(e));
+  return withDifficulty(actingPlayer,
+    () => theirs.reduce((a, b) => (b.value > a.value ? b : a)).id,
+    () => theirs.map(e => e.id));
+}
+
+function botChooseShieldCard(game, player, candidates) {
+  return withDifficulty(player,
+    // Štít má smysl hlavně na nejcennější vyloženou kartu - tu, o kterou by nejvíc bolelo přijít.
+    () => candidates.reduce((a, b) => (b.value > a.value ? b : a)).id,
+    () => candidates.map(c => c.id));
+}
+
+function botChooseYellowTarget(game, player, candidates) {
+  // Bot nevidí skutečnou hodnotu soupeřovy banknuté karty (je tajná až do odhalení), takže nemá
+  // podle čeho preferovat jednu před druhou - vybírá čistě náhodně.
+  return candidates[Math.floor(Math.random() * candidates.length)].id;
+}
+
+function botDecideAction(game, player, isFirstRound) {
+  return withDifficulty(player,
+    () => botDecideActionByGenome(game, player, isFirstRound),
+    () => enumerateLegalActions(game, player));
+}
+
+function botDecideActionByGenome(game, player, isFirstRound) {
+  const G = player.genome;
+  const hand = player.hand;
+  if (hand.length === 0) {
+    // bez karet zbývá jen hrdina (pokud má co zahrát a alespoň trochu se to vyplatí) nebo pass
+    const forcedHero = botConsiderHero(game, player, true);
+    return forcedHero || { type: 'pass' };
+  }
+  const heroAction = botConsiderHero(game, player, false);
+  if (heroAction) return heroAction;
+  const tile = findTile(game, player.currentTileId);
+  const currentColor = tile ? tile.color : null;
+  const mySum = roundSum(player);
+  const others = otherActivePlayers(game, player);
+  const activeOthers = others.filter(p => !p.passedThisRound);
+  const leaderSum = others.length ? Math.max(...others.map(roundSum)) : 0;
+  // Karty, jejichž hodnota je dočasně zakázaná pro hraní lícem nahoru (York/Edmund), bot z
+  // nabídky "zahrát" úplně vyřazuje - banknout je pořád může (viz bankCandidates níže).
+  const playableHand = hand.filter(c => !cardPlayBanned(game, c));
+  const matching = playableHand.filter(c => c.color === currentColor).sort((a, b) => b.value - a.value);
+  const highest = playableHand.length ? playableHand.reduce((a, b) => (b.value > a.value ? b : a)) : null;
+  // "Bezpečná" nejlevnější karta pro obranné/výplňové zahrání - karta hodnoty 1 se do tohohle
+  // výběru počítá až za hodnotu 2 (viz discardRank), protože její schopnost vrátit vlastní vyloženou
+  // kartu zpět na ruku je reálně silnější než jen hodnota 2 - není to "levná" karta na zahození.
+  const lowest = playableHand.length ? playableHand.reduce((a, b) => (discardRank(b) < discardRank(a) ? b : a)) : null;
+  const ones = playableHand.filter(c => c.value === 1);
+  const confidence = roundWinConfidence(game, player);
+  const gapToLeader = leaderSum - mySum;
+  const worthChasing = confidence !== 'low' || gapToLeader <= 2;
+
+  // Counterplay: na jakých barvách polí právě stojí aktivní (nepassnutí) soupeři - to jsou
+  // schopnosti, které je ještě tohle kolo mohou zdarma zasáhnout. Veřejná informace (pozice na
+  // poli je vidět), žádné hádání.
+  const danger = dangerousOpponentColors(game, player);
+  const redOrGreyLive = danger.has('R') || danger.has('S'); // Vražda/Svatba můžou zasáhnout vyloženou kartu
+  const yellowLive = danger.has('Y'); // Úplatky můžou zasáhnout banknutou kartu
+
+  // Jak moc by se PRÁVĚ TEĎ vyplatilo spustit schopnost pole, na kterém stojím - rozhoduje, jestli
+  // je vůbec vhodné prioritizovat zahrání odpovídající barvy, nebo je lepší bankovat/hrát bezpečně
+  // a schopnost nechat na chvíli, kdy bude mít reálný dopad (bod je víc než "zadarmo" spuštěná
+  // schopnost bez efektu).
+  const abilityVal = currentColor ? estimateAbilityValue(game, player, currentColor) : 0;
+  const abilityWorthChasing = abilityVal >= G.abilityWorthChasingThreshold;
+
+  // Bankování: barvy, které už vlastní jako pole, jsou vždy bezpečná investice. Barvu pole, na
+  // kterém právě stojí, bankuje jen když je buď dost jistý, že tohle kolo vyhraje (a pole tedy
+  // získá), nebo když je té barvy v poolu ještě dost na to, aby měl rozumnou šanci ji získat i
+  // příště - jinak by šlo o zbytečně riskantní sázku na barvu, kterou možná nikdy nezíská.
+  const noBanking = !!(game.heroFlags && game.heroFlags.noBanking);
+  const ownedColors = COLORS.filter(c => player.tilesPool[c] > 0);
+  const investColors = new Set(ownedColors);
+  const speculativeOk = currentColor && (confidence === 'high' || colorSupply(game, currentColor) >= 2);
+  if (speculativeOk) investColors.add(currentColor);
+  const bankCandidates = noBanking ? [] : hand.filter(c => investColors.has(c.color)).sort((a, b) => a.value - b.value);
+  function tryBank() {
+    if (bankCandidates.length === 0) return null;
+    return { type: 'bank', cardId: bankCandidates[0].id };
+  }
+
+  // Poslední karta v beznadějném kole: zahrát ji naplno (bez užitku) je zbytečná ztráta - karta by
+  // jen propadla, zatímco na ruce by přežila do příštího kola. Bankování je v pořádku (jde do
+  // bodů), stejně jako zahrání, pokud by schopnost pole reálně ještě k něčemu byla (viz
+  // abilityWorthChasing níže - třeba oslabit vedoucího i bez naděje na výhru kola samotného).
+  // Vyhodnoceno TEĎ, deterministicky - ne přes náhodnou "vzdát kolo" šanci níže, protože u úplně
+  // poslední karty už není co "postupně" zvažovat přes další tahy.
+  if (hand.length === 1 && !worthChasing) {
+    const b = tryBank(); if (b) return b;
+    if (!(matching.length > 0 && abilityWorthChasing)) return { type: 'pass' };
+  }
+
+  // šance, že bot preferuje bankování před hraním "naslepo" na vysoký součet - boti mají
+  // primárně sbírat body (pole × banknuté karty), ne za každou cenu vyhrávat každé kolo. Když
+  // schopnost pole zrovna nestojí za honění, banking se stává ještě lákavější (proč riskovat
+  // vysokou kartu na abilitu, co teď nic nepřinese); naopak když abilita reálně pomůže, banking
+  // ustupuje. A pokud soupeř stojí na Úplatcích a ještě nepassnul, bankování téměř úplně utlumíme -
+  // banknutá karta je jeho volný terč, dokud nepasne.
+  let bankChance = G.bankChanceBase;
+  if (matching.length > 0 && !abilityWorthChasing) bankChance = Math.min(G.bankChanceCap, bankChance + G.bankChanceAbilityLowBump);
+  if (matching.length > 0 && abilityWorthChasing) bankChance = Math.max(G.bankChanceFloor, bankChance - G.bankChanceAbilityHighDrop);
+  if (yellowLive) bankChance *= G.bankChanceYellowMult;
+  const wantsBank = bankCandidates.length > 0 && Math.random() < bankChance;
+
+  // Vzdát kolo: pokud honba za výhrou nevypadá slibně, bot raději šetří karty do dalšího kola
+  // místo aby je zbytečně utrácel - vytváří to napětí a nutí soupeře hádat, jestli ještě hraje,
+  // nebo už dávno "spí". Míra ochoty vzdát se je jiná pro každý styl (hoarder nejvíc, aggressive
+  // nejmíň). Tohle je vyhodnoceno na KAŽDÉM tahu (ne jen jednou za kolo) - protože únava ruky se
+  // musí umět zhoršovat, jak se ruka postupně tenčí v průběhu kola. Aby to ale nekolabovalo do
+  // téměř jistého passu po pár tazích (jako dřív), používáme malé šance NA TAH, ne na kolo -
+  // teprve jejich kumulace v čase (a únava rostoucí s tenčí rukou) dělá pozdější tahy v kole
+  // čím dál opatrnější, ne jeden umělý "hod kostkou" hned na začátku.
+  //
+  // Nezávisle na "nevyplatí se to honit" platí i "únava ruky": čím míň karet bot drží (zejména
+  // 5 a méně), tím větší šanci má na pas i v kole, které by jinak ještě klidně honil - jinak se
+  // v prvních kolech vykartuje a v dalších už nemá co hrát. Neplatí, pokud kolo aktuálně jasně
+  // vede (confidence 'high') - tam se vyplatí to dohrát a pole opravdu získat, ne ho zahodit
+  // kvůli únavě. V 1. kole navíc přidáváme malou vrozenou opatrnost - ještě nevím, co soupeři
+  // drží ani co bankují, takže není důvod pálit karty na kolo, které nemá žádnou zvláštní hodnotu
+  // navíc oproti kterémukoliv jinému.
+  const baseConserveChance = G.conserveChanceBase;
+  const fatigueChance = confidence === 'high' ? 0 : Math.min(G.fatigueCap, Math.max(0, (G.fatigueHandThreshold - hand.length) * G.fatigueSlope));
+  const firstRoundCaution = isFirstRound ? G.firstRoundCaution : 0;
+  // Riskovat vysokou kartu do honby, když soupeř stojí na Vraždě/Svatbě a nevedu jasně, je
+  // zbytečné vystavování terče - o něco raději šetřím a nechám soupeře, ať se poperou mezi sebou.
+  const riskChance = (redOrGreyLive && confidence !== 'high') ? G.riskChanceWhenThreatened : 0;
+  const conserveChance = Math.max(baseConserveChance, fatigueChance, firstRoundCaution, riskChance);
+  if (!worthChasing || fatigueChance > 0 || firstRoundCaution > 0 || riskChance > 0) {
+    if (Math.random() < conserveChance) {
+      // Když se kolo vzdává a soupeř zrovna hrozí Úplatky, banking teď nemá cenu (jen bych
+      // vystavil čerstvě banknutou kartu jeho schopnosti) - radši rovnou pass.
+      if (!yellowLive) {
+        const b = tryBank(); if (b) return b;
+      }
+      return { type: 'pass' };
+    }
+  }
+
+  // Komfortně vede - zamkne si výhru a nezvyšuje součet zbytečně (práh dle genomu).
+  const aheadMargin = G.aheadMargin;
+  if (mySum > leaderSum + aheadMargin || (activeOthers.length === 0 && mySum >= leaderSum)) {
+    const b = tryBank(); if (b) return b;
+    return { type: 'pass' };
+  }
+
+  if (wantsBank) { const b = tryBank(); if (b) return b; }
+
+  if (!highest) {
+    // vůbec nic se nedá zahrát lícem nahoru (York/Edmund zabrali celou ruku) - zbývá banknout,
+    // nebo passnout.
+    const b = tryBank(); if (b) return b;
+    return { type: 'pass' };
+  }
+
+  // Má-li bot na stole ohroženou nechráněnou kartu hodnoty 3+ a v ruce jedničku, zatímco aktivní
+  // soupeř hrozí Vraždou/Svatbou a kolo jasně nevede, je zahrání jedničky chytrý tah - schopností
+  // "vrátit kartu" si tu ohroženou kartu vezme zpátky na ruku dřív, než o ni přijde zadarmo.
+  // Počítáno zvlášť nahoře, ať to neschová jiná podmínka (např. abilityWorthChasing).
+  const oneRescueTarget = redOrGreyLive && confidence !== 'high' && ones.length > 0 &&
+    player.playedThisRound.some(e => e.active && e.value >= 3 && !e.facedown && !isProtected(e));
+
+  // "Hoardovací" preference (dřív pevně svázaná se stylem 'hoarder'): mimo endgame ještě šetřit a
+  // hrát levné výplňové karty, dokud to jde. Teď kontinuální - G.hoardingTendency (0-1) je šance,
+  // že se tahle preference na daném tahu vůbec zvažuje, G.hoardingTileGate nahrazuje dřívější
+  // pevnou mez "< 3 pole".
+  const hoardingNow = G.hoardingTendency > 0 && Math.random() < G.hoardingTendency && tilesTotal(player) < G.hoardingTileGate;
+
+  let card;
+  if (oneRescueTarget) {
+    card = ones[0];
+  } else if (hoardingNow) {
+    // Hodnota 1 se do "levných" nepočítá vůbec (i mezi neutrálními kartami - neutrální balíček v
+    // ruce obsahuje hodnoty 0-6, takže i neutrální jednička je pořád jednička), je to tahově silná
+    // karta, ne fodder.
+    const filler = playableHand.filter(c => c.value !== 1 && (c.color === 'N' || c.value <= 2));
+    card = filler.length ? filler.reduce((a, b) => (b.value < a.value ? b : a)) : playableHand.reduce((a, b) => (discardRank(b) < discardRank(a) ? b : a));
+  } else if (matching.length > 0 && (abilityWorthChasing || matching[0].value !== 1)) {
+    // Schopnost pole buď teď reálně pomůže (viz estimateAbilityValue), nebo zahrání téhle karty
+    // stejně nic nestojí navíc, protože to není jednička - žádný důvod ji schovávat.
+    card = matching[0];
+  } else if (redOrGreyLive && confidence !== 'high' && lowest) {
+    // Soupeř stojí na Vraždě/Svatbě a nevedu jasně - nevystavuju zbytečně svou nejlepší kartu
+    // jako terč, radši hraju bezpečně nízkou (ale ne jedničku jen tak - viz discardRank) a lepší
+    // karty schovávám na později/bankování.
+    card = lowest;
+  } else if (matching.length > 0) {
+    // Zbývá případ: jediná odpovídající karta JE jednička a schopnost teď nestojí za honění -
+    // neplýtvat jí na bezcenné spuštění, zahrát radši normálně nejvyšší kartou a jedničku si
+    // nechat na později (na skutečnou záchranu, kombo, nebo bezpečný pozdější tah).
+    card = highest.value !== 1 ? highest : matching[0];
+  } else {
+    card = highest;
+  }
+  return { type: 'play', cardId: card.id };
+}
+
+function botUseFavorToken(game, player, currentColor) {
+  return withDifficulty(player,
+    () => botUseFavorTokenByGenome(game, player, currentColor),
+    () => [true, false]);
+}
+
+function botUseFavorTokenByGenome(game, player, currentColor) {
+  const G = player.genome;
+  const mySum = roundSum(player);
+  const others = otherActivePlayers(game, player);
+  if (others.length === 0) return false;
+  if (game.heroFlags && game.heroFlags.noNeutralCards && currentColor === 'B') return false;
+  const leaderSum = Math.max(...others.map(roundSum));
+
+  if (currentColor === 'R') {
+    // Vraždu použije jen když by zabití soupeřovy nejlepší karty skutečně zvrátilo kolo v jeho
+    // prospěch - ne naslepo. Cílem je přirozeně aktuální lídr kola.
+    const leader = others.reduce((a, b) => (roundSum(b) > roundSum(a) ? b : a));
+    const theirActive = leader.playedThisRound.filter(e => e.active && !isProtected(e));
+    if (theirActive.length === 0) return false;
+    const theirTop = theirActive.reduce((a, b) => (b.value > a.value ? b : a));
+    const leaderSumWithoutTop = roundSum(leader) - theirTop.value;
+    return mySum <= leaderSum && mySum > leaderSumWithoutTop - G.redTokenMargin;
+  }
+
+  if (currentColor === 'B') {
+    // Podporu církve použije jen když ještě nevede - honit součet, když už vyhrává, je zbytečné.
+    return mySum <= leaderSum + G.blueTokenMargin;
+  }
+
+  if (currentColor === 'Y') {
+    // Úplatky (odhalení a znehodnocení soupeřovy banknuté karty) - cílí na hráče, který má tohle
+    // kolo nejvíc banknutých karet (nejvíc co ztratit); pokud nikdo nic banknutého nemá, propadá.
+    const candidates = others.filter(p => p.playedThisRound.some(e => e.active && e.facedown && !isProtected(e)));
+    if (candidates.length === 0) return false;
+    const threat = candidates.reduce((a, b) => (tilesTotal(b) > tilesTotal(a) ? b : a));
+    return tilesTotal(threat) >= G.yellowTokenTileThreshold || roundSum(threat) > mySum + G.yellowTokenSumMargin;
+  }
+
+  if (currentColor === 'G') {
+    // Štít - žeton je drahé zboží (a jeho pouhé držení soupeře straší), takže se vyplatí jen
+    // když reálně naklání váhy: chráním opravdu cennou kartu (ne ledajakou) A jsem buď v kole
+    // ještě ve hře o vedení, nebo bych bez štítu klesl znatelně pod vedoucího. Když vedu s
+    // pohodlným náskokem nebo naopak beznadějně ztrácím, ochrana jedné karty výsledek kola
+    // nezmění - žeton se šetří na chvíli, kdy skutečně rozhodne.
+    const eligible = player.playedThisRound.filter(e => e.active && !e.facedown && !isProtected(e));
+    if (eligible.length === 0) return false;
+    const best = eligible.reduce((a, b) => (b.value > a.value ? b : a));
+    if (best.value < G.shieldValueThreshold) return false;
+    const gapToLeader = leaderSum - mySum;
+    if (gapToLeader > G.shieldMaxDeficit) return false; // beznadějně ztrácím - ochrana jedné karty kolo nezachrání
+    return gapToLeader > G.shieldMinLead;
+  }
+
+  if (currentColor === 'S') {
+    // Svatbu použije jen když má skutečně co nevýhodně dát (nejlépe bezcennou banknutou kartu)
+    // a soupeř má co nabídnout lepšího - jinak škoda žetonu.
+    if (!player.playedThisRound.some(e => e.active && !isProtected(e))) return false;
+    const giveId = botPickGreyGiveEntry(player);
+    const giveEntry = player.playedThisRound.find(e => e.id === giveId);
+    const giveValue = giveEntry.facedown ? -1 : giveEntry.value; // bezcenný bluff bank = "levné" dát pryč
+    let bestTargetValue = -Infinity;
+    for (const p of others) {
+      const theirs = p.playedThisRound.filter(e => e.active && !isProtected(e) && !e.facedown);
+      if (theirs.length === 0) continue;
+      const top = theirs.reduce((a, b) => (b.value > a.value ? b : a));
+      if (top.value > bestTargetValue) bestTargetValue = top.value;
+    }
+    if (bestTargetValue === -Infinity) return false;
+    return bestTargetValue > giveValue + G.greyTradeMargin;
+  }
+
+  return false;
+}
+
+function tileScoreForBot(player, tile, occupantPenalty) {
+  const G = player.genome;
+  const handMatch = player.hand.filter(c => c.color === tile.color).reduce((s, c) => s + c.value, 0);
+  const synergy = player.tilesPool[tile.color] * G.tileSynergyTilesWeight + player.bankedPool[tile.color] * G.tileSynergyBankedWeight;
+  const penalty = occupantPenalty ? tile.occupants.length * G.tileOccupantPenalty : 0;
+  return handMatch + synergy - penalty;
+}
+
+function botChooseTile(game, player, candidates, isInitial) {
+  return withDifficulty(player,
+    () => botChooseTileByGenome(game, player, candidates, isInitial),
+    () => candidates.map(t => t.id));
+}
+
+function botChooseTileByGenome(game, player, candidates, isInitial) {
+  const G = player.genome;
+  let best = candidates[0];
+  let bestScore = -Infinity;
+  for (const t of candidates) {
+    const score = tileScoreForBot(player, t, true) + Math.random() * G.tileRandomJitter;
+    if (score > bestScore) { bestScore = score; best = t; }
+  }
+  return best.id;
+}
+
+// ===================== HLAVNÍ SMYČKA =====================
+
+async function runGame(game) {
+  await initialPlacementPhase(game);
+  while (game.phase === 'round') {
+    await playRound(game);
+  }
+}
+
+function __auditTotal(game) {
+  let total = 0;
+  for (const p of game.players) {
+    const bankedTotal = Object.values(p.bankedPool).reduce((s, v) => s + v, 0);
+    total += p.hand.length + p.drawPile.length + p.discardPile.length + p.playedThisRound.length + bankedTotal;
+  }
+  return total;
+}
+
+async function takeTurn(game, player, isFirstRound) {
+  if (player.hand.length === 0 && !hasUnusedHero(player)) {
+    player.passedThisRound = true;
+    uiLog(`${player.name} nemá karty na ruce ani hrdiny a musí passnout.`, 'muted');
+    return;
+  }
+  let action;
+  if (player.isHuman) {
+    action = await uiHumanChooseAction(game, player);
+  } else {
+    await sleep(BOT_DELAY_MS);
+    action = botDecideAction(game, player, isFirstRound);
+  }
+
+  if (action.type === 'pass') {
+    player.passedThisRound = true;
+    uiLog(`${player.name} passuje.`, 'pass');
+    return;
+  }
+
+  if (action.type === 'hero') {
+    await playHero(game, player, action.heroId);
+    return;
+  }
+
+  const idx = player.hand.findIndex(c => c.id === action.cardId);
+  const card = player.hand[idx];
+  if (!card) { player.passedThisRound = true; return; }
+
+  if (action.type === 'bank' && game.heroFlags && game.heroFlags.noBanking) {
+    // ochranná pojistka - bot/UI by tuhle volbu neměly nabízet, dokud platí Henry VI.
+    uiLog(`${player.name} nemůže bankovat - bankování je dočasně zakázané (Henry VI.). Passuje.`, 'muted');
+    player.passedThisRound = true;
+    return;
+  }
+  if (action.type === 'play' && cardPlayBanned(game, card)) {
+    // ochranná pojistka - hodnota je dočasně zakázaná pro hraní lícem nahoru (York/Edmund),
+    // nebo jde o bezbarvou kartu a bezbarvé karty jsou dočasně zakázané (Jindřich VI.).
+    const reason = card.color === 'N' && game.heroFlags && game.heroFlags.noNeutralCards
+      ? 'bezbarvé karty jsou dočasně zakázané'
+      : 'tuhle hodnotu nelze zahrát lícem nahoru';
+    uiLog(`${player.name} nemůže zahrát tuto kartu - ${reason}. Passuje.`, 'muted');
+    player.passedThisRound = true;
+    return;
+  }
+
+  player.hand.splice(idx, 1);
+  const tile = findTile(game, player.currentTileId);
+  const currentColor = tile ? tile.color : null;
+
+  if (action.type === 'bank') {
+    // libovolná barva (i bezbarvá) se dá banknout - bezbarvá karta nikdy neskóruje (žádné pole
+    // není bezbarvé), ale právě proto je to legitimní blaf: soupeři nevidí, co jsi banknul.
+    const bankedForcedZero = !!(game.heroFlags && game.heroFlags.forceBankedZero); // Edward IV.
+    const placeholderValue = bankedForcedZero ? 0 : 1;
+    const entry = { id: uid('play'), color: 'N', realColor: card.color, realValue: card.value, value: placeholderValue, originalValue: placeholderValue, active: true, facedown: true };
+    player.playedThisRound.push(entry);
+    uiLog(`${player.name} bankuje kartu lícem dolů (hodnota ${placeholderValue}).`, 'bank');
+    await flashEntries(game, [entry], 'play');
+    return;
+  }
+
+  // action.type === 'play'
+  const entry = { id: uid('play'), color: card.color, realColor: card.color, value: card.value, originalValue: card.value, active: true, facedown: false };
+  if (game.heroFlags && game.heroFlags.forceValueOne) entry.value = 1; // Edward IV.
+  player.playedThisRound.push(entry);
+  uiLog(`${player.name} hraje ${COLOR_NAME[card.color]} ${card.value}.`, 'play');
+  // Krok 1: zahraná karta se na chvíli zvýrazní, ať je vidět, že přibyla na stůl, než se stane
+  // cokoliv dalšího (schopnost, vrácení karty na ruku...).
+  await flashEntries(game, [entry], 'play');
+
+  // Krok 2: pokud karta spustí schopnost pole zdarma (barva karty odpovídá poli, na kterém stojím),
+  // ta se vyhodnotí hned (a zasažené karty se zvýrazní samy).
+  if (currentColor && card.color === currentColor) {
+    await triggerAbility(game, currentColor, player, false);
+  }
+  // Krok 3: žeton přízně jde použít jen když právě zahraná karta NENÍ barvy pole, na kterém stojím -
+  // pokud by byla, schopnost už proběhla zdarma výše a žeton by ji spustil podruhé. Pod Příměřím
+  // se žeton nabízet vůbec nemá, protože schopnost by stejně jen propadla. Tohle musí proběhnout
+  // PŘED krokem s kartou hodnoty 1 (viz krok 4) - žeton (např. svatba/prohození karet) se má
+  // stihnout vyhodnotit dřív, než se hráč rozhoduje, kterou svou kartu vrátí zpět na ruku.
+  if (!abilitiesDisabled(game) && player.favorTokens > 0 && currentColor && card.color !== currentColor) {
+    const use = player.isHuman
+      ? await uiHumanYesNo(game, player, `Chceš použít žeton přízně a spustit schopnost pole (${COLOR_ABILITY_NAME[currentColor]})? Zbývá ti ${player.favorTokens}.`)
+      : botUseFavorToken(game, player, currentColor);
+    if (use) {
+      player.favorTokens -= 1;
+      // Trvalý vizuální otisk na kartě, která žeton spustila - zůstává vidět až do konce kola.
+      entry.favorUsed = true;
+      uiLog(`${player.name} používá žeton přízně (${COLOR_ABILITY_NAME[currentColor]}).`, 'favor');
+      await triggerAbility(game, currentColor, player, true);
+    }
+  }
+  // Krok 4: karta s hodnotou 1 nutí vrátit jinou vyloženou kartu zpět na ruku (zvýrazní se sama) -
+  // až úplně naposled, po vyhodnocení schopnosti (ať už zdarma podle pole, nebo přes žeton), aby
+  // hráč věděl přesně, jak stůl vypadá (např. po prohození kartou svatby), než si vybírá, kterou
+  // vlastní kartu vrátí. Pokud platí Příměří (Margaret Beaufort), tohle pravidlo do konce kola padá.
+  if (card.value === 1) {
+    if (abilitiesDisabled(game)) {
+      uiLog(`${player.name} zahrál kartu s hodnotou 1, ale vracení karty je díky Příměří zrušené.`, 'muted');
+    } else {
+      await maybeReturnOne(game, player);
+    }
+  }
+}
+
+</script>
+<script>
+// ===================== UI VRSTVA =====================
+
+const $ = (id) => document.getElementById(id);
+const HOUSE_ICON = { R: '🩸', G: '🌿', Y: '👑', B: '⛪', S: '💍', N: '◆' };
+
+let __selectedCardId = null;
+let __logRenderedCount = 0;
+
+function uiLog(text, cls) {
+  const entry = document.createElement('div');
+  entry.className = 'entry' + (cls ? ' ' + cls : '');
+  entry.textContent = text;
+  $('log-list').prepend(entry);
+}
+
+// flash: nepovinný krátkodobý stavový příznak z herní logiky (viz game.js flashEntries), který se
+// zobrazí jako jasně odlišená animace, aby bylo poznat "co se právě stalo" krok za krokem:
+//   'play'   - karta byla právě zahrána/banknuta (žlutozelený záblesk)
+//   'add'    - na stůl přibyla nová karta díky schopnosti (modrý záblesk)
+//   'hit'    - karta byla právě zničena schopností/hrdinou (červený záblesk + křížek)
+//   'swap'   - karta právě změnila majitele (svatba, fialový záblesk)
+//   'return' - karta se za chvíli vrátí zpět na ruku (oranžový záblesk)
+const FLASH_TITLE = {
+  play: 'Právě zahráno.',
+  add: 'Právě přibylo díky schopnosti.',
+  hit: 'Právě zničeno.',
+  swap: 'Právě prohozeno (svatba).',
+  return: 'Vrací se zpět na ruku (karta 1).',
+};
+
+function cardEl(colorKey, value, opts) {
+  opts = opts || {};
+  const el = document.createElement('div');
+  el.className = 'card house-' + colorKey + ' card-' + colorKey + (opts.big ? ' big' : '') +
+    (opts.facedown ? ' facedown' : '') + (opts.inactive ? ' inactive' : '') + (opts.clickable ? ' clickable' : '') +
+    (opts.locked ? ' locked' : '') + (opts.shielded ? ' shielded' : '') + (opts.peek ? ' peekable' : '') +
+    (opts.origPeek != null ? ' origable' : '') + (opts.banned ? ' value-banned' : '') +
+    (opts.negative ? ' negative' : '') + (opts.flash ? ' flash-' + opts.flash : '');
+  if (opts.banned) el.title = 'Tuto hodnotu teď nelze hrát lícem nahoru (schopnost hrdiny) - jde ale banknout.';
+  if (opts.flash) el.title = FLASH_TITLE[opts.flash] || '';
+  if (opts.facedown) {
+    el.textContent = '?';
+  } else {
+    el.textContent = String(value);
+  }
+  if (opts.locked) el.title = 'Úplatky: tuto kartu nelze žádným způsobem cílit (zničit, vrátit, prohodit) - platí do konce kola.';
+  if (opts.shielded) el.title = 'Štít (Špionáž): tuto kartu nelze žádným způsobem cílit ani jí měnit hodnotu - platí do konce kola.';
+  // Vlastní banknutá karta (lícem dolů pro všechny ostatní) po najetí myší lehce "prosvítí" -
+  // ukáže se skutečná barva a hodnota na 75% opacity. Jen pro vlastní karty (viz volání níže).
+  if (opts.peek) {
+    const peekLayer = document.createElement('div');
+    peekLayer.className = 'card-peek house-' + opts.peek.color;
+    peekLayer.textContent = String(opts.peek.value);
+    peekLayer.title = 'Tvá banknutá karta (vidíš jen ty).';
+    el.appendChild(peekLayer);
+  }
+  // Karta, jejíž zobrazená hodnota se liší od té, se kterou byla zahraná/banknutá (typicky vlivem
+  // hrdiny) - po najetí myší se ukáže původní hodnota na 100% opacity, ať vlastní nebo soupeřova.
+  if (opts.origPeek != null) {
+    const origLayer = document.createElement('div');
+    origLayer.className = 'card-orig';
+    origLayer.textContent = String(opts.origPeek);
+    origLayer.title = 'Původní hodnota před efektem hrdiny.';
+    el.appendChild(origLayer);
+  }
+  if (opts.flash === 'hit') {
+    const hit = document.createElement('div');
+    hit.className = 'hit-mark';
+    hit.textContent = '✕';
+    el.appendChild(hit);
+  }
+  if (opts.favor) {
+    const badge = document.createElement('div');
+    badge.className = 'favor-badge';
+    badge.textContent = '🪙';
+    badge.title = 'Na téhle kartě byl použit žeton přízně.';
+    el.appendChild(badge);
+  }
+  if (opts.selected) el.classList.add('selected');
+  if (opts.onClick) el.addEventListener('click', opts.onClick);
+  return el;
+}
+
+// Malá skupinka částečně překrytých rubů karet reprezentující počet karet v ruce daného hráče -
+// místo pouhého čísla, ať je na první pohled vidět "kolik toho asi drží v ruce".
+function handFanEl(count) {
+  const wrap = document.createElement('div');
+  wrap.className = 'hand-fan';
+  // Zobraz přesně tolik rubů, kolik karet hráč skutečně drží - číslo vedle musí sedět s obrázkem.
+  // Horní mez je jen pojistka proti nesmyslně velkému počtu (v běžné hře k tomu nedojde).
+  const shown = Math.min(count, 30);
+  for (let i = 0; i < shown; i++) {
+    const back = document.createElement('div');
+    back.className = 'card-back-mini';
+    back.style.zIndex = String(i);
+    wrap.appendChild(back);
+  }
+  const label = document.createElement('span');
+  label.className = 'hand-fan-count';
+  label.textContent = String(count);
+  wrap.appendChild(label);
+  return wrap;
+}
+
+// Zvláštní "dlaždice" pro hrdinu právě vyloženého do play area hráče - vizuálně odlišná od
+// běžných karet, viditelná pro všechny, dokud kolo neskončí (viz player.activeHeroThisRound).
+function heroTileEl(hero) {
+  const el = document.createElement('div');
+  el.className = 'hero-tile' + (hero.uiFlash ? ' flash-' + hero.uiFlash : '');
+  el.title = 'Aktivní hrdina tohoto kola: ' + hero.name;
+  const icon = document.createElement('div');
+  icon.className = 'hero-tile-icon';
+  icon.textContent = '🎭';
+  const label = document.createElement('div');
+  label.className = 'hero-tile-name';
+  label.textContent = hero.name;
+  el.appendChild(icon);
+  el.appendChild(label);
+  return el;
+}
+
+function poolBadge(colorMap, iconMap) {
+  const wrap = document.createElement('div');
+  wrap.style.display = 'inline-flex';
+  wrap.style.gap = '4px';
+  wrap.style.flexWrap = 'wrap';
+  for (const c of COLORS) {
+    const n = colorMap[c];
+    if (!n) continue;
+    const g = document.createElement('span');
+    g.className = 'pool-group';
+    const dot = document.createElement('span');
+    dot.className = 'mini-dot house-' + c;
+    const num = document.createElement('span');
+    num.className = 'n';
+    num.textContent = n;
+    g.appendChild(dot); g.appendChild(num);
+    wrap.appendChild(g);
+  }
+  return wrap;
+}
+
+function uiRender(game) {
+  renderStatus(game);
+  renderBoard(game);
+  renderPlayers(game);
+  renderHandArea(game);
+}
+
+function renderStatus(game) {
+  $('round-num').textContent = game.round;
+  const starter = game.players[game.startingPlayerIdx];
+  $('starting-player').textContent = starter ? starter.name : '—';
+}
+
+function renderBoard(game) {
+  const box = $('board-tiles');
+  box.innerHTML = '';
+  const tiles = inPlayTiles(game);
+  for (const t of tiles) {
+    const el = document.createElement('div');
+    el.className = 'tile house-' + t.color;
+    const label = document.createElement('div');
+    label.className = 'tile-label';
+    label.textContent = COLOR_NAME[t.color];
+    const occ = document.createElement('div');
+    occ.className = 'tile-occupants';
+    for (const pid of t.occupants) {
+      const p = game.players.find(x => x.id === pid);
+      if (!p) continue;
+      const chip = document.createElement('div');
+      chip.className = 'occ-chip' + (p.isHuman ? ' me' : '');
+      chip.textContent = p.name.slice(0, 1);
+      chip.title = p.name;
+      occ.appendChild(chip);
+    }
+    el.appendChild(label);
+    el.appendChild(occ);
+    box.appendChild(el);
+  }
+  const claimedCount = game.tiles.length - tiles.length;
+  $('board-hint').textContent = `${claimedCount} / ${game.tiles.length} polí získáno`;
+}
+
+function renderPlayers(game) {
+  // Hráči i herní pole teď sdílí jednu mřížku (#table-grid) - viz style.css - takže tu jen
+  // odstraníme staré karty hráčů (podle třídy) a necháme board-wrap (herní pole) na místě.
+  const box = $('table-grid');
+  box.querySelectorAll('.player-card').forEach((el) => el.remove());
+  // 3 hráči: layout je "seat0 - seat1 / pole / seat3" (osamocený třetí hráč dole na celou šířku
+  // místo dvojice) - viz .players-3 pravidla ve style.css.
+  box.classList.toggle('players-3', game.players.length === 3);
+  const currentTurnPlayerId = game.__currentTurnPlayerId || null;
+  for (const p of game.players) {
+    const card = document.createElement('div');
+    card.className = 'player-card' + (p.isHuman ? ' is-me' : '') + (p.id === currentTurnPlayerId ? ' is-turn' : '');
+    card.setAttribute('data-seat', String(p.seat));
+
+    const name = document.createElement('div');
+    name.className = 'pname';
+    if (p.seat === game.startingPlayerIdx) {
+      const starter = document.createElement('span');
+      starter.className = 'starter-icon';
+      starter.title = 'Začíná toto kolo';
+      starter.textContent = '🌹';
+      name.appendChild(starter);
+    }
+    const nameText = document.createElement('span');
+    nameText.textContent = p.name;
+    name.appendChild(nameText);
+    if (p.isHuman) {
+      const b = document.createElement('span'); b.className = 'badge'; b.textContent = 'TY';
+      name.appendChild(b);
+    }
+    card.appendChild(name);
+
+    // Ruka hráče znázorněná jako částečně překryté ruby karet místo pouhého čísla - platí pro
+    // všechny hráče včetně tebe (svoje karty navíc vidíš doopravdy dole v hand-baru). Vedle toho i
+    // počet karet, které hráči ještě zbývají v dobíracím balíčku.
+    const handWrap = document.createElement('div');
+    handWrap.className = 'hand-fan-wrap';
+    handWrap.appendChild(handFanEl(p.hand.length));
+    const drawCount = document.createElement('span');
+    drawCount.className = 'draw-pile-count';
+    drawCount.title = 'Kolik karet hráči zbývá v dobíracím balíčku.';
+    drawCount.innerHTML = `🂠 <span class="n">${p.drawPile.length}</span>`;
+    handWrap.appendChild(drawCount);
+    card.appendChild(handWrap);
+
+    // Žetony přízně - větší, jasně čitelné ikony místo drobného řetězce emoji.
+    const favorRow = document.createElement('div');
+    favorRow.className = 'prow p-favor';
+    if (p.favorTokens > 0) {
+      for (let i = 0; i < p.favorTokens; i++) {
+        const tok = document.createElement('span');
+        tok.className = 'favor-token';
+        tok.textContent = '🪙';
+        favorRow.appendChild(tok);
+      }
+      const lbl = document.createElement('span');
+      lbl.className = 'favor-label';
+      lbl.textContent = 'žetony přízně';
+      favorRow.appendChild(lbl);
+    } else {
+      const none = document.createElement('span');
+      none.className = 'favor-label muted';
+      none.textContent = '— žádné žetony přízně';
+      favorRow.appendChild(none);
+    }
+    card.appendChild(favorRow);
+
+    // Na kterém poli aktuálně stojí.
+    const tileRow = document.createElement('div');
+    tileRow.className = 'prow p-standing';
+    tileRow.appendChild(document.createTextNode('Stojí na: '));
+    const tile = findTile(game, p.currentTileId);
+    if (tile) {
+      const chip = document.createElement('span');
+      chip.className = 'standing-chip house-' + tile.color;
+      chip.textContent = COLOR_NAME[tile.color];
+      tileRow.appendChild(chip);
+    } else {
+      const none = document.createElement('span');
+      none.style.color = 'var(--text-dim)';
+      none.textContent = '—';
+      tileRow.appendChild(none);
+    }
+    card.appendChild(tileRow);
+
+    const row2 = document.createElement('div');
+    row2.className = 'prow';
+    row2.appendChild(document.createTextNode('Pole: '));
+    if (p.isHuman) {
+      row2.appendChild(poolBadge(p.tilesPool));
+    } else {
+      const hidden = document.createElement('span');
+      hidden.style.color = 'var(--text-dim)';
+      hidden.textContent = `🔒 skryto (${tilesTotal(p)})`;
+      row2.appendChild(hidden);
+    }
+    card.appendChild(row2);
+
+    const row3 = document.createElement('div');
+    row3.className = 'prow';
+    row3.appendChild(document.createTextNode('Bank: '));
+    if (p.isHuman) {
+      row3.appendChild(poolBadge(p.bankedPool));
+    } else {
+      const hidden = document.createElement('span');
+      hidden.style.color = 'var(--text-dim)';
+      hidden.textContent = '🔒 skryto';
+      row3.appendChild(hidden);
+    }
+    card.appendChild(row3);
+
+    // Rozehráno v tomto kole + součet - sloučeno přímo do boxu hráče.
+    if (game.phase === 'round' && !p.eliminated) {
+      const roundRow = document.createElement('div');
+      roundRow.className = 'prow p-round';
+      const cardsWrap = document.createElement('div');
+      cardsWrap.className = 'rp-cards';
+      // Aktivní hrdina tohoto kola (pokud nějaký byl zahrán) - viditelný pro všechny, na prvním místě.
+      if (p.activeHeroThisRound) {
+        cardsWrap.appendChild(heroTileEl(p.activeHeroThisRound));
+      }
+      if (p.playedThisRound.length === 0 && !p.activeHeroThisRound) {
+        const none = document.createElement('span');
+        none.style.color = 'var(--text-dim)';
+        none.style.fontSize = '0.78rem';
+        none.textContent = 'zatím nic';
+        cardsWrap.appendChild(none);
+      }
+      // Záporné karty (trvale zamčené žluté úplatky) jdou do vlastního druhého řádku, o trochu menší.
+      const posRow = document.createElement('div'); posRow.className = 'rp-cards-row';
+      const negRow = document.createElement('div'); negRow.className = 'rp-cards-row';
+      for (const e of p.playedThisRound) {
+        const showOrig = !e.facedown && e.originalValue != null && e.value !== e.originalValue;
+        const el = cardEl(e.facedown ? 'N' : e.color, e.value, {
+          facedown: e.facedown,
+          inactive: !e.active,
+          locked: !!e.untargetable,
+          shielded: !!e.shielded,
+          negative: e.value < 0,
+          peek: (e.facedown && p.isHuman) ? { color: e.realColor, value: e.realValue } : null,
+          origPeek: showOrig ? e.originalValue : null,
+          flash: e.uiFlash,
+          favor: !!e.favorUsed,
+        });
+        (e.value < 0 ? negRow : posRow).appendChild(el);
+      }
+      cardsWrap.appendChild(posRow);
+      if (negRow.children.length > 0) cardsWrap.appendChild(negRow);
+      roundRow.appendChild(cardsWrap);
+      const sum = document.createElement('div');
+      sum.className = 'rp-sum';
+      sum.textContent = roundSum(p);
+      roundRow.appendChild(sum);
+      card.appendChild(roundRow);
+    }
+
+    // Hrdinové - jednou zahraný hrdina je odhalený navždy (jeho identitu i tak už prozradil log
+    // i play area), takže ho vidí všichni. Nepoužití hrdinové zůstávají tajní - vlastní jméno a
+    // popis vidí jen majitel, soupeřům se ukazuje jen že tam nějaký nepoužitý ještě čeká.
+    const heroRow = document.createElement('div');
+    heroRow.className = 'prow p-heroes';
+    heroRow.appendChild(document.createTextNode('Hrdinové: '));
+    for (const h of (p.heroes || [])) {
+      const def = heroDef(h.id);
+      const chip = document.createElement('span');
+      if (h.used) {
+        chip.className = 'hero-chip used';
+        chip.textContent = '✓ ' + def.name;
+        chip.title = def.desc + ' (již použito)';
+      } else if (p.isHuman) {
+        chip.className = 'hero-chip';
+        chip.textContent = '🎭 ' + def.name;
+        chip.title = def.desc;
+      } else {
+        chip.className = 'hero-chip hidden';
+        chip.textContent = '🎭 ?';
+        chip.title = 'Nepoužitý hrdina - identita skrytá až do zahrání.';
+      }
+      heroRow.appendChild(chip);
+    }
+    card.appendChild(heroRow);
+
+    const row4 = document.createElement('div');
+    row4.className = 'prow';
+    if (p.eliminated) {
+      const pill = document.createElement('span'); pill.className = 'status-pill eliminated'; pill.textContent = 'vyřazen';
+      row4.appendChild(pill);
+    } else if (p.passedThisRound) {
+      const pill = document.createElement('span'); pill.className = 'status-pill passed'; pill.textContent = 'passnul';
+      row4.appendChild(pill);
+    } else if (game.phase === 'round') {
+      const pill = document.createElement('span'); pill.className = 'status-pill'; pill.textContent = 've hře';
+      row4.appendChild(pill);
+    }
+    card.appendChild(row4);
+
+    box.appendChild(card);
+  }
+}
+
+function renderHandArea(game) {
+  const human = game.players.find(p => p.isHuman);
+  const handBox = $('hand-cards');
+  handBox.innerHTML = '';
+  if (!human || human.eliminated) { $('hand-bar').classList.add('hidden'); return; }
+  $('hand-bar').classList.remove('hidden');
+  const sorted = [...human.hand].sort((a, b) => (a.color === b.color ? a.value - b.value : a.color.localeCompare(b.color)));
+  for (const c of sorted) {
+    handBox.appendChild(cardEl(c.color, c.value, {
+      clickable: game.__awaitingHumanAction === true,
+      selected: __selectedCardId === c.id,
+      banned: cardPlayBanned(game, c),
+      onClick: () => {
+        if (!game.__awaitingHumanAction) return;
+        __selectedCardId = (__selectedCardId === c.id) ? null : c.id;
+        renderHandArea(game);
+        updateHandActionButtons(game);
+      },
+    }));
+  }
+  updateHandActionButtons(game);
+}
+
+function updateHandActionButtons(game) {
+  const human = game.players.find(p => p.isHuman);
+  const hasSel = !!__selectedCardId;
+  const waiting = game.__awaitingHumanAction === true;
+  const selCard = (hasSel && human) ? human.hand.find(c => c.id === __selectedCardId) : null;
+  const selBanned = selCard ? cardPlayBanned(game, selCard) : false;
+  const noBanking = !!(game.heroFlags && game.heroFlags.noBanking);
+  $('btn-play').disabled = !waiting || !hasSel || selBanned;
+  $('btn-bank').disabled = !waiting || !hasSel || noBanking;
+  $('btn-pass').disabled = !waiting;
+  $('hand-hint').textContent = waiting
+    ? (hasSel
+        ? (selBanned ? (noBanking ? 'Tuhle kartu teď nelze zahrát ani banknout.' : 'Tuhle kartu teď nelze zahrát lícem nahoru — jde jen banknout.') : 'Karta vybrána — zahraj ji, nebo ji banknuj.')
+        : 'Vyber kartu z ruky, nebo rovnou passni. Můžeš také zahrát hrdinu.')
+    : (human && human.eliminated ? 'Jsi vyřazen ze hry.' : 'Čeká se na tah…');
+}
+
+// ---- human input funkce volané z game.js ----
+
+async function uiHumanChooseAction(game, player) {
+  __selectedCardId = null;
+  game.__awaitingHumanAction = true;
+  game.__currentTurnPlayerId = player.id;
+  uiRender(game);
+  return new Promise((resolve) => {
+    const finish = (action) => {
+      game.__awaitingHumanAction = false;
+      $('btn-play').onclick = null; $('btn-bank').onclick = null; $('btn-pass').onclick = null;
+      $('hero-actions').innerHTML = '';
+      __selectedCardId = null;
+      resolve(action);
+    };
+    $('btn-play').onclick = () => {
+      const c = player.hand.find(c => c.id === __selectedCardId);
+      if (__selectedCardId && c && !cardPlayBanned(game, c)) finish({ type: 'play', cardId: __selectedCardId });
+    };
+    $('btn-bank').onclick = () => { if (__selectedCardId && !(game.heroFlags && game.heroFlags.noBanking)) finish({ type: 'bank', cardId: __selectedCardId }); };
+    $('btn-pass').onclick = () => finish({ type: 'pass' });
+
+    // Hrdinové jsou vždy k dispozici jako alternativa k normálnímu tahu, dokud nejsou použití.
+    const heroBox = $('hero-actions');
+    heroBox.innerHTML = '';
+    for (const h of (player.heroes || [])) {
+      if (h.used) continue;
+      const def = heroDef(h.id);
+      const btn = document.createElement('button');
+      btn.className = 'hero-btn ghost';
+      btn.textContent = `🎭 Zahrát: ${def.name}`;
+      btn.title = def.desc;
+      btn.addEventListener('click', () => finish({ type: 'hero', heroId: h.id }));
+      heroBox.appendChild(btn);
+    }
+  });
+}
+
+function openModal(title) {
+  $('modal-title').textContent = title;
+  $('modal-options').innerHTML = '';
+  $('modal-overlay').classList.remove('hidden');
+}
+function closeModal() {
+  $('modal-overlay').classList.add('hidden');
+  $('modal-options').innerHTML = '';
+}
+function addOption(labelNode, onClick) {
+  const btn = document.createElement('div');
+  btn.className = 'opt-btn';
+  btn.appendChild(labelNode);
+  btn.addEventListener('click', onClick);
+  $('modal-options').appendChild(btn);
+  return btn;
+}
+
+async function uiHumanChooseOpponent(game, player, candidates, promptText) {
+  return new Promise((resolve) => {
+    openModal(promptText);
+    for (const c of candidates) {
+      const label = document.createElement('div');
+      label.textContent = c.name;
+      addOption(label, () => { closeModal(); resolve(c.id); });
+    }
+  });
+}
+
+async function uiHumanChooseCard(game, player, ownerPlayer, promptText) {
+  const candidates = ownerPlayer.playedThisRound.filter(e => e.active && !isProtected(e));
+  return new Promise((resolve) => {
+    openModal(promptText + ` (${ownerPlayer.name})`);
+    for (const e of candidates) {
+      const wrap = document.createElement('div');
+      wrap.appendChild(cardEl(e.facedown ? 'N' : e.color, e.value, {
+        big: true,
+        facedown: e.facedown,
+        negative: e.value < 0,
+        peek: (e.facedown && ownerPlayer.isHuman) ? { color: e.realColor, value: e.realValue } : null,
+      }));
+      addOption(wrap, () => { closeModal(); resolve(e.id); });
+    }
+  });
+}
+
+async function uiHumanChooseReturnCard(game, player, eligible, promptText) {
+  return new Promise((resolve) => {
+    openModal(promptText);
+    for (const e of eligible) {
+      const wrap = document.createElement('div');
+      wrap.appendChild(cardEl(e.color, e.value, { big: true }));
+      addOption(wrap, () => { closeModal(); resolve(e.id); });
+    }
+  });
+}
+
+async function uiHumanChooseFromEntries(game, player, promptText, entries) {
+  return new Promise((resolve) => {
+    openModal(promptText);
+    for (const e of entries) {
+      const wrap = document.createElement('div');
+      wrap.appendChild(cardEl(e.facedown ? 'N' : e.color, e.value, { big: true, facedown: e.facedown, negative: e.value < 0 }));
+      addOption(wrap, () => { closeModal(); resolve(e.id); });
+    }
+  });
+}
+
+async function uiHumanChooseHandCard(game, player, promptText) {
+  return new Promise((resolve) => {
+    openModal(promptText);
+    const sorted = [...player.hand].sort((a, b) => (a.color === b.color ? a.value - b.value : a.color.localeCompare(b.color)));
+    for (const c of sorted) {
+      const wrap = document.createElement('div');
+      wrap.appendChild(cardEl(c.color, c.value, { big: true }));
+      addOption(wrap, () => { closeModal(); resolve(c.id); });
+    }
+  });
+}
+
+async function uiHumanYesNo(game, player, promptText) {
+  return new Promise((resolve) => {
+    openModal(promptText);
+    const yes = document.createElement('div'); yes.textContent = 'Ano';
+    const no = document.createElement('div'); no.textContent = 'Ne';
+    addOption(yes, () => { closeModal(); resolve(true); });
+    addOption(no, () => { closeModal(); resolve(false); });
+  });
+}
+
+async function uiHumanChooseEntryPayment(game, player, promptText) {
+  return new Promise((resolve) => {
+    openModal(promptText);
+    const hand = document.createElement('div'); hand.textContent = 'Odhodit kartu z ruky';
+    const deck = document.createElement('div'); deck.textContent = 'Odhodit 3 karty z vrchu balíčku';
+    addOption(hand, () => { closeModal(); resolve('hand'); });
+    addOption(deck, () => { closeModal(); resolve('deck'); });
+  });
+}
+
+async function uiHumanChooseTile(game, player, tileCandidates, promptText) {
+  return new Promise((resolve) => {
+    openModal(promptText);
+    for (const t of tileCandidates) {
+      const wrap = document.createElement('div');
+      wrap.style.display = 'flex'; wrap.style.flexDirection = 'column'; wrap.style.alignItems = 'center'; wrap.style.gap = '4px';
+      const sw = document.createElement('div');
+      sw.className = 'tile house-' + t.color;
+      sw.style.width = '60px'; sw.style.minHeight = '60px';
+      const lbl = document.createElement('div'); lbl.className = 'tile-label'; lbl.textContent = COLOR_NAME[t.color];
+      sw.appendChild(lbl);
+      if (t.occupants.length) {
+        const occ = document.createElement('div'); occ.className = 'tile-occupants';
+        for (const pid of t.occupants) {
+          const pl = game.players.find(x => x.id === pid);
+          const chip = document.createElement('div'); chip.className = 'occ-chip'; chip.textContent = pl ? pl.name.slice(0,1) : '?';
+          occ.appendChild(chip);
+        }
+        sw.appendChild(occ);
+      }
+      wrap.appendChild(sw);
+      if (t.occupants.length) {
+        const warn = document.createElement('div');
+        warn.style.cssText = 'font-size:0.68rem;color:var(--danger);';
+        warn.textContent = 'obsazeno — stojí kartu';
+        wrap.appendChild(warn);
+      }
+      addOption(wrap, () => { closeModal(); resolve(t.id); });
+    }
+  });
+}
+
+async function uiAnnounceRoundEnd(game, ranked, winner) {
+  // vizuální potvrzení už dávají logy a render; není potřeba blokující modál
+}
+
+async function uiAnnounceGameEnd(game, scores) {
+  const box = $('gameover-box');
+  box.innerHTML = '';
+  const h2 = document.createElement('h2');
+  h2.textContent = `Vítězí ${scores[0].player.name}!`;
+  box.appendChild(h2);
+  const sub = document.createElement('div');
+  sub.style.cssText = 'color:var(--text-dim);font-size:0.85rem;margin-bottom:6px;';
+  sub.textContent = 'Konečné skóre = pole (barva) × (1 + banknuté karty té barvy), sečteno přes všechny barvy.';
+  box.appendChild(sub);
+
+  const table = document.createElement('table');
+  table.className = 'score-table';
+  const thead = document.createElement('tr');
+  ['Hráč', ...COLORS.map(c => COLOR_NAME[c]), 'Celkem'].forEach(t => {
+    const th = document.createElement('th'); th.textContent = t; thead.appendChild(th);
+  });
+  table.appendChild(thead);
+  scores.forEach((s, i) => {
+    const tr = document.createElement('tr');
+    if (i === 0) tr.className = 'win';
+    const nameTd = document.createElement('td'); nameTd.className = 'pname'; nameTd.textContent = s.player.name;
+    tr.appendChild(nameTd);
+    for (const c of COLORS) {
+      const b = s.breakdown.find(x => x.color === c);
+      const td = document.createElement('td');
+      td.innerHTML = `${b.tiles}×(1+${b.banked})<br><span style="color:var(--text-dim);font-size:0.72rem">=${b.points}</span>`;
+      tr.appendChild(td);
+    }
+    const totalTd = document.createElement('td'); totalTd.className = 'score-total'; totalTd.textContent = s.total;
+    tr.appendChild(totalTd);
+    table.appendChild(tr);
+  });
+  box.appendChild(table);
+
+  const restartBtn = document.createElement('button');
+  restartBtn.className = 'primary';
+  restartBtn.textContent = 'Nová hra';
+  restartBtn.onclick = () => location.reload();
+  box.appendChild(restartBtn);
+
+  $('gameover-overlay').classList.remove('hidden');
+}
+
+// Volba počtu hráčů hned na začátku, ještě před rozdáním karet a rozmístěním na pole.
+async function uiHumanChoosePlayerCount() {
+  return new Promise((resolve) => {
+    openModal('Kolik hráčů chceš hrát?');
+    const mk = (title, subtitle, n) => {
+      const wrap = document.createElement('div');
+      wrap.style.cssText = 'display:flex;flex-direction:column;align-items:center;gap:2px;min-width:120px;';
+      const big = document.createElement('div');
+      big.style.cssText = 'font-family:Cinzel,serif;font-weight:700;font-size:1.3rem;color:var(--accent);';
+      big.textContent = title;
+      const small = document.createElement('div');
+      small.style.cssText = 'font-size:0.72rem;color:var(--text-dim);';
+      small.textContent = subtitle;
+      wrap.appendChild(big); wrap.appendChild(small);
+      addOption(wrap, () => { closeModal(); resolve(n); });
+    };
+    mk('4 hráči', 'ty + 3 boti · na 4 pole', 4);
+    mk('3 hráči', 'ty + 2 boti · na 5 polí', 3);
+  });
+}
+
+// Volba počtu hrdinů na hráče - hned po volbě počtu hráčů, taky před rozdáním karet. Hrdinové se
+// v každém případě přidělují náhodně.
+async function uiHumanChooseHeroCount() {
+  return new Promise((resolve) => {
+    openModal('Kolik hrdinů chceš mít na hráče?');
+    const mk = (title, subtitle, n) => {
+      const wrap = document.createElement('div');
+      wrap.style.cssText = 'display:flex;flex-direction:column;align-items:center;gap:2px;min-width:110px;';
+      const big = document.createElement('div');
+      big.style.cssText = 'font-family:Cinzel,serif;font-weight:700;font-size:1.3rem;color:var(--accent);';
+      big.textContent = title;
+      const small = document.createElement('div');
+      small.style.cssText = 'font-size:0.72rem;color:var(--text-dim);';
+      small.textContent = subtitle;
+      wrap.appendChild(big); wrap.appendChild(small);
+      addOption(wrap, () => { closeModal(); resolve(n); });
+    };
+    mk('2 hrdinové', 'výchozí — každý dostane 2', 2);
+    mk('1 hrdina', 'každý dostane jen 1', 1);
+    mk('0 hrdinů', 'bez hrdinů', 0);
+  });
+}
+
+// Volba obtížnosti botů - hned po volbě hrdinů, před rozdáním karet. 100 % = boti hrají svůj
+// natrénovaný genom (viz claude/simulace-1000-her-balance.md) na plný výkon; nižší hodnoty =
+// v daném procentu tahů bot místo toho zahraje čistě náhodnou, ale vždy legální akci (viz
+// withDifficulty v game.js) - snazší soupeř, co ale nikdy nedělá nic mimo pravidla.
+async function uiHumanChooseDifficulty() {
+  return new Promise((resolve) => {
+    openModal('Jak silní mají být boti?');
+    const mk = (title, subtitle, n) => {
+      const wrap = document.createElement('div');
+      wrap.style.cssText = 'display:flex;flex-direction:column;align-items:center;gap:2px;min-width:92px;';
+      const big = document.createElement('div');
+      big.style.cssText = 'font-family:Cinzel,serif;font-weight:700;font-size:1.3rem;color:var(--accent);';
+      big.textContent = title;
+      const small = document.createElement('div');
+      small.style.cssText = 'font-size:0.72rem;color:var(--text-dim);';
+      small.textContent = subtitle;
+      wrap.appendChild(big); wrap.appendChild(small);
+      addOption(wrap, () => { closeModal(); resolve(n); });
+    };
+    mk('100 %', 'plná síla (doporučeno)', 100);
+    mk('90 %', 'lehce slabší', 90);
+    mk('80 %', 'slabší', 80);
+    mk('70 %', 'citelně slabší', 70);
+    mk('60 %', 'snadný', 60);
+    mk('50 %', 'velmi snadný', 50);
+  });
+}
+
+// Přehledová tabulka schopností barev polí a hrdinů - stálá referenční pomůcka pod logem, hráč se
+// do ní může kdykoliv během hry podívat, kdyby se v pravidlech ztrácel.
+function renderAbilitiesTables() {
+  const box = $('abilities-tables');
+  if (!box) return;
+  box.innerHTML = '';
+
+  const colorTable = document.createElement('table');
+  colorTable.className = 'abilities-table';
+  const ctHead = document.createElement('tr');
+  ['Pole', 'Schopnost', 'Popis'].forEach(t => { const th = document.createElement('th'); th.textContent = t; ctHead.appendChild(th); });
+  colorTable.appendChild(ctHead);
+  for (const c of COLORS) {
+    const tr = document.createElement('tr');
+    tr.className = 'ab-color-' + c;
+    const tdColor = document.createElement('td');
+    tdColor.innerHTML = `<span class="mini-dot house-${c}" style="margin-right:5px;"></span>${COLOR_NAME[c]}`;
+    const tdName = document.createElement('td'); tdName.className = 'ab-name'; tdName.textContent = COLOR_ABILITY_NAME[c];
+    const tdDesc = document.createElement('td'); tdDesc.textContent = COLOR_ABILITY_DESC[c];
+    tr.appendChild(tdColor); tr.appendChild(tdName); tr.appendChild(tdDesc);
+    colorTable.appendChild(tr);
+  }
+  box.appendChild(colorTable);
+
+  const heroTable = document.createElement('table');
+  heroTable.className = 'abilities-table';
+  const htHead = document.createElement('tr');
+  ['Hrdina', 'Popis'].forEach(t => { const th = document.createElement('th'); th.textContent = t; htHead.appendChild(th); });
+  heroTable.appendChild(htHead);
+  for (const h of HERO_LIST) {
+    const tr = document.createElement('tr');
+    const tdName = document.createElement('td'); tdName.className = 'ab-name'; tdName.textContent = '🎭 ' + h.name;
+    const tdDesc = document.createElement('td'); tdDesc.textContent = h.desc;
+    tr.appendChild(tdName); tr.appendChild(tdDesc);
+    heroTable.appendChild(tr);
+  }
+  box.appendChild(heroTable);
+}
+
+// ---- bootstrap ----
+async function boot() {
+  const numPlayers = await uiHumanChoosePlayerCount();
+  const heroCount = await uiHumanChooseHeroCount();
+  const botDifficulty = await uiHumanChooseDifficulty();
+  const game = await initGame('Ty', numPlayers, heroCount, botDifficulty);
+  window.__game = game;
+  const subtitle = $('mode-subtitle');
+  if (subtitle) {
+    const base = numPlayers === 3 ? 'varianta pro 3 hráče — proti dvěma botům' : 'varianta pro 4 hráče — proti třem botům';
+    subtitle.textContent = botDifficulty >= 100 ? base : `${base} (obtížnost ${botDifficulty} %)`;
+  }
+  renderAbilitiesTables();
+  uiRender(game);
+  try {
+    await runGame(game);
+  } catch (err) {
+    game.__lastError = err;
+    uiLog('Chyba ve hře: ' + (err && err.message ? err.message : String(err)), 'eliminated');
+    console.error(err);
+  }
+}
+
+
+</script>
+<script>
+  boot();
+</script>
+</body>
+</html>
