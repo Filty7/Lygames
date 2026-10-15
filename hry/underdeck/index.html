@@ -589,6 +589,15 @@ body.artnew #tipbox{background:#0d0a0b;border:1px solid #4a3a2c;border-radius:2p
 .tiles.spellpick .tile{flex:1 1 0;width:auto;min-width:0;max-width:250px}
 @media (max-width:600px){.tiles.spellpick{gap:8px;flex-wrap:nowrap}.tiles.spellpick .tile{padding:8px 6px;gap:5px}.tiles.spellpick .tile h3{font-size:15px;margin:0}.tiles.spellpick .ds{font-size:12px;line-height:1.3}}
 @media (max-width:700px){.inside>.side,.inside svg.side{display:none!important}}
+.sbox{margin:12px auto 4px;max-width:340px;text-align:left;border-top:1px solid var(--line);padding-top:10px}
+.sbh{display:flex;justify-content:space-between;align-items:baseline;font-family:var(--display);font-size:20px;color:var(--torch)}.sbh b{font-size:28px;font-variant-numeric:tabular-nums}
+.sbox .d{margin:2px 0 6px}.sbok{color:#8fc47a!important}
+.sbf{display:flex;gap:6px;margin:6px 0 2px}.sbf input{flex:1;min-width:0;font:inherit;font-size:15px;padding:6px 8px;background:#0c0a0b;color:var(--bone);border:1px solid var(--line);border-radius:3px}
+.sbf input:focus{outline:2px solid var(--torch);outline-offset:1px}
+.sbt{margin:12px 0 4px;font-size:15px}
+.sbl{list-style:none;margin:0;padding:0;font-size:14px}.sbl li{display:grid;grid-template-columns:26px 1fr auto 44px;gap:6px;align-items:baseline;padding:3px 4px;border-bottom:1px solid #ffffff10}
+.sbl li.me{background:#d9a03022;outline:1px solid #d9a03066}.sbp{color:var(--muted,#9a8e80);font-variant-numeric:tabular-nums}.sbn{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.sbd{color:#9a8e80;font-size:12px;white-space:nowrap}.sbl b{text-align:right;font-variant-numeric:tabular-nums;color:var(--torch)}
 </style>
 
 <div class="wrap">
@@ -1296,7 +1305,7 @@ const inc=(o,k,n)=>{o[k]=(o[k]||0)+(n===undefined?1:n);};
 function stat(fn){if(!statOn())return;try{fn(STATS.C);statSave();}catch(e){}}
 function addGold(n){S.gold+=n;if(statOn())S.goldEarn=(S.goldEarn||0)+n;}
 const monAvg=()=>{const m=S.comp.filter(i=>CARDS[i].type==='m'&&!CARDS[i].boss);return m.length?m.reduce((a,i)=>a+CARDS[i].v,0)/m.length:0;};
-const GAMEVER='v1.94';
+const GAMEVER='v1.95';
 const BP=7,NROOM=21; // boss every 7th Room, 3 bosses
 const FR=nr=>nr-Math.floor(nr/BP),NFIGHT=18; // fight-room number 1..18 (bosses excluded)
 function runRec(end){
@@ -1338,6 +1347,7 @@ function openGal(){
 }
 // patch notes for players: newest first, short and general
 const PATCH=[
+ ['v1.95','16. 10.',['Na konci výpravy online žebříček: napiš jméno a ulož skóre (1 bod za každou sebranou minci, 10 bodů za každý vyčištěný Room).']],
  ['v1.94','15. 10.',['Krvavý oltář stojí 5 max ♥.','Studna dává vždy +3 max ♥.']],
  ['v1.93','15. 10.',['Po 1. a 2. bossovi Ohniště: vylosuje tvé kouzlo, lektvar nebo zbraň, která shoří. Za −1 max ♥ můžeš losovat znovu, odmítnuté karty se nevrací, dokud se neprotočí všechny.','Očarovaná zbraň v tarotovém vzhledu svítí fialově.']],
  ['v1.92','14. 10.',['Věštba řadí karty podle druhu a síly, neprozradí pořadí v balíčku.','Výběr kouzla se na mobilu vejde na obrazovku.','Report obsahuje případné chyby hry.']],
@@ -2166,6 +2176,30 @@ function hints(){
 function errLog(e,src){try{const a=JSON.parse(localStorage.getItem('ud_errs')||'[]');const st=((e&&e.stack)||String(e&&e.message||e)).split('\n').slice(0,4).join(' | ');
   a.push({t:new Date().toISOString(),v:GAMEVER,scr:(typeof S!=='undefined'&&S)?S.screen+' r'+S.roomNo:'',m:st.slice(0,500)});localStorage.setItem('ud_errs',JSON.stringify(a.slice(-10)));}catch(x){}}
 addEventListener('error',e=>errLog(e.error||e.message));addEventListener('unhandledrejection',e=>errLog(e.reason));
+var SB={url:'https://ttgjzbpglgerxvbmaqdt.supabase.co/rest/v1/underdeck_scores',key:'sb_publishable_MDCkjnVd2_hNMKLfJZq4JQ_pSoVWmiv',list:null,err:'',busy:false,mine:null,loading:false};
+function sbCalc(){const won=S.screen==='final',rooms=won?NROOM:Math.max(0,(S.roomNo||1)-1),coins=Math.max(0,S.goldEarn||0);return{won,rooms,coins,score:coins+10*rooms};}
+function sbDone(){try{return (JSON.parse(localStorage.getItem('ud_scored')||'[]')).includes(S.rid);}catch(e){return false;}}
+function sbMark(){try{const a=JSON.parse(localStorage.getItem('ud_scored')||'[]');a.push(S.rid);localStorage.setItem('ud_scored',JSON.stringify(a.slice(-50)));}catch(e){}}
+const sbEsc=t=>String(t).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+function sbHdr(){return{apikey:SB.key,'Content-Type':'application/json'};}
+function sbLoad(force){if(SB.loading||(SB.list&&!force))return;SB.loading=true;
+  fetch(SB.url+'?select=id,name,score,coins,rooms,won,created_at&order=score.desc,created_at.asc&limit=10',{headers:sbHdr()})
+   .then(r=>r.ok?r.json():Promise.reject(r.status)).then(d=>{SB.list=d;SB.err='';}).catch(e=>{SB.err='Žebříček se nepodařilo načíst.';})
+   .finally(()=>{SB.loading=false;sbPaint();});}
+function sbListHTML(){if(SB.err)return `<p class="d">${SB.err}</p>`;if(!SB.list)return '<p class="d">Načítám žebříček…</p>';if(!SB.list.length)return '<p class="d">Zatím tu nikdo není. Buď první.</p>';
+  return `<ol class="sbl">${SB.list.map((r,k)=>`<li class="${SB.mine===r.id?'me':''}"><span class="sbp">${k+1}.</span><span class="sbn">${sbEsc(r.name)}</span><span class="sbd">${r.won?'★ ':''}${r.rooms} R · ${r.coins} 🪙</span><b>${r.score}</b></li>`).join('')}</ol>`;}
+function sbPaint(){const e=document.getElementById('sbList');if(e)e.innerHTML=sbListHTML();}
+function sbHTML(){if(!(S&&S.mode==='camp'&&S.run&&!TUT.on))return '';const c=sbCalc(),done=sbDone(),dev=!!S.dev;let nm='';try{nm=localStorage.getItem('ud_name')||'';}catch(e){}
+  setTimeout(()=>sbLoad(false),0);
+  return `<div class="sbox"><div class="sbh"><span>Skóre</span><b>${c.score}</b></div><p class="d">${c.coins} ${c.coins===1?'mince':c.coins>1&&c.coins<5?'mince':'mincí'} + ${c.rooms} ${c.rooms===1?'Room':c.rooms>1&&c.rooms<5?'Roomy':'Roomů'} × 10</p>`+
+   (dev?'<p class="d">S dev tools se skóre neukládá.</p>':done?'<p class="d sbok">Skóre je uložené v žebříčku.</p>':`<div class="sbf"><input id="sbName" maxlength="20" placeholder="Tvoje jméno" value="${sbEsc(nm)}" autocomplete="nickname"><button class="b go" data-act="sbsave"${SB.busy?' disabled':''}>Uložit skóre</button></div><p class="d" id="sbMsg"></p>`)+
+   `<h3 class="sbt">Nejlepší výpravy</h3><div id="sbList">${sbListHTML()}</div></div>`;}
+function sbSave(){if(SB.busy||sbDone()||S.dev)return;const i=document.getElementById('sbName'),nm=(i&&i.value||'').trim().slice(0,20),m=document.getElementById('sbMsg');
+  if(!nm){if(m)m.textContent='Napiš jméno.';if(i)i.focus();return;}try{localStorage.setItem('ud_name',nm);}catch(e){}
+  const c=sbCalc();SB.busy=true;if(m)m.textContent='Ukládám…';
+  fetch(SB.url+'?select=id',{method:'POST',headers:Object.assign(sbHdr(),{Prefer:'return=representation'}),body:JSON.stringify({name:nm,score:c.score,coins:c.coins,rooms:c.rooms,won:c.won,ver:GAMEVER,run_id:S.rid})})
+   .then(r=>r.ok?r.json():Promise.reject(r.status)).then(d=>{SB.mine=d&&d[0]&&d[0].id;sbMark();snd('coin');SB.busy=false;modal();sbLoad(true);})
+   .catch(e=>{SB.busy=false;const mm=document.getElementById('sbMsg');if(mm)mm.textContent='Uložení se nepovedlo. Zkontroluj připojení a zkus to znovu.';});}
 function setH(el,h){if(el._h===h&&el._f===el.firstElementChild&&(!el._f||el._f.parentNode===el))return;el.innerHTML=h;el._h=h;el._f=el.firstElementChild;}
 var TIPB=null,TIPC=null;
 function tipHide(){TIPC=null;if(TIPB)TIPB.hidden=true;}
@@ -2282,14 +2316,14 @@ function modal(){
     if(B&&S.bossAll){h=`<h2>Vyber bosse</h2><p class="d">Jen pro testování.</p><div class="tiles">`+Object.keys(BOSS).map(k=>{const t=bossTileFor(k,Math.min(2,Math.floor((S.roomNo+1)/BP)-1));return `<button class="tile" data-act="pickboss" data-k="${k}"><h3>${t.name}</h3><div class="tc">${t.cards.map(c=>`<div class="mini">${cardHTML(c)}</div>`).join('')}</div><span class="ds">${t.desc}</span></button>`;}).join('')+`</div>`;v.innerHTML=h;o.hidden=false;v.classList.add('wide');return;}
     h=(S.rewNote?`<p class="rewn">Vylepšení +${S.rewUpN||3} · ${S.rewNote}</p>`:'')+`<h2>${B?'Boss':'Kam dál?'}</h2><p>${(S.roomNo+1)%BP===0?'Boss '+((S.roomNo+1)/BP)+'/3':'Room '+FR(S.roomNo+1)+'/'+NFIGHT}. ${B?'Cesta vede jen jedním směrem.':'Vyber si jednu cestu, druhá se vrátí mezi ostatní.'}</p><div class="tiles">`+S.offer.map((i,n)=>roomTile(i==='B'?S.bossTile:S.tiles[i],n)).join('')+`</div>${S.selOff!=null&&S.offer[S.selOff]!=null?`<p class="seld">${(t=>t.desc||'')(S.offer[S.selOff]==='B'?S.bossTile:S.tiles[S.offer[S.selOff]])}<br><b>Klikni znovu a vstoupíš.</b></p>`:`<p class="seld d">Klikni na Room a uvidíš popis, druhým klikem do něj vejdeš.</p>`}${B&&DEVMODE?`<div class="btns" style="margin-top:12px"><button class="b" data-act="bossall">Vybrat jiného bosse (jen pro testování)</button></div>`:''}<p class="d" style="margin:10px 0 0">Životy ${S.hp}/${S.max} · zlato ${S.gold} · balíček ${S.comp.length} karet</p>`;
   }
-  else if(S.screen==='final')h=`<h2>Kampaň dokončena</h2><p>Prošel jsi všech ${NFIGHT} Roomů a porazil tři bosse.</p>${shardHTML()}<p class="d">Životy ${S.hp}/${S.max} · zlato ${S.gold} · balíček ${S.comp.length} karet</p><div class="btns"><button class="b go" data-act="menu">Menu</button></div>`;
+  else if(S.screen==='final')h=`<h2>Kampaň dokončena</h2><p>Prošel jsi všech ${NFIGHT} Roomů a porazil tři bosse.</p>${shardHTML()}${sbHTML()}<p class="d">Životy ${S.hp}/${S.max} · zlato ${S.gold} · balíček ${S.comp.length} karet</p><div class="btns"><button class="b go" data-act="menu">Menu</button></div>`;
   else if(S.over==='hero'){
     const L=S.heroLives,soul=on=>inkIcon('soul','soul'+(on?'':' off'));
     h=`<h2>Padl jsi… ale ještě ne naposled</h2><p>Tvoje duše se vrací ke vchodu do Roomu. Stojí tě to jeden hero život.</p><div class="souls">${Array.from({length:HERO},(_,k)=>soul(k<L-1)).join('')}</div><p class="d">Room ${S.roomNo} začneš znovu přesně tak, jak jsi do něj vešel: stejný balíček, zlato i předměty, balíček se jen znovu zamíchá. Životy budou jako při vstupu, nejméně však ${Math.ceil(S.max/2)}.<br>Zbývající hero životy po návratu: <b>${L-1}</b></p><div class="btns">${undoB}<button class="b go" data-act="heroretry">Opakovat Room</button><button class="b" data-act="heroquit">Ukončit run</button></div>`;
   }
   else if(S.over==='dead'){
     const left=[...S.deck,...live()].filter(i=>CARDS[i].type==='m').reduce((a,i)=>a+CARDS[i].v,0);
-    h=`<h2>Padl jsi</h2><p>${camp?'Kampaň končí v Roomu '+S.roomNo+' se zlatem '+S.gold+'.':'V temnotě zbyla monstra o síle '+left+'. Skóre: −'+left+'.'}</p>${camp?shardHTML():''}<div class="btns">${undoB}<button class="b go" data-act="menu">Menu</button></div>`;
+    h=`<h2>Padl jsi</h2><p>${camp?'Kampaň končí v Roomu '+S.roomNo+' se zlatem '+S.gold+'.':'V temnotě zbyla monstra o síle '+left+'. Skóre: −'+left+'.'}</p>${camp?shardHTML()+sbHTML():''}<div class="btns">${undoB}<button class="b go" data-act="menu">Menu</button></div>`;
   }else if(S.over==='win'){
     h=camp?`<h2>${S.boss?'Boss poražen':'Room '+S.roomNo+' vyčištěn'}</h2><p>${S.tileName}. Životy ${S.hp}/${S.max}, zlato ${S.gold}.</p><div class="btns">${undoB}<button class="b go" data-act="cont">Pokračovat</button></div>`
       :`<h2>Jsi venku</h2><p>Prošel jsi celé sklepení. Skóre: ${S.hp}.</p><div class="btns">${undoB}<button class="b go" data-act="menu">Menu</button></div>`;
@@ -2321,6 +2355,7 @@ function onAct(e){
   else if(a==='pickboss'){S.bossTile=bossTileFor(b.dataset.k,Math.min(2,Math.floor((S.roomNo+1)/BP)-1));S.bossAll=false;S.offer=['B'];const t=S.bossTile;S.roomNo++;S.tileName=t.name;S.boss=true;S.bossKind=t.boss;S.bossLv=t.lv;S.bossUsed.push(t.boss);S.offer=null;S.bossTile=null;startRoom();}
   else if(a==='rpk'){const R=S.rest,id=+b.dataset.id,k=R.sel.indexOf(id);if(k>=0)R.sel.splice(k,1);else{const sum=R.sel.reduce((x,i)=>x+CARDS[i].v,0);if(sum+CARDS[id].v<=R.b)R.sel.push(id);}modal();}
   else if(a==='restok')restBurn();
+  else if(a==='sbsave'){sbSave();return;}
   else if(a==='rupok'){S.restUp=null;offerNext();}
   else if(a==='fireok'){const F=S.fire;if(!F)return;const id=F.cur;S.comp=S.comp.filter(x=>x!==id);S.deck=(S.deck||[]).filter(x=>x!==id);S.removed=(S.removed||0)+1;stat(C=>{C.fire=C.fire||{};inc(C.fire,CARDS[id].type==='w'?'zbraň':CARDS[id].type==='p'?'lektvar':'kouzlo');C.fireRe=(C.fireRe||0)+F.n;});snd('discard');say(nameOf(CARDS[id])+' shořela v ohništi.');S.fire=null;offerNext();}
   else if(a==='firere'){const F=S.fire;if(!F)return;const v=fireOK();if(v.length<2||S.max<=1)return;S.max--;S.hp=Math.min(S.hp,S.max);F.n++;if(!F.pool.length)F.pool=shuffle(v.filter(i=>i!==F.cur));F.cur=F.pool.pop();snd('equip');render([]);}
@@ -3061,5 +3096,6 @@ setDev(DEVMODE);
 function devConfirm(text,yes,title,ok){if(DEVMODE&&!title){yes();return;}$('devH').textContent=title||'Vývojářská funkce';$('devYes').textContent=ok||'Pokračovat';$('devT').textContent=text;$('devc').hidden=false;$('devYes').onclick=()=>{$('devc').hidden=true;yes();};}
 $('devNo').onclick=()=>{$('devc').hidden=true;};
 </script>
+
 
 </body></html>
