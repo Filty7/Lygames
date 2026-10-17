@@ -789,7 +789,7 @@ const RTIP=(k,l)=>({
  ring:'Při útěku vyléčíš +'+[1,2,2][l-1]+' ♥ za vyložené monstrum'+(l>=3?' a získáš 1 zbroj za každá dvě monstra':'')+'.'+(l>=3?'\nSmíš utéct znovu.':''),
  fists:'Zabití monstra pěstí zraní o '+l+' méně (min. 1).',
  echo:(l===1?'První seslané kouzlo v místnosti dostane':'První '+l+' seslaná kouzla v místnosti dostanou')+' dočasnou kopii naspod balíčku.'+(l===1?'\nPři získání dostaneš kouzlo zdarma.':''),
- crystal:'Na začátku místnosti získáš '+(l*2)+' zbroje.\nZa každé seslané kouzlo +1 zbroj.',
+ crystal:'Na začátku místnosti získáš '+(l+1)+' zbroje.\nZa každé seslané kouzlo +1 zbroj.',
  herb:'Každý lektvar léčí o +1 ♥.\nZa každých '+HERBN[l-1]+' vypitých lektvarů +1 max ♥.',
  flask:'Kdykoliv vypiješ lektvar, náhodné monstrum v balíčku ztratí '+l+(l===1?' sílu.':' síly.'),
  grim:'Na začátku místnosti vloží do balíčku '+(l===1?'kouzlo':l+'× kouzlo')+' Roztavení.\nVšechna Roztavení počítají zbraň o 1 silnější.',
@@ -1347,7 +1347,7 @@ function openGal(){
 }
 // patch notes for players: newest first, short and general
 const PATCH=[
- ['v1.97','17. 10.',['Skóre: −5 bodů za každé startovní vylepšení (koupené za diamanty).','Prsten útěku: +1 / 2 / 2 ♥ za monstrum, zbroj (+1 za každá 2 monstra) až na 3. úrovni.','Stínový plášť: při útěku −1 jednomu / dvěma / třem náhodným monstrům.']],
+ ['v1.97','17. 10.',['Skóre: −5 bodů za každé startovní vylepšení (koupené za diamanty).','Prsten útěku: +1 / 2 / 2 ♥ za monstrum, zbroj (+1 za každá 2 monstra) až na 3. úrovni.','Stínový plášť: při útěku −1 jednomu / dvěma / třem náhodným monstrům.','Krystal many: na začátku místnosti 2 / 3 / 4 zbroje.']],
  ['v1.96','16. 10.',['Místo „Room“ se všude píše „místnost“.','Sekera se v obchodě nabízí o polovinu silnější, za stejnou cenu.','Když v runu použiješ dev tools, skóre do žebříčku nejde uložit.']],
  ['v1.95','16. 10.',['Na konci výpravy online žebříček: napiš jméno a ulož skóre (1 bod za každou sebranou minci, 10 bodů za každou vyčištěnou místnost).']],
  ['v1.94','15. 10.',['Krvavý oltář stojí 5 max ♥.','Studna dává vždy +3 max ♥.']],
@@ -1708,7 +1708,7 @@ function startRoom(){
   S.comp=S.comp.filter(i=>{const c=CARDS[i];return !c.gone&&!c.temp&&!c.fire;});
   if(S.mode==='camp')statRoom();
   Object.assign(S,{deck:shuffle(S.comp.slice()),room:[null,null,null,null],weapon:null,armor:null,lastPotion:null,resolved:0,streak:0,over:null,kcState:'',loot:null,lootType:S.mimicLv!==Math.floor((S.roomNo-1)/BP)&&Math.random()<1/16?'mimic':'gold',history:[],screen:'play',debuff:{},buff:{},ls:[],arm:0,lastSpell:null,pick:null,echoN:0,hamN:0,joker:0,rune:[],ward:S.wardNext?1:0,wardNext:0,wardB:null});
-  {const cr=rl('crystal');if(cr){S.arm=cr*2;relV('crystal',cr*2);}}
+  {const cr=rl('crystal');if(cr){S.arm=cr+1;relV('crystal',cr+1);}}
   if(S.ward){const ms=shuffle(S.deck.filter(i=>CARDS[i].type==='m'&&!CARDS[i].trap&&!CARDS[i].dart&&!CARDS[i].fire));S.wardB={};ms.forEach((i,k)=>{S.wardB[i]=[2,2,1][k%3];});}
   {const gl=rl('grim');for(let k=0;k<gl;k++){const n=mk('x',undefined,'✦');Object.assign(CARDS[n],{sp:'melt',temp:1});S.deck.splice(rnd(S.deck.length+1),0,n);}}
   if(S.boss){const lv=S.bossLv||0,bid=mkBoss(S.bossKind,lv);S.plantId=S.bossKind==='plant'?bid:null;S.deck.splice(rnd(S.deck.length+1),0,bid);if(S.bossKind==='plant')for(let i=0;i<BOSS.plant.lv[lv].vn;i++)S.deck.splice(rnd(S.deck.length+1),0,mkVine());if(S.bossKind==='dragon')for(let i=0;i<BOSS.dragon.lv[lv].f;i++)S.deck.splice(rnd(S.deck.length+1),0,mkFire(1));}
