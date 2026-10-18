@@ -638,6 +638,12 @@ body{margin:0}
 .mute{padding:4px 7px!important;line-height:0}.mute svg{width:15px;height:15px;display:block}
 .stats .mute{padding:2px 5px!important}
 .mute.on{color:#d0705a}
+@media (min-width:701px){
+  body.wide1 .track{position:static;transform:none;flex-direction:row;flex-wrap:nowrap;justify-content:center;align-items:center;gap:7px;margin:8px auto 0;width:max-content;max-width:100%}
+  body.wide1 .track i{width:11px;height:11px}
+  body.wide1 .track i.bs{width:15px;height:15px}
+  body.wide1 .track i.cd{width:6px;height:6px}
+}
 </style>
 
 <div class="wrap">
@@ -1345,7 +1351,7 @@ const inc=(o,k,n)=>{o[k]=(o[k]||0)+(n===undefined?1:n);};
 function stat(fn){if(!statOn())return;try{fn(STATS.C);statSave();}catch(e){}}
 function addGold(n){S.gold+=n;if(statOn())S.goldEarn=(S.goldEarn||0)+n;}
 const monAvg=()=>{const m=S.comp.filter(i=>CARDS[i].type==='m'&&!CARDS[i].boss);return m.length?m.reduce((a,i)=>a+CARDS[i].v,0)/m.length:0;};
-const GAMEVER='v2.01';
+const GAMEVER='v2.02';
 const BP=7,NROOM=21; // boss every 7th Room, 3 bosses
 const FR=nr=>nr-Math.floor(nr/BP),NFIGHT=18; // fight-room number 1..18 (bosses excluded)
 function runRec(end){
@@ -1387,6 +1393,7 @@ function openGal(){
 }
 // patch notes for players: newest first, short and general
 const PATCH=[
+ ['v2.02','18. 10.',['Na počítači je ukazatel místností vodorovně uprostřed pod odkládacími poli, nad tlačítky.','Ztlumení teď vypne i tichý šum jeskyně v pozadí (dřív hrál dál přes ozvěnu).']],
  ['v2.01','18. 10.',['Stínový plášť: při útěku ubere celkem 1 / 2 / 3 síly, rozdělené mezi až 1 / 2 / 3 vyložená monstra (když jich je míň, dostane některé víc).','Speciální lektvary v obchodě (zbroj, neviditelnost) mají sílu 2–3 v 1. patře, 3–4 ve 2. a 4–5 ve 3.','Karty se zvláštní schopností mají vpravo dole malý vykřičník – najeď na ně a uvidíš popis.','Vedle tlačítka zvuku je tlačítko, které jedním klikem ztlumí (a zase zapne) všechno.']],
  ['v2.00','18. 10.',['Na počítači jsou vyložené karty nahoře o 30 % větší. Tlačítky + a − vpravo od nich si velikost nastavíš v pěti krocích (hra si ji pamatuje).']],
  ['v1.99','18. 10.',['Na počítači jsou všechna odkládací pole v jedné řadě vedle zbraně (lektvar, kouzla, batoh, relikvie) a karty mají zase plnou velikost.']],
@@ -2261,8 +2268,8 @@ function wideLayout(){try{rszInit();const z1=document.querySelector('.zones'),ca
   const wide=matchMedia('(min-width:701px)').matches&&!document.body.classList.contains('lite');
   if(wide===!!wideLayout.on)return;wideLayout.on=wide;document.body.classList.toggle('wide1',wide);
   const g=id=>document.getElementById(id);
-  if(wide){['zp','zs','zb','za'].forEach(id=>z1.append(g(id)));}
-  else{z1.append(g('zp'));['za','zb','zs'].forEach(id=>camp.append(g(id)));}}catch(e){}}
+  if(wide){['zp','zs','zb','za'].forEach(id=>z1.append(g(id)));camp.after(g('track'));}
+  else{z1.append(g('zp'));['za','zb','zs'].forEach(id=>camp.append(g(id)));document.querySelector('header').after(g('track'));}}catch(e){}}
 addEventListener('resize',()=>{clearTimeout(wideLayout.t);wideLayout.t=setTimeout(()=>{wideLayout();},120);});
 function fitLayout(){document.documentElement.style.removeProperty('--cw');return;try{const de=document.documentElement;if(innerWidth<=700||document.body.classList.contains('lite')){de.style.removeProperty('--cw');return;}
   const base=Math.min(118,(innerWidth-72)/5),b=document.querySelector('.wrap>.btns');if(!b)return;
@@ -3006,7 +3013,7 @@ function audio(){
 
 // --- dungeon ambience: low wind, a deep drone, distant drips and chains ---
 function ambStart(c,rev){try{
-  const A=MUS.amb=c.createGain();A.gain.value=.9;A.connect(MUS.master);const aw=c.createGain();aw.gain.value=.5;A.connect(aw);aw.connect(rev);
+  const A=MUS.amb=c.createGain();A.gain.value=.9;A.connect(MUS.master);const aw=MUS.ambw=c.createGain();aw.gain.value=.5*MUS.vol/.6;A.connect(aw);aw.connect(rev);
   const L=c.sampleRate*6,b=c.createBuffer(2,L,c.sampleRate);for(let ch=0;ch<2;ch++){const d=b.getChannelData(ch);let v=0;for(let i=0;i<L;i++){v=v*.995+(Math.random()*2-1)*.05;d[i]=v;}}
   const n=c.createBufferSource();n.buffer=b;n.loop=true;const f=c.createBiquadFilter();f.type='bandpass';f.frequency.value=260;f.Q.value=.6;const g=c.createGain();g.gain.value=.22;
   const lfo=c.createOscillator(),lg=c.createGain();lfo.frequency.value=.07;lg.gain.value=140;lfo.connect(lg);lg.connect(f.frequency);
@@ -3115,6 +3122,7 @@ function musApply(){
   MUS.master.gain.cancelScheduledValues(c.currentTime);MUS.master.gain.setTargetAtTime(.8*MUS.vol,c.currentTime,.6);
   if(MUS.vol===0&&MUS.timer){const tm=MUS.timer;setTimeout(()=>{if(MUS.vol===0){clearInterval(tm);if(MUS.timer===tm)MUS.timer=null;}},1500);}
   if(SFX.bus)SFX.bus.gain.setTargetAtTime(.6*SFX.vol,c.currentTime,.05);
+  if(MUS.ambw){MUS.ambw.gain.cancelScheduledValues(c.currentTime);MUS.ambw.gain.setTargetAtTime(.5*MUS.vol/.6,c.currentTime,.6);}
 }
 document.addEventListener('pointerdown',()=>{if(!MUS.started){MUS.started=true;const c=audio();if(c){if(c.state==='suspended')c.resume();musApply();}}},{capture:true});
 // volume panel
