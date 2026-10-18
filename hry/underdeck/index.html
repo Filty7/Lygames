@@ -623,6 +623,15 @@ body{margin:0}
   body.wide1 #za .hint{display:none}
   body.wide1 #camp{display:none!important}
 }
+@media (min-width:701px){
+  body.wide1 #row{--cw:calc(min(118px,calc((100vw - 32px - 40px)/5)) * var(--rs,1.3));--ch:calc(var(--cw)*1.42);align-items:center}
+  .rsz{display:none}
+  body.wide1 .rsz{display:flex;flex-direction:column;align-items:center;gap:4px;margin-left:6px;flex:none}
+  .rsz button{font:inherit;font-size:18px;line-height:1;width:30px;height:30px;padding:0;border-radius:4px;background:#221d1e;color:var(--bone);border:0;box-shadow:0 0 0 1px #4a3e38;cursor:pointer}
+  .rsz button:disabled{opacity:.35;cursor:default}
+  .rsz button:focus-visible{outline:2px solid var(--torch);outline-offset:1px}
+  .rsz i{display:block;width:6px;height:6px;border-radius:50%;background:#4a3e38}.rsz i.on{background:var(--torch)}
+}
 </style>
 
 <div class="wrap">
@@ -1330,7 +1339,7 @@ const inc=(o,k,n)=>{o[k]=(o[k]||0)+(n===undefined?1:n);};
 function stat(fn){if(!statOn())return;try{fn(STATS.C);statSave();}catch(e){}}
 function addGold(n){S.gold+=n;if(statOn())S.goldEarn=(S.goldEarn||0)+n;}
 const monAvg=()=>{const m=S.comp.filter(i=>CARDS[i].type==='m'&&!CARDS[i].boss);return m.length?m.reduce((a,i)=>a+CARDS[i].v,0)/m.length:0;};
-const GAMEVER='v1.99';
+const GAMEVER='v2.00';
 const BP=7,NROOM=21; // boss every 7th Room, 3 bosses
 const FR=nr=>nr-Math.floor(nr/BP),NFIGHT=18; // fight-room number 1..18 (bosses excluded)
 function runRec(end){
@@ -1372,6 +1381,7 @@ function openGal(){
 }
 // patch notes for players: newest first, short and general
 const PATCH=[
+ ['v2.00','18. 10.',['Na počítači jsou vyložené karty nahoře o 30 % větší. Tlačítky + a − vpravo od nich si velikost nastavíš v pěti krocích (hra si ji pamatuje).']],
  ['v1.99','18. 10.',['Na počítači jsou všechna odkládací pole v jedné řadě vedle zbraně (lektvar, kouzla, batoh, relikvie) a karty mají zase plnou velikost.']],
  ['v1.98','18. 10.',['Na počítači se hra vejde na obrazovku bez posouvání: odložený lektvar, kouzlo a batoh jsou nižší a karty se zmenší podle výšky okna.','Past a šipka jdou na zbraň jen podle stejného pravidla jako monstra (kromě Kopí).','Bonusový útěk je jen ve Výpravě, ne v Klasické hře ani v tutoriálu.']],
  ['v1.97','17. 10.',['Skóre: −5 bodů za každé startovní vylepšení (koupené za diamanty).','Prsten útěku: +1 / 2 / 2 ♥ za monstrum, zbroj (+1 za každá 2 monstra) až na 3. úrovni.','Stínový plášť: při útěku −1 jednomu / dvěma / třem náhodným monstrům.','Krystal many: na začátku místnosti 2 / 3 / 4 zbroje.']],
@@ -2231,7 +2241,14 @@ function sbSave(){if(SB.busy||sbDone()||sbDev())return;const i=document.getEleme
   fetch(SB.url+'?select=id',{method:'POST',headers:Object.assign(sbHdr(),{Prefer:'return=representation'}),body:JSON.stringify({name:nm,score:c.score,coins:c.coins,rooms:c.rooms,upgrades:c.upg,won:c.won,ver:GAMEVER,run_id:S.rid})})
    .then(r=>r.ok?r.json():Promise.reject(r.status)).then(d=>{SB.mine=d&&d[0]&&d[0].id;sbMark();snd('coin');SB.busy=false;modal();sbLoad(true);})
    .catch(e=>{SB.busy=false;const mm=document.getElementById('sbMsg');if(mm)mm.textContent='Uložení se nepovedlo. Zkontroluj připojení a zkus to znovu.';});}
-function wideLayout(){try{const z1=document.querySelector('.zones'),camp=document.getElementById('camp');if(!z1||!camp)return;z1.classList.add('z1');
+var RSZ=[1,1.15,1.3,1.45,1.6],RSI=2;try{const g=localStorage.getItem('ud_rowsz'),v=+g;if(g!==null&&v>=0&&v<RSZ.length)RSI=v;}catch(e){}
+function rszApply(){document.documentElement.style.setProperty('--rs',RSZ[RSI]);const c=document.querySelector('.rsz');if(!c)return;
+  c.querySelector('[data-r="1"]').disabled=RSI>=RSZ.length-1;c.querySelector('[data-r="-1"]').disabled=RSI<=0;c.querySelectorAll('i').forEach((d,k)=>d.classList.toggle('on',k===RSZ.length-1-RSI));}
+function rszInit(){const row=document.getElementById('row');if(!row||row.querySelector('.rsz'))return;
+  row.insertAdjacentHTML('beforeend','<div class="rsz" aria-label="Velikost karet"><button data-r="1" title="Větší karty" aria-label="Větší karty">+</button>'+RSZ.map(()=>'<i></i>').join('')+'<button data-r="-1" title="Menší karty" aria-label="Menší karty">−</button></div>');
+  row.querySelector('.rsz').addEventListener('click',e=>{const b=e.target.closest('button[data-r]');if(!b)return;e.stopPropagation();RSI=Math.max(0,Math.min(RSZ.length-1,RSI+(+b.dataset.r)));try{localStorage.setItem('ud_rowsz',RSI);}catch(x){}rszApply();});
+  rszApply();}
+function wideLayout(){try{rszInit();const z1=document.querySelector('.zones'),camp=document.getElementById('camp');if(!z1||!camp)return;z1.classList.add('z1');
   const wide=matchMedia('(min-width:701px)').matches&&!document.body.classList.contains('lite');
   if(wide===!!wideLayout.on)return;wideLayout.on=wide;document.body.classList.toggle('wide1',wide);
   const g=id=>document.getElementById(id);
