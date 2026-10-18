@@ -644,6 +644,7 @@ body{margin:0}
   body.wide1 .track i.bs{width:15px;height:15px}
   body.wide1 .track i.cd{width:6px;height:6px}
 }
+.card{-webkit-touch-callout:none}
 </style>
 
 <div class="wrap">
@@ -1351,7 +1352,7 @@ const inc=(o,k,n)=>{o[k]=(o[k]||0)+(n===undefined?1:n);};
 function stat(fn){if(!statOn())return;try{fn(STATS.C);statSave();}catch(e){}}
 function addGold(n){S.gold+=n;if(statOn())S.goldEarn=(S.goldEarn||0)+n;}
 const monAvg=()=>{const m=S.comp.filter(i=>CARDS[i].type==='m'&&!CARDS[i].boss);return m.length?m.reduce((a,i)=>a+CARDS[i].v,0)/m.length:0;};
-const GAMEVER='v2.03';
+const GAMEVER='v2.04';
 const BP=7,NROOM=21; // boss every 7th Room, 3 bosses
 const FR=nr=>nr-Math.floor(nr/BP),NFIGHT=18; // fight-room number 1..18 (bosses excluded)
 function runRec(end){
@@ -1393,6 +1394,7 @@ function openGal(){
 }
 // patch notes for players: newest first, short and general
 const PATCH=[
+ ['v2.04','18. 10.',['Na mobilu: podrž prst asi vteřinu na kartě s vykřičníkem a ukáže se její popis. Zmizí při dalším dotyku.']],
  ['v2.03','18. 10.',['Lektvar zbroje a neviditelnost: vyléčí plnou sílu, ale bonus je poloviční (zaokrouhleno dolů, aspoň 1) – lektvar zbroje 3 dá 1 zbroj, neviditelnost 3 ubere monstrům 1.']],
  ['v2.02','18. 10.',['Na počítači je ukazatel místností vodorovně uprostřed pod odkládacími poli, nad tlačítky.','Ztlumení teď vypne i tichý šum jeskyně v pozadí (dřív hrál dál přes ozvěnu).']],
  ['v2.01','18. 10.',['Stínový plášť: při útěku ubere celkem 1 / 2 / 3 síly, rozdělené mezi až 1 / 2 / 3 vyložená monstra (když jich je míň, dostane některé víc).','Speciální lektvary v obchodě (zbroj, neviditelnost) mají sílu 2–3 v 1. patře, 3–4 ve 2. a 4–5 ve 3.','Karty se zvláštní schopností mají vpravo dole malý vykřičník – najeď na ně a uvidíš popis.','Vedle tlačítka zvuku je tlačítko, které jedním klikem ztlumí (a zase zapne) všechno.']],
@@ -2289,6 +2291,14 @@ function tipShow(c){if(!TIPB){TIPB=document.createElement('div');TIPB.id='tipbox
 document.addEventListener('mouseover',e=>{const c=e.target.closest&&e.target.closest('.card[data-tip]');if(!c||document.querySelector('.card.drag')){if(TIPC)tipHide();return;}if(c!==TIPC)tipShow(c);});
 document.addEventListener('mouseout',e=>{if(TIPC&&(!e.relatedTarget||!TIPC.contains(e.relatedTarget)))tipHide();});
 document.addEventListener('pointerdown',tipHide,true);addEventListener('scroll',tipHide,true);
+var LP={t:0,x:0,y:0,c:null,done:0,sup:0};
+function lpCancel(){clearTimeout(LP.t);LP.t=0;LP.c=null;}
+document.addEventListener('pointerdown',e=>{lpCancel();LP.done=0;if(e.pointerType==='mouse')return;const c=e.target.closest&&e.target.closest('.card[data-tip]');if(!c)return;
+  LP.c=c;LP.x=e.clientX;LP.y=e.clientY;LP.t=setTimeout(()=>{const k=LP.c;LP.t=0;if(!k||!k.isConnected)return;if(k.classList.contains('drag'))return;tipShow(k);LP.done=Date.now();try{navigator.vibrate&&navigator.vibrate(12);}catch(x){}},900);},true);
+document.addEventListener('pointermove',e=>{if((LP.t||LP.done)&&Math.hypot(e.clientX-LP.x,e.clientY-LP.y)>10){lpCancel();if(LP.done){LP.done=0;tipHide();}}},true);
+document.addEventListener('pointerup',()=>{lpCancel();if(LP.done){LP.sup=Date.now();LP.done=0;}},true);document.addEventListener('pointercancel',lpCancel,true);
+document.addEventListener('click',e=>{if(LP.sup&&Date.now()-LP.sup<500){LP.sup=0;e.stopPropagation();e.preventDefault();}},true);
+document.addEventListener('contextmenu',e=>{if(e.target.closest&&e.target.closest('.card'))e.preventDefault();},true);
 function render(fresh,dhp){tipHide();
   const camp=S.mode==='camp';if(camp)saveSoon();
   slots.forEach((s,i)=>{s.innerHTML=S.room[i]===null?'':cardHTML(S.room[i],true);});
