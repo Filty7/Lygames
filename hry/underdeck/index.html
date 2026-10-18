@@ -1294,8 +1294,8 @@ function caveHTML(){
 const nameOf=c=>{if(c.mimic)return 'Mimik';const sg=u=>u>0?' +'+u:' −'+(-u);if(c.nm)return c.up?c.nm+sg(c.up):c.nm;if(c.sp)return c.sp==='chain'&&(c.ch||1)>1?'Blesk '+['I','II','III'][(c.ch||1)-1]:SN[c.sp];const u=c.up||0,n=c.type==='m'?MNf()[c.v]||'Obr':c.type==='w'?WN[c.v-u]||'Zbraň':c.type==='p'?PN[c.v-u]||'Lektvar':ON[c.type];return u?n+sg(u):n;};
 const label=c=>c.type==='m'?'':c.nm?c.nm:c.type==='w'||c.type==='p'?'':nameOf(c);
 const marks=c=>(c.sp==='melt'?MK.inst:'')+(c.temp?MK.tmp:'')+('gkc'.includes(c.type)||c.fire?MK.flee:'')+(c.gone||c.mimic?MK.gone:'')+(GEAR.includes(c.type)?MK.arm:'');
-const INVD=v=>Math.max(1,v),SILT=n=>n+' '+(n===1?'sílu':n<5?'síly':'sil'),
- PTIP=c=>c.stam?'+'+c.v+' ♥ a dá zbroj '+c.v+'.':c.inv?'+'+c.v+' ♥, vyložená monstra ztratí sílu '+INVD(c.v)+'.':'';
+const INVD=v=>Math.max(1,Math.floor(v/2)),SILT=n=>n+' '+(n===1?'sílu':n<5?'síly':'sil'),
+ PTIP=c=>c.stam?'+'+c.v+' ♥ a dá zbroj '+INVD(c.v)+'.':c.inv?'+'+c.v+' ♥, vyložená monstra ztratí sílu '+INVD(c.v)+'.':'';
 const TMPT='\n⌛ Dočasná, na konci místnosti zmizí.';
 const FRAGT='\n⌛ Úlomek, na konci místnosti zmizí.';
 const tipOf=c=>c.temp&&c.type!=='m'?(tipBase(c).replace(/ ?(Vznikl z přebytku léčení, po této místnosti zmizí\.|Po této místnosti zmizí\.)/,'')+(c.frag?FRAGT:TMPT)).replace(/^\n/,'').trim():tipBase(c);
@@ -1351,7 +1351,7 @@ const inc=(o,k,n)=>{o[k]=(o[k]||0)+(n===undefined?1:n);};
 function stat(fn){if(!statOn())return;try{fn(STATS.C);statSave();}catch(e){}}
 function addGold(n){S.gold+=n;if(statOn())S.goldEarn=(S.goldEarn||0)+n;}
 const monAvg=()=>{const m=S.comp.filter(i=>CARDS[i].type==='m'&&!CARDS[i].boss);return m.length?m.reduce((a,i)=>a+CARDS[i].v,0)/m.length:0;};
-const GAMEVER='v2.02';
+const GAMEVER='v2.03';
 const BP=7,NROOM=21; // boss every 7th Room, 3 bosses
 const FR=nr=>nr-Math.floor(nr/BP),NFIGHT=18; // fight-room number 1..18 (bosses excluded)
 function runRec(end){
@@ -1393,6 +1393,7 @@ function openGal(){
 }
 // patch notes for players: newest first, short and general
 const PATCH=[
+ ['v2.03','18. 10.',['Lektvar zbroje a neviditelnost: vyléčí plnou sílu, ale bonus je poloviční (zaokrouhleno dolů, aspoň 1) – lektvar zbroje 3 dá 1 zbroj, neviditelnost 3 ubere monstrům 1.']],
  ['v2.02','18. 10.',['Na počítači je ukazatel místností vodorovně uprostřed pod odkládacími poli, nad tlačítky.','Ztlumení teď vypne i tichý šum jeskyně v pozadí (dřív hrál dál přes ozvěnu).']],
  ['v2.01','18. 10.',['Stínový plášť: při útěku ubere celkem 1 / 2 / 3 síly, rozdělené mezi až 1 / 2 / 3 vyložená monstra (když jich je míň, dostane některé víc).','Speciální lektvary v obchodě (zbroj, neviditelnost) mají sílu 2–3 v 1. patře, 3–4 ve 2. a 4–5 ve 3.','Karty se zvláštní schopností mají vpravo dole malý vykřičník – najeď na ně a uvidíš popis.','Vedle tlačítka zvuku je tlačítko, které jedním klikem ztlumí (a zase zapne) všechno.']],
  ['v2.00','18. 10.',['Na počítači jsou vyložené karty nahoře o 30 % větší. Tlačítky + a − vpravo od nich si velikost nastavíš v pěti krocích (hra si ji pamatuje).']],
@@ -1832,7 +1833,7 @@ function effect(id,z){ // {ok,hint,why}
   if(!ok)return{ok:0,why:t==='x'?(sp==='terror'?'Terror přetáhni na monstrum.':sp==='dup'?'Duplikaci přetáhni na vyloženou zbraň, lektvar nebo kouzlo.':sp==='ench'?'Enchant přetáhni na vyloženou zbraň.':['fball','charm','stun','split'].includes(sp)?SN[sp]+' přetáhni na monstrum.':'Kouzlo přetáhni na místo pro kouzla.'):t==='g'?'Mince patří do batohu.':t==='a'?'Mapu přetáhni na batoh.':t==='k'?(inRoom('c')!==undefined?'Klíč přetáhni na truhlu.':'Truhla tu zatím není. Klíč nech ležet.'):t==='c'?(inRoom('k')!==undefined?'Na truhlu přetáhni klíč.':'Klíč tu zatím není. Truhlu nech ležet.'):gear?nameOf(c)+' patří na místo pro výbavu.':t==='t'?'Nářadí přetáhni na zbraň.':t==='p'?'Lektvar patří na místo pro lektvary.':t==='w'?'Zbraň patří na místo pro zbraň.':'Sem monstrum nepatří.'};
   if(z==='spell')return{ok:1,hint:'seslat'};
   if(z==='fist'){const fd=fistD(c,v);return{ok:1,hint:'−'+soak(fd)+' ♥'+(fd<v?' · pěsti':'')+(urnOK(c,v)?' · urna +'+URNH[rl('urn')-1]+' ♥':'')};}
-  if(z==='potion'){const hv=v+(rl('herb')?1:0);return{ok:1,hint:'+'+Math.min(hv,S.max-S.hp)+' ♥'+(c.stam?', zbroj +'+v:'')+(c.inv?', nepřátelé −'+INVD(v):'')+((c.fancy||c.up>0)&&hv>S.max-S.hp?', přebytek '+(hv-(S.max-S.hp))+' naspod':'')};}
+  if(z==='potion'){const hv=v+(rl('herb')?1:0);return{ok:1,hint:'+'+Math.min(hv,S.max-S.hp)+' ♥'+(c.stam?', zbroj +'+INVD(v):'')+(c.inv?', nepřátelé −'+INVD(v):'')+((c.fancy||c.up>0)&&hv>S.max-S.hp?', přebytek '+(hv-(S.max-S.hp))+' naspod':'')};}
   if(z==='pack'&&(t==='k'||t==='c'))return inRoom(t==='k'?'c':'k')!==undefined?{ok:0,why:t==='k'?'Klíč přetáhni na truhlu.':'Na truhlu přetáhni klíč.'}:{ok:1,hint:'zahodit · klíč i truhla zmizí'};
   if(z==='pack')return t==='a'?{ok:1,hint:S.deck.some(i=>!'gkc'.includes(CARDS[i].type))?'vybrat z balíčku':'v balíčku nic není'}:{ok:1,hint:'+'+coinG(c)+' '+zlT(coinG(c))};
   if(z==='armor'){
@@ -1896,7 +1897,7 @@ function act(id,z){
   if(t==='m'&&!c.fire&&!c.trap&&!c.dart&&(z==='fist'||z==='weapon'||z==='armor'))try{fxBlood(cardRect(id),c);fxShake(1.6);}catch(e){}
   let killed=t==='m';
   if(z==='fist'){const fd=fistD(c,v);if(fd<v){fxRing(cardRect(id),'#b7a6e0');relV('fists',v-fd);}hurt(fd);if(S.hp>0&&urnOK(c,v)){const h0=S.hp;S.hp=Math.min(S.max,S.hp+URNH[rl('urn')-1]);relV('urn',S.hp-h0);const r=cardRect(id);setTimeout(()=>{if(r){fxSparkle(r,'rgba(183,166,224,1)');}const hr=$('hp').getBoundingClientRect();fxHeal(hr);fxFloat(hr,'+'+(S.hp-h0)+' ♥ urna','var(--potion)');},120);}if(c.fire){killed=false;S.deck.push(id);const fr=cardRect(id);fxEmbers(fr);fxDeck([id],fr,false,150);}}
-  else if(z==='potion'){const hb=rl('herb')?1:0,hv=v+hb;const ov=hv-(S.max-S.hp);if((c.fancy||c.up>0)&&ov>0){const n=c.stam?mkX('p',ov,{nm:'Úlomek zbroje',g:'stam',stam:1,temp:1,frag:1}):c.inv?mkX('p',ov,{nm:'Úlomek neviditelnosti',inv:1,temp:1,frag:1}):mkX('p',ov,{nm:'Úlomek lektvaru',temp:1,frag:1});S.deck.push(n);setTimeout(()=>{const pe=$('ppad').getBoundingClientRect();fxRing(pe,'var(--potion)');fxSparkle(pe,'rgba(98,197,152,1)');fxFloat(pe,'přebytek +'+ov,'var(--potion)');setTimeout(()=>{const g=document.createElement('div');g.innerHTML=cardHTML(n);const c=g.firstElementChild;Object.assign(c.style,{position:'fixed',inset:'auto',left:pe.left+'px',top:pe.top+'px',width:pe.width+'px',height:pe.height+'px',zIndex:72,pointerEvents:'none'});document.body.append(c);c.animate([{transform:'scale(.3)',opacity:0,filter:'brightness(2)'},{transform:'scale(1.08)',opacity:1,filter:'brightness(1.4)'},{transform:'scale(1)',opacity:1,filter:'none'}],{duration:380,easing:'ease-out',fill:'forwards'}).onfinish=()=>{c.remove();fxDeck([n],pe,false,0);};},260);},40);say('Přebytek léčení: naspod balíčku přibyl '+nameOf(CARDS[n])+' '+ov+'.');}if(c.stam){S.arm=(S.arm||0)+v;}if(hb)relV('herb',Math.max(0,Math.min(hb,S.max-S.hp-v)));S.hp=Math.min(S.max,S.hp+hv);S.lastPotion=id;
+  else if(z==='potion'){const hb=rl('herb')?1:0,hv=v+hb;const ov=hv-(S.max-S.hp);if((c.fancy||c.up>0)&&ov>0){const n=c.stam?mkX('p',ov,{nm:'Úlomek zbroje',g:'stam',stam:1,temp:1,frag:1}):c.inv?mkX('p',ov,{nm:'Úlomek neviditelnosti',inv:1,temp:1,frag:1}):mkX('p',ov,{nm:'Úlomek lektvaru',temp:1,frag:1});S.deck.push(n);setTimeout(()=>{const pe=$('ppad').getBoundingClientRect();fxRing(pe,'var(--potion)');fxSparkle(pe,'rgba(98,197,152,1)');fxFloat(pe,'přebytek +'+ov,'var(--potion)');setTimeout(()=>{const g=document.createElement('div');g.innerHTML=cardHTML(n);const c=g.firstElementChild;Object.assign(c.style,{position:'fixed',inset:'auto',left:pe.left+'px',top:pe.top+'px',width:pe.width+'px',height:pe.height+'px',zIndex:72,pointerEvents:'none'});document.body.append(c);c.animate([{transform:'scale(.3)',opacity:0,filter:'brightness(2)'},{transform:'scale(1.08)',opacity:1,filter:'brightness(1.4)'},{transform:'scale(1)',opacity:1,filter:'none'}],{duration:380,easing:'ease-out',fill:'forwards'}).onfinish=()=>{c.remove();fxDeck([n],pe,false,0);};},260);},40);say('Přebytek léčení: naspod balíčku přibyl '+nameOf(CARDS[n])+' '+ov+'.');}if(c.stam){S.arm=(S.arm||0)+INVD(v);}if(hb)relV('herb',Math.max(0,Math.min(hb,S.max-S.hp-v)));S.hp=Math.min(S.max,S.hp+hv);S.lastPotion=id;
     if(hb){S.herbN=(S.herbN||0)+1;const need=HERBN[rl('herb')-1];if(S.herbN>=need){S.herbN=0;S.max++;S.hp=Math.min(S.max,S.hp+1);relV('herb',2);setTimeout(()=>{const hr=$('hp').getBoundingClientRect();fxHeal(hr);fxSparkle(hr,'rgba(98,197,152,1)');fxFloat(hr,'+1 max ♥','var(--potion)');},350);setTimeout(()=>say('Bylinkářův váček: +1 max ♥ a +1 ♥.'),800);}}
     {const fl=rl('flask');const ms=fl?S.deck.filter(i=>CARDS[i].type==='m'&&!CARDS[i].trap&&!CARDS[i].dart&&!CARDS[i].fire&&val(i)>0):[];if(ms.length){const x=ms[rnd(ms.length)];S.debuff[x]=(S.debuff[x]||0)+fl;relV('flask',fl);setTimeout(()=>{const r=$('deck').getBoundingClientRect();fxDark(r);fxFloat(r,nameOf(CARDS[x])+' −'+fl,'#c9b8f0');},300);setTimeout(()=>say('Alchymistova baňka: '+nameOf(CARDS[x])+' v balíčku má do konce místnosti −'+fl+'.'),700);}}}
   else if(z==='pack'&&t==='a'){
