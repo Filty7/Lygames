@@ -632,6 +632,12 @@ body{margin:0}
   .rsz button:focus-visible{outline:2px solid var(--torch);outline-offset:1px}
   .rsz i{display:block;width:6px;height:6px;border-radius:50%;background:#4a3e38}.rsz i.on{background:var(--torch)}
 }
+.card .abm{position:absolute;right:calc(var(--cw)*.045);bottom:calc(var(--cw)*.045);z-index:4;width:calc(var(--cw)*.13);height:calc(var(--cw)*.13);min-width:11px;min-height:11px;box-sizing:border-box;display:grid;place-items:center;font:700 calc(var(--cw)*.095)/1 system-ui,sans-serif;color:#a49c94;border:1px solid #a49c94;border-radius:2px;background:#0008;opacity:.6;transition:opacity .2s,color .2s,border-color .2s;pointer-events:none}
+.card:hover .abm,.card:focus-visible .abm{opacity:.95;color:#f4f0ea;border-color:#e4ded6}
+.card.abil .rn{right:auto;left:5px}
+.mute{padding:4px 7px!important;line-height:0}.mute svg{width:15px;height:15px;display:block}
+.stats .mute{padding:2px 5px!important}
+.mute.on{color:#d0705a}
 </style>
 
 <div class="wrap">
@@ -639,7 +645,7 @@ body{margin:0}
     <div><h1>Underdeck</h1><div id="sub"></div></div>
     <div class="stats">
       <div class="gold" id="goldbox" title="Zlato: slouží k nákupu karet a vylepšování"><i></i><b id="gold">0</b></div><div class="gold diab" id="diabox" title="Diamanty: slouží k nákupu trvalého vylepšení karet"><svg viewBox="0 0 64 64"></svg><b id="dian">0</b></div><span id="herob" class="herob tp" hidden data-tip="Duše hrdiny: když padneš, dostaneš ještě jednu šanci."><svg viewBox="0 0 64 64"></svg><b id="heron">3</b></span>
-      <button class="b aud" title="Hlasitost hudby a zvuků" style="padding:4px 9px;font-size:13px">♪ zvuk</button><button class="b artbtn" title="Přepnout grafický styl karet" style="padding:4px 9px;font-size:13px" onclick="artToggle()">🖌 styl</button>
+      <button class="b aud" title="Hlasitost hudby a zvuků" style="padding:4px 9px;font-size:13px">♪ zvuk</button><button class="b mute" style="padding:4px 7px;font-size:13px" title="Ztlumit vše" aria-label="Ztlumit vše" aria-pressed="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9h4l5-4v14l-5-4H4z" fill="currentColor" fill-opacity=".25"/><path class="mw" d="M16.5 8.5a5 5 0 0 1 0 7M19 6a8.5 8.5 0 0 1 0 12"/><path class="mx" d="M16 9l6 6M22 9l-6 6" style="display:none"/></svg></button><button class="b artbtn" title="Přepnout grafický styl karet" style="padding:4px 9px;font-size:13px" onclick="artToggle()">🖌 styl</button>
       <span class="dev"><button class="b" id="cheat" title="DEV: vyléčí na maximum">♥ max</button><button class="b" id="jumpBoss" title="DEV: skočí na nejbližšího bosse">⇥ boss</button><button class="b" id="devAdd" title="DEV: přidá kartu do balíčku">+ karta</button></span>
       <div class="hp" id="hp" aria-live="polite"><span id="hph" aria-hidden="true" style="color:var(--monster);font-size:24px;display:inline-block;width:1.1em;text-align:center">♥</span><b id="hpn">20</b><small id="hpm">/ 20</small><div class="bar"><i id="hpbar"></i><i id="hpg"></i></div><span id="hpx" hidden></span><span id="armb" class="armb tp" style="visibility:hidden" data-tip="Zbroj: když utrpíš zranění, sníží se o hodnotu zbroje, poté ztratíš 1 zbroj."><svg viewBox="0 0 24 24"><path d="M12 3l7 3v6c0 5-3 8-7 9-4-1-7-4-7-9V6z"/></svg><b id="armn">0</b></span></div>
     </div>
@@ -691,7 +697,7 @@ body{margin:0}
   <div class="mc">
     <h2>Underdeck</h2>
     <p class="tag">karetní sestup do podzemí</p>
-    <div id="maud"><button class="b artbtn" title="Přepnout grafický styl karet" onclick="artToggle()">🖌 tarot</button><button class="b aud" title="Hlasitost hudby a zvuků">♪ zvuk</button></div>
+    <div id="maud"><button class="b artbtn" title="Přepnout grafický styl karet" onclick="artToggle()">🖌 tarot</button><button class="b aud" title="Hlasitost hudby a zvuků">♪ zvuk</button><button class="b mute" title="Ztlumit vše" aria-label="Ztlumit vše" aria-pressed="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9h4l5-4v14l-5-4H4z" fill="currentColor" fill-opacity=".25"/><path class="mw" d="M16.5 8.5a5 5 0 0 1 0 7M19 6a8.5 8.5 0 0 1 0 12"/><path class="mx" d="M16 9l6 6M22 9l-6 6" style="display:none"/></svg></button></div>
     <div class="mbtns" id="mbtns"></div>
   </div>
   <p class="credit">Inspirováno sólovou karetní hrou <b>Scoundrel</b> od Zacha Gage a Kurta Biega (2011).<br>Tento design navrhl <b>Tomáš Lyga</b>.</p>
@@ -819,7 +825,7 @@ const BTIP='Po zabití přidá do balíčku 5 chapadel a odchází ze hry.';
 const RN={flask:'Alchymistova baňka',herb:'Bylinkářův váček',hammer:'Kovářské kladivo',cloak:'Stínový plášť',ring:'Prsten útěku',fists:'Rváčovy pěsti',crystal:'Krystal many',echo:'Ozvěna',grim:'Grimoár',urn:'Urna duší'};
 const RTIP=(k,l)=>({
  hammer:'První nasazená zbraň získá sílu +'+(l+1)+', každá další pak o 1 méně.',
- cloak:'Při útěku '+(l===1?'jedno náhodné vyložené monstrum ztratí':l+' náhodná vyložená monstra ztratí')+' 1 sílu.',
+ cloak:'Při útěku '+['až jedno vyložené monstrum ztratí 1 sílu','až dvě vyložená monstra ztratí celkem 2 síly','až tři vyložená monstra ztratí celkem 3 síly'][l-1]+'.',
  ring:'Při útěku vyléčíš +'+[1,2,2][l-1]+' ♥ za vyložené monstrum'+(l>=3?' a získáš 1 zbroj za každá dvě monstra':'')+'.'+(l>=3?'\nSmíš utéct znovu.':''),
  fists:'Zabití monstra pěstí zraní o '+l+' méně (min. 1).',
  echo:(l===1?'První seslané kouzlo v místnosti dostane':'První '+l+' seslaná kouzla v místnosti dostanou')+' dočasnou kopii naspod balíčku.'+(l===1?'\nPři získání dostaneš kouzlo zdarma.':''),
@@ -1339,7 +1345,7 @@ const inc=(o,k,n)=>{o[k]=(o[k]||0)+(n===undefined?1:n);};
 function stat(fn){if(!statOn())return;try{fn(STATS.C);statSave();}catch(e){}}
 function addGold(n){S.gold+=n;if(statOn())S.goldEarn=(S.goldEarn||0)+n;}
 const monAvg=()=>{const m=S.comp.filter(i=>CARDS[i].type==='m'&&!CARDS[i].boss);return m.length?m.reduce((a,i)=>a+CARDS[i].v,0)/m.length:0;};
-const GAMEVER='v2.00';
+const GAMEVER='v2.01';
 const BP=7,NROOM=21; // boss every 7th Room, 3 bosses
 const FR=nr=>nr-Math.floor(nr/BP),NFIGHT=18; // fight-room number 1..18 (bosses excluded)
 function runRec(end){
@@ -1381,6 +1387,7 @@ function openGal(){
 }
 // patch notes for players: newest first, short and general
 const PATCH=[
+ ['v2.01','18. 10.',['Stínový plášť: při útěku ubere celkem 1 / 2 / 3 síly, rozdělené mezi až 1 / 2 / 3 vyložená monstra (když jich je míň, dostane některé víc).','Speciální lektvary v obchodě (zbroj, neviditelnost) mají sílu 2–3 v 1. patře, 3–4 ve 2. a 4–5 ve 3.','Karty se zvláštní schopností mají vpravo dole malý vykřičník – najeď na ně a uvidíš popis.','Vedle tlačítka zvuku je tlačítko, které jedním klikem ztlumí (a zase zapne) všechno.']],
  ['v2.00','18. 10.',['Na počítači jsou vyložené karty nahoře o 30 % větší. Tlačítky + a − vpravo od nich si velikost nastavíš v pěti krocích (hra si ji pamatuje).']],
  ['v1.99','18. 10.',['Na počítači jsou všechna odkládací pole v jedné řadě vedle zbraně (lektvar, kouzla, batoh, relikvie) a karty mají zase plnou velikost.']],
  ['v1.98','18. 10.',['Na počítači se hra vejde na obrazovku bez posouvání: odložený lektvar, kouzlo a batoh jsou nižší a karty se zmenší podle výšky okna.','Past a šipka jdou na zbraň jen podle stejného pravidla jako monstra (kromě Kopí).','Bonusový útěk je jen ve Výpravě, ne v Klasické hře ani v tutoriálu.']],
@@ -1636,8 +1643,8 @@ function roomTile(t,n){
 const roomIn=(t,mid)=>`<div class="inside">${roomArt(t,'side')}<div class="mid">${mid}</div>${roomArt(t,'side',1)}</div>`;
 function cardHTML(id,inRoom,notip){
   const c=CARDS[id],num=c.type==='m'||c.type==='w'||c.type==='p'?val(id):c.v?c.v:c.type==='g'?'+'+coinG(c):c.type==='c'&&S&&S.mode==='camp'?'+'+chestG(FR(S.roomNo)):'';
-  const tip=notip?'':tipOf(c);
-  return `<div class="card wr${id%3} ${c.type}${c.boss?' boss':''}${c.type==='m'&&!c.boss&&(c.ghost||c.bat||c.rat||c.mimic)?' spec':''}${c.fire?' fire':''}${c.trap||c.dart?' trapc':''}${c.inv?' invis':''}${c.stam?' stamc':''}${c.up?' up':''}${c.temp?' tmp':''}${c.up<0?' dn':''}${(S&&S.ls&&S.ls.includes(id))||c.blood?' ench':''}${S&&S.rune&&S.rune.includes(id)?' rune':''}${c.upTo!=null?' upv':''}${typeof ARTNEW!=='undefined'&&ARTNEW&&S&&S.weapon&&S.weapon.kills&&S.weapon.kills.includes(id)&&!c.ghost?' bloody b'+(id%3):''}${typeof ARTNEW!=='undefined'&&ARTNEW&&S&&S.weapon&&S.weapon.id===id&&S.weapon.kills&&S.weapon.kills.length?' bloodw':''}" data-id="${id}" ${tip?`data-tip="${tip}"`:''} ${inRoom?`tabindex="0" role="button" aria-label="${nameOf(c)} ${num}"`:''}><span class="n" style="--rot:${((id*37)%9)-4}deg">${num}</span><span class="s">${c.suit||''}</span>${(ITIP[c.type]||c.type==='q')&&LVI(c)>1?`<span class="lvs">${STARS(LVI(c))}</span>`:''}${S&&S.rune&&S.rune.includes(id)?'<span class="rn">ᚱ</span>':''}${S&&S.ward&&S.wardB&&S.wardB[id]&&!c.nw?`<span class="wb">+${S.wardB[id]}</span>`:''}${inRoom&&S&&S.relics&&urnOK(c,val(id))?`<span class="urnm"><svg viewBox="0 0 64 64">${G.rl_urn}</svg></span>`:''}${art(c)}<span class="t">${label(c)}</span><span class="ic">${marks(c)}</span></div>`;
+  const tip=notip?'':tipOf(c),abil=c.type!=='q'&&c.type!=='g'&&!!tipOf(c);
+  return `<div class="card wr${id%3} ${c.type}${c.boss?' boss':''}${c.type==='m'&&!c.boss&&(c.ghost||c.bat||c.rat||c.mimic)?' spec':''}${abil?' abil':''}${c.fire?' fire':''}${c.trap||c.dart?' trapc':''}${c.inv?' invis':''}${c.stam?' stamc':''}${c.up?' up':''}${c.temp?' tmp':''}${c.up<0?' dn':''}${(S&&S.ls&&S.ls.includes(id))||c.blood?' ench':''}${S&&S.rune&&S.rune.includes(id)?' rune':''}${c.upTo!=null?' upv':''}${typeof ARTNEW!=='undefined'&&ARTNEW&&S&&S.weapon&&S.weapon.kills&&S.weapon.kills.includes(id)&&!c.ghost?' bloody b'+(id%3):''}${typeof ARTNEW!=='undefined'&&ARTNEW&&S&&S.weapon&&S.weapon.id===id&&S.weapon.kills&&S.weapon.kills.length?' bloodw':''}" data-id="${id}" ${tip?`data-tip="${tip}"`:''} ${inRoom?`tabindex="0" role="button" aria-label="${nameOf(c)} ${num}"`:''}><span class="n" style="--rot:${((id*37)%9)-4}deg">${num}</span><span class="s">${c.suit||''}</span>${(ITIP[c.type]||c.type==='q')&&LVI(c)>1?`<span class="lvs">${STARS(LVI(c))}</span>`:''}${S&&S.rune&&S.rune.includes(id)?'<span class="rn">ᚱ</span>':''}${S&&S.ward&&S.wardB&&S.wardB[id]&&!c.nw?`<span class="wb">+${S.wardB[id]}</span>`:''}${inRoom&&S&&S.relics&&urnOK(c,val(id))?`<span class="urnm"><svg viewBox="0 0 64 64">${G.rl_urn}</svg></span>`:''}${art(c)}<span class="t">${label(c)}</span><span class="ic">${marks(c)}</span>${abil?'<span class="abm" aria-hidden="true">!</span>':''}</div>`;
 }
 
 let S,busy=false,menuOpen=false,viewDeck=false,viewAdd=false,peek=false;
@@ -2143,15 +2150,17 @@ function skip(){
   if(jokerNow()){S.joker=1;stat(C=>{C.joker=(C.joker||0)+1;});say('Bonusový útěk pro tuto místnost využit.');}
   const cl=rl('cloak')||0,ms=live().filter(i=>CARDS[i].type==='m'&&!CARDS[i].fire&&!CARDS[i].face&&!CARDS[i].trap&&!CARDS[i].dart&&val(i)>0);
   if(cl&&ms.length){
-    busy=true;const xs=shuffle(ms.slice()).slice(0,cl);
-    xs.forEach(x=>{const r=cardRect(x);S.debuff[x]=(S.debuff[x]||0)+1;relV('cloak',1);
+    busy=true;const ca={};let left=cl;
+    while(left>0){const c=ms.filter(x=>val(x)-(ca[x]||0)>0);if(!c.length)break;const m=Math.min(...c.map(x=>ca[x]||0)),cc=c.filter(x=>(ca[x]||0)===m),x=cc[rnd(cc.length)];ca[x]=(ca[x]||0)+1;left--;}
+    const xs=Object.keys(ca).map(Number);
+    xs.forEach(x=>{const r=cardRect(x),a=ca[x];S.debuff[x]=(S.debuff[x]||0)+a;relV('cloak',a);
       const el=document.querySelector(`.slot .card[data-id="${x}"]`);if(el){const n=el.querySelector('.n');if(n)n.textContent=val(x);el.animate([{filter:'none'},{filter:'brightness(.55) saturate(.6)',offset:.4},{filter:'none'}],{duration:520});}
-      fxDark(r);fxFloat(r,'−1','#c9b8f0');});snd('spell');
-    setTimeout(()=>skipGo(xs),560);return;
+      fxDark(r);fxFloat(r,'−'+a,'#c9b8f0');});snd('spell');
+    setTimeout(()=>skipGo(xs,ca),560);return;
   }
   busy=true;skipGo(null);
 }
-function skipGo(cloakX){
+function skipGo(cloakX,cloakA){
   const ids=live(),kc=i=>CARDS[i].type==='k'||CARDS[i].type==='c',hasKC=ids.some(kc),ratR=ids.filter(i=>CARDS[i].rat).map(i=>[i,cardRect(i)]);
   const gone=ids.filter(i=>CARDS[i].type==='g'||CARDS[i].fire||(hasKC&&kc(i)));
   const mons=ids.filter(i=>CARDS[i].type==='m'&&!CARDS[i].fire&&!CARDS[i].face&&!CARDS[i].trap&&!CARDS[i].dart);
@@ -2178,7 +2187,7 @@ function skipGo(cloakX){
     ids.forEach(i=>{if(CARDS[i].rat){CARDS[i].v++;note+='Krysa zesílila na '+CARDS[i].v+'. ';}});
     ratR.forEach(([i])=>setTimeout(()=>fxRatGrow(i),80));
     S.deck.push(...shuffle(ids.filter(i=>!gone.includes(i)&&i!==killId)));
-    if(cloakX&&cloakX.length)note+='Stínový plášť: '+cloakX.map(i=>nameOf(CARDS[i])).join(', ')+(cloakX.length>1?' mají':' má')+' do konce místnosti −1. ';
+    if(cloakX&&cloakX.length)note+='Stínový plášť: '+cloakX.map(i=>nameOf(CARDS[i])+' −'+((cloakA&&cloakA[i])||1)).join(', ')+' do konce místnosti. ';
     {const ri=rl('ring');if(ri&&mons.length){const n=mons.length,ra=ri>=3?Math.floor(n/2):0,hl=Math.min(n*[1,2,2][ri-1],S.max-S.hp);S.hp+=hl;relV('ring',hl+ra);if(ra)S.arm=(S.arm||0)+ra;fdh+=hl;{const hr=$('hp').getBoundingClientRect(),na=ra;setTimeout(()=>{if(hl){fxHeal(hr);fxFloat(hr,'+'+hl+' ♥','var(--potion)');}if(na)setTimeout(()=>fxFloat($('armb').getBoundingClientRect(),'zbroj +'+na,'#b8c4cc'),250);fxSparkle(hr,'rgba(183,166,224,1)');},60);}note+='Prsten útěku: +'+hl+' ♥'+(ra?', zbroj +'+ra:'')+'. ';}}
     S.room=[null,null,null,null];
     if(killId!==null)onKill(killId);
@@ -2632,7 +2641,7 @@ function bloodAltar(kind){
 // calm corridor (after Rooms 3 and 6 of each level) = the only shop: each offer once, buy anything you can afford
 const cF=f=>3+.6*f,rollS=(c,sp)=>Math.max(2,Math.round(c*(1-sp+2*sp*Math.random())));
 const SPEC=[{nm:'Luk',g:'bow',wk:'bow',tip:'Po zabití zažene silnější vyložené monstrum naspod a sníží mu sílu o 1.'},{nm:'Kopí',g:'spear',wk:'spear',tip:'Může zabít silnější monstrum, než jaké zabila naposledy, poté se ale zničí.'},{nm:'Sekera',g:'axe',wk:'axe',tip:'Při každém zabití ztratí 2 síly do konce místnosti.'},{nm:'Lektvar zbroje',g:'stam',stam:1},{nm:'Neviditelnost',inv:1}];
-function mkSpec(r,f){const o=SPEC[r],w=r<3,aL=Math.max(4,Math.round(cF(f))),aH=Math.round(aL*1.45),ax=aL+rnd(aH-aL+1),hv=Math.max(2,Math.round(ax/2)),v=w?(r===2?Math.round(ax*1.5):hv):Math.max(2,rollS(.5*cF(f),.2));const i=mkX(w?'w':'p',v,Object.assign({},o));return {id:i,price:w?9+Math.floor(hv/3):7+Math.floor(v/3)};}
+function mkSpec(r,f){const o=SPEC[r],w=r<3,aL=Math.max(4,Math.round(cF(f))),aH=Math.round(aL*1.45),ax=aL+rnd(aH-aL+1),hv=Math.max(2,Math.round(ax/2)),v=w?(r===2?Math.round(ax*1.5):hv):2+LVN()+rnd(2);const i=mkX(w?'w':'p',v,Object.assign({},o));return {id:i,price:w?9+Math.floor(hv/3):7+Math.floor(v/3)};}
 function openCalm(){
   const f=FR(S.roomNo),c=cF(f),lv=LVN(),off=[];
   const bL=Math.max(2,Math.round(c*.6)),bH=Math.max(bL,Math.round(bL*1.5)),bs=bL+rnd(bH-bL+1);if(Math.random()<.6){const w=mk('w',bs,'♦');off.push({id:w,price:6+Math.floor(bs/3),kind:'card'});}else{const pp=mk('p',bs,'♥');off.push({id:pp,price:4+Math.floor(bs/3),kind:'card'});}
@@ -3109,7 +3118,13 @@ function musApply(){
 }
 document.addEventListener('pointerdown',()=>{if(!MUS.started){MUS.started=true;const c=audio();if(c){if(c.state==='suspended')c.resume();musApply();}}},{capture:true});
 // volume panel
-function audSync(){$('vMus').value=Math.round(MUS.vol*100);$('vSfx').value=Math.round(SFX.vol*100);$('vMusN').textContent=Math.round(MUS.vol*100);$('vSfxN').textContent=Math.round(SFX.vol*100);}
+function muteSync(){const m=MUS.vol===0&&SFX.vol===0;document.querySelectorAll('.mute').forEach(b=>{b.classList.toggle('on',m);b.setAttribute('aria-pressed',m);b.title=m?'Zapnout zvuk':'Ztlumit vše';b.setAttribute('aria-label',b.title);b.querySelector('.mw').style.display=m?'none':'';b.querySelector('.mx').style.display=m?'':'none';});}
+function muteToggle(){const m=MUS.vol===0&&SFX.vol===0;
+  if(m){let p=null;try{p=JSON.parse(localStorage.getItem('ud_vprev')||'null');}catch(e){}if(!p||!(p[0]>0||p[1]>0))p=[.6,.7];MUS.vol=p[0];SFX.vol=p[1];}
+  else{try{localStorage.setItem('ud_vprev',JSON.stringify([MUS.vol,SFX.vol]));}catch(e){}MUS.vol=0;SFX.vol=0;}
+  audSync();audSave();const c=audio();if(c){if(c.state==='suspended')c.resume();musApply();}}
+document.querySelectorAll('.mute').forEach(b=>b.addEventListener('click',e=>{e.stopPropagation();muteToggle();}));
+function audSync(){muteSync();$('vMus').value=Math.round(MUS.vol*100);$('vSfx').value=Math.round(SFX.vol*100);$('vMusN').textContent=Math.round(MUS.vol*100);$('vSfxN').textContent=Math.round(SFX.vol*100);}
 function audSave(){try{localStorage.setItem('ud_vmus',MUS.vol);localStorage.setItem('ud_vsfx',SFX.vol);}catch(e){}}
 $('vMus').addEventListener('input',e=>{MUS.vol=e.target.value/100;audSync();audSave();const c=audio();if(c){if(c.state==='suspended')c.resume();musApply();}});
 $('vSfx').addEventListener('input',e=>{SFX.vol=e.target.value/100;audSync();audSave();musApply();});
