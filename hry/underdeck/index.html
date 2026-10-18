@@ -600,10 +600,7 @@ body.artnew #tipbox{background:#0d0a0b;border:1px solid #4a3a2c;border-radius:2p
 .sbd{color:#9a8e80;font-size:12px;white-space:nowrap}.sbl b{text-align:right;font-variant-numeric:tabular-nums;color:var(--torch)}
 body{margin:0}
 @media (min-width:701px){
-  #zp .pad,#zb .pad,#zs .pad{height:calc(var(--ch)*.58);overflow:hidden;align-items:start;place-items:start center}
-  #zp .pad>.card,#zs .pad>.card,#zb .pad>.card{height:var(--ch);flex:none}
-  #zp .pad>svg,#zs .pad>svg,#zb .pad>svg{width:62%;height:auto;margin-top:8%}
-  .wrap{max-width:980px}
+  .wrap{max-width:1130px}
   #row{justify-content:center}
   .zone.side{width:max(calc(var(--cw) + 16px),104px)}
 }
@@ -612,6 +609,19 @@ body{margin:0}
   .zone{padding:6px;gap:4px}
   .zone h2{font-size:16px}
   .msg{min-height:1.2em;font-size:14px}
+}
+@media (min-width:701px){
+  body.wide1 .zones.z1{justify-content:center}
+  body.wide1 #zf{flex:none}
+  body.wide1 #zw{flex:0 1 420px;min-width:260px}
+  body.wide1 #zp,body.wide1 #zs,body.wide1 #zb{flex:0 1 calc(var(--cw) + 16px);min-width:72px;width:auto}
+  body.wide1 #zp .pad,body.wide1 #zs .pad,body.wide1 #zb .pad{width:100%;max-width:var(--cw);overflow:hidden;place-items:center}
+  body.wide1 #zp .pad>.card,body.wide1 #zs .pad>.card,body.wide1 #zb .pad>.card{width:var(--cw);flex:none;justify-self:start}
+  body.wide1 #za{flex:none;width:auto;padding-inline:8px}
+  body.wide1 #za .rels{flex-direction:column;gap:6px;flex:1;justify-content:center}
+  body.wide1 #za .rel{width:calc(var(--cw)*.46);height:calc(var(--cw)*.46)}
+  body.wide1 #za .hint{display:none}
+  body.wide1 #camp{display:none!important}
 }
 </style>
 
@@ -1320,7 +1330,7 @@ const inc=(o,k,n)=>{o[k]=(o[k]||0)+(n===undefined?1:n);};
 function stat(fn){if(!statOn())return;try{fn(STATS.C);statSave();}catch(e){}}
 function addGold(n){S.gold+=n;if(statOn())S.goldEarn=(S.goldEarn||0)+n;}
 const monAvg=()=>{const m=S.comp.filter(i=>CARDS[i].type==='m'&&!CARDS[i].boss);return m.length?m.reduce((a,i)=>a+CARDS[i].v,0)/m.length:0;};
-const GAMEVER='v1.98';
+const GAMEVER='v1.99';
 const BP=7,NROOM=21; // boss every 7th Room, 3 bosses
 const FR=nr=>nr-Math.floor(nr/BP),NFIGHT=18; // fight-room number 1..18 (bosses excluded)
 function runRec(end){
@@ -1362,6 +1372,7 @@ function openGal(){
 }
 // patch notes for players: newest first, short and general
 const PATCH=[
+ ['v1.99','18. 10.',['Na počítači jsou všechna odkládací pole v jedné řadě vedle zbraně (lektvar, kouzla, batoh, relikvie) a karty mají zase plnou velikost.']],
  ['v1.98','18. 10.',['Na počítači se hra vejde na obrazovku bez posouvání: odložený lektvar, kouzlo a batoh jsou nižší a karty se zmenší podle výšky okna.','Past a šipka jdou na zbraň jen podle stejného pravidla jako monstra (kromě Kopí).','Bonusový útěk je jen ve Výpravě, ne v Klasické hře ani v tutoriálu.']],
  ['v1.97','17. 10.',['Skóre: −5 bodů za každé startovní vylepšení (koupené za diamanty).','Prsten útěku: +1 / 2 / 2 ♥ za monstrum, zbroj (+1 za každá 2 monstra) až na 3. úrovni.','Stínový plášť: při útěku −1 jednomu / dvěma / třem náhodným monstrům.','Krystal many: na začátku místnosti 2 / 3 / 4 zbroje.']],
  ['v1.96','16. 10.',['Místo „Room“ se všude píše „místnost“.','Sekera se v obchodě nabízí o polovinu silnější, za stejnou cenu.','Když v runu použiješ dev tools, skóre do žebříčku nejde uložit.']],
@@ -2220,7 +2231,14 @@ function sbSave(){if(SB.busy||sbDone()||sbDev())return;const i=document.getEleme
   fetch(SB.url+'?select=id',{method:'POST',headers:Object.assign(sbHdr(),{Prefer:'return=representation'}),body:JSON.stringify({name:nm,score:c.score,coins:c.coins,rooms:c.rooms,upgrades:c.upg,won:c.won,ver:GAMEVER,run_id:S.rid})})
    .then(r=>r.ok?r.json():Promise.reject(r.status)).then(d=>{SB.mine=d&&d[0]&&d[0].id;sbMark();snd('coin');SB.busy=false;modal();sbLoad(true);})
    .catch(e=>{SB.busy=false;const mm=document.getElementById('sbMsg');if(mm)mm.textContent='Uložení se nepovedlo. Zkontroluj připojení a zkus to znovu.';});}
-function fitLayout(){try{const de=document.documentElement;if(innerWidth<=700||document.body.classList.contains('lite')){de.style.removeProperty('--cw');return;}
+function wideLayout(){try{const z1=document.querySelector('.zones'),camp=document.getElementById('camp');if(!z1||!camp)return;z1.classList.add('z1');
+  const wide=matchMedia('(min-width:701px)').matches&&!document.body.classList.contains('lite');
+  if(wide===!!wideLayout.on)return;wideLayout.on=wide;document.body.classList.toggle('wide1',wide);
+  const g=id=>document.getElementById(id);
+  if(wide){['zp','zs','zb','za'].forEach(id=>z1.append(g(id)));}
+  else{z1.append(g('zp'));['za','zb','zs'].forEach(id=>camp.append(g(id)));}}catch(e){}}
+addEventListener('resize',()=>{clearTimeout(wideLayout.t);wideLayout.t=setTimeout(()=>{wideLayout();},120);});
+function fitLayout(){document.documentElement.style.removeProperty('--cw');return;try{const de=document.documentElement;if(innerWidth<=700||document.body.classList.contains('lite')){de.style.removeProperty('--cw');return;}
   const base=Math.min(118,(innerWidth-72)/5),b=document.querySelector('.wrap>.btns');if(!b)return;
   const H=cw=>{de.style.setProperty('--cw',cw+'px');return b.getBoundingClientRect().bottom+window.scrollY+70;};
   const h1=H(base);if(h1<=innerHeight){de.style.setProperty('--cw',base+'px');return;}
@@ -2258,7 +2276,7 @@ function render(fresh,dhp){tipHide();
   $('sub').textContent=(TUT.on?'Tutoriál · ':'')+(camp?(S.boss?'Boss '+Math.ceil(S.roomNo/BP)+'/3':'Místnost '+FR(S.roomNo)+'/'+NFIGHT)+' · '+S.tileName:'Klasická hra');
   $('track').hidden=!camp;
   if(camp)setH($('track'),(Array.from({length:NROOM},(_,k)=>{const n=k+1,bs=n%BP===0,dn=n<S.roomNo||(n===S.roomNo&&(S.over==='win'||S.screen!=='play'&&S.screen!=='loot'&&S.screen!=='pick'));const pip=`<i class="${bs?'bs ':''}${dn?'done ':''}${n===S.roomNo?'cur':''}" title="${bs?'Boss '+(n/BP):'Místnost '+FR(n)}"></i>`;return pip+(n%BP===3||n%BP===6?`<i class="cd${n<S.roomNo||(n===S.roomNo&&S.calmAt===n)?' done':''}" title="Klidná cesta"></i>`:'');}).join('')));
-  $('goldbox').hidden=!camp;$('diabox').hidden=!camp||TUT.on;$('dian').textContent=META.d||0;$('camp').hidden=!camp;$('gold').textContent=S.gold-goldPend;if(statOn()&&S.gold>(S.goldMax||0))S.goldMax=S.gold;
+  $('goldbox').hidden=!camp;$('diabox').hidden=!camp||TUT.on;$('dian').textContent=META.d||0;$('camp').hidden=!camp;wideLayout();['za','zb','zs'].forEach(id=>{const e=$(id);if(e)e.hidden=!camp;});$('gold').textContent=S.gold-goldPend;if(statOn()&&S.gold>(S.goldMax||0))S.goldMax=S.gold;
   $('hpn').textContent=S.hp;document.body.classList.toggle('lowhp',S.hp>0&&S.hp<=S.max*.25);$('hpbar').style.width=S.hp/S.max*100+'%';$('hpm').textContent='/ '+S.max;$('armb').style.visibility=S.arm>0?'visible':'hidden';$('herob').hidden=!(S.mode==='camp'&&S.run&&!TUT.on);$('heron').textContent=S.heroLives||0;$('armn').textContent=S.arm||0;
   if(dhp){
     const f=document.createElement('span');f.className='float';f.textContent=(dhp>0?'+':'−')+Math.abs(dhp);
