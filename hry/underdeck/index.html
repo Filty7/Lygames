@@ -833,7 +833,7 @@ const RN={flask:'Alchymistova baňka',herb:'Bylinkářův váček',hammer:'Ková
 const RTIP=(k,l)=>({
  hammer:'První nasazená zbraň získá sílu +'+(l+1)+', každá další pak o 1 méně.',
  cloak:'Při útěku '+['až jedno vyložené monstrum ztratí 1 sílu','až dvě vyložená monstra ztratí celkem 2 síly','až tři vyložená monstra ztratí celkem 3 síly'][l-1]+'.',
- ring:'Při útěku vyléčíš +'+[1,2,2][l-1]+' ♥ za vyložené monstrum'+(l>=3?' a získáš 1 zbroj za každá dvě monstra':'')+'.'+(l>=3?'\nSmíš utéct znovu.':''),
+ ring:'Při útěku vyléčíš +'+[1,2,2][l-1]+' ♥ za vyložené monstrum'+(l>=3?' a získáš 1 zbroj za každá dvě monstra':'')+'.',
  fists:'Zabití monstra pěstí zraní o '+l+' méně (min. 1).',
  echo:(l===1?'První seslané kouzlo v místnosti dostane':'První '+l+' seslaná kouzla v místnosti dostanou')+' dočasnou kopii naspod balíčku.'+(l===1?'\nPři získání dostaneš kouzlo zdarma.':''),
  crystal:'Na začátku místnosti získáš '+(l+1)+' zbroje.\nZa každé seslané kouzlo +1 zbroj.',
@@ -1352,7 +1352,7 @@ const inc=(o,k,n)=>{o[k]=(o[k]||0)+(n===undefined?1:n);};
 function stat(fn){if(!statOn())return;try{fn(STATS.C);statSave();}catch(e){}}
 function addGold(n){S.gold+=n;if(statOn())S.goldEarn=(S.goldEarn||0)+n;}
 const monAvg=()=>{const m=S.comp.filter(i=>CARDS[i].type==='m'&&!CARDS[i].boss);return m.length?m.reduce((a,i)=>a+CARDS[i].v,0)/m.length:0;};
-const GAMEVER='v2.04';
+const GAMEVER='v2.05';
 const BP=7,NROOM=21; // boss every 7th Room, 3 bosses
 const FR=nr=>nr-Math.floor(nr/BP),NFIGHT=18; // fight-room number 1..18 (bosses excluded)
 function runRec(end){
@@ -1394,6 +1394,7 @@ function openGal(){
 }
 // patch notes for players: newest first, short and general
 const PATCH=[
+ ['v2.05','19. 10.',['Prsten útěku na 3. úrovni už nedovoluje utéct dvakrát po sobě.']],
  ['v2.04','18. 10.',['Na mobilu: podrž prst asi vteřinu na kartě s vykřičníkem a ukáže se její popis. Zmizí při dalším dotyku.']],
  ['v2.03','18. 10.',['Lektvar zbroje a neviditelnost: vyléčí plnou sílu, ale bonus je poloviční (zaokrouhleno dolů, aspoň 1) – lektvar zbroje 3 dá 1 zbroj, neviditelnost 3 ubere monstrům 1.']],
  ['v2.02','18. 10.',['Na počítači je ukazatel místností vodorovně uprostřed pod odkládacími poli, nad tlačítky.','Ztlumení teď vypne i tichý šum jeskyně v pozadí (dřív hrál dál přes ozvěnu).']],
@@ -1702,7 +1703,7 @@ const stuck=()=>count()>0&&!live().some(playable);
 const needDeal=()=>S.screen==='play'&&!S.over&&S.deck.length>0&&(count()<=1||stuck());
 const armT=()=>S.armor===null?'':CARDS[S.armor].type;
 const canAct=()=>!busy&&!menuOpen&&S.screen==='play'&&!S.over&&!needDeal();
-const fleeLim=()=>rl('ring')>=3?2:1,jokerOK=()=>!!S&&S.mode==='camp'&&!TUT.on,jokerNow=()=>jokerOK()&&S.streak>=fleeLim()&&!S.joker;
+const fleeLim=()=>1,jokerOK=()=>!!S&&S.mode==='camp'&&!TUT.on,jokerNow=()=>jokerOK()&&S.streak>=fleeLim()&&!S.joker;
 const canSkip=()=>!busy&&S.screen==='play'&&!S.over&&S.resolved===0&&!live().some(i=>CARDS[i].trap)&&(S.streak<fleeLim()||(jokerOK()&&!S.joker))&&count()>0&&(count()===4||!S.deck.length);
 function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
 function cleared(){return !S.deck.length&&(count()===0||stuck());}
