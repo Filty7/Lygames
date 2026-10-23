@@ -4,9 +4,9 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Lygames – hry Tomáše Lygy</title>
-<meta name="description" content="Karetní a strategické hry do prohlížeče od Tomáše Lygy. To je život, Underdeck a Válka růží – zdarma, bez instalace, na počítači i na mobilu.">
+<meta name="description" content="Hry do prohlížeče od Tomáše Lygy. To je život, Underdeck, Válka růží a Hlubina – zdarma, bez instalace, na počítači, mobilu i s ovladačem.">
 <meta property="og:title" content="Lygames – hry Tomáše Lygy">
-<meta property="og:description" content="Karetní a strategické hry do prohlížeče. Zdarma, bez instalace.">
+<meta property="og:description" content="Karetní, strategické a roguelike hry do prohlížeče. Zdarma, bez instalace.">
 <meta property="og:image" content="https://lygames.cz/img/underdeck.jpg?v=3">
 <meta property="og:url" content="https://lygames.cz/">
 <meta name="theme-color" content="#0E0C0B">
@@ -26,6 +26,17 @@ p{text-wrap:pretty}
 .btn{transition:filter .15s ease, background .15s ease, color .15s ease}
 .btn:hover{filter:brightness(1.12)}
 .ghost:hover{background:rgba(237,230,214,.08)}
+.games{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,440px),1fr));gap:28px}
+.plat{display:flex;flex-wrap:wrap;gap:10px;margin:4px 0 2px}
+.pi{display:flex;align-items:center;gap:9px;padding:7px 12px 7px 9px;border:1px solid;border-radius:4px;background:rgba(0,0,0,.25);line-height:1.1}
+.pi svg{flex:none;width:26px;height:26px}
+.pi b{display:block;font-family:'Cinzel',Georgia,serif;font-weight:700;font-size:13px;letter-spacing:.1em}
+.pi small{display:block;font-size:13px;opacity:.9}
+.pi.ok{color:#7FCB6A;border-color:rgba(127,203,106,.45)}
+.pi.mid{color:#E3B341;border-color:rgba(227,179,65,.45)}
+.pi.no{color:#E0655A;border-color:rgba(224,101,90,.45)}
+.plegend{display:flex;flex-wrap:wrap;justify-content:center;gap:8px 22px;margin:26px 0 0;font-size:14px;color:#8C826F}
+.plegend i{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:7px;vertical-align:0}
 </style>
 </head>
 <body>
@@ -60,7 +71,7 @@ p{text-wrap:pretty}
 <div style="position: relative; z-index: 1; max-width: 760px; margin: 0 auto; display: flex; flex-direction: column; align-items: center; gap: 22px">
 <p style="margin: 0; font-family: 'Cinzel', Georgia, serif; font-weight: 600; font-size: 14px; letter-spacing: 0.3em; color: #D4A04C">NEZÁVISLÉ HRY DO PROHLÍŽEČE</p>
 <h1 style="margin: 0; font-family: 'Cinzel', Georgia, serif; font-weight: 700; font-size: clamp(52px, 10vw, 128px); line-height: 1; letter-spacing: 0.06em; color: #F3ECDD; text-shadow: 0 0 40px rgba(227,162,76,0.25), 0 4px 0 #000">LYGAMES</h1>
-<p style="margin: 0; max-width: 560px; font-size: clamp(18px, 2vw, 21px); color: #CFC5B0">Bez instalace a&nbsp;zdarma – na počítači i&nbsp;na mobilu.</p>
+<p style="margin: 0; max-width: 560px; font-size: clamp(18px, 2vw, 21px); color: #CFC5B0">Bez instalace a&nbsp;zdarma – na počítači, na mobilu i&nbsp;s&nbsp;ovladačem.</p>
 <div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 14px; margin-top: 10px">
 <a href="#hry" class="btn" style="display: inline-flex; align-items: center; min-height: 50px; padding: 0 30px; background: #D4A04C; color: #140F0B; border-radius: 3px; font-family: 'Cinzel', Georgia, serif; font-weight: 700; font-size: 15px; letter-spacing: 0.12em; text-decoration: none">HRÁT HRY</a>
 <a href="#o-mne" class="btn ghost" style="display: inline-flex; align-items: center; min-height: 50px; padding: 0 30px; border: 1px solid #6E6150; color: #EDE6D6; border-radius: 3px; font-family: 'Cinzel', Georgia, serif; font-weight: 700; font-size: 15px; letter-spacing: 0.12em; text-decoration: none">O&nbsp;AUTOROVI</a>
@@ -70,7 +81,7 @@ p{text-wrap:pretty}
 
 <section id="hry" aria-labelledby="hry-nadpis" style="position: relative; z-index: 2; max-width: 1200px; margin: clamp(-170px, -14vw, -130px) auto 0; padding: 0 24px">
 <h2 id="hry-nadpis" style="position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap">Hry</h2>
-<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr)); gap: 24px">
+<div class="games">
 
 <article class="game" style="background: #17130F; border: 1px solid #2E2620; border-radius: 6px; overflow: hidden; box-shadow: 0 20px 40px rgba(0,0,0,0.5); display: flex; flex-direction: column">
 <div style="position: relative; aspect-ratio: 4 / 3; background: #0B0908; border-bottom: 1px solid #2E2620; overflow: hidden">
@@ -81,6 +92,7 @@ p{text-wrap:pretty}
 <h3 style="margin: 0; font-family: 'Cinzel', Georgia, serif; font-weight: 700; font-size: 28px; line-height: 1.15; color: #F3ECDD">To je život</h3>
 <p style="margin: 0; color: #BFB49E">Narodíš se do náhodné rodiny. Máš ambice, sny i&nbsp;starosti. Pracuj s&nbsp;časem, který ti byl dán, a&nbsp;prožij zcela unikátní život.</p>
 <p style="margin: 0; font-size: 15px; color: #A39882">1 hráč · karty · klidné tempo</p>
+<div class="plat" aria-label="Kde hrát"><span class="pi ok"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2.5" y="4" width="19" height="12.5" rx="1.5"/><path d="M8.5 20.5h7M12 16.5v4"/></svg><span><b>PC</b><small>doporučeno</small></span></span><span class="pi mid"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="6.5" y="2.5" width="11" height="19" rx="2"/><path d="M11 18.5h2"/></svg><span><b>MOBIL</b><small>hratelné</small></span></span></div>
 <div style="margin-top: auto; padding-top: 10px">
 <a href="hry/to-je-zivot/" class="btn ghost" style="display: flex; align-items: center; justify-content: center; min-height: 48px; border: 1px solid #D4A04C; color: #D4A04C; border-radius: 3px; font-family: 'Cinzel', Georgia, serif; font-weight: 700; font-size: 14px; letter-spacing: 0.16em; text-decoration: none">HRÁT</a>
 </div>
@@ -96,6 +108,7 @@ p{text-wrap:pretty}
 <h3 style="margin: 0; font-family: 'Cinzel', Georgia, serif; font-weight: 700; font-size: 28px; line-height: 1.15; color: #F3ECDD">Underdeck</h3>
 <p style="margin: 0; color: #BFB49E">Karetní sestup do podzemí inspirovaný sólovou karetní hrou Scoundrel. Vylepšuj balíček, hledej kombinace a&nbsp;prolízej se až na konec.</p>
 <p style="margin: 0; font-size: 15px; color: #A39882">1 hráč · dungeon · krátké partie</p>
+<div class="plat" aria-label="Kde hrát"><span class="pi ok"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2.5" y="4" width="19" height="12.5" rx="1.5"/><path d="M8.5 20.5h7M12 16.5v4"/></svg><span><b>PC</b><small>doporučeno</small></span></span><span class="pi ok"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="6.5" y="2.5" width="11" height="19" rx="2"/><path d="M11 18.5h2"/></svg><span><b>MOBIL</b><small>doporučeno</small></span></span></div>
 <div style="margin-top: auto; padding-top: 10px">
 <a href="hry/underdeck/" class="btn ghost" style="display: flex; align-items: center; justify-content: center; min-height: 48px; border: 1px solid #D4A04C; color: #D4A04C; border-radius: 3px; font-family: 'Cinzel', Georgia, serif; font-weight: 700; font-size: 14px; letter-spacing: 0.16em; text-decoration: none">HRÁT</a>
 </div>
@@ -111,13 +124,31 @@ p{text-wrap:pretty}
 <h3 style="margin: 0; font-family: 'Cinzel', Georgia, serif; font-weight: 700; font-size: 28px; line-height: 1.15; color: #F3ECDD">Válka růží</h3>
 <p style="margin: 0; color: #BFB49E">Šlechtické rody, úplatky a&nbsp;hrdinové z&nbsp;doby válek růží. Přízeň si koupíš, vybojuješ, nebo ukradneš.</p>
 <p style="margin: 0; font-size: 15px; color: #A39882">3–4 hráči · hra proti botům</p>
+<div class="plat" aria-label="Kde hrát"><span class="pi ok"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2.5" y="4" width="19" height="12.5" rx="1.5"/><path d="M8.5 20.5h7M12 16.5v4"/></svg><span><b>PC</b><small>doporučeno</small></span></span><span class="pi mid"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="6.5" y="2.5" width="11" height="19" rx="2"/><path d="M11 18.5h2"/></svg><span><b>MOBIL</b><small>hratelné</small></span></span></div>
 <div style="margin-top: auto; padding-top: 10px">
 <a href="hry/valka-ruzi/" class="btn ghost" style="display: flex; align-items: center; justify-content: center; min-height: 48px; border: 1px solid #D4A04C; color: #D4A04C; border-radius: 3px; font-family: 'Cinzel', Georgia, serif; font-weight: 700; font-size: 14px; letter-spacing: 0.16em; text-decoration: none">HRÁT</a>
 </div>
 </div>
 </article>
 
+<article class="game" style="background: #17130F; border: 1px solid #2E2620; border-radius: 6px; overflow: hidden; box-shadow: 0 20px 40px rgba(0,0,0,0.5); display: flex; flex-direction: column">
+<div style="position: relative; aspect-ratio: 4 / 3; background: #0B0908; border-bottom: 1px solid #2E2620; overflow: hidden">
+<img loading="lazy" width="840" height="630" src="img/hlubina.jpg?v=1" alt="Screenshot ze hry Hlubina: řez opuštěnou podzemní laboratoří s žebříkem, střílnou, ohněm, přízraky a stoupající vodou" style="display: block; width: 100%; height: 100%; object-fit: cover; object-position: center top">
 </div>
+<div style="padding: 22px 26px 28px; display: flex; flex-direction: column; gap: 12px; flex-grow: 1">
+<p style="margin: 0; font-family: 'Cinzel', Georgia, serif; font-weight: 600; font-size: 12px; letter-spacing: 0.22em; color: #D4A04C">KOOPERATIVNÍ ROGUELIKE</p>
+<h3 style="margin: 0; font-family: 'Cinzel', Georgia, serif; font-weight: 700; font-size: 28px; line-height: 1.15; color: #F3ECDD">Hlubina</h3>
+<p style="margin: 0; color: #BFB49E">Sestup do opuštěné podzemní laboratoře inspirovaný deskovou hrou SubTerra. Odhaluj chodby, hlídej stoupající vodu a&nbsp;najdi zařízení, které probudí portál ven.</p>
+<p style="margin: 0; font-size: 15px; color: #A39882">1 hráč · nebo 2–3 hráči na ovladače u&nbsp;jedné obrazovky</p>
+<div class="plat" aria-label="Kde hrát"><span class="pi ok"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2.5" y="4" width="19" height="12.5" rx="1.5"/><path d="M8.5 20.5h7M12 16.5v4"/></svg><span><b>PC</b><small>doporučeno</small></span></span><span class="pi no"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="6.5" y="2.5" width="11" height="19" rx="2"/><path d="M11 18.5h2"/></svg><span><b>MOBIL</b><small>nedoporučeno</small></span></span><span class="pi ok"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 7.5h10a4.5 4.5 0 0 1 4.4 5.4l-.9 4.4a2.6 2.6 0 0 1-4.5 1.2L14.4 16H9.6l-1.6 2.5a2.6 2.6 0 0 1-4.5-1.2l-.9-4.4A4.5 4.5 0 0 1 7 7.5z"/><path d="M7.5 11v3M6 12.5h3"/><circle cx="15.5" cy="11.5" r=".6" fill="currentColor"/><circle cx="17.5" cy="13.5" r=".6" fill="currentColor"/></svg><span><b>OVLADAČ</b><small>podporováno</small></span></span></div>
+<div style="margin-top: auto; padding-top: 10px">
+<a href="hry/hlubina/" class="btn ghost" style="display: flex; align-items: center; justify-content: center; min-height: 48px; border: 1px solid #D4A04C; color: #D4A04C; border-radius: 3px; font-family: 'Cinzel', Georgia, serif; font-weight: 700; font-size: 14px; letter-spacing: 0.16em; text-decoration: none">HRÁT</a>
+</div>
+</div>
+</article>
+
+</div>
+<p class="plegend"><span><i style="background:#7FCB6A"></i>doporučeno</span><span><i style="background:#E3B341"></i>hratelné</span><span><i style="background:#E0655A"></i>nedoporučeno</span></p>
 </section>
 
 <section aria-label="Proč hrát" style="max-width: 1100px; margin: 0 auto; padding: clamp(72px, 9vw, 120px) 24px clamp(56px, 7vw, 96px)">
@@ -129,8 +160,8 @@ p{text-wrap:pretty}
 </div>
 <div style="display: flex; flex-direction: column; align-items: center; gap: 12px">
 <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#D4A04C" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="6" y="2" width="12" height="20" rx="2"></rect><path d="M11 18 h2"></path></svg>
-<h3 style="margin: 0; font-family: 'Cinzel', Georgia, serif; font-weight: 700; font-size: 17px; letter-spacing: 0.14em">MOBIL I POČÍTAČ</h3>
-<p style="margin: 0; max-width: 320px; color: #A39882; font-size: 16px">Hry jsou dělané na dotyk i&nbsp;na myš,<br>ve vlaku i&nbsp;u&nbsp;stolu.</p>
+<h3 style="margin: 0; font-family: 'Cinzel', Georgia, serif; font-weight: 700; font-size: 17px; letter-spacing: 0.14em">POČÍTAČ, MOBIL, OVLADAČ</h3>
+<p style="margin: 0; max-width: 320px; color: #A39882; font-size: 16px">Většinu her zahraješ na dotyk i&nbsp;myší.<br>U&nbsp;každé hry je vidět, kde se hraje nejlépe.</p>
 </div>
 <div style="display: flex; flex-direction: column; align-items: center; gap: 12px">
 <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#D4A04C" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="12" height="16" rx="1.5"></rect><path d="M9 3 h10.5 a1.5 1.5 0 0 1 1.5 1.5 V17"></path><path d="M9 11 l3 2 -3 2 z"></path></svg>
