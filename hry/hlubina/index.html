@@ -895,7 +895,7 @@ p,small,li,em,.hint,.clore,.cdesc{text-wrap:pretty}
 /* typy levelů */
 .gcell.unlit img{filter:brightness(.1) grayscale(1) contrast(1.6)}
 #fog{z-index:7}#fog i{position:absolute;width:var(--cs);height:var(--cs);background-image:var(--fog);background-size:384px 384px;opacity:0;transition:opacity .45s ease}
-#fog i.on{opacity:.96;transition:opacity 1.1s ease 1.4s}
+#fog i.on{opacity:1;transition:opacity 1.1s ease 1.4s}
 .mon{transition:transform 1.4s cubic-bezier(.45,.05,.55,.95),opacity .45s}.mon.nofade{transition:none!important}.mon.unlit{opacity:0!important;transition:transform 1.4s cubic-bezier(.45,.05,.55,.95),opacity 1s ease 1.4s}
 .nowrap{position:absolute;font-size:30px;color:#e04040;text-shadow:0 0 8px rgba(224,64,64,.7);pointer-events:auto;cursor:help;line-height:1}
 .gl.noox{height:var(--cs);background:linear-gradient(90deg,rgba(150,150,150,.18),rgba(120,120,120,.1),rgba(150,150,150,.18));box-shadow:inset 0 2px 0 rgba(190,190,190,.3),inset 0 -2px 0 rgba(190,190,190,.3);animation:noox 2.4s ease-in-out infinite alternate}
@@ -1095,9 +1095,9 @@ function tileDesc(t){
 // typy levelů (modifikátory) pro patro 3: každé místnosti jeden, vybraný se už ve výpravě neobjeví
 const MODS={
   lost:{name:'Ztracení',icon:'⌖',short:'každý začíná v jiném rohu',desc:'Výprava se rozdělila. Každá postava začíná v jiném rohu (nahoře, nebo patro nad dnem) v záchranné kapsli, ze které vede jen jedna cesta. Zóna je uprostřed, voda začíná úplně dole. Jeskyně tu nejde dokola: okraje jsou pevná zeď.'},
-  dark:{name:'Tma',icon:'◐',short:'vidíš jen kolem postav',desc:'Nejde proud. Vidíš jen dílky do 2 polí od některé postavy, zbytek jeskyně zčerná a zůstane z něj jen obrys.'},
+  dark:{name:'Tma',icon:'◐',short:'vidíš jen kolem postav',desc:'Nejde proud. Vidíš jen dílky do 2 kroků po chodbách od některé postavy. Dílky, kde už jste byli, se zatáhnou do tmy a nevidíš, co na nich je.'},
   twin:{name:'Dvojitý zámek',icon:'⚙',short:'portál probudí až dvě zařízení',desc:'Portál probudí až dvě zařízení. Jedno je někde ve 3. patře, druhé 1 až 2 patra nade dnem. Obě musí někdo aktivovat.'},
-  portal:{name:'Na dohled',icon:'◎',short:'portál je vidět hned pod startem',desc:'Portál leží hned pod startem a je vidět od začátku. Přímo k němu ale cesta nevede, musíš si ji najít. Zóna se zařízením je až u dna.'},
+  portal:{name:'Na dohled',icon:'◎',short:'portál je vidět hned pod startem',desc:'Portál leží hned pod startem a je vidět od začátku. Přímo k němu ale cesta nevede, musíš si ji najít. Zóna se zařízením (4 × 2) se dotýká dna.'},
   rush:{name:'Úprk',icon:'»',short:'poloviční čas i balíček',desc:'Poloviční čas a jen polovina dílků v balíčku. Pro zařízení se musí rychle, jinak se ztratíte.'},
   lowox:{name:'Dusno',icon:'O₂',short:'2 řady bez kyslíku',desc:'Na začátku a po každé Záplavě (až když voda stoupne) se vylosují 2 řady nad vodou bez kyslíku. Může se stát, že dýchatelná nezůstane žádná. Oheň v nich nehoří a kdo v nich skončí tah, dostane 1 zranění (Potápěč místo toho spotřebuje kyslík). Kryt má vlastní vzduch.'}};
 function genMap(){
@@ -1303,12 +1303,12 @@ function applyMod(){
     G.chars.forEach((c,i)=>{if(c.dead)return;const [x,y]=spots[(si++)%spots.length];c.x=x;c.y=y;const d=x===L?[0,1,0,0]:x===R?[0,0,0,1]:(Math.random()<.5?[0,1,0,0]:[0,0,0,1]);
       if(!G.board[idx(x,y)])G.board[idx(x,y)]={t:{id:'pod'+i,kind:'dead',feat:'pod'},e:d,fire:false,rubble:false,start:true};});}
   if(m==='twin'){const yb=ROWS-2-rand(2);G.zones=[{x:0,y:2,w:COLS,h:1,n:0,found:false},{x:0,y:yb,w:COLS,h:1,n:0,found:false}];G.zone={x:-9,y:-9};}
-  if(m==='portal'){G.zone={x:rand(COLS-2),y:ROWS-3};const i=G.deck.findIndex(t=>t.kind==='exit');if(i>=0)G.deck.splice(i,1);const y=G.startY+1;if(inB(START_X,y))G.board[idx(START_X,y)]={t:{id:'exit',kind:'exit',feat:null},e:[1,1,1,1],fire:false,rubble:false,exit:true};}
+  if(m==='portal'){G.zones=[{x:rand(COLS-3),y:ROWS-2,w:4,h:2,n:0,found:false}];G.zone={x:-9,y:-9};const i=G.deck.findIndex(t=>t.kind==='exit');if(i>=0)G.deck.splice(i,1);const y=G.startY+1;if(inB(START_X,y))G.board[idx(START_X,y)]={t:{id:'exit',kind:'exit',feat:null},e:[1,1,1,1],fire:false,rubble:false,exit:true};}
   if(m==='rush'){G.limit=Math.floor(G.limit/2);const ex=G.deck.findIndex(t=>t.kind==='exit'),et=ex>=0?G.deck.splice(ex,1)[0]:null;G.deck=G.deck.slice(0,Math.floor(G.deck.length/2));if(et)G.deck.splice(G.deck.length-rand(Math.min(10,G.deck.length+1)),0,et);}
   if(m==='lowox')rollNoOx();
 }
 // nízký kyslík: 3 náhodné řady nad vodou
-function rollNoOx(){const rows=[];for(let y=0;y<Math.min(G.W,ROWS);y++)if(G.round>1||y!==G.startY)rows.push(y);   /* na startu je startovní řada dýchatelná */const init=G.round<=1;if(UI.ready&&G.evPhase&&!init){UI.noOxDisp=(G.noOx||[]).slice();SEQ.push({k:'noox'});}G.noOx=shuffle(rows).slice(0,Math.min(2,rows.length)).sort((a,b)=>a-b);   /* 2 řady; po záplavě klidně i všechny, co nad vodou zbyly */
+function rollNoOx(){const rows=[],st=new Set(G.chars.filter(onBoard).map(c=>c.y));for(let y=0;y<Math.min(G.W,ROWS);y++)if(G.round>1||!st.has(y))rows.push(y);   /* na startu je startovní řada dýchatelná */const init=G.round<=1;if(UI.ready&&G.evPhase&&!init){UI.noOxDisp=(G.noOx||[]).slice();SEQ.push({k:'noox'});}G.noOx=shuffle(rows).slice(0,Math.min(2,rows.length)).sort((a,b)=>a-b);   /* 2 řady; po záplavě klidně i všechny, co nad vodou zbyly */
   G.board.forEach((c,i)=>{if(c&&c.fire&&G.noOx.includes((i/COLS)|0))c.fire=false;});if(G.noOx.length)log(`Bez kyslíku: ${G.noOx.map(y=>(y+1)*10+' m').join(', ')}. Oheň tu nehoří, konec tahu tady zraňuje.`,'ev');}
 const noOx=y=>!!(G.noOx&&G.noOx.includes(y));
 function log(t,cls){G.log.unshift({t,cls:cls||''});if(G.log.length>150)G.log.pop();}
@@ -1330,7 +1330,7 @@ function placeCell(x,y,t,e,chainDir,step){
   if(t.kind==='exit'){c.exit=true;}
   if(t.kind==='lever'){c.lever=true;log('Našli jste podivné zařízení! Kdo na pole vstoupí, probudí portál.','good');}
   G.board[idx(x,y)]=c; fresh.set(idx(x,y),fresh.size);
-  if(t.feat==='fire'&&!flooded(y)){c.fire=true;log('Odhalená chodba je v plamenech.','bad');}
+  if(t.feat==='fire'&&!flooded(y)){if(typeof noOx==='function'&&noOx(y)){c.fireOut=true;log('Odhalená chodba hořela, ale bez kyslíku oheň hned zhasl.','good');if(UI.ready)SEQ.push({k:'douse',x,y,txt:'bez kyslíku zhaslo'});}else{c.fire=true;log('Odhalená chodba je v plamenech.','bad');}}
   if(t.feat==='monster')log('Odhalili jste doupě přízraku.','bad');
   if(t.kind==='exit')log(G.leverOn?'Nalezen PORTÁL a už víří!':'Nalezen PORTÁL, ale je mrtvý. Najděte zařízení ve spodní zóně.','good');
   if(t.gem){c.gem=true;log('Na podstavci v chodbě září obětní soška!','good');}
@@ -1424,7 +1424,7 @@ function diveCheck(){G.chars.forEach(c=>{if(onBoard(c)&&!inWaterS(c)&&!noOx(c.y)
 function shaftSlots(x,y,s){let led=0,clm=0;G.chars.forEach(o=>{if(!onBoard(o)||o.x!==x||o.y!==y||(s&&s.id===o.id))return;if(o.ledge)led++;else clm++;});return {led,clm};}
 function isShaft(x,y){const c=B(x,y);return !!c&&!c.solid&&!flooded(y)&&vConn(x,y);}
 // zařadí vstup do šachty: lano/žebřík (lezec), nebo okraj; vrací false, když je plno
-function ledgeOK(x,y){const c=B(x,y);return !!c&&(c.e[E]||c.e[Wd])&&(c.t.kind!=='cross'||c.t.feat==='turret')&&c.t.feat!=='squeeze'&&!c.t.noLedge&&!c.noLedge&&!ladderSet().has(x+','+y);}   // v šachtě se žebříkem prkna nejsou
+function ledgeOK(x,y){const c=B(x,y);return !!c&&(c.e[E]||c.e[Wd])&&(c.t.kind!=='cross'||c.t.feat==='turret')&&c.t.feat!=='squeeze'&&c.t.feat!=='core'&&!c.t.noLedge&&!c.noLedge&&!ladderSet().has(x+','+y);}   // v šachtě se žebříkem prkna nejsou
 function fitShaft(m,s,downed){
   if(vsq(m.x,m.y)){m.ledge=false;return !G.chars.some(o=>onBoard(o)&&o.id!==s.id&&o.x===m.x&&o.y===m.y);}   // v koridoru jen jeden
   if(!isShaft(m.x,m.y))return true;
@@ -1470,7 +1470,7 @@ function enterTile(c,m){
         for(const yy of radOn){if(c.downed||c.dead)break;SEQ.push({k:'tok',cid:c.id,x:c.x,y:yy,fall:yy!==y0});c.y=yy;radTest(c,'Pád radiací');}
         SEQ.push({k:'tok',cid:c.id,x:c.x,y:y0+d,fall:true,end:true});c.via=null;
       }else for(const yy of radOn){if(c.downed||c.dead)break;c.y=yy;radTest(c,'Pád radiací');}
-      c.y=y0+d;c.anim=c.seqLock?0:d;slimePass(c,y0+1,y0+d-1);
+      c.y=y0+d;c.anim=c.seqLock?0:d;slimePass(c,y0+1,y0+d-1);pipePass(c,y0,y0+d-1);
       if(UI.ready)SEQ.push({k:'wait',ms:c.seqLock?250:360+140*d});
       if(flooded(c.y))log(`${c.name} spadl(a) do vody a potopil(a) se.`);
       else{log(`${c.name} se propadl(a) o ${d} ${d===1?'patro':d<5?'patra':'pater'}!`,'bad');dmg(c,Math.max(0,d-alv(c,'jumper')),'pád');}
@@ -1489,7 +1489,7 @@ function applyGravity(){
     const d=fallDist(c);if(!d)return;
     const yS=c.y;if(UI.ready&&G.evPhase){c.seqLock=true;SEQ.push({k:'tok',cid:c.id,x:c.x,y:c.y+d,fall:true,end:true});c.y+=d;}   // při události padá až ve svém pořadí
     else{c.y+=d;c.anim=d;}
-    slimePass(c,yS+1,c.y-1);
+    slimePass(c,yS+1,c.y-1);pipePass(c,yS,c.y-1);
     if(flooded(c.y)){log(`${c.name} spadl(a) do vody.`);return;}
     log(`${c.name} ztratil(a) oporu a propadl(a) se o ${d}.`,'bad');
     if(!c.downed){dmg(c,Math.max(0,d-alv(c,'jumper')),'pád');landInSqueeze(c);if(!c.downed&&!c.dead)landEffects(c);}
@@ -1592,6 +1592,7 @@ function actTele(c){
     if(ledgeOK(x,y)&&!others.some(o=>o.ledge))c.ledge=true;                       // na prknech je místo
     else if(rp&&!others.some(o=>o.rope===rp.id))c.rope=rp.id;                     // chytí se lana
   }   // jinak spadne
+  if(!isHole(x,y)||c.ledge||c.rope!=null||flooded(y))landEffects(c);   /* teleport se počítá jako vstup na pole (střílna, přízrak…) */
   c.tp={from,to:{x,y}};c.arr=G.nid++;
   afterAction(c);settle();
 }
@@ -1608,7 +1609,7 @@ function actOpenDoor(c,t){pushUndo();spend(c,1);const n=B(t.x,t.y);n.shut[t.d]=f
   if(t.d===S||t.d===N){G.ropes.forEach(r=>{if(r.x===t.x&&r.yBottom===(t.d===S?t.y:t.y-1)&&r.yTop<r.yBottom){const nb=ropeDown(r.x,r.yBottom);if(nb>r.yBottom){r.yBottom=nb;log('Lano se spustilo dál skrz otevřené dveře.');}}});}
   afterAction(c);settle();}
 // střílna: kdo vstoupí na pole kulometu nebo do laseru, 50 % na zásah; přízrak v cestě střelu schytá místo něj
-function laserCells(x,y){const out=[];for(let d=0;d<4;d++){let cx=x,cy=y;for(let k=0;k<COLS+ROWS;k++){if(!edgeOpen(cx,cy,d))break;[cx,cy]=NB(cx,cy,d);const n=B(cx,cy);if(!n||n.rubble)break;out.push({x:cx,y:cy,d,k:k+1});}}return out;}
+function laserCells(x,y){const out=[];for(let d=0;d<4;d++){let cx=x,cy=y;for(let k=0;k<COLS+ROWS;k++){if(!edgeOpen(cx,cy,d))break;[cx,cy]=NB(cx,cy,d);const n=B(cx,cy);if(!n||n.rubble||n.t.feat==='bunker')break;out.push({x:cx,y:cy,d,k:k+1});}}return out;}   /* do krytu ani přes zavřené dveře pasti nevidí */
 function turretCheck(c){G.board.forEach((t,i)=>{if(!t||t.t.feat!=='turret'||t.rubble)return;const tx=i%COLS,ty=(i/COLS)|0;
   if(tx===c.x&&ty===c.y)return;   /* přímo na poli střílny je mrtvý úhel */
   const lc=laserCells(tx,ty).find(q=>q.x===c.x&&q.y===c.y);if(!lc)return;
@@ -1631,6 +1632,7 @@ function coreBurst(crit){const cells=new Map();G.board.forEach((t,i)=>{if(t&&t.t
   G.chars.filter(o=>onBoard(o)&&cells.has(o.x+','+o.y)&&!isBunker(o.x,o.y)).forEach(o=>{{const ar=alv(o,'antirad');if(ar&&rollP(ar*.15,o.name,'Antiradiace proti jádru')){log(`${o.name} (Antiradiace) jádru odolal(a).`,'good');return;}}
     if(sq)sq.hits.push({cid:o.id,x:o.x,y:o.y,d:cells.get(o.x+','+o.y)});o.sap=Math.min(2,(o.sap||0)+1);log(`${o.name}: jádro radiace, příští kolo o ${o.sap} ${o.sap===1?'akci':'akce'} méně.`,'bad');});}
 // konec tahu ve slizu
+function pipePass(c,a,b){for(let y=a;y<=b;y++){const t=B(c.x,y);if(t&&t.t.feat==='pipe'&&!t.rubble&&G.W>0){log(`${c.name} propadl(a) prasklým potrubím a rozkýval(a) ho. Voda stoupá o patro!`,'bad');if(UI.ready)SEQ.push({k:'pipe',x:c.x,y});waterChange(-1,true);}}}
 function slimePass(c,a,b){for(let y=a;y<=b;y++){const t=B(c.x,y);if(t&&t.t.feat==='slime'){log(`${c.name} propadl(a) slizem!`,'bad');dmg(c,3,'sliz');return;}}}
 function slimeEnd(c){const cl=B(c.x,c.y);if(cl&&cl.t.feat==='slime'&&standing(c)){log(`${c.name} skončil(a) tah ve slizu.`,'bad');dmg(c,1,'sliz');}}
 function moveGhosts(){G.monsters.forEach(ghostStep);}
@@ -2355,7 +2357,7 @@ function drawTile(c){
 const TILE_CACHE=new Map();
 function tileKey(c){return [c.preview?1:0,c.pipeV?1:0,(c.shut||[]).map(v=>v?1:0).join(''),c.dim?1:0,c.t.id,c.t.kind,c.e.join(''),c.t.feat||'',c.t.cave||'',c.gem?1:0,c.serum?1:0,c.rubble?1:0,c.rubBelow?1:0,c.planks?1:0,c.open?1:0,c.openUp?1:0,c.lv?1:0].join('|');}
 function tileImg(c){const k=tileKey(c);let u=TILE_CACHE.get(k);if(!u){u=drawTile(c).toDataURL();TILE_CACHE.set(k,u);if(TILE_CACHE.size>600)TILE_CACHE.delete(TILE_CACHE.keys().next().value);}return u;}
-function ledgeKind(t,cell){return (t.kind!=='cross'||t.feat==='turret')&&t.feat!=='squeeze'&&!t.noLedge&&!(cell&&cell.noLedge);}
+function ledgeKind(t,cell){return (t.kind!=='cross'||t.feat==='turret')&&t.feat!=='squeeze'&&t.feat!=='core'&&!t.noLedge&&!(cell&&cell.noLedge);}
 function cellView(x,y,c){
   const below=B(x,y+1),open=!!(c.e[2]&&eConn(x,y)),openUp=!!(c.e[0]&&y>0&&eConn(x,y-1));
   const rubBelow=!!(open&&below&&below.rubble&&!below.rubbleAnim);
@@ -2620,7 +2622,7 @@ function computeLight(){
       if(d>=3)continue;const cl=B(x,y);if(!cl||cl.rubble)continue;
       for(let dd=0;dd<4;dd++){if(!cl.e[dd])continue;const [nx,ny]=NB(x,y,dd);if(!inB(nx,ny))continue;const kk=nx+','+ny;if(seen.has(kk))continue;seen.add(kk);
         const n=B(nx,ny);if(n&&n.e[OPP[dd]])q.push([nx,ny,d+1]);}}});
-  G.board.forEach((c,i)=>{if(!c)return;const x=i%COLS,y=(i/COLS)|0;let a=0;
+  G.board.forEach((c,i)=>{if(!c)return;const x=i%COLS,y=(i/COLS)|0;let a=0;if(typeof unlit==='function'&&unlit(x,y))return;   /* ve tmě nesvítí nic, co nevidíš */
     if(c.fire)a=.6;else if(c.t.feat==='hazard')a=.45;else if(c.t.feat==='monster')a=.38;else if(c.gem)a=.42;else if(c.exit)a=G.leverOn?.85:.3;else if(c.lever)a=.55;
     if(a)L.push({x,y,a,r:1.15,flick:c.fire?2:0});});
   UI.light=L;
@@ -2780,7 +2782,7 @@ function renderGlows(){
   });
   // světlo z otevřených chodeb do neprozkoumané tmy
   const SP=['radial-gradient(ellipse 22% 80% at 50% 100%,','radial-gradient(ellipse 80% 26% at 0% 50%,','radial-gradient(ellipse 22% 80% at 50% 0%,','radial-gradient(ellipse 80% 26% at 100% 50%,'];
-  G.board.forEach((c,i)=>{if(!c||c.rubble)return;const x=i%COLS,y=(i/COLS)|0;
+  G.board.forEach((c,i)=>{if(!c||c.rubble)return;const x=i%COLS,y=(i/COLS)|0;if(unlit(x,y))return;
     for(let d=0;d<4;d++){if(!c.e[d])continue;const [nx,ny]=NB(x,y,d);if(!inB(nx,ny)||B(nx,ny))continue;
       if(G.placing&&G.placing.x===nx&&G.placing.y===ny)continue;
       h+=`<div class="gl spill" style="left:${nx*CS}px;top:${ny*CS}px;background:${SP[d]}rgba(235,240,255,.24),rgba(220,228,255,.07) 55%,transparent 82%)"></div>`;}});
@@ -2819,12 +2821,12 @@ function unlit(x,y){if(!G||G.mod!=='dark')return false;return !litSet().has(x+',
 let FOG_URL=null;function fogURL(){if(FOG_URL)return FOG_URL;const N=96,c=mkCanvas(N*4,N*4),g=c.getContext('2d'),W=N*4;
   const R=rng(77),grid=(s)=>{const n=W/s+1,a=[];for(let i=0;i<n*n;i++)a.push(R());return (x,y)=>{const gx=x/s,gy=y/s,x0=Math.floor(gx),y0=Math.floor(gy),fx=gx-x0,fy=gy-y0,u=fx*fx*(3-2*fx),v=fy*fy*(3-2*fy),at=(i,j)=>a[((j%(n-1))*n+(i%(n-1)))];return (at(x0,y0)*(1-u)+at(x0+1,y0)*u)*(1-v)+(at(x0,y0+1)*(1-u)+at(x0+1,y0+1)*u)*v;};};
   const o1=grid(96),o2=grid(48),o3=grid(24),img=g.createImageData(W,W);
-  for(let y=0;y<W;y++)for(let x=0;x<W;x++){const n=o1(x,y)*.55+o2(x,y)*.3+o3(x,y)*.15,k=(y*W+x)*4,v=Math.round(10+n*26);img.data[k]=v;img.data[k+1]=v-2;img.data[k+2]=v+8;img.data[k+3]=Math.round(222+n*30);}
+  for(let y=0;y<W;y++)for(let x=0;x<W;x++){const n=o1(x,y)*.55+o2(x,y)*.3+o3(x,y)*.15,k=(y*W+x)*4,v=Math.round(5+n*15);img.data[k]=v;img.data[k+1]=Math.max(0,v-1);img.data[k+2]=v+4;img.data[k+3]=255;}
   g.putImageData(img,0,0);FOG_URL=c.toDataURL();return FOG_URL;}
 function renderFog(){let f=document.getElementById('fog');if(!f){f=document.createElement('div');f.id='fog';f.className='layer';const m=document.getElementById('mons');m.parentNode.insertBefore(f,m.nextSibling);}
   const dark=G&&G.mod==='dark';f.hidden=!dark;if(!dark)return;const n=COLS*ROWS;
   if(f.children.length!==n||f._u!==COLS){f._u=COLS;let h='';for(let i=0;i<n;i++){const x=i%COLS,y=(i/COLS)|0;h+=`<i style="left:${x*CS}px;top:${y*CS}px;background-position:${-x*CS}px ${-y*CS}px"></i>`;}f.innerHTML=h;f.style.setProperty('--fog',`url(${fogURL()})`);}
-  for(let i=0;i<n;i++){const x=i%COLS,y=(i/COLS)|0;f.children[i].classList.toggle('on',unlit(x,y));}}
+  for(let i=0;i<n;i++){const x=i%COLS,y=(i/COLS)|0;f.children[i].classList.toggle('on',!!G.board[i]&&unlit(x,y));}}   /* zatáhne se jen dílek, kde už jsi byl: černá s texturou */
 function renderCells(){
   const P=G.placing;let h='';
   for(let y=0;y<ROWS;y++)for(let x=0;x<COLS;x++){
@@ -3221,7 +3223,7 @@ function setupCamera(){
 /* ================= MENU, ULOŽENÍ, PRAVIDLA ================= */
 const VERSION='0.68';
 const CHANGELOG=[
-  ['0.68','Ladění typů levelů a střílny',['Ztracení: každý začíná v jiném rohu (nahoře a patro nad dnem; ve dvou šikmo, ve třech dva nahoře a jeden dole, ve čtyřech všechny rohy), voda začíná úplně dole, zóna je uprostřed.','Na dohled: zóna se zařízením je u dna.','Tma: vidíš 2 kroky po chodbách (ne vzdušnou čarou). Tma má mlhu, odhalené dílky zmizí až po chvíli a při přiblížení se zase vynoří. Přízraky ani lasery přes tmu vidět nejsou.','Dusno: kyslík se přesune až po stoupnutí vody a jsou jen 2 řady bez kyslíku.','Střílna trefí první postavu nebo přízrak v cestě, ať laser spustil kdokoli. Při testu bliká jen laser ve směru spuštění, ostatní na chvíli zhasnou. Střílna i test radiace počkají, až postava dojde (i po rozvinutí žebříku).','Kryt: postava v něm stojí v suchu i pod hladinou. Kratší popisek a popisky dílků jsou vždy nahoře.','Sliz zraní hned při vstupu, až potom přijde pád šachtou.','Kantýna + jádro radiace: nejdřív přibudou akce, jádro pak sebere tu poslední.','Razítko u události jen při kritickém zásahu (u dynamitu už ne).']],
+  ['0.68','Ladění typů levelů a střílny',['Ztracení: každý začíná v jiném rohu (nahoře a patro nad dnem; ve dvou šikmo, ve třech dva nahoře a jeden dole, ve čtyřech všechny rohy), voda začíná úplně dole, zóna je uprostřed.','Na dohled: zóna se zařízením je 4 × 2 a dotýká se dna.','Tma: vidíš 2 kroky po chodbách (ne vzdušnou čarou). Dílky mimo dosah se po chvíli zatáhnou do úplné tmy s texturou a při přiblížení se zase vynoří. Nic z nich neprosvítá: přízraky, lasery, záře ani světlo z chodeb.','Dusno: kyslík se přesune až po stoupnutí vody a jsou jen 2 řady bez kyslíku. Na začátku nikdy v řadě, kde stojí postavy. Oheň odhalený bez kyslíku hned zhasne.','Střílna trefí první postavu nebo přízrak v cestě, ať laser spustil kdokoli. Při testu bliká jen laser ve směru spuštění, ostatní na chvíli zhasnou. Střílna i test radiace počkají, až postava dojde (i po rozvinutí žebříku).','Kryt: postava v něm stojí v suchu i pod hladinou. Kratší popisek a popisky dílků jsou vždy nahoře.','Sliz zraní hned při vstupu, až potom přijde pád šachtou. Prasklé potrubí spustí i ten, kdo jím jen propadne.','Teleport se počítá jako vstup na pole (střílna vystřelí). Střílna nevidí do krytu ani přes zavřené dveře pasti. Jádro radiace nemá prkna nad šachtou.','Kantýna + jádro radiace: nejdřív přibudou akce, jádro pak sebere tu poslední.','Razítko u události jen při kritickém zásahu (u dynamitu už ne).']],
   ['0.67','Pasti, střílny a animace',['Běžná událost už nemá razítko SPUŠTĚNO, razítko dostane jen kritický zásah a dynamit.','Past chytí i toho, kdo do ní propadá, a zavře se až ve chvíli, kdy je postava uvnitř. Chytí i přízrak. Dveře se otevírají pohybem zvenku do pasti (značka na poli), už to není speciální akce.','Střílna střílí jen při vstupu do laseru (při každém), přímo na jejím poli je mrtvý úhel. Před výstřelem se rozblikají červené diody, pak buď vystřelí, nebo se zeleně rozsvítí i s laserem.','Karanténa, ke které se přízrak vydá, se rozsvítí a zabzučí. Prasklé potrubí při zvednutí vody blikne a roztočí ventil.','Jádro radiace: kratší kaskáda od jádra do okolí, zasažená postava sebou trhne a ztracená akce je v profilu světle zelená.','Opraveno: pohyb před vyčerpáním (třeba šplhání po laně) se přehrával jako běh a teprve pak se postava chytila lana.','Karty událostí už po najetí neukazují systémový tooltip (text je na kartě). Tutoriál: kamera v klidu přejede k zóně a portálu, u vody je vysvětleno, že na konci kola klesá o patro.']],
   ['0.66','Multiplayer pro 4',['Lokální multiplayer pro 2–4 hráče. Ve čtyřech se hraje lehká obtížnost (každý má 1 postavu), ve třech lehká nebo normální. Když se přihlásí víc hráčů, obtížnost se sama upraví.','Při pokračování ve výpravě se mezi hráče rozdělí jen živé postavy.','Nové hlavní menu: na tmavém pozadí je minimalistický plán bočního řezu laboratoře, po stranách občas zabliká světlo a shora občas padá suť. Výraznější tlačítka, hra už pod menu neprosvítá.','Na plánu laboratoře víc druhů poznámek (žluté lístky, útržky s páskou, linkované kartičky, zakroužkovaná varování), 30 textů, a nepřekrývají místnosti.','Víc jmen pro postavy (přes 70).','Přepsaná pravidla: všechny strany stejně vysoké, aktuální obrázky dílků (oheň, radiace, přízrak, žebřík, lano…), základní hra v kapitolách 1–12 a vše, co přichází až během výpravy, stručně v Extra pravidlech. Nová strana Ovládání. V pravidlech jde listovat LB / RB.','Tutoriál jde celý ovládat ovladačem: tlačítka Další / Rozumím potvrdí A, v bublině je nápověda k ovladači.','Test room (v hlavním menu): asi 50 dílků se vším, co hra má, volba typu levelu, počtu postav, schopností III a hry bez časového limitu.']],
   ['0.65','Světová tabulka a životy podle obtížnosti',['Skóre se po konci výpravy odešle do světové tabulky na lygames.cz. Tabulka výprav ukazuje světovou top 10 i výpravy z tohoto prohlížeče.','Max. životy podle obtížnosti: lehká 5, normální 6, těžká 7. Sérem jde doplnit nejvýš na toto maximum.','Ovladač: dílek jde otáčet i tlačítky LB / RB.']],
@@ -4633,7 +4635,7 @@ async function playSeqRun(){
       await sleep(md*160+760);els.forEach(e=>e.remove());render();continue;}
     if(s.k==='douse'){lay.hidden=true;const cl=B(s.x,s.y);   /* hasič: oheň zhasne až teď, v kouři a páře */
       const fxl=document.getElementById('fx'),sm=document.createElement('div');sm.className='smoke';sm.style.left=s.x*CS+'px';sm.style.top=s.y*CS+'px';sm.innerHTML='<i></i><i></i><i></i><i></i><i></i>';fxl.appendChild(sm);
-      SF('splash');particles((s.x+.5)*CS,(s.y+.6)*CS,22,['#d8d8d8','#a8a8a8','#eef4f8'],{sp:30,t:1.1,sz:4});await sleep(250);if(cl)delete cl.fireOut;render();floatText((s.x+.5)*CS,s.y*CS+10,'uhašeno',true,'half');await sleep(900);setTimeout(()=>sm.remove(),900);continue;}
+      SF(s.txt?'fire':'splash');if(s.txt)await sleep(600);particles((s.x+.5)*CS,(s.y+.6)*CS,22,['#d8d8d8','#a8a8a8','#eef4f8'],{sp:30,t:1.1,sz:4});await sleep(250);if(cl)delete cl.fireOut;render();floatText((s.x+.5)*CS,s.y*CS+10,s.txt||'uhašeno',true,'half');await sleep(900);setTimeout(()=>sm.remove(),900);continue;}
     if(s.k==='oxy'){lay.hidden=true;if(UI.oxyLag&&UI.oxyLag[s.cid])UI.oxyLag[s.cid]--;floatText((s.x+.5)*CS,s.y*CS+10,'kyslík −1',true,'half');SF('bubble');render();await sleep(450);continue;}
     if(s.k==='evreset'){lay.hidden=true;await sleep(300);G.usedShow=null;const bx=document.getElementById('evcards');bx.classList.add('refresh');renderEvents();SF('card');await sleep(700);bx.classList.remove('refresh');continue;}
     if(s.k==='qkill'){await sleep(500);qzap(s.mid);await sleep(700);continue;}
