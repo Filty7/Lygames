@@ -291,6 +291,28 @@ h1,h2,h3{font-family:var(--display);font-weight:700;margin:0;letter-spacing:.02e
 .mbtn.sm{padding:6px 12px;font-size:18px;flex:none;align-items:center}
 .tsec{display:flex;flex-direction:column;gap:6px}.tsec>b{font-family:var(--display);font-size:13px;letter-spacing:.2em;color:var(--muted);font-weight:normal}.dsel.wrap{flex-wrap:wrap}
 #tutbox .tgp{display:none;font-size:12px;color:var(--muted);border-top:1px solid var(--line);margin-top:8px;padding-top:6px}body.gpon #tutbox .tgp{display:block}
+.gl.quar.lure{animation:qlure 1.4s ease-out;z-index:3}
+@keyframes qlure{0%{filter:none}12%{filter:brightness(2.4) drop-shadow(0 0 14px #ffe66a)}30%{filter:brightness(1.4)}45%{filter:brightness(2.2) drop-shadow(0 0 12px #ffe66a)}100%{filter:none}}
+.gl.quar.lure::after{content:"";position:absolute;inset:4px;border:2px solid rgba(255,230,106,.9);box-shadow:0 0 18px rgba(255,230,106,.8),inset 0 0 18px rgba(255,230,106,.5);animation:qlb 1.4s ease-out forwards}
+@keyframes qlb{0%{opacity:0}15%{opacity:1}60%{opacity:.7}100%{opacity:0}}
+.pipefl{position:absolute;width:var(--cs);height:var(--cs);pointer-events:none;z-index:6;animation:pipefl .9s ease-out forwards}
+@keyframes pipefl{0%{background:rgba(120,200,255,0);box-shadow:none}15%{background:rgba(120,200,255,.45);box-shadow:inset 0 0 26px rgba(200,240,255,.9),0 0 20px rgba(90,170,240,.8)}100%{background:rgba(120,200,255,0);box-shadow:none}}
+.pipefl .valve{position:absolute;width:18px;height:18px;border-radius:50%;border:3px solid #d04a2a;box-sizing:border-box;background:radial-gradient(circle,#3a1410 30%,transparent 32%);animation:valvespin .9s cubic-bezier(.3,.1,.3,1) forwards}
+.pipefl .valve::before,.pipefl .valve::after{content:"";position:absolute;left:50%;top:-1px;bottom:-1px;width:2px;margin-left:-1px;background:#e8603a}.pipefl .valve::after{transform:rotate(90deg)}
+@keyframes valvespin{from{transform:rotate(0)}to{transform:rotate(540deg)}}
+.corefl.casc{opacity:0;animation:corecasc .62s ease-out forwards}
+@keyframes corecasc{0%{opacity:0;transform:scale(.9)}25%{opacity:1;transform:scale(1)}100%{opacity:0;transform:scale(1.02)}}
+.tok.radhit .spr{filter:drop-shadow(0 0 6px #8cff5a) brightness(1.4) hue-rotate(60deg)}
+.tok.radhit{animation:radkick .45s ease-out}
+@keyframes radkick{0%,100%{translate:0 0}25%{translate:-4px -2px}55%{translate:3px 0}}
+.ap i.sap{border-color:#9dff7a;box-shadow:0 0 5px rgba(157,255,122,.75);background:rgba(157,255,122,.35)}
+.gl.turret.arm{animation:tuarm .17s steps(2) 3}
+@keyframes tuarm{0%{background:radial-gradient(circle at 50% 66%,rgba(255,40,30,.95),rgba(255,40,30,.25) 30%,transparent 45%)}100%{background:radial-gradient(circle at 50% 66%,rgba(255,60,40,.15),transparent 25%)}}
+.gl.laser.arm::before{animation:lzarm .17s steps(2) 3}
+@keyframes lzarm{0%{opacity:1;height:2px}100%{opacity:.15}}
+.gl.turret.ok{background:radial-gradient(circle at 50% 66%,rgba(90,255,120,.85),rgba(90,255,120,.2) 30%,transparent 45%)}
+.gl.laser.ok::before{background:rgba(90,255,120,.9)!important;box-shadow:0 0 6px rgba(90,255,120,1)!important}
+.mk.door{border-color:#ffd23a}
 .mver{font-size:12px;color:var(--dim)}
 .nrow{display:flex;gap:10px;align-items:center}
 .nrow .pimg{width:48px;height:48px}
@@ -1217,7 +1239,8 @@ function isFloating(c){return false;}
 function hasLedge(x,y){return isHole(x,y);}
 function wouldFall(m){return m.rope==null&&!m.ledge&&isHole(m.x,m.y)&&!flooded(m.y);}
 function surfaceLedge(){G.chars.forEach(c=>{if(onBoard(c)&&!c.buried&&!held(c)&&!c.ledge&&!flooded(c.y)&&isHole(c.x,c.y)&&ledgeOK(c.x,c.y)){c.ledge=true;}});}
-function fallDist(m){if(m.rope!=null||m.ledge)return 0;let y=m.y,d=0;while((isHole(m.x,y)||(m.downed&&vsq(m.x,y)&&vConn(m.x,y)))&&!flooded(y)){y++;d++;const tc=B(m.x,y);if(tc&&tc.t.feat==='trap'&&!(tc.trapIn||[]).length)break;}return d;}   // do pasti se padá a zůstane se v ní
+function fallDist(m){if(m.rope!=null||m.ledge)return 0;{const sc=B(m.x,m.y);if(sc&&sc.t.feat==='trap'&&!sc.rubble&&!(m.id!=null&&(sc.trapIn||[]).includes(m.id)))return 0;}   /* past: kdo do ní vstoupí, toho chytí */
+ let y=m.y,d=0;while((isHole(m.x,y)||(m.downed&&vsq(m.x,y)&&vConn(m.x,y)))&&!flooded(y)){y++;d++;const tc=B(m.x,y);if(tc&&tc.t.feat==='trap'&&!(tc.trapIn||[]).length)break;}return d;}   // do pasti se padá a zůstane se v ní
 // opuštění koridoru směrem dolů (vylezení nebo vyšoupnutí): žebřík chytí, jinak pád jako ze skoku
 function sqFall(c,ys){const x=c.x;if(!vConn(x,ys))return {y:ys,d:0};const L=ladderSet();let y=ys+1;
   if(L.has(x+','+y)&&!c.downed){if(!G.chars.some(o=>onBoard(o)&&o!==c&&o.x===x&&o.y===y&&!o.ledge))return {y,ladder:true,d:0};
@@ -1519,7 +1542,7 @@ function ghostStep(m){
   if(cand.some(q=>q.quar))cand=cand.filter(q=>q.quar);   // při remíze vyhrává karanténa
   const t=pick(cand),[nx,ny]=first.get(key(t.x,t.y));
   if(G.monsters.some(o=>o!==m&&o.x===nx&&o.y===ny))return;   // dva přízraky nikdy na jednom poli: čeká ve frontě
-  if(UI.ready&&G.evPhase){if(m.sx==null){m.sx=m.x;m.sy=m.y;}SEQ.push({k:'mmove',mid:m.id,x:nx,y:ny});}
+  if(UI.ready&&G.evPhase){if(m.sx==null){m.sx=m.x;m.sy=m.y;}if(t.quar)SEQ.push({k:'qlure',x:t.x,y:t.y});SEQ.push({k:'mmove',mid:m.id,x:nx,y:ny});}
   m.x=nx;m.y=ny;
   if(quarKill(m))return;
   pipeTick();
@@ -1529,7 +1552,7 @@ function ghostStep(m){
 function pipeTick(){G.board.forEach((c,i)=>{if(!c||c.t.feat!=='pipe'||c.rubble)return;const x=i%COLS,y=(i/COLS)|0,now=[];
   G.chars.forEach(o=>{if(onBoard(o)&&o.x===x&&o.y===y)now.push('c'+o.id);});G.monsters.forEach(m=>{if(!m.qdead&&m.x===x&&m.y===y)now.push('m'+m.id);});
   const old=c.pipeIn||[],nw=now.filter(k=>!old.includes(k));c.pipeIn=now;
-  nw.forEach(k=>{if(G.W<=0)return;const who=k[0]==='c'?G.chars[+k.slice(1)].name:'Přízrak';log(`${who} rozkýval(a) prasklé potrubí. Voda stoupá o patro!`,'bad');waterChange(-1,true);});});}
+  nw.forEach(k=>{if(G.W<=0)return;const who=k[0]==='c'?G.chars[+k.slice(1)].name:'Přízrak';log(`${who} rozkýval(a) prasklé potrubí. Voda stoupá o patro!`,'bad');if(UI.ready)SEQ.push({k:'pipe',x,y});waterChange(-1,true);});});}
 // karanténa: přízrak, který do ní vstoupí, zahyne
 function quarKill(m){const c=B(m.x,m.y);if(!c||c.t.feat!=='quar')return false;
   log('Přízrak vstoupil do karantény a rozpadl se!','good');
@@ -1569,8 +1592,10 @@ function actTele(c){
 /* ---------- extra destičky ---------- */
 // past: kdo vstoupí (i pádem), za tím se zabouchnou dveře u všech otvorů; otevřít jde jen zvenku ze sousedního pole
 function trapTick(){G.board.forEach((c,i)=>{if(!c||c.t.feat!=='trap')return;const x=i%COLS,y=(i/COLS)|0;c.trapIn=(c.trapIn||[]).filter(id=>{const o=G.chars[id];return onBoard(o)&&o.x===x&&o.y===y;});
-  const nw=G.chars.filter(o=>onBoard(o)&&o.x===x&&o.y===y&&!c.trapIn.includes(o.id));if(!nw.length)return;
-  nw.forEach(o=>c.trapIn.push(o.id));c.shut=c.e.map(v=>!!v);c.slam=true;log(`Dveře pasti se zabouchly! ${nw.map(o=>o.name).join(', ')} uvnitř.`,'bad');if(UI.ready)SEQ.push({k:'slam',x,y});});}
+  c.monIn=(c.monIn||[]).filter(id=>G.monsters.some(m=>m.id===id&&!m.qdead&&m.x===x&&m.y===y));
+  const nw=G.chars.filter(o=>onBoard(o)&&o.x===x&&o.y===y&&!c.trapIn.includes(o.id)),nm=G.monsters.filter(m=>!m.qdead&&m.x===x&&m.y===y&&!c.monIn.includes(m.id));if(!nw.length&&!nm.length)return;
+  nw.forEach(o=>c.trapIn.push(o.id));nm.forEach(m=>c.monIn.push(m.id));const was=!!c.shut&&c.e.every((v,d)=>!v||c.shut[d]);c.shut=c.e.map(v=>!!v);if(was)return;c.slam=true;
+  log(`Dveře pasti se zabouchly! ${nw.map(o=>o.name).concat(nm.map(()=>'přízrak')).join(', ')} uvnitř.`,nw.length?'bad':'good');if(UI.ready){c.slamPending=true;SEQ.push({k:'slam',x,y});}});}
 function doorTargets(c){if(c.downed)return [];const res=[];for(let d=0;d<4;d++){const cell=B(c.x,c.y);if(!cell||!cell.e[d]||shutAt(cell,d))continue;const [nx,ny]=NB(c.x,c.y,d),n=B(nx,ny);
   if(n&&n.t.feat==='trap'&&n.e[OPP[d]]&&shutAt(n,OPP[d]))res.push({x:nx,y:ny,d:OPP[d]});}return res;}
 function actOpenDoor(c,t){pushUndo();spend(c,1);const n=B(t.x,t.y);n.shut[t.d]=false;log(`${c.name} otevřel(a) dveře pasti.`,'good');
@@ -1579,21 +1604,22 @@ function actOpenDoor(c,t){pushUndo();spend(c,1);const n=B(t.x,t.y);n.shut[t.d]=f
 // střílna: kdo vstoupí na pole kulometu nebo do laseru, 50 % na zásah; přízrak v cestě střelu schytá místo něj
 function laserCells(x,y){const out=[];for(let d=0;d<4;d++){let cx=x,cy=y;for(let k=0;k<COLS+ROWS;k++){if(!edgeOpen(cx,cy,d))break;[cx,cy]=NB(cx,cy,d);const n=B(cx,cy);if(!n||n.rubble)break;out.push({x:cx,y:cy,d,k:k+1});}}return out;}
 function turretCheck(c){G.board.forEach((t,i)=>{if(!t||t.t.feat!=='turret'||t.rubble)return;const tx=i%COLS,ty=(i/COLS)|0;
-  let on=tx===c.x&&ty===c.y,lc=null;if(!on){lc=laserCells(tx,ty).find(q=>q.x===c.x&&q.y===c.y);if(!lc)return;}
+  if(tx===c.x&&ty===c.y)return;   /* přímo na poli střílny je mrtvý úhel */
+  const lc=laserCells(tx,ty).find(q=>q.x===c.x&&q.y===c.y);if(!lc)return;
   G.info=true;const fire=!rollP(.5,c.name,'střílna (vyhnout se výstřelu)');
   if(lc)t.aim=lc.d;
-  if(!fire){log(`Střílna zabzučela, ale nevystřelila (${c.name}).`,'good');if(UI.ready)SEQ.push({k:'turret',tx,ty,x:c.x,y:c.y,hit:false});return;}
+  if(!fire){log(`Střílna zabzučela, ale nevystřelila (${c.name}).`,'good');if(UI.ready)SEQ.push({k:'turret',tx,ty,ti:i,x:c.x,y:c.y,hit:false});return;}
   let shield=null;if(lc){let cx=tx,cy=ty;for(let k=1;k<lc.k;k++){[cx,cy]=NB(cx,cy,lc.d);const m=G.monsters.find(q=>q.x===cx&&q.y===cy&&!q.qdead);if(m){shield=m;break;}}}
-  t.aim=lc?lc.d:t.aim;if(UI.ready)SEQ.push({k:'turret',tx,ty,x:shield?shield.x:c.x,y:shield?shield.y:c.y,hit:true});
+  t.aim=lc?lc.d:t.aim;if(UI.ready)SEQ.push({k:'turret',tx,ty,ti:i,x:shield?shield.x:c.x,y:shield?shield.y:c.y,hit:true});
   if(shield){G.monsters=G.monsters.filter(q=>q!==shield);log(`Střílna vystřelila, ale střelu schytal přízrak! ${c.name} je v bezpečí.`,'good');}
   else{log(`Střílna vystřelila po: ${c.name}!`,'bad');dmg(c,1,'střílna');}});}
 // jádro radiace: při události Radiace ozáří okolí do 2 kroků po chodbách; zasažený začne kolo o akci (při kritickém o dvě) méně
-function coreZone(x,y){const key=(a,b)=>a+','+b,D=new Map([[key(x,y),0]]),q=[[x,y]],out=[[x,y]];
-  while(q.length){const [cx,cy]=q.shift(),d=D.get(key(cx,cy));if(d>=2)continue;for(let dd=0;dd<4;dd++){if(!edgeOpen(cx,cy,dd))continue;const [nx,ny]=NB(cx,cy,dd),n=B(nx,ny);if(!n||n.rubble||D.has(key(nx,ny)))continue;D.set(key(nx,ny),d+1);q.push([nx,ny]);out.push([nx,ny]);}}return out;}
-function coreBurst(crit){const cells=new Set();G.board.forEach((t,i)=>{if(t&&t.t.feat==='core'&&!t.rubble)coreZone(i%COLS,(i/COLS)|0).forEach(([x,y])=>cells.add(x+','+y));});
-  if(!cells.size)return;if(UI.ready)SEQ.push({k:'core',cells:[...cells].map(k=>{const [x,y]=k.split(',').map(Number);return idx(x,y);})});
+function coreZone(x,y){const key=(a,b)=>a+','+b,D=new Map([[key(x,y),0]]),q=[[x,y]],out=[[x,y,0]];
+  while(q.length){const [cx,cy]=q.shift(),d=D.get(key(cx,cy));if(d>=2)continue;for(let dd=0;dd<4;dd++){if(!edgeOpen(cx,cy,dd))continue;const [nx,ny]=NB(cx,cy,dd),n=B(nx,ny);if(!n||n.rubble||D.has(key(nx,ny)))continue;D.set(key(nx,ny),d+1);q.push([nx,ny]);out.push([nx,ny,d+1]);}}return out;}
+function coreBurst(crit){const cells=new Map();G.board.forEach((t,i)=>{if(t&&t.t.feat==='core'&&!t.rubble)coreZone(i%COLS,(i/COLS)|0).forEach(([x,y,d])=>{const k=x+','+y;if(!cells.has(k)||cells.get(k)>d)cells.set(k,d);});});
+  if(!cells.size)return;const sq=UI.ready?{k:'core',cells:[...cells].map(([k,d])=>{const [x,y]=k.split(',').map(Number);return {i:idx(x,y),d};}),hits:[]}:null;if(sq)SEQ.push(sq);
   G.chars.filter(o=>onBoard(o)&&cells.has(o.x+','+o.y)&&!isBunker(o.x,o.y)).forEach(o=>{{const ar=alv(o,'antirad');if(ar&&rollP(ar*.15,o.name,'Antiradiace proti jádru')){log(`${o.name} (Antiradiace) jádru odolal(a).`,'good');return;}}
-    o.sap=Math.min(2,(o.sap||0)+1);log(`${o.name}: jádro radiace, příští kolo o ${o.sap} ${o.sap===1?'akci':'akce'} méně.`,'bad');});}
+    if(sq)sq.hits.push({cid:o.id,x:o.x,y:o.y,d:cells.get(o.x+','+o.y)});o.sap=Math.min(2,(o.sap||0)+1);log(`${o.name}: jádro radiace, příští kolo o ${o.sap} ${o.sap===1?'akci':'akce'} méně.`,'bad');});}
 // konec tahu ve slizu
 function slimePass(c,a,b){for(let y=a;y<=b;y++){const t=B(c.x,y);if(t&&t.t.feat==='slime'){log(`${c.name} propadl(a) slizem!`,'bad');dmg(c,3,'sliz');return;}}}
 function slimeEnd(c){const cl=B(c.x,c.y);if(cl&&cl.t.feat==='slime'&&standing(c)){log(`${c.name} skončil(a) tah ve slizu.`,'bad');dmg(c,1,'sliz');}}
@@ -1965,7 +1991,7 @@ function endRoundEvents(){
   applyGravity();G.evPhase=false;
   if(G.used.length>=4){if(UI.ready){G.usedShow=G.used.slice();SEQ.push({k:'evreset'});}G.used=[];}   // karty se obnoví až po přehrání události
   G.banner=b;G.round++;
-  G.chars.forEach(c=>{c.used=0;if(c.sap){c.used=Math.min(2,c.sap);c.sap=0;}c.bonus=0;if(c.feast){if(standing(c)){c.used-=2;c.bonus=2;}c.feast=false;}c.done=!!(G.tut&&c.hold&&c.downed&&onBoard(c));c.started=false;if(!UI.ready)c.exhausted=false;});if(UI.ready)G.clearEx=true;
+  G.chars.forEach(c=>{c.used=0;c.sapNow=0;if(c.sap){c.used=Math.min(2,c.sap);c.sapNow=c.used;c.sap=0;}c.bonus=0;if(c.feast){if(standing(c)){c.used-=2;c.bonus=2;}c.feast=false;}c.done=!!(G.tut&&c.hold&&c.downed&&onBoard(c));c.started=false;if(!UI.ready)c.exhausted=false;});if(UI.ready)G.clearEx=true;
   G.active=null;G.mode='move';undoStack=[];
   checkOver();
 }
@@ -2324,7 +2350,7 @@ function cellView(x,y,c){
   const below=B(x,y+1),open=!!(c.e[2]&&eConn(x,y)),openUp=!!(c.e[0]&&y>0&&eConn(x,y-1));
   const rubBelow=!!(open&&below&&below.rubble&&!below.rubbleAnim);
   const shown=UI.ladShown&&UI.ladShown.has(x+','+y);
-  return Object.assign({},c,{open,openUp,rubBelow,planks:open&&!rubBelow&&!shown&&(c.e[1]||c.e[3])&&ledgeKind(c.t,c),lv:G.leverOn||!!(c.lever&&c.on),rubble:c.rubble&&!c.rubbleAnim,dim:c.t.feat==='spring'&&flooded(y)});
+  return Object.assign({},c,{shut:c.slamPending?null:c.shut,open,openUp,rubBelow,planks:open&&!rubBelow&&!shown&&(c.e[1]||c.e[3])&&ledgeKind(c.t,c),lv:G.leverOn||!!(c.lever&&c.on),rubble:c.rubble&&!c.rubbleAnim,dim:c.t.feat==='spring'&&flooded(y)});
 }
 function previewView(t,e,y){return {t,e,gem:t.gem,serum:t.serum,preview:true,open:!!e[2],openUp:!!e[0],planks:!!e[2]&&!!(e[1]||e[3])&&t.kind!=='stairs'&&ledgeKind(t),lv:G&&G.leverOn};}
 
@@ -2567,7 +2593,11 @@ const SND={ctx:null,on:true,mood:'calm',
   faint(){this.noise(1.3,{f:800,fto:300,q:1,gain:.08,a:.1,wet:.6});this.tone(70,1,{to:40,gain:.15,delay:.4});},
   card(){this.noise(.1,{ft:'highpass',f:2400,gain:.06});this.noise(.08,{ft:'highpass',f:3000,gain:.04,delay:.12});},
   dice(){for(let i=0;i<7;i++)this.noise(.03,{f:900+Math.random()*700,q:3,gain:.12,delay:i*.07});},
-  tick(){this.tone(900,.03,{gain:.03,type:'square'});}
+  tick(){this.tone(900,.03,{gain:.03,type:'square'});},
+  hum(){this.tone(110,.8,{type:'sawtooth',gain:.035,a:.05,wet:.5});this.tone(220,.7,{type:'square',gain:.012,a:.05,wet:.5});this.noise(.7,{ft:'bandpass',f:1800,q:4,gain:.025,a:.05,wet:.6});this.tone(880,.25,{type:'triangle',gain:.03,delay:.05,wet:.8});},
+  valve(){this.tone(320,.45,{type:'triangle',to:170,gain:.05,wet:.4});this.tone(520,.2,{type:'square',to:300,gain:.012,delay:.1});this.noise(.9,{f:4200,q:1,gain:.05,a:.15,wet:.5,delay:.2});},
+  beep(){this.tone(1500,.07,{type:'square',gain:.025});},
+  okchime(){this.tone(880,.14,{type:'triangle',gain:.05});this.tone(1320,.22,{type:'triangle',gain:.05,delay:.11});}
 };
 const SF=(fn,...a)=>{try{if(SND.ctx&&SND.on)SND[fn](...a);}catch(e){}};
 
@@ -2724,10 +2754,10 @@ function renderGlows(){
     if(c.t.feat==='pipe'){const hz=!(c.pipeV!=null?c.pipeV:!(c.e[1]||c.e[3])),pts=hz?[[70,48,0],[30,56,.4],[26,58,.8]]:[[74,38,0],[20,48,.35],[26,50,.7],[74,40,.55]];h+=`<div class="gl pcold" style="${st}"></div><div class="gl pipe" style="${st}">${pts.map(([l,t,d])=>`<i style="left:${l}px;top:${t}px;animation-delay:${d}s"></i>`).join('')}</div>`;}
     if(c.t.feat==='canteen')h+=`<div class="gl cant" style="${st}"></div>`;
     if(c.t.feat==='bunker'&&flooded(y))h+=`<div class="gl bunkdry" style="${st};background-image:url(${tileImg(cellView(x,y,c))})"></div>`;   // do krytu voda nenateče
-    if(c.t.feat==='turret'){const ang=[-90,0,90,180][c.aim!=null?c.aim:(c.e[E]?E:c.e[Wd]?Wd:c.e[S]?S:N)];h+=`<div class="gl turret" style="${st}"><i class="gun" style="background-image:url(${gunURL()});transform:rotate(${ang}deg)"></i></div>`;laserCells(x,y).forEach(q=>{const hz=q.d===E||q.d===Wd;
-      h+=`<div class="gl laser ${hz?'h':'v'}" style="left:${q.x*CS}px;top:${q.y*CS}px"></div>`;});}
+    if(c.t.feat==='turret'){const ang=[-90,0,90,180][c.aim!=null?c.aim:(c.e[E]?E:c.e[Wd]?Wd:c.e[S]?S:N)];h+=`<div class="gl turret" data-tu="${i}" style="${st}"><i class="gun" style="background-image:url(${gunURL()});transform:rotate(${ang}deg)"></i></div>`;laserCells(x,y).forEach(q=>{const hz=q.d===E||q.d===Wd;
+      h+=`<div class="gl laser ${hz?'h':'v'}" data-tl="${i}" style="left:${q.x*CS}px;top:${q.y*CS}px"></div>`;});}
     if(c.t.feat==='spring'&&!flooded(y))h+=`<div class="gl spr" style="${st}"></div>`;
-    if(c.t.feat==='quar')h+=`<div class="gl quar" style="${st}"><svg viewBox="0 0 96 96"><polyline class="b1" points="26,22 34,30 30,38 40,44 36,52 46,58 44,66"/><polyline class="b2" points="70,20 62,28 68,36 58,42 64,50 54,58 60,66"/><polyline class="b3" points="28,40 40,36 48,44 58,38 70,46"/></svg></div>`;
+    if(c.t.feat==='quar')h+=`<div class="gl quar" data-qu="${i}" style="${st}"><svg viewBox="0 0 96 96"><polyline class="b1" points="26,22 34,30 30,38 40,44 36,52 46,58 44,66"/><polyline class="b2" points="70,20 62,28 68,36 58,42 64,50 54,58 60,66"/><polyline class="b3" points="28,40 40,36 48,44 58,38 70,46"/></svg></div>`;
     if(c.lever)h+=`<div class="gl lever${G.leverOn||c.on?' on':''}" style="${st}"></div>`;
     if(c.start)h+=`<div class="gl start" style="${st}"></div>`;
     if((c.fire||c.fireOut)&&!c.fireAnim){
@@ -2756,8 +2786,8 @@ function renderBadges(){
     if(c.t.feat==='cave')b.push(['cv','Zával '+ROMAN[c.t.cave],IC.rocks]);
     if(c.t.feat==='tele')b.push(['tp','Teleport: za 1 akci tě přenese na druhý',IC.tele]);
     if(c.t.feat==='quar')b.push(['qr','Karanténa: přízrak, který vstoupí, zahyne',IC.quar]);
-    if(c.t.feat==='turret')b.push(['tu','Střílna: kdo vstoupí na pole nebo do laseru, má 50 % na zásah za 1. Přízrak v cestě střelu schytá.',IC.turret]);
-    if(c.t.feat==='trap')b.push(['tr','Past: za tím, kdo vstoupí, se zabouchnou dveře. Otevřít jdou jen zvenku ze sousedního pole (1 akce), nebo dynamitem.',IC.trap]);
+    if(c.t.feat==='turret')b.push(['tu','Střílna: kdo vstoupí do laseru, má 50 % na zásah za 1 (při každém vstupu). Přímo na poli střílny je mrtvý úhel. Přízrak v cestě střelu schytá.',IC.turret]);
+    if(c.t.feat==='trap')b.push(['tr','Past: kdo do ní vstoupí nebo jí propadá, toho chytí a zabouchnou se dveře (chytí i přízrak). Otevřeš je zvenku pohybem ze sousedního pole (1 akce), nebo dynamitem.',IC.trap]);
     if(c.t.feat==='slime')b.push(['sl','Sliz: vstup nebo propad −3, konec tahu −1.',IC.slime]);
     if(c.t.feat==='core')b.push(['co','Jádro radiace: při události Radiace ozáří okolí do 2 polí. Zasažený začne kolo o akci méně.',IC.core]);
     if(c.t.feat==='pipe')b.push(['pp','Prasklé potrubí: kdokoli sem vstoupí (i přízrak), voda stoupne o patro.',IC.pipe]);
@@ -2980,7 +3010,7 @@ function renderCrew(){
     const hpv=c.hp+(UI.lag[c.id]||0);let hp='';for(let i=0;i<(c.permMax||MAXHP);i++)hp+=`<i class="${i<hpv?'':i<c.maxHp?'empty':'lost'}"></i>`;
     let ab='';{const dl=alv(c,'diver')*2;if(dl){const ox=c.diveReady?dl:Math.min(dl,(c.whp||0)+((UI.oxyLag||{})[c.id]||0));ab+='<span class="oxy" title="kyslík (Potápěč)">';for(let i=0;i<dl;i++)ab+=`<u class="${i<ox?'f':''}"></u>`;ab+='</span>';}
      const fl=alv(c,'firefighter');if(fl){ab+=(c.uses.firefighter>0?'<span class="ffimm" title="Hasič: oheň na jeho poli uhasí místo zranění"></span>':'')+'<span class="oxy ff" title="hašení (Hasič)">';for(let i=0;i<ffMax(c);i++)ab+=`<u class="${i<c.uses.firefighter?'f':''}"></u>`;ab+='</span>';}}
-    let ap='';if(c.downed)ap=`<i class="${c.used<1?'used':''}"></i>`;else{const nl=Math.max(0,2-c.used),el2=c.used<3?1:0;ap=`<i class="ex ${el2?'used':''}" title="vyčerpání"></i><i class="${nl>=1?'used':''}"></i><i class="${nl>=2?'used':''}"></i>`;for(let k=0;k<(c.bonus||0);k++)ap+=`<i class="bon ${k<-c.used?'used':''}" title="akce navíc (kantýna)"></i>`;}
+    let ap='';if(c.downed)ap=`<i class="${c.used<1?'used':''}"></i>`;else{const nl=Math.max(0,2-c.used),el2=c.used<3?1:0;const sp=Math.min(2,c.sapNow||0);ap=`<i class="ex ${el2?'used':''}" title="vyčerpání"></i><i class="${nl>=1?'used':''}${2-sp<1?' sap':''}"${2-sp<1?' title="akce sebraná jádrem radiace"':''}></i><i class="${nl>=2?'used':''}${2-sp<2?' sap':''}"${2-sp<2?' title="akce sebraná jádrem radiace"':''}></i>`;for(let k=0;k<(c.bonus||0);k++)ap+=`<i class="bon ${k<-c.used?'used':''}" title="akce navíc (kantýna)"></i>`;}
     if(c.dead){hp='';ab='';ap=`<span class="skull" title="ztracen(a) navždy">${IC.skull}</span>`;}
     const ch=[];
     if(UI.pending===c.id)ch.push(`<span class="on">klikni znovu</span>`);
@@ -3031,7 +3061,6 @@ function renderActions(a){
     const dB=alv(a,'doctor');
     h+=`<button class="act grn ${G.mode==='heal'?'on':''}" ${canH?(ht.length===1?`data-heal="${ht[0].id}"`:'data-m="heal"'):'disabled'}${ex(2)} title="${why||'Ošetřit +2'+(dB?` (50 %: +${2+dB})`:'')}"><span class="invi">${IC.heart}</span> Ošetřit${canH&&ht.length===1&&ht[0]!==a?' '+portraitSVG(ht[0],'hpic'):''} <small>2</small></button>`;
     if(G.mode==='heal'&&canH)ht.forEach(o=>h+=`<button class="act grn" data-heal="${o.id}" title="Ošetřit ${o.name}">${portraitSVG(o,'hpic')} +2${dB?`<span style="color:var(--good)">(+${dB})</span>`:''}</button>`);
-    doorTargets(a).forEach((t,i)=>h+=`<button class="act" data-door="${i}" ${rem>=1?'':'disabled'}${ex(1)} title="Otevře dveře pasti ${DIRNAME[OPP[t.d]]}">Otevřít dveře <small>1</small></button>`);
     const tm=teleMate(a);if(tm)h+=`<button class="act org" data-a="tele" ${rem>=1?'':'disabled'}${ex(1)} title="${tm.fresh?'Druhý teleport ještě neleží na mapě: objevíš se s ním na náhodném místě.':'Přenese tě na druhý teleport.'}">Teleport <small>1</small></button>`;
     rv.forEach(o=>h+=`<button class="act grn" data-rv2="${o.id}" ${rem>=2&&tAllow('revive')?'':'disabled'}${ex(2)}>${portraitSVG(o,'hpic')} Zvednout <small>2</small></button>`);
   }
@@ -3077,6 +3106,7 @@ function renderMarks(a){
       if(!a.downed)ropeOptions(a).forEach((o,i)=>{if(!tAllow('rope',o.x,o.yTop))return;const rc=ropeCost(a),st=rem<rc?' na':ex(rc)?' exh':'';
         const pc=Math.round(o.chance*100),pips=Math.round(o.chance*5);
         h+=`<button class="mk rope${st}" data-rp="${i}" ${rem<rc?'disabled':''} title="Lano · ${rc} ${rc===1?'akce':'akce'} · šance ${pc} %" style="left:${o.x*CS+CS/2-11}px;top:${o.yTop*CS+4}px;width:22px;height:22px">${IC.anchor}<span class="pips">${[0,1,2,3,4].map(k=>`<i class="${k<pips?'on':''}"></i>`).join('')}</span></button>`;});
+      if(!a.downed)doorTargets(a).forEach((t,i)=>{const st=rem<1?' na':ex(1)?' exh':'';h+=mk(t.x,t.y,'dig door'+st,'otevřít dveře · 1',`data-door="${i}" ${rem<1?'disabled':''}`);});
       if(!a.downed)digTargets(a).forEach((t,i)=>{if(!tAllow('dig',t.x,t.y))return;const st=rem<2?' na':ex(2)?' exh':'';h+=mk(t.x,t.y,'dig'+st,'vykopat · 2',`data-dg="${i}" ${rem<2?'disabled':''}`);});
       if(!a.downed&&rem>=1)revealTargets(a).forEach(t=>{
         const horiz=t.d===E||t.d===Wd,ar=tAllow('reveal',t.x,t.y),ae=horiz&&tAllow('explore',t.x,t.y);if(!ar&&!ae)return;
@@ -3164,8 +3194,9 @@ function setupCamera(){
 }
 
 /* ================= MENU, ULOŽENÍ, PRAVIDLA ================= */
-const VERSION='0.66';
+const VERSION='0.67';
 const CHANGELOG=[
+  ['0.67','Pasti, střílny a animace',['Běžná událost už nemá razítko SPUŠTĚNO, razítko dostane jen kritický zásah a dynamit.','Past chytí i toho, kdo do ní propadá, a zavře se až ve chvíli, kdy je postava uvnitř. Chytí i přízrak. Dveře se otevírají pohybem zvenku do pasti (značka na poli), už to není speciální akce.','Střílna střílí jen při vstupu do laseru (při každém), přímo na jejím poli je mrtvý úhel. Před výstřelem se rozblikají červené diody, pak buď vystřelí, nebo se zeleně rozsvítí i s laserem.','Karanténa, ke které se přízrak vydá, se rozsvítí a zabzučí. Prasklé potrubí při zvednutí vody blikne a roztočí ventil.','Jádro radiace: kratší kaskáda od jádra do okolí, zasažená postava sebou trhne a ztracená akce je v profilu světle zelená.','Opraveno: pohyb před vyčerpáním (třeba šplhání po laně) se přehrával jako běh a teprve pak se postava chytila lana.']],
   ['0.66','Multiplayer pro 4',['Lokální multiplayer pro 2–4 hráče. Ve čtyřech se hraje lehká obtížnost (každý má 1 postavu), ve třech lehká nebo normální. Když se přihlásí víc hráčů, obtížnost se sama upraví.','Při pokračování ve výpravě se mezi hráče rozdělí jen živé postavy.','Nové hlavní menu: na tmavém pozadí je minimalistický plán bočního řezu laboratoře, po stranách občas zabliká světlo a shora občas padá suť. Výraznější tlačítka, hra už pod menu neprosvítá.','Na plánu laboratoře víc druhů poznámek (žluté lístky, útržky s páskou, linkované kartičky, zakroužkovaná varování), 30 textů, a nepřekrývají místnosti.','Víc jmen pro postavy (přes 70).','Přepsaná pravidla: všechny strany stejně vysoké, aktuální obrázky dílků (oheň, radiace, přízrak, žebřík, lano…), základní hra v kapitolách 1–12 a vše, co přichází až během výpravy, stručně v Extra pravidlech. Nová strana Ovládání. V pravidlech jde listovat LB / RB.','Tutoriál jde celý ovládat ovladačem: tlačítka Další / Rozumím potvrdí A, v bublině je nápověda k ovladači.','Test room (v hlavním menu): asi 50 dílků se vším, co hra má, volba typu levelu, počtu postav, schopností III a hry bez časového limitu.']],
   ['0.65','Světová tabulka a životy podle obtížnosti',['Skóre se po konci výpravy odešle do světové tabulky na lygames.cz. Tabulka výprav ukazuje světovou top 10 i výpravy z tohoto prohlížeče.','Max. životy podle obtížnosti: lehká 5, normální 6, těžká 7. Sérem jde doplnit nejvýš na toto maximum.','Ovladač: dílek jde otáčet i tlačítky LB / RB.']],
   ['0.64','Razítka a názvy',['Jednotné razítko pro mapu i události, výraznější na kartě levelu. Nové názvy typů: Tma, Dvojitý zámek, Na dohled, Dusno. Řady bez kyslíku jsou šedé a desaturované.']],
@@ -3502,8 +3533,8 @@ ${RR(RF('T','tele',[0,1,1,1],{},'teleport'),RF('T','spring',[0,1,1,1],{},'regene
 `${RX('IV','Destičky od 2. aktu')}<p class="small">Od druhého aktu přidává patro 3 i tyto destičky.</p>
 ${RR(RF('cross','turret',[1,1,1,1],{},'střílna'),RF('straight','trap',[0,1,0,1],{},'past'),RF('cross','slime',[1,1,1,1],{},'sliz'),RF('T','core',[0,1,1,1],{},'jádro'),RF('straight','pipe',[0,1,0,1],{},'potrubí'))}
 <table class="rtab rtsm">
-<tr><td>Střílna</td><td colspan="2">Vstup na pole nebo do laseru: 50 % na −1.</td></tr>
-<tr><td>Past se dveřmi</td><td colspan="2">Za tebou se zabouchnou dveře, otevřít jdou jen zvenku (1 akce).</td></tr>
+<tr><td>Střílna</td><td colspan="2">Každý vstup do laseru: 50 % na −1. Na poli střílny je mrtvý úhel.</td></tr>
+<tr><td>Past se dveřmi</td><td colspan="2">Chytí každého, kdo do ní vstoupí nebo jí propadá (i přízrak), a zabouchne dveře. Zvenku je otevřeš pohybem do ní (1 akce).</td></tr>
 <tr><td>Sliz</td><td colspan="2">Vstup nebo propad −3, konec tahu v něm −1.</td></tr>
 <tr><td>Jádro radiace</td><td colspan="2">Při Radiaci ozáří okolí: kdo je zasažen, má příští kolo o akci méně.</td></tr>
 <tr><td>Prasklé potrubí</td><td colspan="2">Kdo vstoupí (i přízrak), voda stoupne o patro.</td></tr></table>`,
@@ -4206,7 +4237,7 @@ function bigTile(t){
   const os=t.kind==='stairs'?[[1,1,1,1]]:orients(t,null),o=os.find(q=>q[1]||q[3])||os[0];
   return `<span class="cth"><img src="${tileImg(previewView(t,o))}" alt="">${t.kind==='stairs'?`<i class="lad" style="background-image:url(${LAD_URL})"></i>`:''}${t.feat==='fire'?`<i class="mfi">${IC.fire}</i>`:''}<em>${tileDesc(t)}${TILEHELP[t.serum?'serum':t.feat]?`<small>${TILEHELP[t.serum?'serum':t.feat]}</small>`:''}</em></span>`;}
 const TILEHELP={tele:'1 akce: přenese tě na druhý teleport',quar:'přízrak, který vstoupí, zahyne',spring:'konec tahu tady: +3 životy (ne pod vodou)',bunker:'chrání před událostmi, přízrakem, vodou i závalem',canteen:'kdo tu skončí tah, má příště +2 akce',
-  turret:'vstup na pole nebo do laseru: 50 % na −1',trap:'za tebou se zabouchnou dveře, otevřít jdou jen zvenku',slime:'vstup nebo propad −3, konec tahu −1',core:'při Radiaci ozáří okolí: příští kolo o akci méně',pipe:'kdo vstoupí (i přízrak), voda stoupne o patro',serum:'ampule séra: vynes ji, za sérum koupíš +1 max. život'};
+  turret:'vstup do laseru: 50 % na −1 (na poli střílny ne)',trap:'chytí tě (i při pádu), dveře otevřeš pohybem zvenku',slime:'vstup nebo propad −3, konec tahu −1',core:'při Radiaci ozáří okolí: příští kolo o akci méně',pipe:'kdo vstoupí (i přízrak), voda stoupne o patro',serum:'ampule séra: vynes ji, za sérum koupíš +1 max. život'};
 function openConf(id){
   const n=RUN.map.nodes[id],P=photoURLs(n);closeConf();
   const d=document.createElement('div');d.id='mconf';
@@ -4548,14 +4579,28 @@ async function playSeqRun(){
     }
     if(s.k==='wait'){lay.hidden=true;await sleep(s.ms);continue;}
     if(s.k==='roundtick'){lay.hidden=true;if(UI.leftDisp!=null)UI.leftDisp=Math.max(0,UI.leftDisp-1);renderInfo();SF('tick');await sleep(450);continue;}
-    if(s.k==='slam'){lay.hidden=true;SF('slam',.8);shakeView(true);flash('org',250);render();await sleep(600);continue;}
+    if(s.k==='slam'){lay.hidden=true;await sleep(UI.fast?0:480);const sc=B(s.x,s.y);if(sc)delete sc.slamPending;SF('slam',.8);shakeView(true);flash('org',250);dustPuff((s.x+.5)*CS,s.y*CS+70,14);render();await sleep(520);continue;}
+    if(s.k==='qlure'){lay.hidden=true;const q=document.querySelector(`#glows .gl.quar[data-qu="${idx(s.x,s.y)}"]`);if(q){q.classList.remove('lure');void q.offsetWidth;q.classList.add('lure');setTimeout(()=>q.classList.remove('lure'),1500);}SF('hum');await sleep(380);continue;}
+    if(s.k==='pipe'){lay.hidden=true;if(UI.autoCam&&!camVisible(s.x,s.y))centerOn(s.x,s.y,true);const cl=B(s.x,s.y),fxl=document.getElementById('fx'),pv=cl?(cl.pipeV!=null?cl.pipeV:!(cl.e[1]||cl.e[3])):true;
+      const f=document.createElement('div');f.className='pipefl';f.style.left=s.x*CS+'px';f.style.top=s.y*CS+'px';
+      const wx=pv?37:35,wy=pv?TPX.cy0+13:TPX.cy0+10;f.innerHTML=`<i class="valve" style="left:${wx*2-9}px;top:${wy*2-9}px"></i>`;fxl.appendChild(f);
+      SF('valve');particles((s.x+.5)*CS,(s.y+.55)*CS,18,['#5aa8e0','#c8ecff','#2a6a9a'],{sp:34,t:.8,sz:3});flash('blu',300);await sleep(900);setTimeout(()=>f.remove(),400);continue;}
     if(s.k==='turret'){lay.hidden=true;const fxl=document.getElementById('fx'),L=document.createElement('div');const x0=(s.tx+.5)*CS,y0=(s.ty+.45)*CS,x1=(s.x+.5)*CS,y1=(s.y+.45)*CS,len=Math.hypot(x1-x0,y1-y0),ang=Math.atan2(y1-y0,x1-x0);
       if(UI.autoCam&&!camVisible(s.x,s.y))centerOn(s.x,s.y,true);
-      renderGlows();await sleep(320);   // zbraň se nejdřív natočí
-      L.className='tracer'+(s.hit?'':' miss');L.style.left=x0+'px';L.style.top=y0+'px';L.style.width=Math.max(8,len)+'px';L.style.transform=`rotate(${ang}rad)`;fxl.appendChild(L);
-      SF(s.hit?'boom':'tick',s.hit?.5:1);if(s.hit){flash('red',200);particles(x1,y1,14,['#ff6a2a','#ffd25a'],{sp:30,t:.5,sz:3});}await sleep(s.hit?650:450);L.remove();continue;}
-    if(s.k==='core'){lay.hidden=true;const fxl=document.getElementById('fx'),els=s.cells.map(i=>{const d=document.createElement('div');d.className='corefl';d.style.left=(i%COLS)*CS+'px';d.style.top=((i/COLS)|0)*CS+'px';fxl.appendChild(d);return d;});
-      if(UI.autoCam&&s.cells.length)focusBox(s.cells.map(i=>[i%COLS,(i/COLS)|0]));SF('geiger',20);flash('grn',600);await sleep(1900);els.forEach(e=>e.remove());render();continue;}
+      renderGlows();await sleep(220);   /* zbraň se natočí */
+      const ti=s.ti!=null?s.ti:idx(s.tx,s.ty),els=[...document.querySelectorAll(`#glows [data-tu="${ti}"],#glows [data-tl="${ti}"]`)];
+      els.forEach(e=>e.classList.add('arm'));for(let k=0;k<3;k++){SF('beep');await sleep(170);}   /* červené diody se rozblikají */
+      els.forEach(e=>e.classList.remove('arm'));
+      if(s.hit){L.className='tracer';L.style.left=x0+'px';L.style.top=y0+'px';L.style.width=Math.max(8,len)+'px';L.style.transform=`rotate(${ang}rad)`;fxl.appendChild(L);
+        SF('boom',.5);flash('red',200);particles(x1,y1,14,['#ff6a2a','#ffd25a'],{sp:30,t:.5,sz:3});await sleep(420);L.remove();}
+      else{els.forEach(e=>e.classList.add('ok'));SF('okchime');await sleep(450);els.forEach(e=>e.classList.remove('ok'));}
+      continue;}
+    if(s.k==='core'){lay.hidden=true;const fxl=document.getElementById('fx'),cl=s.cells.map(q=>typeof q==='number'?{i:q,d:0}:q),md=Math.max(0,...cl.map(q=>q.d));
+      if(UI.autoCam&&cl.length)focusBox(cl.map(q=>[q.i%COLS,(q.i/COLS)|0]));SF('geiger',14);flash('grn',350);
+      const els=cl.map(q=>{const d=document.createElement('div');d.className='corefl casc';d.style.left=(q.i%COLS)*CS+'px';d.style.top=((q.i/COLS)|0)*CS+'px';d.style.animationDelay=(q.d*.16)+'s';fxl.appendChild(d);return d;});
+      (s.hits||[]).forEach(h=>setTimeout(()=>{const tk=tokEl(h.cid);if(tk){tk.classList.remove('hit','radhit');void tk.offsetWidth;tk.classList.add('hit','radhit');setTimeout(()=>tk.classList.remove('hit','radhit'),520);}SF('hurt');
+        particles((h.x+.5)*CS,(h.y+.5)*CS,12,['#b8ff8a','#6aff4a','#e6ffd0'],{sp:26,t:.6,sz:3});floatText((h.x+.5)*CS,h.y*CS+10,'−1 akce příští kolo',false,'half');},h.d*160+260));
+      await sleep(md*160+760);els.forEach(e=>e.remove());render();continue;}
     if(s.k==='douse'){lay.hidden=true;const cl=B(s.x,s.y);   /* hasič: oheň zhasne až teď, v kouři a páře */
       const fxl=document.getElementById('fx'),sm=document.createElement('div');sm.className='smoke';sm.style.left=s.x*CS+'px';sm.style.top=s.y*CS+'px';sm.innerHTML='<i></i><i></i><i></i><i></i><i></i>';fxl.appendChild(sm);
       SF('splash');particles((s.x+.5)*CS,(s.y+.6)*CS,22,['#d8d8d8','#a8a8a8','#eef4f8'],{sp:30,t:1.1,sz:4});await sleep(250);if(cl)delete cl.fireOut;render();floatText((s.x+.5)*CS,s.y*CS+10,'uhašeno',true,'half');await sleep(900);setTimeout(()=>sm.remove(),900);continue;}
@@ -4568,6 +4613,7 @@ async function playSeqRun(){
     if(s.k==='mmove'){lay.hidden=true;const m=G.monsters.find(q=>q.id===s.mid);if(m){m.sx=s.x;m.sy=s.y;}render();await sleep(1100);continue;}
     if(s.k==='tok'){
       lay.hidden=true;const el=tokEl(s.cid),c=G.chars[s.cid];
+      if(!s.fall&&!s.sink&&!s.end&&c&&c.x===s.x&&c.y===s.y&&!SEQ.some(q=>q.k==='tok'&&q.cid===s.cid)){c.seqLock=false;if(el)el._animTo=0;renderTokens(G.active!=null?G.chars[G.active]:null);await sleep(560);continue;}
       if(el){const pose=s.fall?'fall':restPose({...c,x:s.x,y:s.y,rope:null,ledge:false});setPose(el,c,s.fall?'fall':pose==='idle'?'walk':pose);
         if(s.fall&&!el._gasp){el._gasp=1;SF('gasp');}
         if(s.sink){setPose(el,c,'sunk');el.style.transitionDuration='1.6s';el.style.transitionTimingFunction='ease-in-out';el.style.transform=tf(tokXY(c,s.x,s.y,'sunk',0));}
@@ -4612,8 +4658,10 @@ async function playSeqRun(){
       lay.innerHTML=bigCard(s.ev,lab,'');
       renderEvents();
       // razítko pro všechny události: běžné SPUŠTĚNO, kritické KRITICKÉ ×2
-      await sleep(s.dyn?600:900);{const bc=lay.querySelector('.bigcard');if(bc){bc.insertAdjacentHTML('beforeend',crit?'<div class="rstamp evst crit">KRITICKÉ ×2</div>':`<div class="rstamp evst">${s.dyn?'BUM':'SPUŠTĚNO'}</div>`);SF('slam',crit?.7:.35);if(crit)shakeView(false);}}
-      await sleep(crit?1800:s.dyn?700:1500);
+      /* razítko jen u kritického zásahu (KRITICKÉ ×2) a u dynamitu (BUM), běžná událost se jen ukáže */
+      if(crit||s.dyn){await sleep(s.dyn?600:900);const bc=lay.querySelector('.bigcard');if(bc){bc.insertAdjacentHTML('beforeend',crit?'<div class="rstamp evst crit">KRITICKÉ ×2</div>':'<div class="rstamp evst">BUM</div>');SF('slam',crit?.7:.35);if(crit)shakeView(false);}
+        await sleep(crit?1800:700);}
+      else await sleep(1900);
     }else if(s.k==='die'){
       lay.innerHTML=`<div class="dieroll"><div class="slab" style="color:#ccc">Zával · hod kostkou</div><div class="die3 rolling" id="die">I</div><div class="sname" id="dieT">Které chodby se zřítí?</div></div>`;
       SF('dice');const d=document.getElementById('die');
