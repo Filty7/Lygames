@@ -738,6 +738,7 @@ p,small,li,em,.hint,.clore,.cdesc{text-wrap:pretty}
 .sctot{font-family:var(--display);font-size:46px;color:var(--lamp);line-height:1}.sctot small{display:block;font-size:12px;color:var(--muted);letter-spacing:.08em}
 .scparts{display:flex;flex-direction:column;gap:2px;font-size:13px;color:#cfc8b8}
 .sctab{width:100%;border-collapse:collapse;font-size:13px;margin-top:6px}.sctab th{text-align:left;color:var(--muted);font-weight:normal;border-bottom:1px solid #3a3530;padding:4px 6px}
+.schd{font-size:14px;letter-spacing:.06em;color:var(--lamp);margin:14px 0 2px;font-weight:normal}.sconline{min-height:30px}
 .sctab td{padding:4px 6px;border-bottom:1px solid #24201c}.sctab tr.me td{background:rgba(255,207,107,.14);color:var(--lamp)}
 .gl.pcold{left:0;top:0;transform:scale(1.7);background:radial-gradient(ellipse at 50% 50%,rgba(70,140,230,.13),rgba(70,140,230,.06) 40%,transparent 66%)}
 
@@ -924,7 +925,8 @@ for(const k in EV)EV[k].txt=EV[k].pts.join(' ');
 const evUL=e=>`<ul class="evl">${EV[e].pts.map(t=>`<li>${t}</li>`).join('')}</ul>`;
 const CHARS=[{name:'Bára',color:'#f0a03c'},{name:'Ivo',color:'#58b7e0'},{name:'Kuba',color:'#d57be8'},{name:'Dita',color:'#6ad06a'}];
 // obtížnost = počet postav; skóre se násobí 3/n (lehká ×0,75, těžká ×1,5)
-const DIFF={easy:{n:4,name:'Lehká',mult:.75},normal:{n:3,name:'Normální',mult:1},hard:{n:2,name:'Těžká',mult:1.5}};
+const DIFF={easy:{n:4,hp:5,name:'Lehká',mult:.75},normal:{n:3,hp:6,name:'Normální',mult:1},hard:{n:2,hp:7,name:'Těžká',mult:1.5}};
+function hpCap(){return (DIFF[(typeof RUN!=='undefined'&&RUN&&RUN.diff)||'normal']||DIFF.normal).hp;}
 const LEVER_T={id:'lever',kind:'lever',feat:null};
 const START_T={id:'start',kind:'start',feat:null};
 
@@ -953,7 +955,7 @@ const ABIL_NEW=3,ABIL_UP=2,ABIL_UP3=3,RUN_LEVELS=5;
 const upCost=lvl=>lvl>=2?ABIL_UP3:ABIL_UP;   // cena vylepšení z úrovně lvl
 const alv=(c,id)=>{const a=(c.abil||[]).find(a=>a.id===id);return a?a.lvl:0;};
 let RUN=null;
-function newRun(names,diff){diff=DIFF[diff]?diff:'normal';RUN={diff,level:1,gems:0,chars:CHARS.slice(0,DIFF[diff].n).map((c,i)=>({id:i,name:(names&&names[i])||c.name,color:c.color,permMax:MAXHP,abil:[],alive:true})),offers:[],sel:null,done:false,
+function newRun(names,diff){diff=DIFF[diff]?diff:'normal';RUN={diff,level:1,gems:0,chars:CHARS.slice(0,DIFF[diff].n).map((c,i)=>({id:i,name:(names&&names[i])||c.name,color:c.color,permMax:DIFF[diff].hp,abil:[],alive:true})),offers:[],sel:null,done:false,
   act:1,depth:0,extra:[],path:[],pos:null,onMap:false,gemsTotal:0,maxLvl:0,serum:0};RUN.map=genMap();}
 
 /* ================= MAPA LABORATOŘE (roguelike) ================= */
@@ -3092,8 +3094,9 @@ function setupCamera(){
 }
 
 /* ================= MENU, ULOŽENÍ, PRAVIDLA ================= */
-const VERSION='0.64';
+const VERSION='0.65';
 const CHANGELOG=[
+  ['0.65','Světová tabulka a životy podle obtížnosti',['Skóre se po konci výpravy odešle do světové tabulky na lygames.cz. Tabulka výprav ukazuje světovou top 10 i výpravy z tohoto prohlížeče.','Max. životy podle obtížnosti: lehká 5, normální 6, těžká 7. Sérem jde doplnit nejvýš na toto maximum.','Ovladač: dílek jde otáčet i tlačítky LB / RB.']],
   ['0.64','Razítka a názvy',['Jednotné razítko pro mapu i události, výraznější na kartě levelu. Nové názvy typů: Tma, Dvojitý zámek, Na dohled, Dusno. Řady bez kyslíku jsou šedé a desaturované.']],
   ['0.63','Typy levelů',['Každá místnost v patře 3 má typ levelu (ikonka na plánu, popis v potvrzení): Ztracení, Tma, Dvojitý zámek, Na dohled, Úprk, Dusno. Vybraný typ se už ve výpravě neobjeví.','Patro 4: vybraná událost má vždy kritický zásah a normálně se vyčerpá. Na plánu má místnost razítko KRITICKÉ ×2, v liště karta značku ×2.','Všechny události dostanou při spuštění razítko (SPUŠTĚNO / KRITICKÉ ×2).']],
   ['0.62','Ladění',['Hasič: oheň zhasne až ve fázi zranění, v kouři a páře. Menší text „uhašeno“.','Zával se zastaví nad krytem, neprojde jím.','Maximum je 6 životů (sérem nejde přes 6) a čas na level 25 kol.','Startovní balíček má o 1 slepou uličku s ohněm víc.','Opraveno: popis radiace se při kritickém zásahu ukázal dvakrát, a pohyb s vyčerpáním po skoku.','Pravou páčkou jde posouvat plán laboratoře.']],
@@ -3173,7 +3176,7 @@ function showNaming(diff){
   const m=menuEl();m.hidden=false;UI.inMenu=true;diff=diff||UI.nameDiff||'normal';UI.nameDiff=diff;
   const prev=CHARS.map((c,i)=>(document.getElementById('nm'+i)||{}).value).filter(Boolean),pool=shuffle(NAMES.filter(x=>!prev.includes(x))),names=CHARS.map((c,i)=>prev[i]||pool.shift());
   const row=(c,i)=>`<div class="nrow"><img class="pimg" src="${portraitURL({color:c.color})}" alt=""><input id="nm${i}" maxlength="14" value="${names[i]}" aria-label="Jméno postavy ${i+1}" style="border-color:${c.color}"><button class="mbtn sm" data-reroll="${i}" title="Jiné jméno">⟳</button></div>`;
-  const db=k=>`<button class="mbtn sm dbtn ${k===diff?'on':''}" data-diff="${k}">${DIFF[k].name}<small>${DIFF[k].n} postavy · skóre × ${String(DIFF[k].mult).replace('.',',')}</small></button>`;
+  const db=k=>`<button class="mbtn sm dbtn ${k===diff?'on':''}" data-diff="${k}">${DIFF[k].name}<small>${DIFF[k].n} postavy · ${DIFF[k].hp} životů · skóre × ${String(DIFF[k].mult).replace('.',',')}</small></button>`;
   m.innerHTML=`<div class="mwrap"><div class="mtitle"><span class="mt-k">ZÁPIS DO DENÍKU VÝPRAVY</span><h1 style="font-size:40px">Kdo sestoupí?</h1><p>Vyber obtížnost. Jména můžeš přepsat nebo nechat vylosovat znovu.</p></div>
     <div class="dsel">${['easy','normal','hard'].map(db).join('')}</div>
     <div class="mbtns">${CHARS.slice(0,DIFF[diff].n).map(row).join('')}
@@ -3188,7 +3191,7 @@ function startRun(){
 }
 // starší uložené výpravy (bez plánu laboratoře) se dopočítají, ať se dá pokračovat
 function migrateRun(){
-  if(RUN.act==null)RUN.act=1;RUN.chars.forEach(r=>{if(r.permMax>HP_CAP)r.permMax=HP_CAP;});if(!RUN.diff)RUN.diff=RUN.chars.length>=4?'easy':RUN.chars.length<=2?'hard':'normal';if(RUN.hpBuys==null)RUN.hpBuys=RUN.chars.reduce((a,r)=>a+(r.hpBuys||0),0);if(RUN.serum==null)RUN.serum=0;if(RUN.act>=3&&RUN.map&&RUN.map.nodes['5A']&&RUN.map.nodes['5A'].gem){Object.assign(RUN.map.nodes['5A'],{gem:false,win:true,short:'poslední level · vítězství',name:'Srdce reaktoru',desc:'Poslední level celé výpravy. Kdo projde portálem, dovede výpravu k vítězství.'});}if(RUN.gemsTotal==null)RUN.gemsTotal=RUN.gems||0;if(RUN.maxLvl==null)RUN.maxLvl=0;if(RUN.depth==null)RUN.depth=0;if(!RUN.extra)RUN.extra=[];if(!RUN.path)RUN.path=[];
+  if(RUN.act==null)RUN.act=1;if(!RUN.diff)RUN.diff=RUN.chars.length>=4?'easy':RUN.chars.length<=2?'hard':'normal';RUN.chars.forEach(r=>{const cap=Math.max(hpCap(),HP_CAP);if(r.permMax>cap)r.permMax=cap;});if(RUN.hpBuys==null)RUN.hpBuys=RUN.chars.reduce((a,r)=>a+(r.hpBuys||0),0);if(RUN.serum==null)RUN.serum=0;if(RUN.act>=3&&RUN.map&&RUN.map.nodes['5A']&&RUN.map.nodes['5A'].gem){Object.assign(RUN.map.nodes['5A'],{gem:false,win:true,short:'poslední level · vítězství',name:'Srdce reaktoru',desc:'Poslední level celé výpravy. Kdo projde portálem, dovede výpravu k vítězství.'});}if(RUN.gemsTotal==null)RUN.gemsTotal=RUN.gems||0;if(RUN.maxLvl==null)RUN.maxLvl=0;if(RUN.depth==null)RUN.depth=0;if(!RUN.extra)RUN.extra=[];if(!RUN.path)RUN.path=[];
   if(!RUN.map){RUN.map=genMap();const lv=Math.max(1,Math.min(5,RUN.level||1));RUN.path=MAP_TIERS.slice(0,lv).map(t=>t[0]);RUN.pos=RUN.path[RUN.path.length-1];}
   Object.values(RUN.map.nodes).forEach(n=>{if(n.num==null)n.num=(RUN.act-1)*5+n.tier;if(!n.tag)n.tag=n.id.toLowerCase();if(!n.short)n.short='';if(!n.theme)n.theme=n.pool==='start'?'start':n.pool==='final'?'final':n.room?(n.pool==='hos'?'h_'+n.room:n.room):'dead';});
 }
@@ -3221,9 +3224,26 @@ function runScore(win){const L=win?15:(RUN.maxLvl||RUN.level||1),S=RUN.gemsTotal
 function loadScores(){try{return JSON.parse(localStorage.getItem('hlubina-scores')||'[]');}catch(e){return [];}}
 function recordScore(win){if(RUN.scored)return RUN.scored;const s=runScore(win);s.crew=RUN.chars.map(r=>r.name).join(', ');s.date=new Date().toISOString().slice(0,10);s.id=Date.now();
   const all=loadScores();all.push(s);all.sort((a,b)=>b.total-a.total);try{localStorage.setItem('hlubina-scores',JSON.stringify(all.slice(0,20)));}catch(e){}
-  RUN.scored=s;return s;}
-function scoreTable(hi){const all=loadScores();if(!all.length)return '<p class="hint">Zatím žádná dokončená výprava.</p>';
-  return `<table class="sctab"><tr><th>#</th><th>Skóre</th><th>Level</th><th>Sošky</th><th>Životy</th><th>Obtížnost</th><th>Výprava</th><th>Datum</th></tr>${all.slice(0,10).map((s,i)=>`<tr class="${hi&&s.id===hi?'me':''}"><td>${i+1}</td><td><b>${s.total}</b></td><td>${s.win?'🏆 15':s.L}</td><td>${s.S}</td><td>${s.H}</td><td>${s.diff?DIFF[s.diff].name:'Normální'}</td><td>${s.crew}</td><td>${s.date}</td></tr>`).join('')}</table>`;}
+  RUN.scored=s;sbPost(s);return s;}
+/* online tabulka (Supabase, stejně jako ostatní hry na lygames.cz) */
+const SB={url:'https://ttgjzbpglgerxvbmaqdt.supabase.co/rest/v1/hlubina_scores',key:'sb_publishable_MDCkjnVd2_hNMKLfJZq4JQ_pSoVWmiv',rows:null,state:'idle',mine:{}};
+function sbHdr(){return {apikey:SB.key,'Content-Type':'application/json'};}
+function sbFetch(u,o,ms){const c=typeof AbortController!=='undefined'?new AbortController():null;const t=setTimeout(()=>{if(c)c.abort();},ms||6000);return fetch(u,Object.assign({},o||{},c?{signal:c.signal}:{})).finally(()=>clearTimeout(t));}
+function sbLoad(){if(typeof fetch==='undefined')return Promise.resolve();SB.state='load';
+  return sbFetch(SB.url+'?select=id,name,score,level,gems,hp,diff,won,created_at&order=score.desc,created_at.asc&limit=10',{headers:sbHdr()}).then(r=>{if(!r.ok)throw 0;return r.json();}).then(j=>{SB.rows=j;SB.state='ok';}).catch(()=>{SB.state='err';}).then(sbPaint);}
+function sbPost(s){if(typeof fetch==='undefined'||G.tut)return;try{s.rid=s.rid||(String(s.id)+Math.random().toString(36).slice(2,8));
+  const body={name:String(s.crew||'Výprava').slice(0,80),score:s.total,level:s.L,gems:s.S,hp:s.H,diff:s.diff,won:!!s.win,ver:String(VERSION).slice(0,12),run_id:s.rid};
+  sbFetch(SB.url+'?select=id',{method:'POST',headers:Object.assign(sbHdr(),{Prefer:'return=representation'}),body:JSON.stringify(body)}).then(r=>r.ok?r.json():null).then(j=>{if(j&&j[0])SB.mine[j[0].id]=s.id;}).catch(()=>{}).then(sbLoad);}catch(e){}}
+function sbPaint(){document.querySelectorAll('.sconline').forEach(el=>{const hi=+el.dataset.hi||0;
+  if(SB.state==='err'&&!SB.rows){el.innerHTML='<p class="hint">Světovou tabulku se nepodařilo načíst (jsi offline?). Níže jsou výpravy z tohoto prohlížeče.</p>';return;}
+  if(!SB.rows){el.innerHTML='<p class="hint">Načítám světovou tabulku…</p>';return;}
+  if(!SB.rows.length){el.innerHTML='<p class="hint">Ve světové tabulce zatím nikdo není. Buďte první!</p>';return;}
+  el.innerHTML=`<table class="sctab"><tr><th>#</th><th>Skóre</th><th>Level</th><th>Sošky</th><th>Životy</th><th>Obtížnost</th><th>Výprava</th><th>Datum</th></tr>${SB.rows.map((r,i)=>`<tr class="${hi&&SB.mine[r.id]===hi?'me':''}"><td>${i+1}</td><td><b>${r.score}</b></td><td>${r.won?'🏆 15':r.level}</td><td>${r.gems}</td><td>${r.hp}</td><td>${(DIFF[r.diff]||DIFF.normal).name}</td><td>${escH(r.name)}</td><td>${String(r.created_at||'').slice(0,10)}</td></tr>`).join('')}</table>`;});}
+function escH(t){return String(t).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+function scoreTable(hi){const all=loadScores();setTimeout(()=>{sbPaint();if(SB.state!=='load'&&!(hi&&SB.state==='idle'))sbLoad();},0);
+  return `<h3 class="schd">🌍 Světová tabulka</h3><div class="sconline" data-hi="${hi||0}"><p class="hint">Načítám světovou tabulku…</p></div><h3 class="schd">💾 Tento prohlížeč</h3>`+localTable(all,hi);}
+function localTable(all,hi){if(!all.length)return '<p class="hint">Zatím žádná dokončená výprava.</p>';
+  return `<table class="sctab"><tr><th>#</th><th>Skóre</th><th>Level</th><th>Sošky</th><th>Životy</th><th>Obtížnost</th><th>Výprava</th><th>Datum</th></tr>${all.slice(0,10).map((s,i)=>`<tr class="${hi&&s.id===hi?'me':''}"><td>${i+1}</td><td><b>${s.total}</b></td><td>${s.win?'🏆 15':s.L}</td><td>${s.S}</td><td>${s.H}</td><td>${s.diff?DIFF[s.diff].name:'Normální'}</td><td>${escH(s.crew)}</td><td>${s.date}</td></tr>`).join('')}</table>`;}
 function scoreBox(s){return `<div class="scbox"><div class="sctot">${s.total}<small>bodů</small></div><div class="scparts"><span>level ${s.L} × 100 = ${100*s.L}</span><span>sošky ${s.S} × 25 = ${25*s.S}</span><span>zbylé max. životy ${s.H} × 15 = ${15*s.H}</span>${s.win?'<span>vítězství +500</span>':''}${s.mult&&s.mult!==1?`<span>obtížnost ${DIFF[s.diff].name.toLowerCase()} (${DIFF[s.diff].n} postavy): × ${String(s.mult).replace('.',',')}</span>`:''}</div></div>`;}
 function showScores(){const m=menuEl();
   m.innerHTML=`<div class="mwrap wide"><div class="mtitle"><span class="mt-k">ARCHIV VÝPRAV</span><h1 style="font-size:40px">Tabulka výprav</h1><p>100 × nejhlubší level + 25 × získané sošky + 15 × zbylé max. životy, za vítězství +500. Celé se násobí obtížností: lehká (4 postavy) × 0,75, normální × 1, těžká (2 postavy) × 1,5.</p></div>
@@ -3268,7 +3288,7 @@ function bookPages(){return [
 <div class="rbox"><b>Ve zkratce:</b> odhalujte dílky, padejte jen tam, kam musíte, a držte se pohromadě. Hlubina neodpouští, ale skoro každý krok bez nové informace jde vzít zpět.</div>`,
 `<h3>1. Obsah hry</h3><ul>
 <li><b>48 dílků laboratoře:</b> křižovatky, odbočky, chodby, zatáčky, slepé uličky a 3 žebříky. Mezi posledních 10 dílků je zamíchán <b>portál</b>.</li>
-<li><b>2–4 průzkumníci</b> (podle obtížnosti) s 6 životy, dynamitem a baterkou.</li>
+<li><b>2–4 průzkumníci</b> (podle obtížnosti) s 5 / 6 / 7 životy (lehká / normální / těžká), dynamitem a baterkou.</li>
 <li><b>6 laboratorních karet</b> událostí.</li>
 <li><b>Kostka závalu</b> se stěnami I, II, III.</li>
 <li><b>Obětní sošky</b>, které jsou zároveň měnou mezi levely.</li></ul>
@@ -3335,7 +3355,7 @@ function bookPages(){return [
 <li><b>Patro 3 (neutrální):</b> každá místnost přidá jednu destičku se zvláštností a jednu bez.</li>
 <li><b>Patro 4 (nepřátelské):</b> přidá dvě nebezpečné destičky a v tom levelu má jedna událost vždy kritický zásah (proběhne dvakrát).</li></ul>
 <p>Každá místnost v patře 3 má i <b>typ levelu</b> (ikonka na plánu): Ztracení, Tma, Dvojitý zámek, Na dohled, Úprk, Dusno. Typ, který si vyberete, se už ve výpravě znovu neobjeví.</p>
-<p>Destičky z vybraných místností se přidají do balíčku natrvalo. Jinak dostanete jen sošky, které sami vynesete. Schopnost stojí 3 sošky, vylepšení na II stojí 2 a na III stojí 3. Každý průzkumník má 2 sloty, koupenou schopnost nejde přepsat ani mít dvakrát. Kdo portálem neprošel, má do dalšího levelu maximum životů o 1 menší. V levelu se neumírá: sražená postava se dá vždy zvednout. Kdo ale přijde o poslední maximální život, protože neprošel portálem, je ztracen navždy. Za každý level dostanete ampuli séra a k tomu další za každou živou postavu, která neprošla portálem (a další ampule můžete vynést ze Skladu séra). Za sérum si postava koupí +1 maximální život, nejvýš do 6 (první nákup ve výpravě stojí 1 ampuli, druhý 2 a tak dál, společně pro všechny postavy). Za sérum se dá také natrvalo prodloužit čas na level o 1 kolo (cena 1, 2, 3 … ampule, počítá se zvlášť). Po 5A začíná další akt s novým plánem. 5A ve třetím aktu je poslední level: kdo jím projde, vyhrál. V patře 5 se startuje uprostřed jeskyně těsně nad vodou a zařízení je v posledních třech patrech. Od 2. aktu přidává patro 3 i extra destičky (střílna, past se dveřmi, sliz, jádro radiace, prasklé potrubí).</p>
+<p>Destičky z vybraných místností se přidají do balíčku natrvalo. Jinak dostanete jen sošky, které sami vynesete. Schopnost stojí 3 sošky, vylepšení na II stojí 2 a na III stojí 3. Každý průzkumník má 2 sloty, koupenou schopnost nejde přepsat ani mít dvakrát. Kdo portálem neprošel, má do dalšího levelu maximum životů o 1 menší. V levelu se neumírá: sražená postava se dá vždy zvednout. Kdo ale přijde o poslední maximální život, protože neprošel portálem, je ztracen navždy. Za každý level dostanete ampuli séra a k tomu další za každou živou postavu, která neprošla portálem (a další ampule můžete vynést ze Skladu séra). Za sérum si postava koupí +1 maximální život, nejvýš do startovního maxima obtížnosti (5 / 6 / 7; první nákup ve výpravě stojí 1 ampuli, druhý 2 a tak dál, společně pro všechny postavy). Za sérum se dá také natrvalo prodloužit čas na level o 1 kolo (cena 1, 2, 3 … ampule, počítá se zvlášť). Po 5A začíná další akt s novým plánem. 5A ve třetím aktu je poslední level: kdo jím projde, vyhrál. V patře 5 se startuje uprostřed jeskyně těsně nad vodou a zařízení je v posledních třech patrech. Od 2. aktu přidává patro 3 i extra destičky (střílna, past se dveřmi, sliz, jádro radiace, prasklé potrubí).</p>
 <table class="rtab"><tr><td>Teleport</td><td colspan="2">1 akce: přenese tě na druhý teleport. Leží-li druhý ještě v balíčku, objeví se s tebou na náhodném místě a náhodně natočený.</td></tr>
 <tr><td>Karanténa</td><td colspan="2">Přízrak, který do ní vstoupí, zahyne.</td></tr>
 <tr><td>Regenerace</td><td colspan="2">Kdo v ní ukončí tah, vyléčí se o 3 (sraženého postaví na nohy). Pod vodou nefunguje.</td></tr>
@@ -4034,7 +4054,7 @@ function renderLobby(){
     return `<div class="lslot ${s.ready?'lock':''}" style="--pc:${col}"><div class="lsn">Hráč ${i+1}${i===0?' · vedoucí':''}</div>
       <div class="lpick">${cs.map(c=>`<span class="lpc"><img class="pimg" src="${portraitURL({color:c.color})}" alt=""><b style="color:${shade(c.color,.35)}">${c.name}${c.dead?' †':''}</b></span>`).join('')||'<small>bez postavy</small>'}</div>
       <div class="lst">${s.ready?'<span class="lready">PŘIPRAVEN ✓</span>':gpb('A')+' připraven'+(MPL.mode==='new'?' · '+gpb('X')+' jiná jména':'')}</div></div>`;};
-  const dsel=MPL.mode==='new'?`<div class="dsel">${['easy','normal','hard'].map(k=>`<span class="mbtn sm dbtn ${k===MPL.diff?'on':''} ${DIFF[k].n<Math.max(2,MPL.slots.length)?'off':''}">${DIFF[k].name}<small>${DIFF[k].n} postavy · skóre × ${String(DIFF[k].mult).replace('.',',')}</small></span>`).join('')}</div><p class="hint" style="text-align:center">vedoucí mění obtížnost ◀ ▶</p>`:`<p class="hint" style="text-align:center">Obtížnost: <b>${DIFF[MPL.diff].name}</b> (${lobbyN()} postavy)</p>`;
+  const dsel=MPL.mode==='new'?`<div class="dsel">${['easy','normal','hard'].map(k=>`<span class="mbtn sm dbtn ${k===MPL.diff?'on':''} ${DIFF[k].n<Math.max(2,MPL.slots.length)?'off':''}">${DIFF[k].name}<small>${DIFF[k].n} postavy · ${DIFF[k].hp} životů · skóre × ${String(DIFF[k].mult).replace('.',',')}</small></span>`).join('')}</div><p class="hint" style="text-align:center">vedoucí mění obtížnost ◀ ▶</p>`:`<p class="hint" style="text-align:center">Obtížnost: <b>${DIFF[MPL.diff].name}</b> (${lobbyN()} postavy)</p>`;
   m.innerHTML=`<div class="mwrap wide"><div class="mtitle"><span class="mt-k">LOKÁLNÍ MULTIPLAYER · 2–3 OVLADAČE</span><h1 style="font-size:40px">${MPL.mode==='cont'?'Pokračovat ve výpravě':'Nová výprava'}</h1>
     <p>Připojeno ovladačů: <b>${n}</b>. Každý hráč se přihlásí ${gpb('A')}. Postavy se mezi hráče rozdělí podle počtu hráčů.</p></div>
     ${dsel}<div class="lslots">${[0,1,2].map(box).join('')}</div>
@@ -4093,7 +4113,7 @@ function gameInput(ev,own){
   if(G.over){if(lead&&ev.down.has(0)){const b=document.querySelector('#actions [data-a]');if(b)b.click();}return;}
   if(UI.playing||UI.busy)return;
   if(G.placing){const P=G.placing,ok=!MP.on||mine.includes(P.cid);if(!ok)return;
-    if(ev.dir==='l'||ev.dir==='r'||ev.down.has(3)){if(tAllow('rot')){rotatePlacing();SF('tick');}}
+    if(ev.dir==='l'||ev.dir==='r'||ev.down.has(3)||ev.down.has(4)||ev.down.has(5)){if(tAllow('rot')){rotatePlacing();SF('tick');}}
     if(ev.down.has(0))tryPlace();
     if(ev.down.has(2)){const b=document.querySelector('[data-a="swap"]:not([disabled])');if(b)b.click();}
     return;}
@@ -4205,7 +4225,7 @@ function gpHint(ctx,any){let el=document.getElementById('gphint');
   let t='';
   if(ctx==='game'&&G&&!G.over){const a=G.active!=null?G.chars[G.active]:null;
     const A=gpb('A'),B=gpb('B'),X=gpb('X'),Y=gpb('Y');
-    if(G.placing)t=`◀ ▶ otočit dílek · ${A} položit`+(document.querySelector('[data-a="swap"]')?` · ${X} vyměnit`:'');
+    if(G.placing)t=`◀ ▶ / LB RB otočit dílek · ${A} položit`+(document.querySelector('[data-a="swap"]')?` · ${X} vyměnit`:'');
     else if(!a)t=MP.on?`${A} aktivuje tvou postavu · Start (vedoucí) ukončí kolo · View vrátí krok · pravá páčka kamera, triggery zoom`:`${A} vybrat postavu · LB/RB přepnout · Start ukončit kolo`;
     else t=`${MP.on?'<b style="color:'+a.color+'">'+a.name+'</b> · ':''}páčka vybere cíl · ${A} provést · ${Y} speciální akce${GPF.menu?' (otevřeno)':''} · ${B} zpět${!a.started?' / deaktivovat':''} · podržet ${B} ukončí tah`;}
   else if(ctx==='shop')t=`každý hráč: páčka vybírá · ${gpb('A')} označit, znovu ${gpb('A')} koupit (jen pro sebe) · Hotovo + ${gpb('A')} až všichni`;
@@ -4506,7 +4526,7 @@ function renderShop(){
   const chars=RUN.chars.map(r=>{
     const g=G.chars[r.id],lost=r.lostNow;
     let hp='';for(let i=0;i<r.permMax+(lost?1:0);i++)hp+=`<i class="${i<r.permMax?(RUN.hpFlash===r.id&&i===r.permMax-1?'pop':''):'gone strike'}"></i>`;if(!r.alive&&!lost)hp=`<span class="skull">${IC.skull}</span>`;else if(!r.alive)hp+=`<span class="skull late">${IC.skull}</span>`;
-    const carry=(RUN.carry&&RUN.carry[r.id])||0,hc=(RUN.hpBuys||0)+1,canHp=r.alive&&r.permMax<HP_CAP;
+    const carry=(RUN.carry&&RUN.carry[r.id])||0,hc=(RUN.hpBuys||0)+1,canHp=r.alive&&r.permMax<hpCap();
     const hpBtn=r.alive?`<button class="btn hpbuy ${canHp&&(RUN.serum||0)>=hc?'aff':''}" data-a="buyhp" data-cid="${r.id}" ${canHp&&(RUN.serum||0)>=hc?'':'disabled'}>${canHp?`+1 max. život · ${hc} ${SER}`:'životy na maximu'}</button>`:'';
     const slots=[0,1].map(i=>{const a=r.abil[i];
       const uc=a?upCost(a.lvl):0,nx=a&&a.lvl<ABIL_MAX?[...Array(ABIL_MAX-a.lvl)].map((_,k)=>`${ROMAN[a.lvl+k+1]}: ${ABIL[a.id].desc(a.lvl+k+1)}`).join('\n'):'';
@@ -4556,7 +4576,7 @@ function buyAbility(cid,i,id){
   RUN.gems-=ABIL_NEW;r.abil[i]={id,lvl:1};RUN.offers=RUN.offers.filter(o=>o!==id);RUN.sel=null;SF('clink');renderShop();
 }
 function buyTime(){const c=(RUN.timeBuys||0)+1;if((RUN.serum||0)<c){SF('hurt');return;}RUN.serum-=c;RUN.timeBuys=c;RUN.timeBonus=(RUN.timeBonus||0)+1;SF('clink');renderShop();}   /* vlastní škálování ceny: 1, 2, 3 … */
-function buyHp(cid){const r=RUN.chars[cid];if(!r||!r.alive||r.permMax>=HP_CAP)return;const c=(RUN.hpBuys||0)+1;if((RUN.serum||0)<c){SF('hurt');return;}RUN.serum-=c;r.permMax++;RUN.hpBuys=(RUN.hpBuys||0)+1;   // cena roste společně pro celou výpravu
+function buyHp(cid){const r=RUN.chars[cid];if(!r||!r.alive||r.permMax>=hpCap())return;const c=(RUN.hpBuys||0)+1;if((RUN.serum||0)<c){SF('hurt');return;}RUN.serum-=c;r.permMax++;RUN.hpBuys=(RUN.hpBuys||0)+1;   // cena roste společně pro celou výpravu
   if(r.lostNow)r.lostNow=false;RUN.hpFlash=cid;SF('clink');renderShop();}
 function upgradeAbility(cid,i){const r=RUN.chars[cid],a=r.abil[i];if(!a||a.lvl>=ABIL_MAX)return;const c=upCost(a.lvl);if(RUN.gems<c)return;RUN.gems-=c;a.lvl++;SF('clink');renderShop();}
 function resetView(){UI.lag={};SEQ=[];UI.overShown=false;UI.ladShown=null;UI.monInit=false;UI.lastActive=null;UI.wasDown={};
