@@ -244,27 +244,14 @@ h1,h2,h3{font-family:var(--display);font-weight:700;margin:0;letter-spacing:.02e
 /* hlavní menu */
 #menu{position:fixed;inset:0;z-index:55;display:flex;align-items:center;justify-content:center;padding:20px;overflow:auto;
   background:radial-gradient(ellipse 34% 60% at 50% 50%,rgba(7,6,10,.92),rgba(7,6,10,.55) 70%,transparent 100%)}
-#mbg{position:fixed;inset:0;z-index:54;overflow:hidden;background:#07060a;pointer-events:none}
+#mbg{position:fixed;inset:0;z-index:54;overflow:hidden;background:#08070b;pointer-events:none}
 #mbg[hidden]{display:none}
-.mbgc{position:absolute;left:-96px;top:-96px;image-rendering:pixelated;filter:brightness(.42) saturate(.55) hue-rotate(-8deg);animation:mbgpan 90s ease-in-out infinite alternate}
-@keyframes mbgpan{from{transform:translate(0,0)}to{transform:translate(-150px,-190px)}}
-.mbgvig{position:absolute;inset:0;background:radial-gradient(ellipse 55% 75% at 50% 50%,rgba(7,6,10,.86) 0%,rgba(7,6,10,.55) 55%,rgba(7,6,10,.2) 80%,rgba(7,6,10,.75) 100%),linear-gradient(180deg,rgba(7,6,10,.7),transparent 22%,transparent 75%,rgba(7,6,10,.85))}
-.mbgside{position:absolute;top:0;bottom:0;width:26%;opacity:.9}
-.mbgside.l{left:0;background:radial-gradient(ellipse 60% 40% at 30% 62%,rgba(255,207,107,.10),transparent 70%)}
-.mbgside.r{right:0;background:radial-gradient(ellipse 60% 45% at 70% 38%,rgba(127,255,233,.08),transparent 70%),radial-gradient(ellipse 50% 30% at 75% 85%,rgba(164,107,255,.10),transparent 70%)}
-.mbgdust{position:absolute;inset:-50%;background-image:radial-gradient(1px 1px at 20% 30%,rgba(255,230,180,.5),transparent),radial-gradient(1px 1px at 70% 60%,rgba(255,230,180,.35),transparent),radial-gradient(1.5px 1.5px at 40% 80%,rgba(200,240,255,.3),transparent),radial-gradient(1px 1px at 85% 15%,rgba(255,230,180,.4),transparent);background-size:340px 300px;animation:mbgdust 40s linear infinite;opacity:.7}
-@keyframes mbgdust{from{transform:translate(0,0)}to{transform:translate(170px,300px)}}
-.mbgpol{position:absolute;background:#d9d2bf;padding:10px 10px 30px;box-shadow:0 14px 34px rgba(0,0,0,.7);filter:brightness(.5) sepia(.25);z-index:2}
-.mbgpol img{display:block;width:250px;height:164px;image-rendering:pixelated}
-.mbgpol em{position:absolute;left:12px;bottom:6px;font-family:Caveat,cursive;font-style:normal;font-size:20px;color:#3a3128}
-.mbgpol::before{content:'';position:absolute;left:50%;top:-6px;width:14px;height:14px;margin-left:-7px;border-radius:50%;background:radial-gradient(circle at 35% 35%,#ff8a7a,#8a1d14 70%)}
-.mbgpol.l{left:6%;top:56%;transform:rotate(-7deg)}
-.mbgpol.r{right:6%;top:16%;transform:rotate(5deg)}
-.mbgid{position:absolute;right:9%;top:60%;display:flex;gap:10px;align-items:center;background:#cfc7ae;padding:8px 12px 8px 8px;transform:rotate(-3deg);filter:brightness(.45) sepia(.3);box-shadow:0 10px 26px rgba(0,0,0,.7);z-index:2;font-size:12px;color:#3a3128;line-height:1.3}
-.mbgid img{width:54px;height:64px;image-rendering:pixelated;background:#222}
-.mbgid b{display:block;font-family:var(--display);letter-spacing:.12em;font-size:13px}
-@media (max-width:1180px){.mbgpol,.mbgid{display:none}}
-@media (prefers-reduced-motion:reduce){.mbgc,.mbgdust{animation:none}}
+.mbgboard{position:absolute;left:-48px;top:-48px;--cs:96px;filter:brightness(.56) saturate(.65)}
+.mbgc{position:absolute;left:0;top:0;image-rendering:pixelated}
+.mbgfx{position:absolute;inset:0}
+.mbgwater{position:absolute;left:0;background:linear-gradient(to bottom,rgba(70,120,150,.22),rgba(40,80,105,.3) 60%,rgba(20,45,60,.4));border-top:2px solid rgba(160,210,230,.55)}
+.mbgvig{position:absolute;inset:0;background:radial-gradient(ellipse at 50% 30%,rgba(127,255,233,.07),transparent 50%),radial-gradient(ellipse at 50% 120%,rgba(164,107,255,.12),transparent 60%),radial-gradient(ellipse 55% 75% at 50% 50%,rgba(8,7,11,.9) 0%,rgba(8,7,11,.62) 55%,rgba(8,7,11,.32) 80%,rgba(8,7,11,.7) 100%)}
+
 .mwrap{width:100%;max-width:440px;display:flex;flex-direction:column;gap:22px}
 .mwrap.wide{max-width:640px}
 .mtitle .mt-k{font-family:var(--display);font-size:12px;letter-spacing:.3em;color:var(--muted)}
@@ -3128,7 +3115,7 @@ function setupCamera(){
 /* ================= MENU, ULOŽENÍ, PRAVIDLA ================= */
 const VERSION='0.66';
 const CHANGELOG=[
-  ['0.66','Multiplayer pro 4',['Lokální multiplayer pro 2–4 hráče. Ve čtyřech se hraje lehká obtížnost (každý má 1 postavu), ve třech lehká nebo normální. Když se přihlásí víc hráčů, obtížnost se sama upraví.','Při pokračování ve výpravě se mezi hráče rozdělí jen živé postavy.','Nové hlavní menu: tmavé pozadí s náhodnou jeskyní, fotky po stranách, výraznější tlačítka. Hra už pod menu neprosvítá.','Na plánu laboratoře víc druhů poznámek (žluté lístky, útržky s páskou, linkované kartičky, zakroužkovaná varování), 30 textů, a nepřekrývají místnosti.','Víc jmen pro postavy (přes 70).']],
+  ['0.66','Multiplayer pro 4',['Lokální multiplayer pro 2–4 hráče. Ve čtyřech se hraje lehká obtížnost (každý má 1 postavu), ve třech lehká nebo normální. Když se přihlásí víc hráčů, obtížnost se sama upraví.','Při pokračování ve výpravě se mezi hráče rozdělí jen živé postavy.','Nové hlavní menu: za tmavým pozadím je náhodná statická jeskyně se vším, co v ní bývá (oheň, radiace, závaly, přízraky, žebříky, lana, sošky, voda…), a výraznější tlačítka. Hra už pod menu neprosvítá.','Na plánu laboratoře víc druhů poznámek (žluté lístky, útržky s páskou, linkované kartičky, zakroužkovaná varování), 30 textů, a nepřekrývají místnosti.','Víc jmen pro postavy (přes 70).']],
   ['0.65','Světová tabulka a životy podle obtížnosti',['Skóre se po konci výpravy odešle do světové tabulky na lygames.cz. Tabulka výprav ukazuje světovou top 10 i výpravy z tohoto prohlížeče.','Max. životy podle obtížnosti: lehká 5, normální 6, těžká 7. Sérem jde doplnit nejvýš na toto maximum.','Ovladač: dílek jde otáčet i tlačítky LB / RB.']],
   ['0.64','Razítka a názvy',['Jednotné razítko pro mapu i události, výraznější na kartě levelu. Nové názvy typů: Tma, Dvojitý zámek, Na dohled, Dusno. Řady bez kyslíku jsou šedé a desaturované.']],
   ['0.63','Typy levelů',['Každá místnost v patře 3 má typ levelu (ikonka na plánu, popis v potvrzení): Ztracení, Tma, Dvojitý zámek, Na dohled, Úprk, Dusno. Vybraný typ se už ve výpravě neobjeví.','Patro 4: vybraná událost má vždy kritický zásah a normálně se vyčerpá. Na plánu má místnost razítko KRITICKÉ ×2, v liště karta značku ×2.','Všechny události dostanou při spuštění razítko (SPUŠTĚNO / KRITICKÉ ×2).']],
@@ -3415,31 +3402,57 @@ function showRules(){
 }
 function bookGo(i){BOOK_P=i;SF('card');showRules();}
 
-/* ---------- pozadí menu: náhodná jeskyně, tmavá a živá ---------- */
+/* ---------- pozadí menu: náhodná statická jeskyně se vším, co v ní žije ---------- */
+let MBG_MONS=[];
 function menuBgBuild(){
   let bg=document.getElementById('mbg');
-  if(!bg){bg=document.createElement('div');bg.id='mbg';bg.hidden=true;bg.innerHTML='<canvas class="mbgc"></canvas><div class="mbgdust"></div><div class="mbgside l"></div><div class="mbgside r"></div><div class="mbgvig"></div>';document.body.insertBefore(bg,document.body.firstChild);}
-  const cv=bg.querySelector('canvas'),S=96,W=Math.max(innerWidth,800)+S*3,H=Math.max(innerHeight,600)+S*3,cols=Math.ceil(W/S),rows=Math.ceil(H/S);
+  if(!bg){bg=document.createElement('div');bg.id='mbg';bg.hidden=true;document.body.insertBefore(bg,document.body.firstChild);}
+  bg.innerHTML='<div class="mbgboard"><canvas class="mbgc"></canvas><div class="mbgfx"></div></div><div class="mbgvig"></div>';
+  if(!LAD_URL&&typeof makeStatic==='function')makeStatic();
+  const cv=bg.querySelector('canvas'),fx=bg.querySelector('.mbgfx'),S=CS,W=Math.max(innerWidth,800)+S*2,H=Math.max(innerHeight,600)+S*2,cols=Math.ceil(W/S),rows=Math.ceil(H/S);
   cv.width=cols*TP;cv.height=rows*TP;cv.style.width=cols*S+'px';cv.style.height=rows*S+'px';
   const g=cv.getContext('2d');g.imageSmoothingEnabled=false;g.fillStyle='#0b0a0e';g.fillRect(0,0,cv.width,cv.height);
   const R=Math.random,cell={},key=(x,y)=>x+','+y,D=[[0,-1],[1,0],[0,1],[-1,0]];
   const link=(x,y,d)=>{const a=cell[key(x,y)]||(cell[key(x,y)]=[0,0,0,0]);a[d]=1;const nx=x+D[d][0],ny=y+D[d][1],b=cell[key(nx,ny)]||(cell[key(nx,ny)]=[0,0,0,0]);b[(d+2)%4]=1;};
-  const walkers=3+Math.floor(cols*rows/40);
+  const walkers=4+Math.floor(cols*rows/24);
   for(let w=0;w<walkers;w++){let x=Math.floor(R()*cols),y=Math.floor(R()*rows),d=Math.floor(R()*4);
     for(let s=0;s<10+R()*14;s++){if(R()<.4)d=R()<.5?2:Math.floor(R()*4);const nx=x+D[d][0],ny=y+D[d][1];if(nx<0||ny<0||nx>=cols||ny>=rows){d=(d+1)%4;continue;}link(x,y,d);x=nx;y=ny;}}
-  const kinds=e=>{const n=e.reduce((a,b)=>a+b,0);return n>=4?'cross':n===3?'T':n===1?'dead':(e[0]&&e[2])||(e[1]&&e[3])?'straight':'corner';};
-  let id=0;for(const k in cell){const [x,y]=k.split(',').map(Number),e=cell[k];if(!e.some(Boolean))continue;
-    const f=R(),t={id:'mb'+(id++)+'_'+Math.floor(R()*1e6),kind:kinds(e),feat:f<.06?'fire':f<.1?'hazard':null,cave:f>.9?1:0};
-    try{const c=previewView(t,e,y);c.preview=false;g.drawImage(drawTile(c),x*TP,y*TP);}catch(err){}}
-  /* fotky po stranách */
-  if(!bg.querySelector('.mbgpol')){try{const rr=rng(Math.floor(R()*1e6)),ph=(th,cap,cls)=>{const c=roomScene(th,rr,64+(rr()-.5)*20,128,84);return `<div class="mbgpol ${cls}"><img src="${c.toDataURL()}" alt=""><em>${cap}</em></div>`;};
-    const id=`<div class="mbgid"><img src="${(f=>typeof f==='string'?f:f.toDataURL())(facePhoto(rr,false))}" alt=""><span><b>LAB 7</b>propustka č. ${100+Math.floor(rr()*800)}<br>stupeň B · platí do 1987</span></div>`;
-    bg.insertAdjacentHTML('beforeend',ph('start','poslední foto výpravy','l')+ph('final','reaktor — dno?','r')+id);}catch(err){}}
+  const kindOf=e=>{const n=e.reduce((a,b)=>a+b,0);return n>=4?'cross':n===3?'T':n===1?'dead':(e[0]&&e[2])||(e[1]&&e[3])?'straight':'corner';};
+  const pickW=l=>{let t=l.reduce((a,b)=>a+b[1],0)*R();for(const [v,w] of l){if((t-=w)<=0)return v;}return l[0][0];};
+  const waterY=rows-3-Math.floor(R()*2);let id=0,fxh='';MBG_MONS=[];
+  for(const k in cell){const [x,y]=k.split(',').map(Number),e=cell[k];if(!e.some(Boolean))continue;
+    const kind=kindOf(e),horiz=e[1]||e[3],vert=e[0]&&e[2];
+    let feat=pickW([[null,46],['fire',13],['hazard',7],['monster',6],['rubble',6],['gem',4],['cave',4],['squeeze',kind==='straight'&&horiz&&!vert?6:0],['pipe',kind==='straight'?3:0],['slime',2],['core',1],['tele',1.5],['canteen',1],['bunker',1],['serum',1.5],['spring',1]]);
+    const t={id:'mb'+(id++)+'_'+Math.floor(R()*1e6),kind,feat:['fire','rubble','gem','serum'].includes(feat)?null:feat,cave:feat==='cave'?1+Math.floor(R()*3):0};
+    if(feat==='cave')t.feat='cave';
+    const L=x*S,T=y*S,st=`left:${L}px;top:${T}px`;
+    try{const c=previewView(t,e,y);c.preview=false;c.rubble=feat==='rubble';c.gem=feat==='gem';c.serum=feat==='serum';g.drawImage(drawTile(c),x*TP,y*TP);}catch(err){}
+    if(feat==='hazard'){let p2='';for(let q=0;q<6;q++)p2+=`<i style="left:${20+((q*29+id*7)%56)}px;top:${46+((q*13)%22)}px;animation-delay:${(q*.43).toFixed(2)}s"></i>`;fxh+=`<div class="gl rad" style="${st}">${p2}</div>`;}
+    if(feat==='monster'){fxh+=`<div class="gl lair" style="${st}"></div>`;if(R()<.75)MBG_MONS.push({L:L+(R()-.5)*20,T:T+(R()-.5)*10,seed:R()*9});}
+    if(feat==='gem')fxh+=`<div class="gl idol${horiz?'':' vert'}" style="${st}"></div>`;
+    if(feat==='serum')fxh+=`<div class="gl serum" style="${st}"></div>`;
+    if(feat==='slime')fxh+=`<div class="gl slime" style="${st}"></div>`;
+    if(feat==='core')fxh+=`<div class="gl core" style="${st}"></div>`;
+    if(feat==='tele')fxh+=`<div class="gl tele" style="${st}"></div>`;
+    if(feat==='canteen')fxh+=`<div class="gl cant" style="${st}"></div>`;
+    if(feat==='fire'&&FLAME_URL){const x0=e[3]?0:12,x1=e[1]?96:84;let f='';for(let q=0;q<5;q++){const fx2=x0+4+(x1-x0-24)*(q/4),big=q%2===0;
+        f+=`<span class="fl" style="left:${fx2|0}px;top:${big?44:50}px;${big?'':'scale:.72;'}background-image:url(${FLAME_URL});animation-delay:-${(q*.13+R()).toFixed(2)}s;opacity:${big?.9:.75}"></span>`;}
+      fxh+=`<div class="gl fire" style="${st}"><span class="fglow" style="left:${e[3]?-26:8}px;right:${e[1]?-26:8}px"></span>${f}</div>`;}
+    /* žebříky a lana v šachtách */
+    if(e[2]&&cell[key(x,y+1)]&&LAD_URL&&R()<.5){if(R()<.55)fxh+=`<div class="lad" style="left:${L+34}px;top:${T+40}px;height:${S}px;background-image:url(${LAD_URL})"></div>`;
+      else if(ROPE_URL&&!(e[0]&&R()<.6))fxh+=`<div class="rope" style="left:${L+S/2-3}px;top:${T+30}px;height:${S*(1+Math.floor(R()*2))}px;background-image:url(${ROPE_URL})"></div>`;}
+  }
+  fxh+=`<div class="mbgwater" style="top:${waterY*S+58}px;width:${cols*S}px;height:${(rows-waterY)*S+200}px"></div>`;
+  fx.innerHTML=fxh;
+  MBG_MONS.forEach(m=>{const el=document.createElement('div');el.className='mon';el.style.transform=`translate(${m.L}px,${m.T}px)`;const c=mkCanvas(48,48);el.appendChild(c);fx.appendChild(el);m.cv=c;});
 }
+function mbgTick(t){const bg=document.getElementById('mbg');if(!bg||bg.hidden){MBG_RAF=0;return;}
+  MBG_MONS.forEach(m=>{try{drawSpider(m.cv.getContext('2d'),t/1000,false,m.seed);}catch(e){}});MBG_RAF=requestAnimationFrame(mbgTick);}
+let MBG_RAF=0;
 (function(){
   function sync(){const m=document.getElementById('menu');if(!m)return;let bg=document.getElementById('mbg');
     if(!m.hidden&&!bg){try{menuBgBuild();}catch(e){}bg=document.getElementById('mbg');}
-    if(bg)bg.hidden=m.hidden;}
+    if(bg){bg.hidden=m.hidden;if(!m.hidden&&!MBG_RAF)MBG_RAF=requestAnimationFrame(mbgTick);}}
   const start=()=>{const m=menuEl();new MutationObserver(sync).observe(m,{attributes:true,attributeFilter:['hidden']});sync();};
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',start);else setTimeout(start,0);
   let rt=0;addEventListener('resize',()=>{clearTimeout(rt);rt=setTimeout(()=>{const bg=document.getElementById('mbg');if(bg){try{menuBgBuild();}catch(e){}}},400);});
