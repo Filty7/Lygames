@@ -246,11 +246,10 @@ h1,h2,h3{font-family:var(--display);font-weight:700;margin:0;letter-spacing:.02e
   background:radial-gradient(ellipse 34% 60% at 50% 50%,rgba(7,6,10,.92),rgba(7,6,10,.55) 70%,transparent 100%)}
 #mbg{position:fixed;inset:0;z-index:54;overflow:hidden;background:#08070b;pointer-events:none}
 #mbg[hidden]{display:none}
-.mbgboard{position:absolute;left:-48px;top:-48px;--cs:96px;filter:brightness(.56) saturate(.65)}
+.mbgboard{position:absolute;left:-48px;top:-48px;--cs:96px;filter:brightness(.85) saturate(1.1)}
 .mbgc{position:absolute;left:0;top:0;image-rendering:pixelated}
 .mbgfx{position:absolute;inset:0}
-.mbgwater{position:absolute;left:0;background:linear-gradient(to bottom,rgba(70,120,150,.22),rgba(40,80,105,.3) 60%,rgba(20,45,60,.4));border-top:2px solid rgba(160,210,230,.55)}
-.mbgvig{position:absolute;inset:0;background:radial-gradient(ellipse at 50% 30%,rgba(127,255,233,.07),transparent 50%),radial-gradient(ellipse at 50% 120%,rgba(164,107,255,.12),transparent 60%),radial-gradient(ellipse 55% 75% at 50% 50%,rgba(8,7,11,.9) 0%,rgba(8,7,11,.62) 55%,rgba(8,7,11,.32) 80%,rgba(8,7,11,.7) 100%)}
+.mbgvig{position:absolute;inset:0;background:radial-gradient(ellipse 44% 72% at 50% 50%,rgba(8,7,11,.97) 0%,rgba(8,7,11,.95) 42%,rgba(8,7,11,.78) 62%,rgba(8,7,11,.45) 82%,rgba(8,7,11,.18) 100%),radial-gradient(ellipse 75% 95% at 50% 50%,transparent 55%,rgba(8,7,11,.35) 100%),radial-gradient(ellipse at 50% 0%,rgba(127,255,233,.08),transparent 50%),radial-gradient(ellipse at 50% 110%,rgba(164,107,255,.14),transparent 60%)}
 
 .mwrap{width:100%;max-width:440px;display:flex;flex-direction:column;gap:22px}
 .mwrap.wide{max-width:640px}
@@ -3414,15 +3413,16 @@ function menuBgBuild(){
   const g=cv.getContext('2d');g.imageSmoothingEnabled=false;g.fillStyle='#0b0a0e';g.fillRect(0,0,cv.width,cv.height);
   const R=Math.random,cell={},key=(x,y)=>x+','+y,D=[[0,-1],[1,0],[0,1],[-1,0]];
   const link=(x,y,d)=>{const a=cell[key(x,y)]||(cell[key(x,y)]=[0,0,0,0]);a[d]=1;const nx=x+D[d][0],ny=y+D[d][1],b=cell[key(nx,ny)]||(cell[key(nx,ny)]=[0,0,0,0]);b[(d+2)%4]=1;};
-  const walkers=4+Math.floor(cols*rows/24);
-  for(let w=0;w<walkers;w++){let x=Math.floor(R()*cols),y=Math.floor(R()*rows),d=Math.floor(R()*4);
-    for(let s=0;s<10+R()*14;s++){if(R()<.4)d=R()<.5?2:Math.floor(R()*4);const nx=x+D[d][0],ny=y+D[d][1];if(nx<0||ny<0||nx>=cols||ny>=rows){d=(d+1)%4;continue;}link(x,y,d);x=nx;y=ny;}}
+  /* bludiště přes celou plochu (každé pole má dílek) + pár spojek navíc */
+  {const seen=new Set([key(0,0)]),st=[[0,0]];while(st.length){const [x,y]=st[st.length-1],nb=[0,1,2,3].filter(d=>{const nx=x+D[d][0],ny=y+D[d][1];return nx>=0&&ny>=0&&nx<cols&&ny<rows&&!seen.has(key(nx,ny));});
+    if(!nb.length){st.pop();continue;}const d=nb[Math.floor(R()*nb.length)],nx=x+D[d][0],ny=y+D[d][1];link(x,y,d);seen.add(key(nx,ny));st.push([nx,ny]);}
+   for(let q=0;q<cols*rows*.25;q++){const x=Math.floor(R()*(cols-1)),y=Math.floor(R()*(rows-1));link(x,y,R()<.5?1:2);}}
   const kindOf=e=>{const n=e.reduce((a,b)=>a+b,0);return n>=4?'cross':n===3?'T':n===1?'dead':(e[0]&&e[2])||(e[1]&&e[3])?'straight':'corner';};
   const pickW=l=>{let t=l.reduce((a,b)=>a+b[1],0)*R();for(const [v,w] of l){if((t-=w)<=0)return v;}return l[0][0];};
   const waterY=rows-3-Math.floor(R()*2);let id=0,fxh='';MBG_MONS=[];
   for(const k in cell){const [x,y]=k.split(',').map(Number),e=cell[k];if(!e.some(Boolean))continue;
     const kind=kindOf(e),horiz=e[1]||e[3],vert=e[0]&&e[2];
-    let feat=pickW([[null,46],['fire',13],['hazard',7],['monster',6],['rubble',6],['gem',4],['cave',4],['squeeze',kind==='straight'&&horiz&&!vert?6:0],['pipe',kind==='straight'?3:0],['slime',2],['core',1],['tele',1.5],['canteen',1],['bunker',1],['serum',1.5],['spring',1]]);
+    let feat=pickW([[null,34],['fire',7],['hazard',7],['monster',6],['rubble',6],['gem',4],['cave',4],['squeeze',kind==='straight'&&horiz&&!vert?6:0],['pipe',kind==='straight'?3:0],['slime',2],['core',2],['tele',2.5],['canteen',2],['bunker',2],['serum',2.5],['spring',2],['turret',1.5],['quar',1.5]]);
     const t={id:'mb'+(id++)+'_'+Math.floor(R()*1e6),kind,feat:['fire','rubble','gem','serum'].includes(feat)?null:feat,cave:feat==='cave'?1+Math.floor(R()*3):0};
     if(feat==='cave')t.feat='cave';
     const L=x*S,T=y*S,st=`left:${L}px;top:${T}px`;
@@ -3442,7 +3442,6 @@ function menuBgBuild(){
     if(e[2]&&cell[key(x,y+1)]&&LAD_URL&&R()<.5){if(R()<.55)fxh+=`<div class="lad" style="left:${L+34}px;top:${T+40}px;height:${S}px;background-image:url(${LAD_URL})"></div>`;
       else if(ROPE_URL&&!(e[0]&&R()<.6))fxh+=`<div class="rope" style="left:${L+S/2-3}px;top:${T+30}px;height:${S*(1+Math.floor(R()*2))}px;background-image:url(${ROPE_URL})"></div>`;}
   }
-  fxh+=`<div class="mbgwater" style="top:${waterY*S+58}px;width:${cols*S}px;height:${(rows-waterY)*S+200}px"></div>`;
   fx.innerHTML=fxh;
   MBG_MONS.forEach(m=>{const el=document.createElement('div');el.className='mon';el.style.transform=`translate(${m.L}px,${m.T}px)`;const c=mkCanvas(48,48);el.appendChild(c);fx.appendChild(el);m.cv=c;});
 }
