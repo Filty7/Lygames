@@ -26,12 +26,15 @@ p{text-wrap:pretty}
 .btn{transition:filter .15s ease, background .15s ease, color .15s ease}
 .btn:hover{filter:brightness(1.12)}
 .ghost:hover{background:rgba(237,230,214,.08)}
-.games{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,440px),1fr));gap:28px}
-.plat{display:flex;flex-wrap:wrap;gap:10px;margin:4px 0 2px}
-.pi{display:flex;align-items:center;gap:9px;padding:7px 12px 7px 9px;border:1px solid;border-radius:4px;background:rgba(0,0,0,.25);line-height:1.1}
-.pi svg{flex:none;width:26px;height:26px}
-.pi b{display:block;font-family:'Cinzel',Georgia,serif;font-weight:700;font-size:13px;letter-spacing:.1em}
-.pi small{display:block;font-size:13px;opacity:.9}
+.games{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,250px),1fr));gap:20px}
+.games .game h3{font-size:22px!important}.games .game>div:last-child{padding:16px 18px 20px!important;gap:9px!important}
+.games .game>div:last-child>p:nth-of-type(2){font-size:15.5px;line-height:1.45}.games .game>div:last-child>p:nth-of-type(3){font-size:13.5px!important}
+.pi small{white-space:nowrap}
+.plat{display:flex;flex-wrap:wrap;gap:6px;margin:2px 0 0}
+.pi{display:flex;flex-direction:column;align-items:center;gap:3px;padding:6px 6px 5px;min-width:64px;flex:1 1 0;border:1px solid;border-radius:4px;background:rgba(0,0,0,.25);line-height:1.1;text-align:center}
+.pi svg{flex:none;width:20px;height:20px}
+.pi b{display:block;font-family:'Cinzel',Georgia,serif;font-weight:700;font-size:11px;letter-spacing:.1em}
+.pi small{display:block;font-size:11px;opacity:.9}
 .pi.ok{color:#7FCB6A;border-color:rgba(127,203,106,.45)}
 .pi.mid{color:#E3B341;border-color:rgba(227,179,65,.45)}
 .pi.no{color:#E0655A;border-color:rgba(224,101,90,.45)}
@@ -79,7 +82,7 @@ p{text-wrap:pretty}
 </div>
 </section>
 
-<section id="hry" aria-labelledby="hry-nadpis" style="position: relative; z-index: 2; max-width: 1200px; margin: clamp(-170px, -14vw, -130px) auto 0; padding: 0 24px">
+<section id="hry" aria-labelledby="hry-nadpis" style="position: relative; z-index: 2; max-width: 1240px; margin: clamp(-170px, -14vw, -130px) auto 0; padding: 0 24px">
 <h2 id="hry-nadpis" style="position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap">Hry</h2>
 <div class="games">
 
@@ -94,7 +97,7 @@ p{text-wrap:pretty}
 <p style="margin: 0; font-size: 15px; color: #A39882">1 hráč · karty · klidné tempo</p>
 <div class="plat" aria-label="Kde hrát"><span class="pi ok"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2.5" y="4" width="19" height="12.5" rx="1.5"/><path d="M8.5 20.5h7M12 16.5v4"/></svg><span><b>PC</b><small>doporučeno</small></span></span><span class="pi mid"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="6.5" y="2.5" width="11" height="19" rx="2"/><path d="M11 18.5h2"/></svg><span><b>MOBIL</b><small>hratelné</small></span></span></div>
 <div style="margin-top: auto; padding-top: 10px">
-<a href="hry/to-je-zivot/" class="btn ghost" style="display: flex; align-items: center; justify-content: center; min-height: 48px; border: 1px solid #D4A04C; color: #D4A04C; border-radius: 3px; font-family: 'Cinzel', Georgia, serif; font-weight: 700; font-size: 14px; letter-spacing: 0.16em; text-decoration: none">HRÁT</a>
+<a href="hry/to-je-zivot/" class="btn ghost" style="display: flex; align-items: center; justify-content: center; min-height: 42px; border: 1px solid #D4A04C; color: #D4A04C; border-radius: 3px; font-family: 'Cinzel', Georgia, serif; font-weight: 700; font-size: 14px; letter-spacing: 0.16em; text-decoration: none">HRÁT</a>
 </div>
 </div>
 </article>
@@ -110,7 +113,7 @@ p{text-wrap:pretty}
 <p style="margin: 0; font-size: 15px; color: #A39882">1 hráč · dungeon · krátké partie</p>
 <div class="plat" aria-label="Kde hrát"><span class="pi ok"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2.5" y="4" width="19" height="12.5" rx="1.5"/><path d="M8.5 20.5h7M12 16.5v4"/></svg><span><b>PC</b><small>doporučeno</small></span></span><span class="pi ok"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="6.5" y="2.5" width="11" height="19" rx="2"/><path d="M11 18.5h2"/></svg><span><b>MOBIL</b><small>doporučeno</small></span></span></div>
 <div style="margin-top: auto; padding-top: 10px">
-<a href="hry/underdeck/" class="btn ghost" style="display: flex; align-items: center; justify-content: center; min-height: 48px; border: 1px solid #D4A04C; color: #D4A04C; border-radius: 3px; font-family: 'Cinzel', Georgia, serif; font-weight: 700; font-size: 14px; letter-spacing: 0.16em; text-decoration: none">HRÁT</a>
+<a href="hry/underdeck/" class="btn ghost" style="display: flex; align-items: center; justify-content: center; min-height: 42px; border: 1px solid #D4A04C; color: #D4A04C; border-radius: 3px; font-family: 'Cinzel', Georgia, serif; font-weight: 700; font-size: 14px; letter-spacing: 0.16em; text-decoration: none">HRÁT</a>
 </div>
 </div>
 </article>
@@ -126,7 +129,7 @@ p{text-wrap:pretty}
 <p style="margin: 0; font-size: 15px; color: #A39882">3–4 hráči · hra proti botům</p>
 <div class="plat" aria-label="Kde hrát"><span class="pi ok"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2.5" y="4" width="19" height="12.5" rx="1.5"/><path d="M8.5 20.5h7M12 16.5v4"/></svg><span><b>PC</b><small>doporučeno</small></span></span><span class="pi mid"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="6.5" y="2.5" width="11" height="19" rx="2"/><path d="M11 18.5h2"/></svg><span><b>MOBIL</b><small>hratelné</small></span></span></div>
 <div style="margin-top: auto; padding-top: 10px">
-<a href="hry/valka-ruzi/" class="btn ghost" style="display: flex; align-items: center; justify-content: center; min-height: 48px; border: 1px solid #D4A04C; color: #D4A04C; border-radius: 3px; font-family: 'Cinzel', Georgia, serif; font-weight: 700; font-size: 14px; letter-spacing: 0.16em; text-decoration: none">HRÁT</a>
+<a href="hry/valka-ruzi/" class="btn ghost" style="display: flex; align-items: center; justify-content: center; min-height: 42px; border: 1px solid #D4A04C; color: #D4A04C; border-radius: 3px; font-family: 'Cinzel', Georgia, serif; font-weight: 700; font-size: 14px; letter-spacing: 0.16em; text-decoration: none">HRÁT</a>
 </div>
 </div>
 </article>
@@ -142,7 +145,7 @@ p{text-wrap:pretty}
 <p style="margin: 0; font-size: 15px; color: #A39882">1 hráč · nebo 2–3 hráči na ovladače u&nbsp;jedné obrazovky</p>
 <div class="plat" aria-label="Kde hrát"><span class="pi ok"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2.5" y="4" width="19" height="12.5" rx="1.5"/><path d="M8.5 20.5h7M12 16.5v4"/></svg><span><b>PC</b><small>doporučeno</small></span></span><span class="pi no"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="6.5" y="2.5" width="11" height="19" rx="2"/><path d="M11 18.5h2"/></svg><span><b>MOBIL</b><small>nedoporučeno</small></span></span><span class="pi ok"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 7.5h10a4.5 4.5 0 0 1 4.4 5.4l-.9 4.4a2.6 2.6 0 0 1-4.5 1.2L14.4 16H9.6l-1.6 2.5a2.6 2.6 0 0 1-4.5-1.2l-.9-4.4A4.5 4.5 0 0 1 7 7.5z"/><path d="M7.5 11v3M6 12.5h3"/><circle cx="15.5" cy="11.5" r=".6" fill="currentColor"/><circle cx="17.5" cy="13.5" r=".6" fill="currentColor"/></svg><span><b>OVLADAČ</b><small>podporováno</small></span></span></div>
 <div style="margin-top: auto; padding-top: 10px">
-<a href="hry/hlubina/" class="btn ghost" style="display: flex; align-items: center; justify-content: center; min-height: 48px; border: 1px solid #D4A04C; color: #D4A04C; border-radius: 3px; font-family: 'Cinzel', Georgia, serif; font-weight: 700; font-size: 14px; letter-spacing: 0.16em; text-decoration: none">HRÁT</a>
+<a href="hry/hlubina/" class="btn ghost" style="display: flex; align-items: center; justify-content: center; min-height: 42px; border: 1px solid #D4A04C; color: #D4A04C; border-radius: 3px; font-family: 'Cinzel', Georgia, serif; font-weight: 700; font-size: 14px; letter-spacing: 0.16em; text-decoration: none">HRÁT</a>
 </div>
 </div>
 </article>
