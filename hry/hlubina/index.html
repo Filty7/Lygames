@@ -243,7 +243,28 @@ h1,h2,h3{font-family:var(--display);font-weight:700;margin:0;letter-spacing:.02e
 
 /* hlavní menu */
 #menu{position:fixed;inset:0;z-index:55;display:flex;align-items:center;justify-content:center;padding:20px;overflow:auto;
-  background:radial-gradient(ellipse at 50% 30%,rgba(127,255,233,.07),transparent 50%),radial-gradient(ellipse at 50% 120%,rgba(164,107,255,.12),transparent 60%),rgba(8,7,11,.94)}
+  background:radial-gradient(ellipse 34% 60% at 50% 50%,rgba(7,6,10,.92),rgba(7,6,10,.55) 70%,transparent 100%)}
+#mbg{position:fixed;inset:0;z-index:54;overflow:hidden;background:#07060a;pointer-events:none}
+#mbg[hidden]{display:none}
+.mbgc{position:absolute;left:-96px;top:-96px;image-rendering:pixelated;filter:brightness(.42) saturate(.55) hue-rotate(-8deg);animation:mbgpan 90s ease-in-out infinite alternate}
+@keyframes mbgpan{from{transform:translate(0,0)}to{transform:translate(-150px,-190px)}}
+.mbgvig{position:absolute;inset:0;background:radial-gradient(ellipse 55% 75% at 50% 50%,rgba(7,6,10,.86) 0%,rgba(7,6,10,.55) 55%,rgba(7,6,10,.2) 80%,rgba(7,6,10,.75) 100%),linear-gradient(180deg,rgba(7,6,10,.7),transparent 22%,transparent 75%,rgba(7,6,10,.85))}
+.mbgside{position:absolute;top:0;bottom:0;width:26%;opacity:.9}
+.mbgside.l{left:0;background:radial-gradient(ellipse 60% 40% at 30% 62%,rgba(255,207,107,.10),transparent 70%)}
+.mbgside.r{right:0;background:radial-gradient(ellipse 60% 45% at 70% 38%,rgba(127,255,233,.08),transparent 70%),radial-gradient(ellipse 50% 30% at 75% 85%,rgba(164,107,255,.10),transparent 70%)}
+.mbgdust{position:absolute;inset:-50%;background-image:radial-gradient(1px 1px at 20% 30%,rgba(255,230,180,.5),transparent),radial-gradient(1px 1px at 70% 60%,rgba(255,230,180,.35),transparent),radial-gradient(1.5px 1.5px at 40% 80%,rgba(200,240,255,.3),transparent),radial-gradient(1px 1px at 85% 15%,rgba(255,230,180,.4),transparent);background-size:340px 300px;animation:mbgdust 40s linear infinite;opacity:.7}
+@keyframes mbgdust{from{transform:translate(0,0)}to{transform:translate(170px,300px)}}
+.mbgpol{position:absolute;background:#d9d2bf;padding:10px 10px 30px;box-shadow:0 14px 34px rgba(0,0,0,.7);filter:brightness(.5) sepia(.25);z-index:2}
+.mbgpol img{display:block;width:250px;height:164px;image-rendering:pixelated}
+.mbgpol em{position:absolute;left:12px;bottom:6px;font-family:Caveat,cursive;font-style:normal;font-size:20px;color:#3a3128}
+.mbgpol::before{content:'';position:absolute;left:50%;top:-6px;width:14px;height:14px;margin-left:-7px;border-radius:50%;background:radial-gradient(circle at 35% 35%,#ff8a7a,#8a1d14 70%)}
+.mbgpol.l{left:6%;top:56%;transform:rotate(-7deg)}
+.mbgpol.r{right:6%;top:16%;transform:rotate(5deg)}
+.mbgid{position:absolute;right:9%;top:60%;display:flex;gap:10px;align-items:center;background:#cfc7ae;padding:8px 12px 8px 8px;transform:rotate(-3deg);filter:brightness(.45) sepia(.3);box-shadow:0 10px 26px rgba(0,0,0,.7);z-index:2;font-size:12px;color:#3a3128;line-height:1.3}
+.mbgid img{width:54px;height:64px;image-rendering:pixelated;background:#222}
+.mbgid b{display:block;font-family:var(--display);letter-spacing:.12em;font-size:13px}
+@media (max-width:1180px){.mbgpol,.mbgid{display:none}}
+@media (prefers-reduced-motion:reduce){.mbgc,.mbgdust{animation:none}}
 .mwrap{width:100%;max-width:440px;display:flex;flex-direction:column;gap:22px}
 .mwrap.wide{max-width:640px}
 .mtitle .mt-k{font-family:var(--display);font-size:12px;letter-spacing:.3em;color:var(--muted)}
@@ -251,6 +272,10 @@ h1,h2,h3{font-family:var(--display);font-weight:700;margin:0;letter-spacing:.02e
 .mtitle p{color:var(--muted);margin:6px 0 0;font-size:14px}
 .mbtns{display:flex;flex-direction:column;gap:8px}
 .mbtn{display:flex;flex-direction:column;align-items:flex-start;gap:2px;text-align:left;padding:12px 16px;background:var(--panel2);border:1px solid var(--line);cursor:pointer;font-family:var(--display);font-size:19px;font-weight:600}
+#menu .mbtns>.mbtn:not(.ghost){position:relative;background:linear-gradient(90deg,rgba(40,34,28,.96),rgba(22,19,17,.96));border:1px solid #4a4036;border-left:3px solid #6b5a3e;box-shadow:0 6px 18px rgba(0,0,0,.55),inset 0 1px 0 rgba(255,255,255,.05);transition:transform .12s,border-color .12s,box-shadow .12s}
+#menu .mbtns>.mbtn:not(.ghost):hover,#menu .mbtns>.mbtn:not(.ghost):focus-visible{transform:translateX(4px);border-color:var(--lamp);border-left-color:var(--lamp);box-shadow:0 6px 22px rgba(0,0,0,.6),0 0 18px rgba(255,207,107,.18)}
+#menu .mbtns>.mbtn.primary{background:linear-gradient(90deg,#3a2c12,#231a0c);border-color:var(--lamp);border-left:3px solid var(--lamp);box-shadow:0 6px 22px rgba(0,0,0,.6),0 0 22px rgba(255,207,107,.16)}
+#menu .mbtns>.mbtn.ghost{background:rgba(20,18,16,.9)}
 .mbtn small{font-family:var(--body);font-size:12px;font-weight:400;color:var(--muted)}
 .mbtn:hover{border-color:var(--lampdim)}
 .mbtn.primary{background:#2a2110;border-color:var(--lamp);color:var(--lamp)}
@@ -540,6 +565,13 @@ body.tut #topr .ib:not(#bNew):not(#bSnd){display:none}
 .mstain{position:absolute;width:150px;height:150px;border-radius:50%;border:7px solid rgba(110,70,30,.13);box-shadow:inset 0 0 18px rgba(110,70,30,.12);pointer-events:none}
 .mstain.s2{width:110px;height:110px;border-width:5px;opacity:.8}
 .mnote{position:absolute;font-family:Caveat,cursive;font-size:22px;color:rgba(70,50,30,.75);pointer-events:none;white-space:nowrap}
+.mnote.nv1,.mnote.nv2,.mnote.nv3{white-space:normal;width:170px;padding:12px 12px 10px;font-size:20px;line-height:1.05;color:rgba(50,38,24,.9);box-shadow:2px 4px 8px rgba(0,0,0,.3)}
+.mnote.nv1{background:linear-gradient(160deg,#e6d27a,#cdb85e);clip-path:polygon(0 0,100% 0,100% 88%,90% 100%,0 100%)}
+.mnote.nv1::before,.mnote.nv3::before{content:'';position:absolute;left:50%;top:-5px;width:12px;height:12px;margin-left:-6px;border-radius:50%;background:radial-gradient(circle at 35% 35%,#ff8a7a,#a3241a 70%);box-shadow:1px 2px 2px rgba(0,0,0,.4)}
+.mnote.nv2{background:#ece5d0;width:160px;clip-path:polygon(0 3%,8% 0,22% 4%,38% 0,55% 3%,71% 0,86% 3%,100% 0,100% 100%,0 100%)}
+.mnote.nv2::before{content:'';position:absolute;left:30%;top:-9px;width:64px;height:18px;background:rgba(220,210,170,.55);transform:rotate(-4deg);box-shadow:0 1px 2px rgba(0,0,0,.15)}
+.mnote.nv3{background:repeating-linear-gradient(180deg,#f3efe6 0 19px,#9fb6d8 19px 20px);border-top:3px solid #d37a7a;padding-top:8px}
+.mnote.nv4{color:rgba(160,30,25,.8);font-size:24px;padding:4px 14px;border:2px solid rgba(160,30,25,.55);border-radius:50% 46% 52% 44%/56% 48% 52% 44%}
 .mfloor{position:absolute;left:40px;right:40px;height:1px;border-top:1px dashed rgba(58,49,40,.28)}
 .mfloor span{position:absolute;left:10px;top:4px;font-family:Caveat,cursive;font-size:22px;color:rgba(58,49,40,.7)}
 .mlines{position:absolute;left:0;top:0;pointer-events:none}
@@ -753,7 +785,7 @@ p,small,li,em,.hint,.clore,.cdesc{text-wrap:pretty}
 [data-gp]{outline:2px solid #ffe23a;outline-offset:2px}.gparm{animation:gparm .5s ease-in-out infinite alternate}
 @keyframes gparm{to{box-shadow:0 0 18px #ffe23a}}
 .lslots{display:flex;gap:16px;justify-content:center;flex-wrap:wrap;margin-top:10px}
-.lslot{width:200px;min-height:210px;border:2px dashed #3a3530;padding:12px;text-align:center;background:rgba(255,255,255,.02)}
+.lslot{flex:1 1 0;min-width:0;max-width:200px;min-height:210px;border:2px dashed #3a3530;padding:12px;text-align:center;background:rgba(255,255,255,.02)}
 .lslot:not(.empty){border:2px solid var(--pc)}.lslot.lock{background:rgba(255,226,58,.06);box-shadow:0 0 18px rgba(255,226,58,.15)}
 .lsn{font-size:12px;letter-spacing:.08em;color:var(--muted);text-transform:uppercase}.lwait{margin-top:70px;color:#a8a090}
 .lpick{display:flex;align-items:center;justify-content:center;gap:10px;margin:14px 0 8px}.lpick .pimg{width:84px;height:84px;image-rendering:pixelated}
@@ -3094,8 +3126,9 @@ function setupCamera(){
 }
 
 /* ================= MENU, ULOŽENÍ, PRAVIDLA ================= */
-const VERSION='0.65';
+const VERSION='0.66';
 const CHANGELOG=[
+  ['0.66','Multiplayer pro 4',['Lokální multiplayer pro 2–4 hráče. Ve čtyřech se hraje lehká obtížnost (každý má 1 postavu), ve třech lehká nebo normální. Když se přihlásí víc hráčů, obtížnost se sama upraví.','Při pokračování ve výpravě se mezi hráče rozdělí jen živé postavy.','Nové hlavní menu: tmavé pozadí s náhodnou jeskyní, fotky po stranách, výraznější tlačítka. Hra už pod menu neprosvítá.','Na plánu laboratoře víc druhů poznámek (žluté lístky, útržky s páskou, linkované kartičky, zakroužkovaná varování), 30 textů, a nepřekrývají místnosti.','Víc jmen pro postavy (přes 70).']],
   ['0.65','Světová tabulka a životy podle obtížnosti',['Skóre se po konci výpravy odešle do světové tabulky na lygames.cz. Tabulka výprav ukazuje světovou top 10 i výpravy z tohoto prohlížeče.','Max. životy podle obtížnosti: lehká 5, normální 6, těžká 7. Sérem jde doplnit nejvýš na toto maximum.','Ovladač: dílek jde otáčet i tlačítky LB / RB.']],
   ['0.64','Razítka a názvy',['Jednotné razítko pro mapu i události, výraznější na kartě levelu. Nové názvy typů: Tma, Dvojitý zámek, Na dohled, Dusno. Řady bez kyslíku jsou šedé a desaturované.']],
   ['0.63','Typy levelů',['Každá místnost v patře 3 má typ levelu (ikonka na plánu, popis v potvrzení): Ztracení, Tma, Dvojitý zámek, Na dohled, Úprk, Dusno. Vybraný typ se už ve výpravě neobjeví.','Patro 4: vybraná událost má vždy kritický zásah a normálně se vyčerpá. Na plánu má místnost razítko KRITICKÉ ×2, v liště karta značku ×2.','Všechny události dostanou při spuštění razítko (SPUŠTĚNO / KRITICKÉ ×2).']],
@@ -3134,7 +3167,7 @@ const CHANGELOG=[
   ['0.17–0.24','Šachty, prkna a portál',['Prkna nad dírami, kapacita šachet, lana nahoru i dolů, žebříky přes celou šachtu.','Zařízení v zóně 3 × 3, východ mezi posledními 10 dílky, 50 dílků v balíčku.','Dynamit, sošky na podstavcích, světlo podle dohledu, cyklická mapa.']],
   ['0.1–0.16','První prototyp',['Boční řez s gravitací a pády, odhalování a natáčení dílků, voda, oheň, radiace, přízraky, závaly, události.']]
 ];
-const NAMES=['Bára','Ivo','Kuba','Saša','Olga','Radek','Vilma','Tonda','Dana','Míra','Hedvika','Luboš','Zora','Emil','Jarka','Bohouš','Věra','Oskar','Klára','Pepa','Irma','Kamil','Lída','Vašek'];
+const NAMES=['Bára','Ivo','Kuba','Saša','Olga','Radek','Vilma','Tonda','Dana','Míra','Hedvika','Luboš','Zora','Emil','Jarka','Bohouš','Věra','Oskar','Klára','Pepa','Irma','Kamil','Lída','Vašek','Alena','Bedřich','Cyril','Dobromila','Eliška','Ferda','Gábina','Hynek','Ilona','Jindra','Kristýna','Lumír','Magda','Norbert','Otýlie','Prokop','Renata','Slávek','Šárka','Tadeáš','Uršula','Václav','Wanda','Zbyněk','Žofie','Ota','Marta','Lojza','Jitka','Ruda','Blanka','Mirek','Hanka','Vojta','Libuše','Kvído','Ludmila','Štěpán','Nela','Arnošt','Božena','Jarda','Milada','Vavřinec','Petra','Zdeněk','Ivana','Leoš','Dita','Matěj'];
 let SAVE_OK=true;
 // co věta, to řádek; dvě krátké související věty smí zůstat spolu
 function fmtL(t){const parts=String(t).split(/(?<=[.!?])\s+(?=[A-ZÁČĎÉĚÍŇÓŘŠŤÚŮÝŽ0-9+(„])/);const out=[];
@@ -3149,20 +3182,20 @@ function menuEl(){let m=document.getElementById('menu');if(!m){m=document.create
 function showMenu(sub){
   UI.inMenu=true;MPL=null;const sv=loadSave(),m=menuEl();m.hidden=false;
   if(sub==='mp'){const np=gpList().length;
-    m.innerHTML=`<div class="mwrap"><div class="mtitle"><span class="mt-k">LOKÁLNÍ MULTIPLAYER</span><h1 style="font-size:46px">Multiplayer</h1><p>Tři hráči, tři ovladače, jeden gauč. Připojeno ovladačů: <b>${np}</b> ze 3.</p></div>
+    m.innerHTML=`<div class="mwrap"><div class="mtitle"><span class="mt-k">LOKÁLNÍ MULTIPLAYER</span><h1 style="font-size:46px">Multiplayer</h1><p>Dva až čtyři hráči, každý s vlastním ovladačem, jeden gauč. Připojeno ovladačů: <b>${np}</b> ze 3.</p></div>
     <div class="mbtns">${sv&&sv.RUN.chars.some(r=>r.alive)?`<button class="mbtn primary" data-menu="mpcont">Pokračovat ve výpravě<small>${sv.RUN.chars.map(c=>c.name).join(', ')} · ovladače se znovu přiřadí</small></button>`:''}
       <button class="mbtn ${sv?'':'primary'}" data-menu="mpnew">Nová výprava<small>${sv?'rozehraná výprava se přepíše':'každý si vybere postavu'}</small></button>
       <button class="mbtn ghost" data-menu="menu">Zpět</button></div><div class="mver">verze ${VERSION}</div></div>`;return;}
   if(sub==='sp'){
     const cont=sv&&sv.RUN.chars.some(r=>r.alive)?`<button class="mbtn primary" data-menu="continue">Pokračovat ve výpravě<small>${sv.RUN.onMap||!sv.G?'plán laboratoře':`level ${sv.G.nodeLbl||sv.RUN.level} · kolo ${sv.G.round}`}${sv.RUN.act>1?' · akt '+sv.RUN.act:''} · ${sv.RUN.chars.map(c=>c.name).join(', ')}</small></button>`:'';
-    m.innerHTML=`<div class="mwrap"><div class="mtitle"><span class="mt-k">LAB 7 · SEKTOR HLUBINA</span><h1 style="font-size:46px">Hra pro jednoho</h1><p>Ovládáš celou trojici sám, myší nebo ovladačem.</p></div>
+    m.innerHTML=`<div class="mwrap"><div class="mtitle"><span class="mt-k">LAB 7 · SEKTOR HLUBINA</span><h1 style="font-size:46px">Hra pro jednoho</h1><p>Ovládáš celou výpravu sám, myší nebo ovladačem.</p></div>
     <div class="mbtns">${cont}<button class="mbtn ${cont?'':'primary'}" data-menu="new">${cont?'Začít novou výpravu':'Start výpravy'}<small>${cont?'rozehraná výprava se přepíše':'pojmenuj tři průzkumníky a sestup'}</small></button>
       <button class="mbtn ghost" data-menu="menu">Zpět</button></div><div class="mver">verze ${VERSION}</div></div>`;return;}
   m.innerHTML=`<div class="mwrap">
     <div class="mtitle"><span class="mt-k">LAB 7 · SEKTOR HLUBINA</span><h1>HLUBINA</h1><p>Kooperativní sestup do opuštěné laboratoře.</p></div>
     <div class="mbtns">
       <button class="mbtn primary" data-menu="sp">Hra pro jednoho<small>${sv&&sv.RUN.chars.some(r=>r.alive)?'pokračovat nebo nová výprava':'myš nebo ovladač'}</small></button>
-      <button class="mbtn" data-menu="mp">Multiplayer<small>3 hráči · 3 ovladače</small></button>
+      <button class="mbtn" data-menu="mp">Multiplayer<small>2–4 hráči · ovladače</small></button>
       <button class="mbtn" data-menu="tut">Tutoriál<small>krok za krokem první výprava</small></button>
       <button class="mbtn" data-menu="rules">Pravidla<small>sešit pravidel jako u deskové hry</small></button>
       <button class="mbtn" data-menu="scores">Tabulka výprav<small>nejlepší skóre</small></button>
@@ -3381,6 +3414,36 @@ function showRules(){
   document.getElementById('mbox').classList.add('bookbox');
 }
 function bookGo(i){BOOK_P=i;SF('card');showRules();}
+
+/* ---------- pozadí menu: náhodná jeskyně, tmavá a živá ---------- */
+function menuBgBuild(){
+  let bg=document.getElementById('mbg');
+  if(!bg){bg=document.createElement('div');bg.id='mbg';bg.hidden=true;bg.innerHTML='<canvas class="mbgc"></canvas><div class="mbgdust"></div><div class="mbgside l"></div><div class="mbgside r"></div><div class="mbgvig"></div>';document.body.insertBefore(bg,document.body.firstChild);}
+  const cv=bg.querySelector('canvas'),S=96,W=Math.max(innerWidth,800)+S*3,H=Math.max(innerHeight,600)+S*3,cols=Math.ceil(W/S),rows=Math.ceil(H/S);
+  cv.width=cols*TP;cv.height=rows*TP;cv.style.width=cols*S+'px';cv.style.height=rows*S+'px';
+  const g=cv.getContext('2d');g.imageSmoothingEnabled=false;g.fillStyle='#0b0a0e';g.fillRect(0,0,cv.width,cv.height);
+  const R=Math.random,cell={},key=(x,y)=>x+','+y,D=[[0,-1],[1,0],[0,1],[-1,0]];
+  const link=(x,y,d)=>{const a=cell[key(x,y)]||(cell[key(x,y)]=[0,0,0,0]);a[d]=1;const nx=x+D[d][0],ny=y+D[d][1],b=cell[key(nx,ny)]||(cell[key(nx,ny)]=[0,0,0,0]);b[(d+2)%4]=1;};
+  const walkers=3+Math.floor(cols*rows/40);
+  for(let w=0;w<walkers;w++){let x=Math.floor(R()*cols),y=Math.floor(R()*rows),d=Math.floor(R()*4);
+    for(let s=0;s<10+R()*14;s++){if(R()<.4)d=R()<.5?2:Math.floor(R()*4);const nx=x+D[d][0],ny=y+D[d][1];if(nx<0||ny<0||nx>=cols||ny>=rows){d=(d+1)%4;continue;}link(x,y,d);x=nx;y=ny;}}
+  const kinds=e=>{const n=e.reduce((a,b)=>a+b,0);return n>=4?'cross':n===3?'T':n===1?'dead':(e[0]&&e[2])||(e[1]&&e[3])?'straight':'corner';};
+  let id=0;for(const k in cell){const [x,y]=k.split(',').map(Number),e=cell[k];if(!e.some(Boolean))continue;
+    const f=R(),t={id:'mb'+(id++)+'_'+Math.floor(R()*1e6),kind:kinds(e),feat:f<.06?'fire':f<.1?'hazard':null,cave:f>.9?1:0};
+    try{const c=previewView(t,e,y);c.preview=false;g.drawImage(drawTile(c),x*TP,y*TP);}catch(err){}}
+  /* fotky po stranách */
+  if(!bg.querySelector('.mbgpol')){try{const rr=rng(Math.floor(R()*1e6)),ph=(th,cap,cls)=>{const c=roomScene(th,rr,64+(rr()-.5)*20,128,84);return `<div class="mbgpol ${cls}"><img src="${c.toDataURL()}" alt=""><em>${cap}</em></div>`;};
+    const id=`<div class="mbgid"><img src="${(f=>typeof f==='string'?f:f.toDataURL())(facePhoto(rr,false))}" alt=""><span><b>LAB 7</b>propustka č. ${100+Math.floor(rr()*800)}<br>stupeň B · platí do 1987</span></div>`;
+    bg.insertAdjacentHTML('beforeend',ph('start','poslední foto výpravy','l')+ph('final','reaktor — dno?','r')+id);}catch(err){}}
+}
+(function(){
+  function sync(){const m=document.getElementById('menu');if(!m)return;let bg=document.getElementById('mbg');
+    if(!m.hidden&&!bg){try{menuBgBuild();}catch(e){}bg=document.getElementById('mbg');}
+    if(bg)bg.hidden=m.hidden;}
+  const start=()=>{const m=menuEl();new MutationObserver(sync).observe(m,{attributes:true,attributeFilter:['hidden']});sync();};
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',start);else setTimeout(start,0);
+  let rt=0;addEventListener('resize',()=>{clearTimeout(rt);rt=setTimeout(()=>{const bg=document.getElementById('mbg');if(bg){try{menuBgBuild();}catch(e){}}},400);});
+})();
 
 /* ================= TUTORIÁL ================= */
 // pevná mapa: dílky se odhalují jen z ní, takže se hráč nemůže zaseknout
@@ -3893,9 +3956,17 @@ function renderMap(){
       ${isDone?'<span class="mstamp">PROŠLO</span>':''}${here&&!RUN.done?'<span class="mpin">zde</span>':''}
     </button>`;});
   // poznámky a razítka na okrajích, ať je plán bohatší
-  const notes=['pozor, voda stoupá?','čerpadla mimo provoz','!! nevstupovat bez dozimetru','starý výtah — zasypán','kabely vedou dolů','měřeno 1987'];
-  const nr=mrng('notes');let nt='';
-  for(let i=0;i<4;i++){const t=notes[(i+(RUN.act||1))%notes.length];nt+=`<span class="mnote" style="left:${(i%2?MAPW-230:30)+nr()*40}px;top:${MAPTOP+120+i*330+nr()*60}px;transform:rotate(${((nr()-.5)*10).toFixed(1)}deg)">${t}</span>`;}
+  const notes=['pozor, voda stoupá?','čerpadla mimo provoz','!! nevstupovat bez dozimetru','starý výtah — zasypán','kabely vedou dolů','měřeno 1987','klíče od skladu má Novák','v šachtě 3 slyšet kroky','NEPÍT vodu z kohoutku','generátor B jen ručně','směna 2 se nevrátila','zkontrolovat filtry!','tlak 4,2 atm — stoupá','dozimetr ukazuje nesmysly','kdo bral moje rukavice?','strop praská u schodů','Jana: sejdeme se dole','evakuace 03:40 — zrušena','vzorky B-07 přesunuty níž','tady nespat!!','zásoby na 3 dny','lano 40 m — málo','plyn? zkusit sirku NE','dveře 7C se samy zavírají','oprava čerpadla: zítra','výtah = rakev','kreslím zpaměti, nesedí','pozor na svítící sliz','rozpis služeb visí u kantýny','mapa platí jen nad −40 m'];
+  const nr=mrng('notes'),pool=notes.slice();for(let i=pool.length-1;i>0;i--){const j=Math.floor(nr()*(i+1));[pool[i],pool[j]]=[pool[j],pool[i]];}
+  const busy=Object.values(N).map(n=>{const q=nodePos(n.id);return [q.x-NODEW/2-14,q.y-NODEH/2-40,q.x+NODEW/2+30,q.y+NODEH/2+44];});
+  busy.push([0,0,MAPW,MAPTOP-10],[MAPW-230,H-190,MAPW,H],[MAPW-180,MAPTOP-10,MAPW-60,MAPTOP+110]);
+  for(let t=1;t<=5;t++){const y=MAPTOP+(t-1)*TIERH-40;busy.push([30,y-26,150,y+22]);}
+  const hit=(a,b)=>a[0]<b[2]&&a[2]>b[0]&&a[1]<b[3]&&a[3]>b[1];let nt='',cand=[];
+  for(let y=MAPTOP;y<H-110;y+=24)for(let x=24;x<MAPW-150;x+=24)cand.push([x,y]);
+  for(let i=cand.length-1;i>0;i--){const j=Math.floor(nr()*(i+1));[cand[i],cand[j]]=[cand[j],cand[i]];}
+  let k=0;for(const [x,y] of cand){if(k>=7)break;const v=Math.floor(nr()*5),t=pool[k%pool.length],w=v===0?Math.min(240,t.length*10+10):v===4?Math.min(260,t.length*11+30):175,h=v===0?32:v===4?42:Math.ceil(t.length/15)*22+30,box=[x-8,y-12,x+w+8,y+h+10];
+    if(x+w>MAPW-30||busy.some(b=>hit(b,box)))continue;busy.push(box);k++;
+    nt+=`<span class="mnote nv${v}" style="left:${x}px;top:${y}px;transform:rotate(${((nr()-.5)*(v?14:8)).toFixed(1)}deg)">${t}</span>`;}
   m.innerHTML=`<div class="bpwrap"><div class="bp a${Math.min(3,RUN.act||1)}" style="width:${MAPW}px;height:${H}px;clip-path:${tornEdge()}">${grime(H)}
       <div class="bphead"><span class="bpt">PLÁN SEKTORU HLUBINA</span><span class="bps">LAB 7 · ${RUN.act>1?'akt '+RUN.act:'akt 1'} · list 1/1 · měřítko 1:200</span></div>
       <div class="bpcrew">Výprava: ${RUN.chars.map(c=>c.alive?c.name:`<s>${c.name}</s>`).join(', ')}<br>Sošky: ${RUN.gems} ${CUR}${RUN.depth?`<br>Hloubka +${RUN.depth}`:''}</div>
@@ -4035,36 +4106,39 @@ function navGeneric(ev,sel,onBack){
   if(ev.down.has(1)&&onBack)onBack();
 }
 
-/* ---------- lobby: 2–3 hráči, obtížnost určuje počet postav ---------- */
-// postavy se rozdělí dokola: lehká (4) ve dvou = 2+2, ve třech = 2+1+1; normální (3) ve dvou = 2+1; těžká (2) jen ve dvou = 1+1
+/* ---------- lobby: 2–4 hráči, obtížnost určuje počet postav ---------- */
+// postavy se rozdělí dokola: lehká (4) ve dvou = 2+2, ve třech = 2+1+1, ve čtyřech 1+1+1+1; normální (3) ve dvou = 2+1; těžká (2) jen ve dvou = 1+1
 function showLobby(mode){
   const sv=mode==='cont'?loadSave():null;if(mode==='cont'&&!sv){mode='new';}
   MPL={mode,sv,slots:[],start:0,diff:sv?(sv.RUN.diff||(sv.RUN.chars.length>=4?'easy':sv.RUN.chars.length<=2?'hard':'normal')):'normal',names:CHARS.map(c=>c.name)};
   if(mode==='new'){const p=shuffle(NAMES.slice());MPL.names=CHARS.map((c,i)=>p[i]);}
   MP.on=false;GPF.key=null;UI.inMenu=true;menuEl().hidden=false;renderLobby();}
 function lobbyN(){return MPL.mode==='cont'?MPL.sv.RUN.chars.length:DIFF[MPL.diff].n;}
-function lobbyOwn(){const p=MPL.slots.length,n=lobbyN(),own=MPL.slots.map(()=>[]);if(!p)return own;for(let c=0;c<n;c++)own[c%p].push(c);return own;}
+function lobbyAlive(c){return MPL.mode!=='cont'||MPL.sv.RUN.chars[c].alive;}
+function lobbyAliveN(){let k=0;for(let c=0;c<lobbyN();c++)if(lobbyAlive(c))k++;return k;}
+function lobbyOwn(){const p=MPL.slots.length,n=lobbyN(),own=MPL.slots.map(()=>[]);if(!p)return own;let j=0;for(let c=0;c<n;c++)if(lobbyAlive(c))own[(j++)%p].push(c);return own;}
+function lobbyFix(){const p=MPL.slots.length;if(MPL.mode!=='new'||DIFF[MPL.diff].n>=p)return;MPL.diff=['hard','normal','easy'].find(k=>DIFF[k].n>=p)||'easy';}
 function lobbyChar(cid){if(MPL.mode==='cont'){const r=MPL.sv.RUN.chars[cid];return {color:r.color,name:r.name,dead:!r.alive};}return {color:CHARS[cid].color,name:MPL.names[cid]};}
-function lobbyValid(){const p=MPL.slots.length;return p>=2&&p<=3&&lobbyN()>=p;}
+function lobbyValid(){const p=MPL.slots.length;return p>=2&&p<=4&&lobbyAliveN()>=p;}
 function renderLobby(){
   const m=menuEl(),n=gpList().length,own=lobbyOwn();
   const box=i=>{const s=MPL.slots[i];
-    if(!s)return `<div class="lslot empty"><div class="lsn">Hráč ${i+1}${i===2?' (nepovinný)':''}</div><div class="lwait">${n>i?'zmáčkni '+gpb('A'):'připoj ovladač'}</div></div>`;
+    if(!s)return `<div class="lslot empty"><div class="lsn">Hráč ${i+1}${i>=2?' (nepovinný)':''}</div><div class="lwait">${n>i?'zmáčkni '+gpb('A'):'připoj ovladač'}</div></div>`;
     const cs=(own[i]||[]).map(lobbyChar),col=cs[0]?cs[0].color:'#888';
     return `<div class="lslot ${s.ready?'lock':''}" style="--pc:${col}"><div class="lsn">Hráč ${i+1}${i===0?' · vedoucí':''}</div>
       <div class="lpick">${cs.map(c=>`<span class="lpc"><img class="pimg" src="${portraitURL({color:c.color})}" alt=""><b style="color:${shade(c.color,.35)}">${c.name}${c.dead?' †':''}</b></span>`).join('')||'<small>bez postavy</small>'}</div>
       <div class="lst">${s.ready?'<span class="lready">PŘIPRAVEN ✓</span>':gpb('A')+' připraven'+(MPL.mode==='new'?' · '+gpb('X')+' jiná jména':'')}</div></div>`;};
   const dsel=MPL.mode==='new'?`<div class="dsel">${['easy','normal','hard'].map(k=>`<span class="mbtn sm dbtn ${k===MPL.diff?'on':''} ${DIFF[k].n<Math.max(2,MPL.slots.length)?'off':''}">${DIFF[k].name}<small>${DIFF[k].n} postavy · ${DIFF[k].hp} životů · skóre × ${String(DIFF[k].mult).replace('.',',')}</small></span>`).join('')}</div><p class="hint" style="text-align:center">vedoucí mění obtížnost ◀ ▶</p>`:`<p class="hint" style="text-align:center">Obtížnost: <b>${DIFF[MPL.diff].name}</b> (${lobbyN()} postavy)</p>`;
-  m.innerHTML=`<div class="mwrap wide"><div class="mtitle"><span class="mt-k">LOKÁLNÍ MULTIPLAYER · 2–3 OVLADAČE</span><h1 style="font-size:40px">${MPL.mode==='cont'?'Pokračovat ve výpravě':'Nová výprava'}</h1>
+  m.innerHTML=`<div class="mwrap wide"><div class="mtitle"><span class="mt-k">LOKÁLNÍ MULTIPLAYER · 2–4 OVLADAČE</span><h1 style="font-size:40px">${MPL.mode==='cont'?'Pokračovat ve výpravě':'Nová výprava'}</h1>
     <p>Připojeno ovladačů: <b>${n}</b>. Každý hráč se přihlásí ${gpb('A')}. Postavy se mezi hráče rozdělí podle počtu hráčů.</p></div>
-    ${dsel}<div class="lslots">${[0,1,2].map(box).join('')}</div>
-    <p class="hint" style="margin-top:12px">${!lobbyValid()&&MPL.slots.length>=2?'<b style="color:var(--bad)">Těžká obtížnost má jen 2 postavy, hrají ji nejvýš 2 hráči.</b> ':''}${gpb('B')} zpět · hra začne, až budou všichni přihlášení připraveni (aspoň 2). Mapu, menu a dialogy ovládá vedoucí (hráč 1).</p>
+    ${dsel}<div class="lslots">${[0,1,2,3].map(box).join('')}</div>
+    <p class="hint" style="margin-top:12px">${!lobbyValid()&&MPL.slots.length>=2?`<b style="color:var(--bad)">${MPL.mode==='cont'?'Ve výpravě zbývá jen '+lobbyAliveN()+' živých postav, víc hráčů ji hrát nemůže.':DIFF[MPL.diff].name+' obtížnost má jen '+DIFF[MPL.diff].n+' postavy, hraje ji nejvýš '+DIFF[MPL.diff].n+' hráčů.'}</b> `:''}${gpb('B')} zpět · hra začne, až budou všichni přihlášení připraveni (aspoň 2). Mapu, menu a dialogy ovládá vedoucí (hráč 1).</p>
     <div class="mbtns" style="margin-top:10px"><button class="mbtn ghost" data-menu="mp">Zpět</button></div></div>`;}
 function lobbyInput(evs){
   if(!MPL)return;let dirty=false;const n=gpList().length;
   if(n!==MPL.n){MPL.n=n;dirty=true;}
   evs.forEach(ev=>{const si=MPL.slots.findIndex(s=>s.gp===ev.i),s=MPL.slots[si];
-    if(!s){if(ev.down.has(0)&&MPL.slots.length<3){MPL.slots.push({gp:ev.i,ready:false});MPL.slots.forEach(q=>q.ready=false);SF('card');dirty=true;}
+    if(!s){if(ev.down.has(0)&&MPL.slots.length<4){MPL.slots.push({gp:ev.i,ready:false});lobbyFix();MPL.slots.forEach(q=>q.ready=false);SF('card');dirty=true;}
       else if(ev.down.has(1)&&!MPL.slots.length){MPL=null;showMenu('mp');}
       return;}
     if(si===0&&MPL.mode==='new'&&(ev.dir==='l'||ev.dir==='r')){const ks=['easy','normal','hard'];let k=ks.indexOf(MPL.diff);k=(k+(ev.dir==='r'?1:2))%3;MPL.diff=ks[k];MPL.slots.forEach(q=>q.ready=false);SF('tick');dirty=true;}
