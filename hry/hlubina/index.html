@@ -289,6 +289,8 @@ h1,h2,h3{font-family:var(--display);font-weight:700;margin:0;letter-spacing:.02e
 .mbtn.primary{background:#2a2110;border-color:var(--lamp);color:var(--lamp)}
 .mbtn.ghost{background:transparent;font-size:15px;padding:8px 16px}
 .mbtn.sm{padding:6px 12px;font-size:18px;flex:none;align-items:center}
+.tsec{display:flex;flex-direction:column;gap:6px}.tsec>b{font-family:var(--display);font-size:13px;letter-spacing:.2em;color:var(--muted);font-weight:normal}.dsel.wrap{flex-wrap:wrap}
+#tutbox .tgp{display:none;font-size:12px;color:var(--muted);border-top:1px solid var(--line);margin-top:8px;padding-top:6px}body.gpon #tutbox .tgp{display:block}
 .mver{font-size:12px;color:var(--dim)}
 .nrow{display:flex;gap:10px;align-items:center}
 .nrow .pimg{width:48px;height:48px}
@@ -301,7 +303,7 @@ h1,h2,h3{font-family:var(--display);font-weight:700;margin:0;letter-spacing:.02e
 .mbox.bookbox{max-width:1080px;background:transparent;border:0;box-shadow:none;padding:0}
 .book{display:grid;grid-template-columns:1fr;gap:0;box-shadow:0 30px 80px #000}
 .book.two{grid-template-columns:1fr 1fr}
-.page{position:relative;min-height:560px;padding:34px 38px 46px;background:linear-gradient(90deg,#d9d0b8,#e8e0cb 8%,#e8e0cb 92%,#d6cdb4);color:#2a2520;font-family:var(--serif);font-size:15px;line-height:1.55}
+.page{position:relative;height:590px;overflow:hidden;padding:34px 38px 46px;background:linear-gradient(90deg,#d9d0b8,#e8e0cb 8%,#e8e0cb 92%,#d6cdb4);color:#2a2520;font-family:var(--serif);font-size:15px;line-height:1.55}
 .book.two .page:first-child{box-shadow:inset -18px 0 24px -16px rgba(60,40,20,.45)}
 .book.two .page:last-child{box-shadow:inset 18px 0 24px -16px rgba(60,40,20,.45)}
 .page.empty{background:#d6cdb4}
@@ -313,6 +315,17 @@ h1,h2,h3{font-family:var(--display);font-weight:700;margin:0;letter-spacing:.02e
 .rbox{border:2px solid #8a7a5a;background:rgba(255,250,235,.55);padding:10px 14px;margin:12px 0;font-size:14px}
 .rrow{display:flex;gap:10px;justify-content:center;margin:12px 0 6px}
 .rimg{width:96px;height:96px;image-rendering:pixelated;border:2px solid #3b2a14;box-shadow:2px 3px 0 rgba(0,0,0,.25)}
+.rrow:has(>.rfig:nth-child(5)) .rfi{zoom:.8}.rrow:has(>.rfig:nth-child(5)){gap:6px}
+.rfig{margin:0;display:flex;flex-direction:column;align-items:center;gap:3px}
+.rfi{position:relative;display:block;width:96px;height:96px;--cs:96px;border:2px solid #3b2a14;box-shadow:2px 3px 0 rgba(0,0,0,.25);overflow:hidden;isolation:isolate;background:#111}
+.rfi>img{width:96px;height:96px;image-rendering:pixelated;display:block}
+.rfi .rbg{position:absolute;left:4px;top:4px;width:84px;height:84px;image-rendering:pixelated;filter:drop-shadow(0 0 6px rgba(164,107,255,.55))}
+.rfig figcaption{font-size:11.5px;font-style:italic;color:#5a5040}
+.page .rxhead{margin:-10px 0 8px;font-family:var(--display);font-size:11px;letter-spacing:.25em;color:#8a5a2a}
+.page .rxhead span{border:1.5px solid #8a5a2a;padding:2px 8px}
+.page p.small{font-size:13.5px}
+.rtab.rtsm{font-size:13px}.rtab.rtsm td{padding:4px 5px;color:#2a2520}.rtab.rtsm td:nth-child(2){text-align:left;font-family:var(--serif);font-weight:400}
+.mbox .page h3.h4{font-size:18px;margin-top:14px}
 .rtab{width:100%;border-collapse:collapse;font-size:14px;margin-bottom:10px}
 .rtab td{border-bottom:1px solid #b3a685;padding:5px 6px;vertical-align:top}
 .rtab td:first-child{font-weight:600;white-space:nowrap}.rtab td:nth-child(2){text-align:center;font-family:var(--display);font-weight:700}
@@ -321,7 +334,7 @@ h1,h2,h3{font-family:var(--display);font-weight:700;margin:0;letter-spacing:.02e
 .bnav{display:flex;gap:8px;align-items:center;justify-content:center;margin-top:12px;flex-wrap:wrap}
 .bnav .dot{width:10px;height:10px;padding:0;border-radius:50%;border:1px solid var(--muted);background:transparent;cursor:pointer;margin:0 3px}
 .bnav .dot.on{background:var(--lamp);border-color:var(--lamp)}
-@media (max-width:900px){.page{min-height:0;padding:22px 20px 40px;font-size:14px}.page h2{font-size:34px}.rimg{width:72px;height:72px}.mtitle h1{font-size:52px}}
+@media (max-width:900px){.page{height:auto;min-height:0;padding:22px 20px 40px;font-size:14px}.page h2{font-size:34px}.rimg{width:72px;height:72px}.mtitle h1{font-size:52px}}
 
 .gl.spill{mix-blend-mode:screen;animation:spillf 4s ease-in-out infinite}
 @keyframes spillf{50%{opacity:.75}}
@@ -1128,7 +1141,24 @@ function orients(t,need){
 function exitEdges(need){return [1,1,1,1];}
 function leverEdges(need){return [1,1,1,1];}
 
+function buildTestDeck(){   /* test room: ~50 dílků, od každého druhu aspoň jeden */
+  const d=[];let id=1;const a=(kind,feat,extra)=>d.push(Object.assign({id:'t'+(id++),kind,feat:feat||null},extra||{}));
+  ['cross','cross','T','T','T','straight','straight','corner','corner','corner','dead'].forEach(k=>a(k));
+  a('T',null,{noLedge:true});a('corner',null,{noLedge:true});
+  a('cross','cave',{cave:1});a('T','cave',{cave:2});a('corner','cave',{cave:3});
+  a('T','fire');a('straight','fire');a('dead','fire');
+  a('T','hazard');a('corner','hazard');a('cross','hazard');
+  a('T','monster');a('straight','monster');a('corner','monster');a('cross','fire');
+  a('straight','squeeze');a('straight','squeeze');a('straight','squeeze');
+  a('straight',null,{gem:true});a('straight',null,{gem:true});a('dead',null,{serum:true});
+  a('dead','tele');a('T','tele');a('T','quar',{noLedge:true});a('T','spring');a('T','bunker');a('T','canteen');a('straight','canteen');
+  a('cross','turret');a('straight','trap');a('cross','slime');a('T','core');a('straight','pipe');a('straight','pipe');
+  ['EW','E','W'].forEach(h=>a('stairs',null,{st:{up:true,down:true,h}}));
+  shuffle(d);d.splice(Math.floor(d.length*.45)+rand(Math.ceil(d.length*.4)),0,{id:'exit',kind:'exit',feat:null});
+  return d;
+}
 function buildDeck(){
+  if(RUN&&RUN.testDeck)return buildTestDeck();
   const d=[];let id=1;
   const add=(kind,feat,n,extra)=>{for(let i=0;i<n;i++)d.push(Object.assign({id:'t'+(id++),kind,feat:feat||null},extra||{}));};
   // 45 destiček: 43 tvarů + 2 žebříky, portál se vloží mezi posledních 10
@@ -3136,7 +3166,7 @@ function setupCamera(){
 /* ================= MENU, ULOŽENÍ, PRAVIDLA ================= */
 const VERSION='0.66';
 const CHANGELOG=[
-  ['0.66','Multiplayer pro 4',['Lokální multiplayer pro 2–4 hráče. Ve čtyřech se hraje lehká obtížnost (každý má 1 postavu), ve třech lehká nebo normální. Když se přihlásí víc hráčů, obtížnost se sama upraví.','Při pokračování ve výpravě se mezi hráče rozdělí jen živé postavy.','Nové hlavní menu: na tmavém pozadí je minimalistický plán bočního řezu laboratoře, po stranách občas zabliká světlo a shora občas padá suť. Výraznější tlačítka, hra už pod menu neprosvítá.','Na plánu laboratoře víc druhů poznámek (žluté lístky, útržky s páskou, linkované kartičky, zakroužkovaná varování), 30 textů, a nepřekrývají místnosti.','Víc jmen pro postavy (přes 70).']],
+  ['0.66','Multiplayer pro 4',['Lokální multiplayer pro 2–4 hráče. Ve čtyřech se hraje lehká obtížnost (každý má 1 postavu), ve třech lehká nebo normální. Když se přihlásí víc hráčů, obtížnost se sama upraví.','Při pokračování ve výpravě se mezi hráče rozdělí jen živé postavy.','Nové hlavní menu: na tmavém pozadí je minimalistický plán bočního řezu laboratoře, po stranách občas zabliká světlo a shora občas padá suť. Výraznější tlačítka, hra už pod menu neprosvítá.','Na plánu laboratoře víc druhů poznámek (žluté lístky, útržky s páskou, linkované kartičky, zakroužkovaná varování), 30 textů, a nepřekrývají místnosti.','Víc jmen pro postavy (přes 70).','Přepsaná pravidla: všechny strany stejně vysoké, aktuální obrázky dílků (oheň, radiace, přízrak, žebřík, lano…), základní hra v kapitolách 1–12 a vše, co přichází až během výpravy, stručně v Extra pravidlech. Nová strana Ovládání. V pravidlech jde listovat LB / RB.','Tutoriál jde celý ovládat ovladačem: tlačítka Další / Rozumím potvrdí A, v bublině je nápověda k ovladači.','Test room (v hlavním menu): asi 50 dílků se vším, co hra má, volba typu levelu, počtu postav, schopností III a hry bez časového limitu.']],
   ['0.65','Světová tabulka a životy podle obtížnosti',['Skóre se po konci výpravy odešle do světové tabulky na lygames.cz. Tabulka výprav ukazuje světovou top 10 i výpravy z tohoto prohlížeče.','Max. životy podle obtížnosti: lehká 5, normální 6, těžká 7. Sérem jde doplnit nejvýš na toto maximum.','Ovladač: dílek jde otáčet i tlačítky LB / RB.']],
   ['0.64','Razítka a názvy',['Jednotné razítko pro mapu i události, výraznější na kartě levelu. Nové názvy typů: Tma, Dvojitý zámek, Na dohled, Dusno. Řady bez kyslíku jsou šedé a desaturované.']],
   ['0.63','Typy levelů',['Každá místnost v patře 3 má typ levelu (ikonka na plánu, popis v potvrzení): Ztracení, Tma, Dvojitý zámek, Na dohled, Úprk, Dusno. Vybraný typ se už ve výpravě neobjeví.','Patro 4: vybraná událost má vždy kritický zásah a normálně se vyčerpá. Na plánu má místnost razítko KRITICKÉ ×2, v liště karta značku ×2.','Všechny události dostanou při spuštění razítko (SPUŠTĚNO / KRITICKÉ ×2).']],
@@ -3208,6 +3238,7 @@ function showMenu(sub){
       <button class="mbtn" data-menu="rules">Pravidla<small>sešit pravidel jako u deskové hry</small></button>
       <button class="mbtn" data-menu="scores">Tabulka výprav<small>nejlepší skóre</small></button>
       <button class="mbtn" data-menu="log">Co je nového<small>changelog</small></button>
+      <button class="mbtn" data-menu="test">Test room<small>všechny dílky, typy levelů, rychlé ladění</small></button>
       ${UI.menuFromGame?'<button class="mbtn ghost" data-menu="back">Zpět do hry</button>':''}
     </div>
     <div class="mver">verze ${VERSION}</div></div>`;
@@ -3245,19 +3276,28 @@ function continueRun(){
   if(!G.over&&G.chars.every(c=>c.done||c.dead||c.escaped)){G.chars.forEach(c=>{if(onBoard(c)){c.done=false;c.used=0;c.started=false;}});}
   render();initCam();
 }
+const TESTO={mod:null,diff:'normal',abil:0,time:false};
+const TEST_AB=[null,['diver','climber','jumper','shooter','tracker','demo','firefighter','antirad'],['firefighter','antirad','doctor','demo','shooter','diver','climber','jumper']];
+function showTestSetup(){const m=menuEl();m.hidden=false;UI.inMenu=true;MPL=null;
+  const mb=(k,l,sm,on)=>`<button class="mbtn sm dbtn ${on?'on':''}" ${k}>${l}${sm?`<small>${sm}</small>`:''}</button>`;
+  m.innerHTML=`<div class="mwrap wide"><div class="mtitle"><span class="mt-k">LADĚNÍ</span><h1 style="font-size:40px">Test room</h1><p>Balíček má asi 50 dílků a od každého druhu ve hře aspoň jeden: oheň, radiace, doupata, závaly I–III, plazivky, žebříky, sošky, sérum, teleporty, karanténa, regenerace, kryt, kantýny, střílna, past, sliz, jádro i potrubí. Natáčí se jako obvykle. Hra se neukládá ani nepočítá do skóre.</p></div>
+    <div class="tsec"><b>Typ levelu</b><div class="dsel wrap">${mb('data-tmod=""','Základní','bez zvláštnosti',!TESTO.mod)}${Object.keys(MODS).map(k=>mb(`data-tmod="${k}"`,MODS[k].icon+' '+MODS[k].name,MODS[k].short,TESTO.mod===k)).join('')}</div></div>
+    <div class="tsec"><b>Postavy</b><div class="dsel">${['easy','normal','hard'].map(k=>mb(`data-tdiff="${k}"`,DIFF[k].n+' postavy',DIFF[k].hp+' životů',TESTO.diff===k)).join('')}</div></div>
+    <div class="tsec"><b>Možnosti</b><div class="dsel">${mb('data-topt="abil"',['Bez schopností','Schopnosti III · sada A','Schopnosti III · sada B'][TESTO.abil],['klikni pro sadu A','Potápěč, Lezec, Skokan, Střelec, Stopař, Demolice (+ Hasič, Antiradiace)','Hasič, Antiradiace, Doktor, Demolice, Střelec, Potápěč (+ Lezec, Skokan)'][TESTO.abil],TESTO.abil>0)}${mb('data-topt="time"','Bez časového limitu','999 kol',TESTO.time)}</div></div>
+    <div class="mbtns" style="margin-top:6px"><button class="mbtn primary" data-tgo="1">Spustit test room<small>${TESTO.mod?MODS[TESTO.mod].name:'základní level'} · ${DIFF[TESTO.diff].n} postavy</small></button><button class="mbtn ghost" data-menu="menu">Zpět</button></div></div>`;}
 function startTest(){
-  endTut();RUN=null;newRun(['Bára','Ivo','Kuba']);hideMenu();closeModal();resetView();setSize('9x8');newGame();G.test=true;G.W=ROWS;
-  const T=(kind,feat,extra)=>Object.assign({id:'test'+(G.nid++),kind,feat:feat||null},extra||{});
-  const put=(x,y,t,e)=>{G.board[idx(x,y)]={t,e,fire:false,rubble:false};};
-  // vpravo: dlouhá šachta se svislým koridorem
-  put(5,0,T('T'),[0,1,1,1]);put(5,1,T('straight'),[1,0,1,0]);put(5,2,T('straight','squeeze'),[1,0,1,0]);
-  put(5,3,T('straight'),[1,0,1,0]);put(5,4,T('straight'),[1,0,1,0]);put(5,5,T('T'),[1,1,0,1]);
-  // vlevo: šachta se žebříkem, pod ním svislý koridor
-  put(3,0,T('T'),[0,1,1,1]);put(3,1,T('stairs',null,{st:{up:true,down:true,h:''}}),[1,0,1,0]);put(3,2,T('straight'),[1,0,1,0]);
-  put(3,3,T('straight','squeeze'),[1,0,1,0]);put(3,4,T('straight'),[1,0,1,0]);put(3,5,T('straight'),[1,0,1,0]);put(3,6,T('T'),[1,1,0,1]);
-  log('TEST ROOM: vpravo šachta se svislým koridorem, vlevo šachta se žebříkem a koridorem. Hra se neukládá.','ev');
-  render();initCam();
+  const o=TESTO;endTut();MP.on=false;RUN=null;newRun(null,o.diff);RUN.testDeck=true;RUN.test=true;
+  if(o.abil){const ids=TEST_AB[o.abil];RUN.chars.forEach((r,i)=>{r.abil=[ids[i*2],ids[i*2+1]].map(id=>({id,lvl:3}));});}
+  hideMenu();closeModal();resetView();setSize('9x8');newGame();G.test=true;
+  if(o.mod){G.mod=o.mod;applyMod();}
+  if(o.time)G.limit=999;
+  log(`TEST ROOM${o.mod?' · '+MODS[o.mod].name:''}: ${G.deck.length} dílků v balíčku. Hra se neukládá.`,'ev');
+  UI.live=false;render();initCam();SF('portal');
 }
+document.addEventListener('click',e=>{const b=e.target.closest('[data-tmod],[data-tdiff],[data-topt],[data-tgo]');if(!b||!b.closest('#menu'))return;SF('card');
+  if(b.dataset.tgo){startTest();return;}
+  if(b.dataset.tmod!=null)TESTO.mod=b.dataset.tmod||null;if(b.dataset.tdiff)TESTO.diff=b.dataset.tdiff;if(b.dataset.topt==='abil')TESTO.abil=(TESTO.abil+1)%3;else if(b.dataset.topt)TESTO[b.dataset.topt]=!TESTO[b.dataset.topt];
+  showTestSetup();});
 /* ---------- skóre a tabulka výprav ---------- */
 // skóre = 100 × nejhlubší level (1–15) + 25 × všechny získané sošky + 15 × zbylé max. životy přeživších (+500 za vítězství)
 function runScore(win){const L=win?15:(RUN.maxLvl||RUN.level||1),S=RUN.gemsTotal||0,H=RUN.chars.filter(r=>r.alive).reduce((a,r)=>a+r.permMax,0),d=DIFF[RUN.diff||'normal'],raw=100*L+25*S+15*H+(win?500:0);
@@ -3312,7 +3352,7 @@ function setupMenu(){
     else if(k==='rules')showRules();
     else if(k==='log')showChangelog();
     else if(k==='scores')showScores();
-    else if(k==='test')startTest();
+    else if(k==='test')showTestSetup();
     else if(k==='tut'){MP.on=false;startTutorial();}
     else if(k==='menu')showMenu();
     else if(k==='back')hideMenu();
@@ -3322,92 +3362,176 @@ function setupMenu(){
 
 /* ---------- sešit pravidel ---------- */
 const TI=(kind,feat,e,o)=>`<img class="rimg" src="${tileImg(Object.assign({t:{id:'r'+kind+feat+(o&&o.cave||''),kind,feat:feat||null,cave:o&&o.cave},e,open:!!e[2],openUp:!!e[0],planks:!!(e[2]&&(e[1]||e[3])&&!(o&&o.noPlank)),gem:o&&o.gem,lv:o&&o.lv},o||{}))}" alt="">`;
-function bookPages(){return [
-`<h2>Hlubina</h2><p class="lead">Kooperativní hra pro jednoho hráče, který vede trojici průzkumníků.</p>
-<p>Před desítkami let v podzemní laboratoři Sektoru 7 unikla radiace. Chodby zarostly rzí, ve tmě se něco pohnulo a staré zařízení stále čeká, až ho někdo probudí.</p>
-<p>Vaším úkolem je sestoupit, najít <b>podivné zařízení</b>, které probudí <b>portál</b>, a projít jím dřív, než vám dojde čas, síly a světlo.</p>
-<div class="rbox"><b>Ve zkratce:</b> odhalujte dílky, padejte jen tam, kam musíte, a držte se pohromadě. Hlubina neodpouští, ale skoro každý krok bez nové informace jde vzít zpět.</div>`,
-`<h3>1. Obsah hry</h3><ul>
-<li><b>48 dílků laboratoře:</b> křižovatky, odbočky, chodby, zatáčky, slepé uličky a 3 žebříky. Mezi posledních 10 dílků je zamíchán <b>portál</b>.</li>
-<li><b>2–4 průzkumníci</b> (podle obtížnosti) s 5 / 6 / 7 životy (lehká / normální / těžká), dynamitem a baterkou.</li>
-<li><b>6 laboratorních karet</b> událostí.</li>
-<li><b>Kostka závalu</b> se stěnami I, II, III.</li>
-<li><b>Obětní sošky</b>, které jsou zároveň měnou mezi levely.</li></ul>
-<div class="rrow">${TI('T',null,[0,1,1,1])}${TI('straight','cave',[0,1,0,1],{cave:2})}${TI('straight',null,[0,1,0,1],{gem:true})}${TI('exit',null,[1,1,1,1],{lv:true})}</div>
-<p class="cap">Odbočka s prkny nad šachtou · chodba se závalem II · soška na podstavci · probuzený portál</p>`,
-`<h3>2. Příprava</h3><ol>
-<li>Položte <b>vstupní dílek</b> (vyhaslý portál) doprostřed horní řady. Deska má 9 sloupců a 8 pater.</li>
-<li>Všechny tři průzkumníky postavte na vstup.</li>
-<li>Zamíchejte balíček dílků a portál vložte mezi posledních 10.</li>
-<li>Ve spodní části desky vyznačte náhodnou <b>zónu 3 × 3</b>. Někde v ní je zařízení.</li>
-<li>Laboratorní karty vyložte lícem nahoru. Ukazatel času nastavte na <b>25 kol</b>.</li>
-<li>Hladina vody začíná <b>v polovině výšky jeskyně</b>, ale je neznámá, dokud na ni nenarazíte.</li></ol>
-<div class="rbox"><b>Cyklická deska:</b> levý a pravý okraj na sebe navazují. Kdo odejde vlevo, vynoří se vpravo.</div>`,
-`<h3>3. Průběh kola</h3><p>V každém kole odehraje každý průzkumník jeden tah, v libovolném pořadí.</p>
-<ol><li><b>Tahy průzkumníků.</b> Každý má <b>2 akce</b>. Třetí akce je možná, ale průzkumník se <b>vyčerpá</b> a hned ztratí 1 život.</li>
-<li><b>Pohyb pavouků.</b> Každý pavouk se posune o 1 pole k nejbližšímu stojícímu průzkumníkovi.</li>
-<li><b>Laboratorní karta.</b> Otočte náhodnou nepoužitou kartu a vyhodnoťte ji. Karty se ubírají 6 → 5 → 4 → 3, pak se znovu zamíchají. S 10% šancí jde o <b>kritický zásah</b> a karta se vyhodnotí dvakrát.</li>
+/* obrázek do pravidel: dílek jako ve hře, s ohněm, září, přízrakem, žebříkem nebo lanem */
+let RB_GHOST=null;
+function RF(kind,feat,e,o,cap){o=o||{};
+  const t={id:'rb'+kind+(feat||'')+(o.cave||'')+(o.gem?'g':'')+(o.serum?'s':''),kind,feat:feat||null,cave:o.cave||0,gem:o.gem,serum:o.serum,noLedge:o.noLedge};
+  let c;try{c=previewView(t,e);c.preview=false;Object.assign(c,o.cell||{});}catch(err){c={t,e,open:!!e[2],openUp:!!e[0]};}
+  let ov='';const S=96;
+  if(o.fire&&FLAME_URL){const x0=e[3]?0:12,x1=e[1]?96:84;let f='';for(let k=0;k<5;k++){const fx2=x0+4+(x1-x0-24)*(k/4),big=k%2===0;f+=`<span class="fl" style="left:${fx2|0}px;top:${big?44:50}px;${big?'':'scale:.72;'}background-image:url(${FLAME_URL});animation-delay:-${(k*.13).toFixed(2)}s;opacity:${big?.9:.75}"></span>`;}
+    ov+=`<div class="gl fire" style="left:0;top:0"><span class="fglow" style="left:8px;right:8px"></span>${f}</div>`;}
+  if(feat==='hazard'){let q='';for(let k=0;k<6;k++)q+=`<i style="left:${20+((k*29)%56)}px;top:${46+((k*13)%22)}px;animation-delay:${(k*.43).toFixed(2)}s"></i>`;ov+=`<div class="gl rad" style="left:0;top:0">${q}</div>`;}
+  if(feat==='monster')ov+=`<div class="gl lair" style="left:0;top:0"></div>`;
+  if(o.gem)ov+=`<div class="gl idol${e[1]||e[3]?'':' vert'}" style="left:0;top:0"></div>`;
+  if(o.serum)ov+=`<div class="gl serum" style="left:0;top:0"></div>`;
+  if(kind==='exit'&&o.lv)ov+=`<div class="gl portal on" style="left:0;top:0"></div>`;
+  if(['slime','core','tele','canteen'].includes(feat))ov+=`<div class="gl ${feat==='canteen'?'cant':feat}" style="left:0;top:0"></div>`;
+  if(o.ghost){if(!RB_GHOST){try{const g=mkCanvas(48,48);drawSpider(g.getContext('2d'),.6,false,2);RB_GHOST=g.toDataURL();}catch(err){RB_GHOST='';}}if(RB_GHOST)ov+=`<img class="rbg" src="${RB_GHOST}" alt="">`;}
+  if(o.ladder&&LAD_URL)ov+=`<div class="lad" style="left:34px;top:0;height:${S}px;background-image:url(${LAD_URL})"></div>`;
+  if(o.rope&&ROPE_URL)ov+=`<div class="rope" style="left:${S/2-3}px;top:0;height:${S}px;background-image:url(${ROPE_URL})"></div>`;
+  return `<figure class="rfig"><span class="rfi"><img src="${tileImg(c)}" alt="">${ov}</span>${cap?`<figcaption>${cap}</figcaption>`:''}</figure>`;}
+const RR=(...f)=>`<div class="rrow">${f.join('')}</div>`;
+const RX=(n,t)=>`<div class="rxhead"><span>EXTRA PRAVIDLA · ${n}</span></div><h3>${t}</h3>`;
+function bookPages(){if(!LAD_URL&&typeof makeStatic==='function')makeStatic();return [
+`<h2>Hlubina</h2><p class="lead">Kooperativní sestup do opuštěné laboratoře pro 1–4 hráče.</p>
+<p>Před desítkami let v podzemní laboratoři Sektoru 7 unikla radiace. Chodby zarostly rzí, ve tmě se něco pohnulo a staré zařízení pořád čeká, až ho někdo probudí.</p>
+<p>Vedete výpravu 2–4 průzkumníků. V každém levelu musíte najít <b>zařízení</b>, které probudí <b>portál</b>, a projít jím dřív, než dojde čas, síly a světlo.</p>
+${RR(RF('start',null,[0,1,0,1],{},'vstup'),RF('lever',null,[0,1,0,1],{},'zařízení'),RF('exit',null,[1,1,1,1],{lv:true},'probuzený portál'))}
+<div class="rbox"><b>Ve zkratce:</b> odhalujte dílky, padejte jen tam, kam musíte, a držte se pohromadě. Skoro každý krok, který neodhalil nic nového, jde vzít zpět.</div>
+<p class="cap">Pravidla 1–12 jsou základní hra. Strany s nápisem <b>Extra pravidla</b> popisují věci, které výprava potkává až cestou.</p>`,
+
+`<h3>1. Obsah a příprava</h3><ul>
+<li><b>49 dílků laboratoře:</b> křižovatky, odbočky, chodby, zatáčky, slepé uličky a 3 žebříky. Mezi posledních 10 je zamíchán <b>portál</b>.</li>
+<li><b>Průzkumníci</b> s životy (5 / 6 / 7 podle obtížnosti), dynamitem a baterkou.</li>
+<li><b>6 laboratorních karet</b>, kostka závalu I–III, obětní sošky.</li></ul>
+<ol><li>Vstupní dílek leží uprostřed horní řady. Deska má 9 sloupců a 8 pater.</li>
+<li>Všichni průzkumníci stojí na vstupu.</li>
+<li>Ve spodní části je skrytá <b>zóna 3 × 3</b>. Někde v ní je zařízení.</li>
+<li>Čas na level je <b>25 kol</b>. Voda začíná v polovině výšky, ale neznáte ji, dokud na ni nenarazíte.</li></ol>
+<div class="rbox"><b>Deska je dokola:</b> kdo odejde vlevo, vynoří se vpravo.</div>`,
+
+`<h3>2. Průběh kola</h3><p>V každém kole odehraje každý průzkumník jeden tah. Pořadí volíte sami.</p>
+<ol><li><b>Tahy průzkumníků.</b> Každý má <b>2 akce</b>. Třetí akce jde, ale průzkumník se <b>vyčerpá</b> a ztratí 1 život.</li>
+<li><b>Přízraky</b> se posunou o 1 pole k nejbližšímu stojícímu průzkumníkovi.</li>
+<li><b>Laboratorní karta.</b> Otočí se náhodná nepoužitá karta. S 10% šancí jde o <b>kritický zásah</b> a vyhodnotí se dvakrát.</li>
 <li><b>Voda.</b> Pokud nepřišla Záplava, hladina klesne o patro.</li></ol>
-<p>Po dokončení tahu už průzkumníka nelze vyměnit. Kdo začal hrát, dohraje.</p>`,
-`<h3>4. Akce</h3><table class="rtab">
-<tr><td>Pohyb</td><td>1</td><td>na sousední pole (plazivka stojí 2)</td></tr>
+<p>Kdo začal tah, dohraje ho, průzkumníka uprostřed tahu nevyměníte.</p>
+<div class="rbox">Karty se ubírají 6 → 5 → 4 → 3, pak se znovu zamíchají. Na konci kola se odečte čas, až pak přijde karta.</div>`,
+
+`<h3>3. Akce</h3><table class="rtab">
+<tr><td>Pohyb</td><td>1</td><td>na sousední pole (plazivka 2)</td></tr>
 <tr><td>Odhalit</td><td>1</td><td>líznout dílek, natočit a přiložit</td></tr>
 <tr><td>Prozkoumat</td><td>1</td><td>odhalit do strany a rovnou vstoupit</td></tr>
 <tr><td>Lano</td><td>2</td><td>hodit nahoru, nebo spustit dolů</td></tr>
 <tr><td>Vykopat</td><td>2</td><td>odklidit zával na sousedním poli</td></tr>
 <tr><td>Dynamit</td><td>2</td><td>prorazit stěnu, spustí zával</td></tr>
 <tr><td>Zabít přízrak</td><td>2</td><td>na stejném poli</td></tr>
-<tr><td>Ošetřit</td><td>2</td><td>+2 životy sobě nebo spolubojovníkovi (ne pod vodou)</td></tr>
-<tr><td>Zvednout</td><td>2</td><td>sraženého na 2 životy, maximum −1 pro tento level</td></tr>
-<tr><td>Projít portálem</td><td>1</td><td>jen když je portál probuzený</td></tr>
+<tr><td>Ošetřit</td><td>2</td><td>+2 životy sobě nebo druhému (ne pod vodou)</td></tr>
+<tr><td>Zvednout</td><td>2</td><td>sraženého na 2 životy</td></tr>
+<tr><td>Projít portálem</td><td>1</td><td>jen když je probuzený</td></tr>
 <tr><td>Sebrat sošku</td><td>0</td><td>batoh unese 3 předměty</td></tr></table>`,
-`<h3>5. Odhalování dílků</h3><p>Odhalit lze jen směrem, kam vede otevřená chodba. Dílek musí na toto napojení navazovat, jinak ho natočíte, jak chcete.</p>
-<p><b>Řetězení:</b> vede-li nový dílek šachtou nahoru nebo dolů do neodhaleného pole, odhalí se i další dílek. Pravděpodobnost, že se šachta zastaví, roste s každým patrem: 20, 40, 60, 80, 100 %.</p>
-<p><b>Zóna zařízení:</b> zařízení v balíčku není, je vždy v zóně. Každé odhalené pole zóny má šanci 1/9, 2/9 … 9/9, že je to ono. Když dílky dojdou, je jím rovnou další odhalené pole zóny. Kdo na něj vstoupí, probudí portál.</p>
-<p><b>Ztracení:</b> když dílky dojdou, do zóny nevede žádná otevřená cesta a nikdo nemá dynamit, výprava se ztratila a prohrává.</p>
-<p><b>Balíček:</b> jakmile v něm zbývá 10 a méně dílků, portál může přijít kdykoli.</p>`,
-`<h3>6. Gravitace a šachty</h3><div class="rrow">${TI('T',null,[0,1,1,1])}${TI('cross',null,[1,1,1,1])}</div>
-<p>Vstoupíte-li na pole s otevřenou šachtou dolů, <b>padáte</b> až na dno a ztrácíte 1 život za každé patro. Pád do vody nezraňuje.</p>
-<p><b>Prkna:</b> přes díry vedou stará prkna u zadní stěny. Kdo do šachty vejde ze strany, zůstane na nich přitisknutý zády ke zdi. Z prken lze odejít do stran, hodit lano, nebo skočit. Křižovatky a některé dílky prkna nemají.</p>
-<p><b>Kapacita šachty:</b> jeden průzkumník na prknech a jeden na laně. V šachtě se žebříkem prkna nejsou, vejde se jen jeden na žebřík.</p>
-<p><b>Plazivka:</b> úzkým průlezem se leze naplocho za 2 akce a vejde se do něj jen <b>jeden</b> průzkumník. Dokud tam někdo je, nikdo další nevleze.</p>
-<p><b>Svislý koridor:</b> šachta jím pokračuje. Žebřík skrz něj nevede, lano ano. Kdo do něj spadne, zastaví se v něm (zranění jen po koridor). Je-li obsazený, oba dostanou −1 a původní průzkumník vyletí dolů. Z koridoru dolů tě chytí žebřík hned pod ním (pokud na něm nikdo není), jinak padáš jako ze skoku. Nahoru jen po laně nebo na žebřík těsně nad koridorem. Lano jím projde celé a jde ho spustit i z koridoru. Sražený jím propadne. Dynamit z koridoru udělá <b>koridor T</b>, pro který platí pravidla svislého i vodorovného koridoru zároveň.</p>
-<p><b>Nahoru</b> se dostanete jen po žebříku, po laně, nebo plaváním.</p>`,
-`<h3>7. Lana a žebříky</h3>
-<p><b>Žebřík</b> se po odhalení rozvine přes celou svislou šachtu ve svém sloupci a zlomí prkna, která už nejsou potřeba. Po žebříku se chodí oběma směry za 1 akci.</p>
-<p><b>Lano dolů</b> spustíte z prken do své šachty, nebo do sousední šachty vedle sebe: šance 80 %.</p>
-<p><b>Lano nahoru</b> hodíte odkudkoli, kam vede otevřená šachta nahoru: o 1 patro 60 %, o 2 patra 40 %, o 3 patra 20 %.</p>
-<p>Když lano nechytí, spadne a akce propadnou. Po laně se leze 1 akce za patro.</p>`,
-`<h3>8. Nebezpečí</h3>
-<p><b>Voda.</b> Kdo skončí tah pod hladinou, ztrácí 1 život. Pod vodou se plave do stran a dolů. Nad hladinu vede cesta jen po laně nebo žebříku.</p>
-<p><b>Oheň.</b> Kdo skončí tah v hořící chodbě, ztrácí 1 život. Voda oheň uhasí.</p>
-<p><b>Radiace.</b> Vstup nebo pád zářícím polem znamená test: 50 % na −1 život.</p>
-<p><b>Zával.</b> Chodby se zlatým číslem I, II, nebo III se zřítí, když na kostce padne jejich číslo. Zasypaný je sražen a musí ho někdo vyhrabat.</p>
-<p><b>Pavouci.</b> Líhnou se ve fialově zářících prasklinách. Pohybují se jen chodbami. Dva nikdy nesdílí pole a čekají ve frontě. Kousnutí bere 2 životy.</p>`,
-`<h3>9. Laboratorní karty</h3><table class="rtab">${EVENTS.map(e=>`<tr><td><span class="invi">${EVICON[e]}</span> ${EV[e].name}</td><td colspan="2">${evUL(e)}</td></tr>`).join('')}</table>
-<p><b>Čas:</b> když ukazatel kol dojde na nulu, přichází na konci každého kola navíc <b>Panika</b>: každý stojící průzkumník testuje nervy, 50 % na −1.</p>`,
-`<h3>10. Sražení a konec levelu</h3>
-<p>Průzkumník s 0 životy je <b>sražen</b>. Plazí se po čtyřech jen do stran a má 1 akci (i portálem projít smí). Jiný průzkumník na stejném poli ho za 2 akce zvedne. Zvednutý má v tom kole už jen 1 akci (+ vyčerpání).</p>
-<p>Level končí, jakmile nikdo nestojí v laboratoři: všichni prošli portálem, nebo jsou sraženi či mrtví. Neprojde-li nikdo, výprava jde dál, ale nevynesete žádnou sošku a všem ubude 1 maximální život. Run končí, až když nikdo nežije.</p>
-<h3>11. Plán laboratoře</h3>
-<p>Výprava postupuje po plánu sektoru shora dolů: <b>1A</b> → <b>2A/2B</b> → <b>3A/3B/3C</b> → <b>4A/4B</b> → <b>5A</b>. Kam se dá jít dál, ukazují čáry. Před každým levelem si vybereš místnost.</p>
-<ul><li><b>1A Vstupní hala</b> a <b>5A Hlubinný reaktor</b> dávají za úspěšný průchod 1 sošku navíc. V 5A se jeskyně natrvalo prohloubí o 1 patro (a zóna se zařízením klesne).</li>
-<li><b>Patro 2 (příznivé):</b> teleporty, karanténa, regenerační komora, protiatomový kryt, kantýna nebo depozitář soch.</li>
-<li><b>Patro 3 (neutrální):</b> každá místnost přidá jednu destičku se zvláštností a jednu bez.</li>
-<li><b>Patro 4 (nepřátelské):</b> přidá dvě nebezpečné destičky a v tom levelu má jedna událost vždy kritický zásah (proběhne dvakrát).</li></ul>
-<p>Každá místnost v patře 3 má i <b>typ levelu</b> (ikonka na plánu): Ztracení, Tma, Dvojitý zámek, Na dohled, Úprk, Dusno. Typ, který si vyberete, se už ve výpravě znovu neobjeví.</p>
-<p>Destičky z vybraných místností se přidají do balíčku natrvalo. Jinak dostanete jen sošky, které sami vynesete. Schopnost stojí 3 sošky, vylepšení na II stojí 2 a na III stojí 3. Každý průzkumník má 2 sloty, koupenou schopnost nejde přepsat ani mít dvakrát. Kdo portálem neprošel, má do dalšího levelu maximum životů o 1 menší. V levelu se neumírá: sražená postava se dá vždy zvednout. Kdo ale přijde o poslední maximální život, protože neprošel portálem, je ztracen navždy. Za každý level dostanete ampuli séra a k tomu další za každou živou postavu, která neprošla portálem (a další ampule můžete vynést ze Skladu séra). Za sérum si postava koupí +1 maximální život, nejvýš do startovního maxima obtížnosti (5 / 6 / 7; první nákup ve výpravě stojí 1 ampuli, druhý 2 a tak dál, společně pro všechny postavy). Za sérum se dá také natrvalo prodloužit čas na level o 1 kolo (cena 1, 2, 3 … ampule, počítá se zvlášť). Po 5A začíná další akt s novým plánem. 5A ve třetím aktu je poslední level: kdo jím projde, vyhrál. V patře 5 se startuje uprostřed jeskyně těsně nad vodou a zařízení je v posledních třech patrech. Od 2. aktu přidává patro 3 i extra destičky (střílna, past se dveřmi, sliz, jádro radiace, prasklé potrubí).</p>
-<table class="rtab"><tr><td>Teleport</td><td colspan="2">1 akce: přenese tě na druhý teleport. Leží-li druhý ještě v balíčku, objeví se s tebou na náhodném místě a náhodně natočený.</td></tr>
+
+`<h3>4. Odhalování dílků</h3><p>Odhalit lze jen tam, kam vede otevřená chodba. Dílek musí na napojení navazovat, jinak ho natočíte, jak chcete.</p>
+<p><b>Řetězení:</b> vede-li nový dílek šachtou do neodhaleného pole, odhalí se i další. Šance, že se šachta zastaví, roste s každým patrem: 20, 40, 60, 80, 100 %.</p>
+<p><b>Zóna:</b> zařízení není v balíčku, je vždy v zóně. Každé odhalené pole zóny má šanci 1/9, 2/9 … 9/9, že je to ono. Kdo na zařízení vstoupí, probudí portál.</p>
+<p><b>Konec balíčku:</b> jakmile v něm zbývá 10 a méně dílků, portál může přijít kdykoli. Když dílky dojdou, je zařízením další odhalené pole zóny.</p>
+<p><b>Ztracení:</b> dílky došly, do zóny nevede cesta a nikdo nemá dynamit. Výprava prohrává.</p>`,
+
+`<h3>5. Šachty a prkna</h3>${RR(RF('T',null,[0,1,1,1],{},'prkna nad šachtou'),RF('cross',null,[1,1,1,1],{},'křižovatka bez prken'),RF('straight','squeeze',[0,1,0,1],{},'plazivka'))}
+<p>Vstoupíte-li na pole s otevřenou šachtou dolů, <b>padáte</b> až na dno a ztrácíte 1 život za patro. Pád do vody nezraňuje.</p>
+<p><b>Prkna:</b> kdo vejde do šachty ze strany, zůstane na prknech. Odtud jde odejít do stran, hodit lano, nebo skočit. Křižovatky prkna nemají. Na prknech je místo pro jednoho, na laně pro dalšího.</p>
+<p><b>Plazivka:</b> vstup stojí 2 akce a vejde se do ní jen jeden. Svislou plazivkou šachta pokračuje: lano jí projde, žebřík ne. Kdo do ní spadne, zastaví se v ní.</p>
+<p><b>Nahoru</b> vede cesta jen po žebříku, po laně, nebo plaváním.</p>`,
+
+`<h3>6. Lana a žebříky</h3>${RR(RF('straight',null,[1,0,1,0],{ladder:true},'žebřík'),RF('straight',null,[1,0,1,0],{rope:true},'lano'))}
+<p><b>Žebřík</b> se po odhalení rozvine přes celou svislou šachtu ve svém sloupci a zlomí prkna, která už nejsou potřeba. Leze se po něm oběma směry za 1 akci.</p>
+<p><b>Lano dolů</b> spustíte z prken do své šachty nebo do sousední: šance 80 %.</p>
+<p><b>Lano nahoru</b> hodíte všude, kde vede otevřená šachta nahoru: o 1 patro 60 %, o 2 patra 40 %, o 3 patra 20 %.</p>
+<p>Když lano nechytí, spadne a akce propadnou. Po laně se leze 1 akce za patro. Lano se samo protáhne co nejníž, když se terén změní.</p>`,
+
+`<h3>7. Nebezpečí</h3>${RR(RF('straight','fire',[0,1,0,1],{fire:true},'oheň'),RF('straight','hazard',[0,1,0,1],{},'radiace'),RF('straight','cave',[0,1,0,1],{cave:2},'zával II'),RF('T','monster',[0,1,1,1],{ghost:true},'doupě a přízrak'))}
+<p><b>Voda:</b> kdo skončí tah pod hladinou, ztratí 1 život. Pod vodou se plave do stran a dolů.</p>
+<p><b>Oheň:</b> kdo skončí tah v hořící chodbě, ztratí 1 život. Voda oheň uhasí.</p>
+<p><b>Radiace:</b> vstup nebo pád zářícím polem je test: 50 % na −1 život.</p>
+<p><b>Zával:</b> chodby se zlatým číslem se zřítí, když na kostce padne jejich číslo. Zasypaný je sražen a musí ho někdo vykopat.</p>
+<p><b>Přízraky</b> se líhnou ve fialových doupatech a chodí jen chodbami. Dva nikdy nesdílí pole. Zásah bere 2 životy.</p>`,
+
+`<h3>8. Laboratorní karty</h3><table class="rtab">${EVENTS.map(e=>`<tr><td><span class="invi">${EVICON[e]}</span> ${EV[e].name}</td><td colspan="2">${evUL(e)}</td></tr>`).join('')}</table>
+<p><b>Panika:</b> když dojde čas, přichází na konci každého kola navíc. Každý stojící průzkumník testuje nervy, 50 % na −1.</p>`,
+
+`<h3>9. Sražení a konec levelu</h3>
+<p>Průzkumník s 0 životy je <b>sražen</b>. Plazí se jen do stran a má 1 akci, portálem projít smí. Jiný průzkumník na stejném poli ho za 2 akce zvedne. Zvednutý má v tom kole už jen 1 akci. V levelu se neumírá.</p>
+<p>Level končí, jakmile nikdo nestojí v laboratoři.</p>
+<ul><li>Kdo prošel portálem, vynese své sošky.</li>
+<li>Kdo neprošel, má trvale <b>o 1 maximální život méně</b>. Kdo tak přijde o poslední, je ztracen navždy.</li>
+<li>Výprava končí, až když nikdo nežije, nebo po vítězství.</li></ul>
+<h3>10. Vracení tahů</h3>
+<p>Krok, který <b>neodhalil nic nového</b>, jde vzít zpět, i ukončení tahu. Jakmile padne nová informace (dílek, kostka, test, karta, hod lanem), minulost se uzavře.</p>`,
+
+`<h3>11. Výprava</h3>
+<p>Výprava jde po plánu sektoru shora dolů: <b>1A</b> → <b>2A / 2B</b> → <b>3A / 3B / 3C</b> → <b>4A / 4B</b> → <b>5A</b>. Před každým levelem si vyberete další místnost.</p>
+<ul><li><b>Patro 2</b> je příznivé, <b>patro 3</b> neutrální, <b>patro 4</b> nepřátelské (viz Extra pravidla).</li>
+<li>Destičky z vybraných místností se přidají do balíčku natrvalo.</li>
+<li><b>1A</b> a <b>5A</b> dají za průchod 1 sošku navíc. V 5A se jeskyně natrvalo prohloubí o 1 patro.</li>
+<li>Po 5A začíná další akt s novým plánem. <b>5A ve třetím aktu</b> je poslední level: kdo jím projde, vyhrál.</li></ul>
+<p><b>Obchod mezi levely:</b> za sošky kupujete schopnosti (nová 3, vylepšení na II 2, na III 3). Každý má 2 sloty. Za <b>ampule séra</b> koupíte +1 max. život nebo +1 kolo času natrvalo.</p>`,
+
+`<h3>12. Obtížnost a skóre</h3><table class="rtab">
+<tr><td>Lehká</td><td>4</td><td>5 životů · skóre × 0,75</td></tr>
+<tr><td>Normální</td><td>3</td><td>6 životů · skóre × 1</td></tr>
+<tr><td>Těžká</td><td>2</td><td>7 životů · skóre × 1,5</td></tr></table>
+<p>Číslo udává počet průzkumníků. Sérem jde doplnit život nejvýš na startovní maximum.</p>
+<p><b>Skóre</b> = 100 × nejhlubší level + 25 × všechny získané sošky + 15 × zbylé max. životy přeživších, za vítězství +500. Celé se násobí obtížností. Výsledek se zapíše do světové tabulky.</p>
+<p><b>Multiplayer:</b> 2–4 hráči s ovladači se dělí o postavy dokola. Kdo má víc postav, přepíná LB / RB. Mapu, obchod a dialogy ovládá vedoucí, v obchodě nakupuje každý sám.</p>
+<div class="rbox"><b>Rada:</b> hlubina trestá spěch. Dvě akce a stát je často lepší než třetí a vyčerpání.</div>`,
+
+`${RX('I','Příznivé místnosti (patro 2)')}<p class="small">Každá přidá do balíčku 2 destičky.</p>
+${RR(RF('T','tele',[0,1,1,1],{},'teleport'),RF('T','spring',[0,1,1,1],{},'regenerace'),RF('T','bunker',[0,1,1,1],{},'kryt'),RF('T','canteen',[0,1,1,1],{},'kantýna'))}
+<table class="rtab rtsm">
+<tr><td>Teleport</td><td colspan="2">1 akce: přenese tě na druhý. Neleží-li druhý na mapě, objeví se s tebou na náhodném místě.</td></tr>
 <tr><td>Karanténa</td><td colspan="2">Přízrak, který do ní vstoupí, zahyne.</td></tr>
-<tr><td>Regenerace</td><td colspan="2">Kdo v ní ukončí tah, vyléčí se o 3 (sraženého postaví na nohy). Pod vodou nefunguje.</td></tr>
-<tr><td>Kryt</td><td colspan="2">Nedostane se do něj zával, přízrak ani voda a kdo v něm stojí, toho nezasáhne událost. Dynamit ho neprorazí.</td></tr>
-<tr><td>Kantýna</td><td colspan="2">Kdo v ní ukončí tah, začne příští kolo se 2 akcemi navíc.</td></tr>
-<tr><td>Prasklé potrubí</td><td colspan="2">Kdokoli do něj vstoupí (i přízrak), voda stoupne o patro.</td></tr></table>`,
-`<h3>12. Vracení tahů</h3>
-<p>Krok, který <b>neodhalil nic nového</b>, lze vzít zpět, a to i ukončení tahu nebo zranění od ohně a vody.</p>
-<p>Jakmile se objeví nová informace (dílek, kostka, test, karta, hod lanem), minulost se uzavře.</p>
-<div class="rbox"><b>Rada na konec:</b> hlubina trestá spěch. Dvě akce a stát je často lepší než třetí a vyčerpání.</div>
-<p class="cap" style="margin-top:30px">Hodně štěstí tam dole.</p>`
+<tr><td>Regenerace</td><td colspan="2">Konec tahu tady: +3 životy, sraženého postaví. Pod vodou ne.</td></tr>
+<tr><td>Kryt</td><td colspan="2">Nedostane se do něj zával, přízrak ani voda, nezasáhne tě událost. Dynamit ho neprorazí.</td></tr>
+<tr><td>Kantýna</td><td colspan="2">Konec tahu tady: příští kolo +2 akce.</td></tr>
+<tr><td>Sklad séra</td><td colspan="2">2 slepé uličky s ampulí. Vynes ji portálem.</td></tr>
+<tr><td>Depozitář</td><td colspan="2">1 destička se soškou a 1 obyčejná.</td></tr></table>`,
+
+`${RX('II','Nepřátelské místnosti (patro 4)')}<p class="small">Každá přidá 2 nebezpečné destičky a jedna událost má v tom levelu <b>vždy kritický zásah</b>. Na plánu je označená razítkem.</p>
+<table class="rtab rtsm">
+<tr><td>Dlouhé šachty</td><td colspan="2">2 křižovatky bez prken · Záplava</td></tr>
+<tr><td>Slepé chodby</td><td colspan="2">2 slepé uličky · Vyčerpání</td></tr>
+<tr><td>Líheň přízraků</td><td colspan="2">2 doupata · Přízraky</td></tr>
+<tr><td>Ohnisko požáru</td><td colspan="2">2 hořící chodby · Požár</td></tr>
+<tr><td>Únik radiace</td><td colspan="2">2 radioaktivní dílky · Radiace</td></tr>
+<tr><td>Nestabilní laboratoř</td><td colspan="2">2 dílky se závalem · Zával</td></tr></table>
+<h3 class="h4">Neutrální místnosti (patro 3)</h3><p class="small">Přidají jednu destičku se zvláštností (oheň, radiace, doupě, zával, plazivka, slepá ulička, vzácně žebřík) a jednu obyčejnou. Prostřední bývá nejhorší. Každá má navíc <b>typ levelu</b> (další strana).</p>`,
+
+`${RX('III','Typy levelů (patro 3)')}<p class="small">Typ je na plánu jako ikonka. Typ, který si vyberete, se ve výpravě už neobjeví.</p>
+<table class="rtab rtsm">${Object.keys(MODS).map(k=>`<tr><td>${MODS[k].icon} ${MODS[k].name}</td><td colspan="2">${MODS[k].desc}</td></tr>`).join('')}</table>`,
+
+`${RX('IV','Destičky od 2. aktu')}<p class="small">Od druhého aktu přidává patro 3 i tyto destičky.</p>
+${RR(RF('cross','turret',[1,1,1,1],{},'střílna'),RF('straight','trap',[0,1,0,1],{},'past'),RF('cross','slime',[1,1,1,1],{},'sliz'),RF('T','core',[0,1,1,1],{},'jádro'),RF('straight','pipe',[0,1,0,1],{},'potrubí'))}
+<table class="rtab rtsm">
+<tr><td>Střílna</td><td colspan="2">Vstup na pole nebo do laseru: 50 % na −1.</td></tr>
+<tr><td>Past se dveřmi</td><td colspan="2">Za tebou se zabouchnou dveře, otevřít jdou jen zvenku (1 akce).</td></tr>
+<tr><td>Sliz</td><td colspan="2">Vstup nebo propad −3, konec tahu v něm −1.</td></tr>
+<tr><td>Jádro radiace</td><td colspan="2">Při Radiaci ozáří okolí: kdo je zasažen, má příští kolo o akci méně.</td></tr>
+<tr><td>Prasklé potrubí</td><td colspan="2">Kdo vstoupí (i přízrak), voda stoupne o patro.</td></tr></table>`,
+
+`${RX('V','Schopnosti')}<p class="small">Kupují se v obchodě za sošky. Úrovně I / II / III.</p>
+<table class="rtab rtsm">
+<tr><td>Potápěč</td><td colspan="2">Pod vodou kyslík na 2 / 4 / 6 kol. Voda bere nejdřív kyslík.</td></tr>
+<tr><td>Lezec</td><td colspan="2">Hod lanem +15 / +30 %. III: lano za 1 akci.</td></tr>
+<tr><td>Skokan</td><td colspan="2">Pád zraňuje o 1 / 2 / 3 méně.</td></tr>
+<tr><td>Střelec</td><td colspan="2">1 akce: střela na přízrak až 2 pole rovně (60/40, 80/60, 100/80 %).</td></tr>
+<tr><td>Stopař</td><td colspan="2">1 / 2 / 3× za výpravu vymění tažený dílek.</td></tr>
+<tr><td>Demolice</td><td colspan="2">Výbuch bez závalu. II: 2 dynamity. III: 3 a výbuch za 1 akci.</td></tr>
+<tr><td>Hasič</td><td colspan="2">3 / 5 / 7 hašení za level. Oheň na svém poli uhasí místo zranění.</td></tr>
+<tr><td>Antiradiace</td><td colspan="2">+15 / 30 / 45 % na odolání radiaci.</td></tr>
+<tr><td>Doktor</td><td colspan="2">Ošetření i zvednutí 75 % na +1 / +2. III: vždy +2, zvednutý má plné akce.</td></tr></table>
+<p class="small">Hasič má navíc akci <b>Hasit</b> (1 akce): uhasí oheň na svém poli i na propojených sousedních.</p>`,
+`<h3>Ovládání</h3><table class="rtab rtsm">
+<tr><td>Myš</td><td>Klikni na postavu, pak na pole nebo akci. Horní půlka pole = odhalit, dolní = prozkoumat. Mapu posuneš tažením, kolečkem přiblížíš.</td></tr>
+<tr><td>Ovladač: páčka</td><td>Vybírá postavu, cílové pole nebo tlačítko.</td></tr>
+<tr><td>A</td><td>Vybrat / provést / potvrdit. U dílku položit.</td></tr>
+<tr><td>B</td><td>Zpět, zrušit výběr. Podržet = ukončit tah.</td></tr>
+<tr><td>X</td><td>Stopař: vyměnit dílek. V lobby jiná jména.</td></tr>
+<tr><td>Y</td><td>Otevře speciální akce (lano, dynamit, ošetřit…). U dílku otočit.</td></tr>
+<tr><td>LB / RB</td><td>Přepnout postavu, u dílku otočit, v pravidlech listovat.</td></tr>
+<tr><td>Start</td><td>Ukončit kolo.</td></tr>
+<tr><td>View</td><td>Vrátit krok zpět.</td></tr>
+<tr><td>Pravá páčka · triggery</td><td>Posun kamery · přiblížení.</td></tr></table>
+<p class="cap" style="margin-top:20px">Hodně štěstí tam dole.</p>`
 ];}
 let BOOK_P=0;
 function showRules(){
@@ -3604,7 +3728,7 @@ function tAllow(kind,x,y){
   const v=(s.allow||{})[kind];if(v===true)return true;if(Array.isArray(v))return kind==='sel'?v.includes(x):v.some(p=>p[0]===x&&p[1]===y);
   return false;
 }
-function tutEl(){let b=document.getElementById('tut');if(!b){b=document.createElement('div');b.id='tut';b.innerHTML='<div id="tuthl"></div><div id="tutbox"><div class="tt"></div><div class="tb"></div></div>';document.body.appendChild(b);}return b;}
+function tutEl(){let b=document.getElementById('tut');if(!b){b=document.createElement('div');b.id='tut';b.innerHTML='<div id="tuthl"></div><div id="tutbox"><div class="tt"></div><div class="tgp">Ovladač: páčkou vybereš postavu, pole nebo akci, A ji provede, Y otevře speciální akce, podržené B ukončí tah, Start ukončí kolo.</div><div class="tb"></div></div>';document.body.appendChild(b);}return b;}
 function startTutorial(){
   buildTutMap();RUN=null;newRun([T0,T1,T2]);hideMenu();closeModal();resetView();setSize('9x8');newGame();
   G.tut={i:0,ev:false,evq:[],seen:{}};G.zone={x:-9,y:-9};G.W=ROWS;G.deck=[];G.limit=40;
@@ -4273,6 +4397,7 @@ function shopRows(cids,pickId,mpMode){const mb=document.getElementById('mbox'),r
   rows.push([...mb.querySelectorAll('[data-a="buytime"]:not([disabled])')]);
   rows.push([...mb.querySelectorAll('[data-offer]')]);
   rows.push([...mb.querySelectorAll(mpMode?'.shopsec [data-a="nextlvl"]':'.shopsec [data-a="nextlvl"],.shopsec [data-a="close"]')]);
+  {const tb=document.querySelector('#tut:not([hidden]) #tutbox [data-tnext]');if(tb)rows.push([tb]);}
   return rows.map(r=>r.filter(visible)).filter(r=>r.length);}
 function gridMove(rows,cur,dir){let ri=-1,ci=-1;rows.forEach((r,i)=>{const k=r.indexOf(cur);if(k>=0){ri=i;ci=k;}});
   if(ri<0)return rows[0][0];
@@ -4335,6 +4460,7 @@ function gpHighlight(ctx){
   document.querySelectorAll('.tok.gptgt').forEach(e=>e.classList.remove('gptgt'));
   const root=ctx==='game'&&GPF.scope?document.getElementById(GPF.scope):null,el=findKey(GPF.key,root||document);if(el&&visible(el)){el.classList.add('gpf');const a=G&&G.active!=null?G.chars[G.active]:null;el.style.setProperty('--gpc',a?a.color:'#ffe23a');
     if(el.dataset.heal!=null||el.dataset.rv2!=null){const t=tokEl(+(el.dataset.heal!=null?el.dataset.heal:el.dataset.rv2));if(t)t.classList.add('gptgt');}}   // koho ošetřuju / zvedám
+  {const tb=G&&G.tut&&document.querySelector('#tut:not([hidden]) #tutbox [data-tnext]');document.querySelectorAll('[data-tnext] .gpb').forEach(e=>{if(!tb||!e.closest('#tutbox'))e.remove();});if(tb&&ctx==='game'&&!tb.querySelector('.gpb'))tb.insertAdjacentHTML('afterbegin',gpb('A')+' ');}
   gpGlyphs();}
 // na tlačítkách ukázat, co je na ovladači
 function gpGlyphs(){[['[data-a="place"]','A'],['[data-a="swap"]','X'],['#actions [data-a="end"]','B']].forEach(([sel,k])=>document.querySelectorAll(sel).forEach(b=>{if(!b.querySelector('.gpb'))b.insertAdjacentHTML('afterbegin',gpb(k)+(k==='B'?'<small class="gphold">podržet</small> ':' '));}));}
@@ -4362,13 +4488,17 @@ function gpStep(){
       const leadEvs=MP.on?evs.filter(e=>slotOf(e.i)===MP.lead||(slotOf(e.i)<0&&!MP.gp.some(gi=>pads.some(p=>p.index===gi)))):evs;
       if(ctx==='menu')leadEvs.forEach(ev=>navGeneric(ev,'#menu button:not([disabled])',()=>{const b=document.querySelector('#menu [data-menu="menu"],#menu [data-menu="back"]');if(b)b.click();}));
       else if(ctx==='modal'&&document.querySelector('#mbox.shopbox'))leadEvs.forEach(spShopInput);
-      else if(ctx==='modal')leadEvs.forEach(ev=>navGeneric(ev,'#mbox button:not([disabled]),#mbox [data-offer],#mbox [data-slot]',()=>{const b=document.querySelector('#mbox [data-a="close"]');if(b)b.click();}));
+      else if(ctx==='modal'&&document.querySelector('#mbox.bookbox')&&leadEvs.some(ev=>ev.down.has(4)||ev.down.has(5))){const ev=leadEvs.find(e=>e.down.has(4)||e.down.has(5)),st=window.innerWidth>900?2:1,n=BOOK_P+(ev.down.has(5)?st:-st);if(n>=0&&n<bookPages().length)bookGo(n);}
+      else if(ctx==='modal')leadEvs.forEach(ev=>navGeneric(ev,'#mbox button:not([disabled]),#mbox [data-offer],#mbox [data-slot],#tut:not([hidden]) #tutbox [data-tnext]',()=>{const b=document.querySelector('#mbox [data-a="close"]');if(b)b.click();}));
       else if(ctx==='map'){const conf=document.getElementById('mconf'),rm=document.getElementById('rmap');evs.forEach(ev=>{const dz=v=>Math.abs(v)<.18?0:v;const rx=dz(ev.rx),ry=dz(ev.ry);if(rx||ry)rm.scrollBy(rx*22,ry*22);});leadEvs.forEach(ev=>navGeneric(ev,conf?'#mconf [data-mgo],#mconf [data-mback]':'#rmap [data-node].can,#rmap [data-mapmenu]',()=>{if(document.getElementById('mconf'))closeConf();}));}
-      else if(ctx==='game'&&G&&!G.tut)evs.forEach(ev=>gameInput(ev));
+      else if(ctx==='game'&&G&&G.tut){const tb=document.querySelector('#tut:not([hidden]) #tutbox [data-tnext]');
+        if(tb&&visible(tb)){GPF.key=null;evs.forEach(ev=>{if(ev.down.has(0)){SF('card');tutNext();}});}
+        else evs.forEach(ev=>gameInput(ev));}
+      else if(ctx==='game'&&G)evs.forEach(ev=>gameInput(ev));
     }
     gpHighlight(ctx);gpHint(ctx,true);
   }else if(GPF.any){gpHint('',false);}
-  GPF.any=pads.length>0;
+  GPF.any=pads.length>0;document.body.classList.toggle('gpon',GPF.any);
 }
 if(typeof window!=='undefined'){window.addEventListener('gamepadconnected',()=>{if(MPL)renderLobby();});window.addEventListener('gamepaddisconnected',()=>{if(MPL)renderLobby();});requestAnimationFrame(gpLoop);}
 
@@ -4618,6 +4748,7 @@ function showOver(){
   // nikdo neprošel: výprava pokračuje dál, jen bez vynesených sošek a všem ubude maximum (v tutoriálu i když už nikdo nežije, konec)
   const allDead=()=>RUN.chars.every(r=>!r.alive);
   if(!o.esc&&G.tut){SF('faint');return;}
+  if(G.test){SF(o.esc?'portal':'faint');openModal(`<div class="mhead"><h2>Test room: konec</h2></div><p class="big">${o.esc?'Portálem prošlo: '+o.esc:'Nikdo neprošel.'}</p><p class="hint">Výsledek se nikam nepočítá.</p><div class="mbtns" style="display:flex;gap:8px;margin-top:12px"><button class="btn primary" data-a="testagain">Znovu stejný test</button><button class="btn" data-a="testmenu">Nastavení testu</button><button class="btn" data-a="tomenu">Do menu</button></div>`);return;}
   if(!o.esc&&!RUN.done)SF('faint');
   if(!RUN.done){
     RUN.done=true;RUN.lastEsc=o.esc||0;
@@ -4744,6 +4875,9 @@ function onClick(ev){
     const k=t.dataset.a;
     if(k==='close')closeModal();
     else if(k==='newrun'){closeModal();clearSave();showNaming();}
+    else if(k==='testagain'){closeModal();startTest();}
+    else if(k==='testmenu'){closeModal();showTestSetup();}
+    else if(k==='tomenu'){closeModal();RUN=null;showMenu();}
     else if(k==='nextlvl'){if(G.tut){closeModal();tutNext();}else showMap();}
     else if(k==='shop')showOver();
     else if(k==='rot'){if(tAllow('rot')){rotatePlacing();SF('tick');}}
