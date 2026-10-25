@@ -1021,7 +1021,7 @@ const ABIL={
   climber:{name:'Lezec',desc:l=>l>=3?'+30 % na úspěšný hod lanem. Lano stojí jen 1 akci.':`+${l*15} % na úspěšný hod lanem.`},
   jumper:{name:'Skokan',desc:l=>`Pád zraňuje o ${l} méně.`},
   shooter:{name:'Střelec',desc:l=>`Za 1 akci střílí na přízrak až 2 pole rovně. Šance ${[0,60,80,100][l]} % na 1 pole, ${[0,40,60,80][l]} % na 2 pole.`},
-  tracker:{name:'Stopař',desc:l=>`${l}× za celý run vymění tažený dílek za jiný. Nevybraný se zamíchá zpět.`},
+  tracker:{name:'Stopař',desc:l=>`${l}× za level vymění tažený dílek za jiný. Nevybraný se zamíchá zpět.`},
   demo:{name:'Demolice',desc:l=>l===1?'Jeho výbuch nezpůsobí zával.':l===2?'Nese 2 dynamity. Výbuch nezpůsobí zával.':'Nese 3 dynamity. Výbuch bez závalu, stojí jen 1 akci.'},
   firefighter:{name:'Hasič',desc:l=>`${2*l+1} hašení za level. Když by ho měl popálit oheň, uhasí ho na svém poli (sousední ne).`},
   antirad:{name:'Antiradiace',desc:l=>`+${l*15} % na odolání radiaci (test, pole i jádro).`},
@@ -1280,7 +1280,7 @@ function newGame(){
   G={board:Array(ROWS*COLS).fill(null),deck:buildDeck(),
     chars:RUN.chars.map(r=>({id:r.id,name:r.name,color:r.color,x:START_X,y:0,hp:r.permMax,maxHp:r.permMax,permMax:r.permMax,used:0,started:false,done:false,
       downed:false,dead:!r.alive,buried:false,escaped:false,exhausted:false,rope:null,anim:0,
-      abil:r.abil.map(a=>({...a})),inv:Array(Math.max(1,alv(r,'demo'))).fill('dyn'),uses:{tracker:Math.max(0,alv(r,'tracker')-(r.trackerUsed||0)),firefighter:ffMax(r)},whp:0,diveReady:true})),
+      abil:r.abil.map(a=>({...a})),inv:Array(Math.max(1,alv(r,'demo'))).fill('dyn'),uses:{tracker:alv(r,'tracker'),firefighter:ffMax(r)},whp:0,diveReady:true})),
     monsters:[],ropes:[],gems:0,serum:0,W:Math.ceil(ROWS/2),   // voda začíná v polovině výšky jeskyně (zaokrouhleno nahoru)
     waterKnown:false,round:1,used:[],banner:null,active:null,
     zone:{x:rand(COLS-2),y:Math.ceil(ROWS/2)-1+rand(Math.max(1,ROWS-2-Math.ceil(ROWS/2)))},zoneN:0,leverFound:false,leverOn:false,log:[],nid:1,over:null,mode:'move',placing:null,pendEx:0,info:false,limit:ROUND_LIMIT+((RUN&&RUN.timeBonus)||0)};
@@ -1729,7 +1729,7 @@ function swapPlacing(){
   // nevybraný dílek se vrací: portál mezi posledních 10, zařízení zpět do zóny, ostatní kamkoli
   if(p.t.kind==='exit')G.deck.splice(G.deck.length-rand(Math.min(10,G.deck.length+1)),0,p.t);
   else if(p.t.kind==='lever'){G.leverFound=false;if(G.zones){const z=G.zones.find(q=>q.found&&p.x>=q.x&&p.x<q.x+q.w&&p.y>=q.y&&p.y<q.y+q.h);if(z)z.found=false;}log('Zařízení zůstalo neodhalené, zóna ho skrývá dál.','bad');}
-  else G.deck.splice(rand(G.deck.length+1),0,p.t);c.uses.tracker--;RUN.chars[c.id].trackerUsed=(RUN.chars[c.id].trackerUsed||0)+1;p.swapped=true;p.t=nt;p.opts=orients(nt,p.need);p.i=0;
+  else G.deck.splice(rand(G.deck.length+1),0,p.t);c.uses.tracker--;p.swapped=true;p.t=nt;p.opts=orients(nt,p.need);p.i=0;
   log(`${c.name} (Stopař) vyměnil(a) dílek: ${KINDNAME[nt.kind]}${nt.feat?' · '+FEATNAME[nt.feat]:''}.`);render();
 }
 function rotatePlacing(){if(!G.placing)return;G.placing.i=(G.placing.i+1)%G.placing.opts.length;render();}
@@ -3228,8 +3228,9 @@ function setupCamera(){
 }
 
 /* ================= MENU, ULOŽENÍ, PRAVIDLA ================= */
-const VERSION='0.68';
+const VERSION='0.69';
 const CHANGELOG=[
+  ['0.69','Stopař',['Stopař má výměny dílku 1 / 2 / 3× za každý level (dřív za celou výpravu).']],
   ['0.68','Ladění typů levelů a střílny',['Ztracení: každý začíná v jiném rohu (nahoře a patro nad dnem; ve dvou šikmo, ve třech dva nahoře a jeden dole, ve čtyřech všechny rohy), voda začíná úplně dole, zóna je uprostřed.','Na dohled: zóna se zařízením je 4 × 2 a dotýká se dna.','Tma: vidíš 2 kroky po chodbách (ne vzdušnou čarou). Dílky mimo dosah se po chvíli zatáhnou do úplné tmy s texturou (zůstane jen křídový obrys chodeb, ať víš, kde už jsi byl) a při přiblížení se zase vynoří. Nic z nich neprosvítá: přízraky, lasery, záře ani světlo z chodeb.','Dusno: kyslík se přesune až po stoupnutí vody a jsou jen 2 řady bez kyslíku. Na začátku nikdy v řadě, kde stojí postavy. Oheň odhalený bez kyslíku hned zhasne.','Střílna trefí první postavu nebo přízrak v cestě, ať laser spustil kdokoli. Při testu bliká jen laser ve směru spuštění, ostatní na chvíli zhasnou. Střílna i test radiace počkají, až postava dojde (i po rozvinutí žebříku).','Kryt: postava v něm stojí v suchu i pod hladinou. Kratší popisek a popisky dílků jsou vždy nahoře.','Sliz zraní hned při vstupu, až potom přijde pád šachtou. Prasklé potrubí spustí i ten, kdo jím jen propadne.','Teleport se počítá jako vstup na pole (střílna vystřelí). Střílna nevidí do krytu ani přes zavřené dveře pasti. Jádro radiace nemá prkna nad šachtou.','Kantýna + jádro radiace: nejdřív přibudou akce, jádro pak sebere tu poslední.','Razítko u události jen při kritickém zásahu (u dynamitu už ne).','Stopař: tlačítko ⇄ na odhaleném dílku vedle otočení (na ovladači X), dílek počká i když jde natočit jen jedním směrem. Zával ve tmě se neanimuje, jen je slyšet. Při ošetřování svítí postavy, které jde ošetřit, a po najetí myší ta vybraná.']],
   ['0.67','Pasti, střílny a animace',['Běžná událost už nemá razítko SPUŠTĚNO, razítko dostane jen kritický zásah a dynamit.','Past chytí i toho, kdo do ní propadá, a zavře se až ve chvíli, kdy je postava uvnitř. Chytí i přízrak. Dveře se otevírají pohybem zvenku do pasti (značka na poli), už to není speciální akce.','Střílna střílí jen při vstupu do laseru (při každém), přímo na jejím poli je mrtvý úhel. Před výstřelem se rozblikají červené diody, pak buď vystřelí, nebo se zeleně rozsvítí i s laserem.','Karanténa, ke které se přízrak vydá, se rozsvítí a zabzučí. Prasklé potrubí při zvednutí vody blikne a roztočí ventil.','Jádro radiace: kratší kaskáda od jádra do okolí, zasažená postava sebou trhne a ztracená akce je v profilu světle zelená.','Opraveno: pohyb před vyčerpáním (třeba šplhání po laně) se přehrával jako běh a teprve pak se postava chytila lana.','Karty událostí už po najetí neukazují systémový tooltip (text je na kartě). Tutoriál: kamera v klidu přejede k zóně a portálu, u vody je vysvětleno, že na konci kola klesá o patro.']],
   ['0.66','Multiplayer pro 4',['Lokální multiplayer pro 2–4 hráče. Ve čtyřech se hraje lehká obtížnost (každý má 1 postavu), ve třech lehká nebo normální. Když se přihlásí víc hráčů, obtížnost se sama upraví.','Při pokračování ve výpravě se mezi hráče rozdělí jen živé postavy.','Nové hlavní menu: na tmavém pozadí je minimalistický plán bočního řezu laboratoře, po stranách občas zabliká světlo a shora občas padá suť. Výraznější tlačítka, hra už pod menu neprosvítá.','Na plánu laboratoře víc druhů poznámek (žluté lístky, útržky s páskou, linkované kartičky, zakroužkovaná varování), 30 textů, a nepřekrývají místnosti.','Víc jmen pro postavy (přes 70).','Přepsaná pravidla: všechny strany stejně vysoké, aktuální obrázky dílků (oheň, radiace, přízrak, žebřík, lano…), základní hra v kapitolách 1–12 a vše, co přichází až během výpravy, stručně v Extra pravidlech. Nová strana Ovládání. V pravidlech jde listovat LB / RB.','Tutoriál jde celý ovládat ovladačem: tlačítka Další / Rozumím potvrdí A, v bublině je nápověda k ovladači.','Test room (v hlavním menu): asi 50 dílků se vším, co hra má, volba typu levelu, počtu postav, schopností III a hry bez časového limitu.']],
@@ -3580,7 +3581,7 @@ ${RR(RF('cross','turret',[1,1,1,1],{},'střílna'),RF('straight','trap',[0,1,0,1
 <tr><td>Lezec</td><td colspan="2">Hod lanem +15 / +30 %. III: lano za 1 akci.</td></tr>
 <tr><td>Skokan</td><td colspan="2">Pád zraňuje o 1 / 2 / 3 méně.</td></tr>
 <tr><td>Střelec</td><td colspan="2">1 akce: střela na přízrak až 2 pole rovně (60/40, 80/60, 100/80 %).</td></tr>
-<tr><td>Stopař</td><td colspan="2">1 / 2 / 3× za výpravu vymění tažený dílek.</td></tr>
+<tr><td>Stopař</td><td colspan="2">1 / 2 / 3× za level vymění tažený dílek.</td></tr>
 <tr><td>Demolice</td><td colspan="2">Výbuch bez závalu. II: 2 dynamity. III: 3 a výbuch za 1 akci.</td></tr>
 <tr><td>Hasič</td><td colspan="2">3 / 5 / 7 hašení za level. Oheň na svém poli uhasí místo zranění.</td></tr>
 <tr><td>Antiradiace</td><td colspan="2">+15 / 30 / 45 % na odolání radiaci.</td></tr>
