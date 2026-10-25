@@ -1553,6 +1553,7 @@ function ghostStep(m){
   m.x=nx;m.y=ny;
   if(quarKill(m))return;
   pipeTick();
+  turretTrig(m.x,m.y,null,m);if(!G.monsters.includes(m))return;   /* i přízrak spustí střílnu */
   G.chars.filter(c=>standing(c)&&c.x===m.x&&c.y===m.y).forEach(c=>dmg(c,2,'přízrak'));
 }
 // prasklé potrubí: kdokoli (i přízrak) vstoupí, voda stoupne o patro
@@ -1611,19 +1612,20 @@ function actOpenDoor(c,t){pushUndo();spend(c,1);const n=B(t.x,t.y);n.shut[t.d]=f
   afterAction(c);settle();}
 // střílna: kdo vstoupí na pole kulometu nebo do laseru, 50 % na zásah; přízrak v cestě střelu schytá místo něj
 function laserCells(x,y){const out=[];for(let d=0;d<4;d++){let cx=x,cy=y;for(let k=0;k<COLS+ROWS;k++){if(!edgeOpen(cx,cy,d))break;[cx,cy]=NB(cx,cy,d);const n=B(cx,cy);if(!n||n.rubble||n.t.feat==='bunker')break;out.push({x:cx,y:cy,d,k:k+1});}}return out;}   /* do krytu ani přes zavřené dveře pasti nevidí */
-function turretCheck(c){G.board.forEach((t,i)=>{if(!t||t.t.feat!=='turret'||t.rubble)return;const tx=i%COLS,ty=(i/COLS)|0;
-  if(tx===c.x&&ty===c.y)return;   /* přímo na poli střílny je mrtvý úhel */
-  const lc=laserCells(tx,ty).find(q=>q.x===c.x&&q.y===c.y);if(!lc)return;
-  /* střela trefí první cíl v cestě (postavu nebo přízrak), ne nutně toho, kdo laser spustil */
+function turretCheck(c){turretTrig(c.x,c.y,c,null);}
+/* střílnu spustí kdokoli, kdo vstoupí do laseru (postava i přízrak); trefí první cíl v cestě */
+function turretTrig(px,py,c,mon){G.board.forEach((t,i)=>{if(!t||t.t.feat!=='turret'||t.rubble)return;const tx=i%COLS,ty=(i/COLS)|0;
+  if(tx===px&&ty===py)return;   /* přímo na poli střílny je mrtvý úhel */
+  const lc=laserCells(tx,ty).find(q=>q.x===px&&q.y===py);if(!lc)return;
   let vic=null;{let cx=tx,cy=ty;for(let k=1;k<=lc.k;k++){[cx,cy]=NB(cx,cy,lc.d);const m=G.monsters.find(q=>q.x===cx&&q.y===cy&&!q.qdead&&!q.hid);if(m){vic={m,x:cx,y:cy};break;}
-    const here=G.chars.filter(o=>onBoard(o)&&!o.buried&&o.x===cx&&o.y===cy);if(here.length){vic={c:here.includes(c)?c:here[0],x:cx,y:cy};break;}}}
-  if(!vic)vic={c,x:c.x,y:c.y};
-  G.info=true;const who=vic.c?vic.c.name:'přízrak',fire=!rollP(.5,c.name,'střílna (vyhnout se výstřelu)');
+    const here=G.chars.filter(o=>onBoard(o)&&!o.buried&&o.x===cx&&o.y===cy);if(here.length){vic={c:c&&here.includes(c)?c:here[0],x:cx,y:cy};break;}}}
+  if(!vic)vic=c?{c,x:px,y:py}:{m:mon,x:px,y:py};
+  const trig=c?c.name:'Přízrak';G.info=true;const fire=!rollP(.5,trig,'střílna (vyhnout se výstřelu)');
   t.aim=lc.d;
-  if(!fire){log(`Střílna zabzučela, ale nevystřelila (${c.name}).`,'good');if(UI.ready)SEQ.push({k:'turret',tx,ty,ti:i,d:lc.d,x:vic.x,y:vic.y,hit:false});return;}
+  if(!fire){log(`Střílna zabzučela, ale nevystřelila (${trig}).`,'good');if(UI.ready)SEQ.push({k:'turret',tx,ty,ti:i,d:lc.d,x:vic.x,y:vic.y,hit:false});return;}
   if(UI.ready)SEQ.push({k:'turret',tx,ty,ti:i,d:lc.d,x:vic.x,y:vic.y,hit:true});
-  if(vic.m){G.monsters=G.monsters.filter(q=>q!==vic.m);log(`Střílna vystřelila a trefila přízrak!`,'good');}
-  else{log(`Střílna vystřelila po: ${who}!`,'bad');dmg(vic.c,1,'střílna');}});}
+  if(vic.m){G.monsters=G.monsters.filter(q=>q!==vic.m);log(c?'Střílna vystřelila a trefila přízrak!':'Přízrak spustil střílnu a ta ho sestřelila!','good');}
+  else{log(`Střílna vystřelila po: ${vic.c.name}!${c?'':' (spustil ji přízrak)'}`,'bad');dmg(vic.c,1,'střílna');}});}
 
 // jádro radiace: při události Radiace ozáří okolí do 2 kroků po chodbách; zasažený začne kolo o akci (při kritickém o dvě) méně
 function coreZone(x,y){const key=(a,b)=>a+','+b,D=new Map([[key(x,y),0]]),q=[[x,y]],out=[[x,y,0]];
@@ -1636,7 +1638,7 @@ function coreBurst(crit){const cells=new Map();G.board.forEach((t,i)=>{if(t&&t.t
 function pipePass(c,a,b){for(let y=a;y<=b;y++){const t=B(c.x,y);if(t&&t.t.feat==='pipe'&&!t.rubble&&G.W>0){log(`${c.name} propadl(a) prasklým potrubím a rozkýval(a) ho. Voda stoupá o patro!`,'bad');if(UI.ready)SEQ.push({k:'pipe',x:c.x,y});waterChange(-1,true);}}}
 function slimePass(c,a,b){for(let y=a;y<=b;y++){const t=B(c.x,y);if(t&&t.t.feat==='slime'){log(`${c.name} propadl(a) slizem!`,'bad');dmg(c,3,'sliz');return;}}}
 function slimeEnd(c){const cl=B(c.x,c.y);if(cl&&cl.t.feat==='slime'&&standing(c)){log(`${c.name} skončil(a) tah ve slizu.`,'bad');dmg(c,1,'sliz');}}
-function moveGhosts(){G.monsters.forEach(ghostStep);}
+function moveGhosts(){G.monsters.slice().forEach(m=>{if(G.monsters.includes(m))ghostStep(m);});}
 function ghostsAt(x,y){return G.monsters.filter(m=>m.x===x&&m.y===y);}
 
 /* ---------- akce ---------- */
@@ -2799,7 +2801,7 @@ function renderBadges(){
     if(c.t.feat==='cave')b.push(['cv','Zával '+ROMAN[c.t.cave],IC.rocks]);
     if(c.t.feat==='tele')b.push(['tp','Teleport: za 1 akci tě přenese na druhý',IC.tele]);
     if(c.t.feat==='quar')b.push(['qr','Karanténa: přízrak, který vstoupí, zahyne',IC.quar]);
-    if(c.t.feat==='turret')b.push(['tu','Střílna: kdo vstoupí do laseru, spustí ji (50 %). Trefí první postavu nebo přízrak v cestě (−1). Na poli střílny je mrtvý úhel.',IC.turret]);
+    if(c.t.feat==='turret')b.push(['tu','Střílna: kdo vstoupí do laseru (postava i přízrak), spustí ji (50 %). Trefí první postavu nebo přízrak v cestě (−1). Na poli střílny je mrtvý úhel.',IC.turret]);
     if(c.t.feat==='trap')b.push(['tr','Past: kdo do ní vstoupí nebo jí propadá, toho chytí a zabouchnou se dveře (chytí i přízrak). Otevřeš je zvenku pohybem ze sousedního pole (1 akce), nebo dynamitem.',IC.trap]);
     if(c.t.feat==='slime')b.push(['sl','Sliz: vstup nebo propad −3, konec tahu −1.',IC.slime]);
     if(c.t.feat==='core')b.push(['co','Jádro radiace: při události Radiace ozáří okolí do 2 polí. Zasažený začne kolo o akci méně.',IC.core]);
@@ -3230,7 +3232,7 @@ function setupCamera(){
 /* ================= MENU, ULOŽENÍ, PRAVIDLA ================= */
 const VERSION='0.69';
 const CHANGELOG=[
-  ['0.69','Stopař',['Stopař má výměny dílku 1 / 2 / 3× za každý level (dřív za celou výpravu).']],
+  ['0.69','Stopař a střílna',['Stopař má výměny dílku 1 / 2 / 3× za každý level (dřív za celou výpravu).','Střílnu spustí i přízrak, který vstoupí do laseru. Trefí první postavu nebo přízrak v cestě.']],
   ['0.68','Ladění typů levelů a střílny',['Ztracení: každý začíná v jiném rohu (nahoře a patro nad dnem; ve dvou šikmo, ve třech dva nahoře a jeden dole, ve čtyřech všechny rohy), voda začíná úplně dole, zóna je uprostřed.','Na dohled: zóna se zařízením je 4 × 2 a dotýká se dna.','Tma: vidíš 2 kroky po chodbách (ne vzdušnou čarou). Dílky mimo dosah se po chvíli zatáhnou do úplné tmy s texturou (zůstane jen křídový obrys chodeb, ať víš, kde už jsi byl) a při přiblížení se zase vynoří. Nic z nich neprosvítá: přízraky, lasery, záře ani světlo z chodeb.','Dusno: kyslík se přesune až po stoupnutí vody a jsou jen 2 řady bez kyslíku. Na začátku nikdy v řadě, kde stojí postavy. Oheň odhalený bez kyslíku hned zhasne.','Střílna trefí první postavu nebo přízrak v cestě, ať laser spustil kdokoli. Při testu bliká jen laser ve směru spuštění, ostatní na chvíli zhasnou. Střílna i test radiace počkají, až postava dojde (i po rozvinutí žebříku).','Kryt: postava v něm stojí v suchu i pod hladinou. Kratší popisek a popisky dílků jsou vždy nahoře.','Sliz zraní hned při vstupu, až potom přijde pád šachtou. Prasklé potrubí spustí i ten, kdo jím jen propadne.','Teleport se počítá jako vstup na pole (střílna vystřelí). Střílna nevidí do krytu ani přes zavřené dveře pasti. Jádro radiace nemá prkna nad šachtou.','Kantýna + jádro radiace: nejdřív přibudou akce, jádro pak sebere tu poslední.','Razítko u události jen při kritickém zásahu (u dynamitu už ne).','Stopař: tlačítko ⇄ na odhaleném dílku vedle otočení (na ovladači X), dílek počká i když jde natočit jen jedním směrem. Zával ve tmě se neanimuje, jen je slyšet. Při ošetřování svítí postavy, které jde ošetřit, a po najetí myší ta vybraná.']],
   ['0.67','Pasti, střílny a animace',['Běžná událost už nemá razítko SPUŠTĚNO, razítko dostane jen kritický zásah a dynamit.','Past chytí i toho, kdo do ní propadá, a zavře se až ve chvíli, kdy je postava uvnitř. Chytí i přízrak. Dveře se otevírají pohybem zvenku do pasti (značka na poli), už to není speciální akce.','Střílna střílí jen při vstupu do laseru (při každém), přímo na jejím poli je mrtvý úhel. Před výstřelem se rozblikají červené diody, pak buď vystřelí, nebo se zeleně rozsvítí i s laserem.','Karanténa, ke které se přízrak vydá, se rozsvítí a zabzučí. Prasklé potrubí při zvednutí vody blikne a roztočí ventil.','Jádro radiace: kratší kaskáda od jádra do okolí, zasažená postava sebou trhne a ztracená akce je v profilu světle zelená.','Opraveno: pohyb před vyčerpáním (třeba šplhání po laně) se přehrával jako běh a teprve pak se postava chytila lana.','Karty událostí už po najetí neukazují systémový tooltip (text je na kartě). Tutoriál: kamera v klidu přejede k zóně a portálu, u vody je vysvětleno, že na konci kola klesá o patro.']],
   ['0.66','Multiplayer pro 4',['Lokální multiplayer pro 2–4 hráče. Ve čtyřech se hraje lehká obtížnost (každý má 1 postavu), ve třech lehká nebo normální. Když se přihlásí víc hráčů, obtížnost se sama upraví.','Při pokračování ve výpravě se mezi hráče rozdělí jen živé postavy.','Nové hlavní menu: na tmavém pozadí je minimalistický plán bočního řezu laboratoře, po stranách občas zabliká světlo a shora občas padá suť. Výraznější tlačítka, hra už pod menu neprosvítá.','Na plánu laboratoře víc druhů poznámek (žluté lístky, útržky s páskou, linkované kartičky, zakroužkovaná varování), 30 textů, a nepřekrývají místnosti.','Víc jmen pro postavy (přes 70).','Přepsaná pravidla: všechny strany stejně vysoké, aktuální obrázky dílků (oheň, radiace, přízrak, žebřík, lano…), základní hra v kapitolách 1–12 a vše, co přichází až během výpravy, stručně v Extra pravidlech. Nová strana Ovládání. V pravidlech jde listovat LB / RB.','Tutoriál jde celý ovládat ovladačem: tlačítka Další / Rozumím potvrdí A, v bublině je nápověda k ovladači.','Test room (v hlavním menu): asi 50 dílků se vším, co hra má, volba typu levelu, počtu postav, schopností III a hry bez časového limitu.']],
@@ -3569,7 +3571,7 @@ ${RR(RF('T','tele',[0,1,1,1],{},'teleport'),RF('T','spring',[0,1,1,1],{},'regene
 `${RX('IV','Destičky od 2. aktu')}<p class="small">Od druhého aktu přidává patro 3 i tyto destičky.</p>
 ${RR(RF('cross','turret',[1,1,1,1],{},'střílna'),RF('straight','trap',[0,1,0,1],{},'past'),RF('cross','slime',[1,1,1,1],{},'sliz'),RF('T','core',[0,1,1,1],{},'jádro'),RF('straight','pipe',[0,1,0,1],{},'potrubí'))}
 <table class="rtab rtsm">
-<tr><td>Střílna</td><td colspan="2">Vstup do laseru ji spustí (50 %). Trefí první postavu nebo přízrak v cestě (−1). Na jejím poli je mrtvý úhel.</td></tr>
+<tr><td>Střílna</td><td colspan="2">Vstup do laseru (i přízrakem) ji spustí (50 %). Trefí první postavu nebo přízrak v cestě (−1). Na jejím poli je mrtvý úhel.</td></tr>
 <tr><td>Past se dveřmi</td><td colspan="2">Chytí každého, kdo do ní vstoupí nebo jí propadá (i přízrak), a zabouchne dveře. Zvenku je otevřeš pohybem do ní (1 akce).</td></tr>
 <tr><td>Sliz</td><td colspan="2">Vstup nebo propad −3, konec tahu v něm −1.</td></tr>
 <tr><td>Jádro radiace</td><td colspan="2">Při Radiaci ozáří okolí: kdo je zasažen, má příští kolo o akci méně.</td></tr>
