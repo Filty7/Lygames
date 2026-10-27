@@ -314,6 +314,12 @@ h1,h2,h3{font-family:var(--display);font-weight:700;margin:0;letter-spacing:.02e
 .gl.laser.ok::before{background:rgba(90,255,120,.9)!important;box-shadow:0 0 6px rgba(90,255,120,1)!important}
 .mk.door{border-color:#ffd23a}
 .gl.laser.dim{opacity:0;transition:opacity .12s}
+.lpick{flex-wrap:wrap;justify-content:center}.lpick:has(.lpc+.lpc) .pimg{width:46px!important;height:46px!important}.lpick:has(.lpc+.lpc) .lnm{width:78px;font-size:15px}.lpick:has(.lpc+.lpc){gap:6px}
+.lpick .lnm{font-family:var(--display);font-size:17px;font-weight:700;background:transparent;border:0;border-bottom:1px dashed rgba(255,255,255,.25);text-align:center;width:120px;padding:1px 2px;outline:none}.lpick .lnm:focus{border-bottom-color:var(--lamp);background:rgba(255,255,255,.05)}
+.rnrow{display:flex;align-items:center;gap:4px}.rnin{font-family:var(--display);font-size:16px;font-weight:700;color:var(--ink);background:transparent;border:0;border-bottom:1px dashed rgba(255,255,255,.22);width:120px;padding:1px 2px;outline:none}.rnin:focus{border-bottom-color:var(--lamp);background:rgba(255,255,255,.05)}.btn.rrnd{padding:1px 6px;font-size:13px;line-height:1.2}
+.svlab{display:flex;flex-direction:column;gap:6px;font-size:13px;color:var(--muted)}.svlab input{font-size:18px;padding:8px 10px;background:#141118;border:1px solid var(--line);color:var(--ink);font-family:var(--display)}
+.ldlist{display:flex;flex-direction:column;gap:6px;max-height:52vh;overflow:auto}.ldrow{display:flex;gap:10px;align-items:center;justify-content:space-between;border:1px solid var(--line);background:rgba(20,18,16,.9);padding:8px 10px}
+.ldinfo{display:flex;flex-direction:column;gap:2px;min-width:0}.ldinfo b{font-family:var(--display);font-size:17px}.ldinfo small{color:var(--muted);font-size:12px}.ldinfo .ldd{color:var(--dim)}.ldbtn{display:flex;gap:4px;flex:none}
 .mver{font-size:12px;color:var(--dim)}
 .nrow{display:flex;gap:10px;align-items:center}
 .nrow .pimg{width:48px;height:48px}
@@ -3039,7 +3045,8 @@ function renderInfo(){
 }
 function canSelect(c){return onBoard(c)&&!c.done&&!G.over&&!G.placing;}
 function renderCrew(){
-  document.getElementById('crewList').innerHTML=G.chars.filter(c=>!c.away).map(c=>{
+  const crewL=G.chars.filter(c=>!c.away);if(MP.on)crewL.sort((a,b)=>((ownerOf(a.id)+9)%9-(ownerOf(b.id)+9)%9)||a.id-b.id);   /* v multiplayeru postavy jednoho hráče vedle sebe */
+  document.getElementById('crewList').innerHTML=crewL.map(c=>{
     const gone=!onBoard(c),can=canSelect(c);
     const hpv=c.hp+(UI.lag[c.id]||0);let hp='';for(let i=0;i<(c.permMax||MAXHP);i++)hp+=`<i class="${i<hpv?'':i<c.maxHp?'empty':'lost'}"></i>`;
     let ab='';{const dl=alv(c,'diver')*2;if(dl){const ox=c.diveReady?dl:Math.min(dl,(c.whp||0)+((UI.oxyLag||{})[c.id]||0));ab+='<span class="oxy" title="kyslík (Potápěč)">';for(let i=0;i<dl;i++)ab+=`<u class="${i<ox?'f':''}"></u>`;ab+='</span>';}
@@ -3230,8 +3237,9 @@ function setupCamera(){
 }
 
 /* ================= MENU, ULOŽENÍ, PRAVIDLA ================= */
-const VERSION='0.69';
+const VERSION='0.70';
 const CHANGELOG=[
+  ['0.70','Uložené hry a jména',['Uložit hru (v menu během výpravy): pojmenovaná uložená hra v prohlížeči a volitelně i jako soubor .json. Rozehraná hra z předchozích verzí zůstává a Pokračovat ji načte jako dřív.','Hra pro jednoho i Multiplayer mají Načíst uloženou hru: seznam uložených her s detaily, stažení, smazání a načtení ze souboru. Načtenou hru jde hrát sólo i v multiplayeru.','Multiplayer si pamatuje, kdo hrál za které postavy. Při pokračování dostane každý hráč zpátky své postavy podle pořadí přihlášení, Y je prohodí.','Jména postav jde přepsat myší a klávesnicí v lobby i na konci levelu, X dá náhodné jméno.','V multiplayeru jsou postavy jednoho hráče v dolní liště vedle sebe.']],
   ['0.69','Stopař a střílna',['Stopař má výměny dílku 1 / 2 / 3× za každý level (dřív za celou výpravu).','Střílnu spustí i přízrak, který vstoupí do laseru. Trefí první postavu nebo přízrak v cestě.']],
   ['0.68','Ladění typů levelů a střílny',['Ztracení: každý začíná v jiném rohu (nahoře a patro nad dnem; ve dvou šikmo, ve třech dva nahoře a jeden dole, ve čtyřech všechny rohy), voda začíná úplně dole, zóna je uprostřed.','Na dohled: zóna se zařízením je 4 × 2 a dotýká se dna.','Tma: vidíš 2 kroky po chodbách (ne vzdušnou čarou). Dílky mimo dosah se po chvíli zatáhnou do úplné tmy s texturou (zůstane jen křídový obrys chodeb, ať víš, kde už jsi byl) a při přiblížení se zase vynoří. Nic z nich neprosvítá: přízraky, lasery, záře ani světlo z chodeb.','Dusno: kyslík se přesune až po stoupnutí vody a jsou jen 2 řady bez kyslíku. Na začátku nikdy v řadě, kde stojí postavy. Oheň odhalený bez kyslíku hned zhasne.','Střílna trefí první postavu nebo přízrak v cestě, ať laser spustil kdokoli. Při testu bliká jen laser ve směru spuštění, ostatní na chvíli zhasnou. Střílna i test radiace počkají, až postava dojde (i po rozvinutí žebříku).','Kryt: postava v něm stojí v suchu i pod hladinou. Kratší popisek a popisky dílků jsou vždy nahoře.','Sliz zraní hned při vstupu, až potom přijde pád šachtou. Prasklé potrubí spustí i ten, kdo jím jen propadne.','Teleport se počítá jako vstup na pole (střílna vystřelí). Střílna nevidí do krytu ani přes zavřené dveře pasti. Jádro radiace nemá prkna nad šachtou.','Kantýna + jádro radiace: nejdřív přibudou akce, jádro pak sebere tu poslední.','Razítko u události jen při kritickém zásahu (u dynamitu už ne).','Stopař: tlačítko ⇄ na odhaleném dílku vedle otočení (na ovladači X), dílek počká i když jde natočit jen jedním směrem. Zával ve tmě se neanimuje, jen je slyšet. Při ošetřování svítí postavy, které jde ošetřit, a po najetí myší ta vybraná.']],
   ['0.67','Pasti, střílny a animace',['Běžná událost už nemá razítko SPUŠTĚNO, razítko dostane jen kritický zásah a dynamit.','Past chytí i toho, kdo do ní propadá, a zavře se až ve chvíli, kdy je postava uvnitř. Chytí i přízrak. Dveře se otevírají pohybem zvenku do pasti (značka na poli), už to není speciální akce.','Střílna střílí jen při vstupu do laseru (při každém), přímo na jejím poli je mrtvý úhel. Před výstřelem se rozblikají červené diody, pak buď vystřelí, nebo se zeleně rozsvítí i s laserem.','Karanténa, ke které se přízrak vydá, se rozsvítí a zabzučí. Prasklé potrubí při zvednutí vody blikne a roztočí ventil.','Jádro radiace: kratší kaskáda od jádra do okolí, zasažená postava sebou trhne a ztracená akce je v profilu světle zelená.','Opraveno: pohyb před vyčerpáním (třeba šplhání po laně) se přehrával jako běh a teprve pak se postava chytila lana.','Karty událostí už po najetí neukazují systémový tooltip (text je na kartě). Tutoriál: kamera v klidu přejede k zóně a portálu, u vody je vysvětleno, že na konci kola klesá o patro.']],
@@ -3290,13 +3298,14 @@ function showMenu(sub){
   UI.inMenu=true;MPL=null;const sv=loadSave(),m=menuEl();m.hidden=false;
   if(sub==='mp'){const np=gpList().length;
     m.innerHTML=`<div class="mwrap"><div class="mtitle"><span class="mt-k">LOKÁLNÍ MULTIPLAYER</span><h1 style="font-size:46px">Multiplayer</h1><p>Dva až čtyři hráči, každý s vlastním ovladačem, jeden gauč. Připojeno ovladačů: <b>${np}</b> ze 3.</p></div>
-    <div class="mbtns">${sv&&sv.RUN.chars.some(r=>r.alive)?`<button class="mbtn primary" data-menu="mpcont">Pokračovat ve výpravě<small>${sv.RUN.chars.map(c=>c.name).join(', ')} · ovladače se znovu přiřadí</small></button>`:''}
-      <button class="mbtn ${sv?'':'primary'}" data-menu="mpnew">Nová výprava<small>${sv?'rozehraná výprava se přepíše':'každý si vybere postavu'}</small></button>
+    <div class="mbtns">${sv&&sv.RUN.chars.some(r=>r.alive)?`<button class="mbtn primary" data-menu="mpcont">Pokračovat ve výpravě<small>${escH(saveSummary(sv))} · ovladače se znovu přiřadí</small></button>`:''}
+      <button class="mbtn" data-menu="loadmp">Načíst uloženou hru<small>${loadSlots().length?loadSlots().length+' uložených · ':''}nebo ze souboru</small></button>
+      <button class="mbtn ${sv?'':'primary'}" data-menu="mpnew">Nová výprava<small>${sv?'poslední hra zůstane jen v uložených':'každý si vybere postavu'}</small></button>
       <button class="mbtn ghost" data-menu="menu">Zpět</button></div><div class="mver">verze ${VERSION}</div></div>`;return;}
   if(sub==='sp'){
-    const cont=sv&&sv.RUN.chars.some(r=>r.alive)?`<button class="mbtn primary" data-menu="continue">Pokračovat ve výpravě<small>${sv.RUN.onMap||!sv.G?'plán laboratoře':`level ${sv.G.nodeLbl||sv.RUN.level} · kolo ${sv.G.round}`}${sv.RUN.act>1?' · akt '+sv.RUN.act:''} · ${sv.RUN.chars.map(c=>c.name).join(', ')}</small></button>`:'';
+    const cont=sv&&sv.RUN.chars.some(r=>r.alive)?`<button class="mbtn primary" data-menu="continue">Pokračovat ve výpravě<small>${sv.RUN.onMap||!sv.G?'plán laboratoře':`${lvlName(sv.RUN,sv.G)} · kolo ${sv.G.round}`}${sv.RUN.act>1?' · akt '+sv.RUN.act:''} · ${sv.RUN.chars.map(c=>c.name).join(', ')}</small></button>`:'';
     m.innerHTML=`<div class="mwrap"><div class="mtitle"><span class="mt-k">LAB 7 · SEKTOR HLUBINA</span><h1 style="font-size:46px">Hra pro jednoho</h1><p>Ovládáš celou výpravu sám, myší nebo ovladačem.</p></div>
-    <div class="mbtns">${cont}<button class="mbtn ${cont?'':'primary'}" data-menu="new">${cont?'Začít novou výpravu':'Start výpravy'}<small>${cont?'rozehraná výprava se přepíše':'pojmenuj tři průzkumníky a sestup'}</small></button>
+    <div class="mbtns">${cont}<button class="mbtn" data-menu="loadsp">Načíst uloženou hru<small>${loadSlots().length?loadSlots().length+' uložených · ':''}nebo ze souboru</small></button><button class="mbtn ${cont?'':'primary'}" data-menu="new">${cont?'Začít novou výpravu':'Start výpravy'}<small>${cont?'poslední hra zůstane jen v uložených':'pojmenuj průzkumníky a sestup'}</small></button>
       <button class="mbtn ghost" data-menu="menu">Zpět</button></div><div class="mver">verze ${VERSION}</div></div>`;return;}
   m.innerHTML=`<div class="mwrap">
     <div class="mtitle"><span class="mt-k">LAB 7 · SEKTOR HLUBINA</span><h1>HLUBINA</h1><p>Kooperativní sestup do opuštěné laboratoře.</p></div>
@@ -3308,6 +3317,7 @@ function showMenu(sub){
       <button class="mbtn" data-menu="scores">Tabulka výprav<small>nejlepší skóre</small></button>
       <button class="mbtn" data-menu="log">Co je nového<small>changelog</small></button>
       <button class="mbtn" data-menu="test">Test room<small>všechny dílky, typy levelů, rychlé ladění</small></button>
+      ${liveSaveData()?'<button class="mbtn" data-menu="save">Uložit hru<small>pojmenovaná uložená hra, i jako soubor</small></button>':''}
       ${UI.menuFromGame?'<button class="mbtn ghost" data-menu="back">Zpět do hry</button>':''}
     </div>
     <div class="mver">verze ${VERSION}</div></div>`;
@@ -3339,7 +3349,7 @@ function migrateRun(){
 function continueRun(){
   const sv=loadSave();if(!sv){showNaming();return;}
   hideMenu();closeModal();RUN=sv.RUN;migrateRun();UI.live=true;if(RUN.onMap||!sv.G){showMap();return;}
-  resetView();setSize('9x'+Math.round(sv.G.board.length/9));G=sv.G;undoStack=[];fresh=new Map();SEQ=[];
+  resetView();setSize('9x'+Math.round(sv.G.board.length/9));G=sv.G;undoStack=[];fresh=new Map();SEQ=[];G.chars.forEach(c=>{const r=RUN.chars[c.id];if(r)c.name=r.name;});
   G.chars.forEach(c=>{c.seqLock=false;c.anim=0;c.via=null;});G.ropes.forEach(r=>r.anim=false);G.board.forEach(c=>{if(c){c.rubbleAnim=false;c.fireAnim=false;c.fireNew=false;}});
   G.evPhase=false;UI.busy=false;
   if(!G.over&&G.chars.every(c=>c.done||c.dead||c.escaped)){G.chars.forEach(c=>{if(onBoard(c)){c.done=false;c.used=0;c.started=false;}});}
@@ -3419,6 +3429,9 @@ function setupMenu(){
     else if(k==='new')showNaming();
     else if(k==='go'){MP.on=false;startRun();}
     else if(k==='rules')showRules();
+    else if(k==='save')showSaveScreen('menu');
+    else if(k==='loadsp')showLoadScreen('sp');
+    else if(k==='loadmp')showLoadScreen('mp');
     else if(k==='log')showChangelog();
     else if(k==='scores')showScores();
     else if(k==='test')showTestSetup();
@@ -4354,24 +4367,33 @@ function showLobby(mode){
 function lobbyN(){return MPL.mode==='cont'?MPL.sv.RUN.chars.length:DIFF[MPL.diff].n;}
 function lobbyAlive(c){return MPL.mode!=='cont'||MPL.sv.RUN.chars[c].alive;}
 function lobbyAliveN(){let k=0;for(let c=0;c<lobbyN();c++)if(lobbyAlive(c))k++;return k;}
-function lobbyOwn(){const p=MPL.slots.length,n=lobbyN(),own=MPL.slots.map(()=>[]);if(!p)return own;let j=0;for(let c=0;c<n;c++)if(lobbyAlive(c))own[(j++)%p].push(c);return own;}
+function lobbyOwn(){const p=MPL.slots.length,n=lobbyN(),own=MPL.slots.map(()=>[]);if(!p)return own;
+  /* pokračování: každý hráč dostane zpátky své postavy z minula (X je prohodí dokola) */
+  const mo=MPL.mode==='cont'&&MPL.sv.RUN.mpOwn;if(mo&&mo.length===p){const r=MPL.rot||0,o=mo.map((_,i)=>(mo[(i+r)%p]||[]).filter(c=>c<n&&lobbyAlive(c)));if(o.every(l=>l.length))return o;}
+  let j=0;for(let c=0;c<n;c++)if(lobbyAlive(c))own[(j+(MPL.rot||0))%p].push(c),j++;return own;}
 function lobbyFix(){const p=MPL.slots.length;if(MPL.mode!=='new'||DIFF[MPL.diff].n>=p)return;MPL.diff=['hard','normal','easy'].find(k=>DIFF[k].n>=p)||'easy';}
-function lobbyChar(cid){if(MPL.mode==='cont'){const r=MPL.sv.RUN.chars[cid];return {color:r.color,name:r.name,dead:!r.alive};}return {color:CHARS[cid].color,name:MPL.names[cid]};}
+function lobbyChar(cid){if(MPL.mode==='cont'){const r=MPL.sv.RUN.chars[cid];return {cid,color:r.color,name:r.name,dead:!r.alive};}return {cid,color:CHARS[cid].color,name:MPL.names[cid]};}
 function lobbyValid(){const p=MPL.slots.length;return p>=2&&p<=4&&lobbyAliveN()>=p;}
 function renderLobby(){
-  const m=menuEl(),n=gpList().length,own=lobbyOwn();
+  const m=menuEl(),n=gpList().length,own=lobbyOwn(),ae=document.activeElement,keep=ae&&ae.dataset&&ae.dataset.lnm!=null?{k:ae.dataset.lnm,s:ae.selectionStart,e:ae.selectionEnd}:null;
   const box=i=>{const s=MPL.slots[i];
     if(!s)return `<div class="lslot empty"><div class="lsn">Hráč ${i+1}${i>=2?' (nepovinný)':''}</div><div class="lwait">${n>i?'zmáčkni '+gpb('A'):'připoj ovladač'}</div></div>`;
     const cs=(own[i]||[]).map(lobbyChar),col=cs[0]?cs[0].color:'#888';
     return `<div class="lslot ${s.ready?'lock':''}" style="--pc:${col}"><div class="lsn">Hráč ${i+1}${i===0?' · vedoucí':''}</div>
-      <div class="lpick">${cs.map(c=>`<span class="lpc"><img class="pimg" src="${portraitURL({color:c.color})}" alt=""><b style="color:${shade(c.color,.35)}">${c.name}${c.dead?' †':''}</b></span>`).join('')||'<small>bez postavy</small>'}</div>
-      <div class="lst">${s.ready?'<span class="lready">PŘIPRAVEN ✓</span>':gpb('A')+' připraven'+(MPL.mode==='new'?' · '+gpb('X')+' jiná jména':'')}</div></div>`;};
+      <div class="lpick">${cs.map(c=>`<span class="lpc"><img class="pimg" src="${portraitURL({color:c.color})}" alt="">${c.dead?`<b style="color:${shade(c.color,.35)}">${escH(c.name)} †</b>`:`<input class="lnm" data-lnm="${c.cid}" maxlength="14" value="${escH(c.name)}" aria-label="Jméno postavy" title="Klikni a přepiš jméno" style="color:${shade(c.color,.35)}">`}</span>`).join('')||'<small>bez postavy</small>'}</div>
+      <div class="lst">${s.ready?'<span class="lready">PŘIPRAVEN ✓</span>':gpb('A')+' připraven · '+gpb('X')+' jiná jména'+(MPL.mode==='cont'&&MPL.slots.length>1?' · '+gpb('Y')+' prohodit':'')}</div></div>`;};
   const dsel=MPL.mode==='new'?`<div class="dsel">${['easy','normal','hard'].map(k=>`<span class="mbtn sm dbtn ${k===MPL.diff?'on':''} ${DIFF[k].n<Math.max(2,MPL.slots.length)?'off':''}">${DIFF[k].name}<small>${DIFF[k].n} postavy · ${DIFF[k].hp} životů · skóre × ${String(DIFF[k].mult).replace('.',',')}</small></span>`).join('')}</div><p class="hint" style="text-align:center">vedoucí mění obtížnost ◀ ▶</p>`:`<p class="hint" style="text-align:center">Obtížnost: <b>${DIFF[MPL.diff].name}</b> (${lobbyN()} postavy)</p>`;
   m.innerHTML=`<div class="mwrap wide"><div class="mtitle"><span class="mt-k">LOKÁLNÍ MULTIPLAYER · 2–4 OVLADAČE</span><h1 style="font-size:40px">${MPL.mode==='cont'?'Pokračovat ve výpravě':'Nová výprava'}</h1>
     <p>Připojeno ovladačů: <b>${n}</b>. Každý hráč se přihlásí ${gpb('A')}. Postavy se mezi hráče rozdělí podle počtu hráčů.</p></div>
     ${dsel}<div class="lslots">${[0,1,2,3].map(box).join('')}</div>
     <p class="hint" style="margin-top:12px">${!lobbyValid()&&MPL.slots.length>=2?`<b style="color:var(--bad)">${MPL.mode==='cont'?'Ve výpravě zbývá jen '+lobbyAliveN()+' živých postav, víc hráčů ji hrát nemůže.':DIFF[MPL.diff].name+' obtížnost má jen '+DIFF[MPL.diff].n+' postavy, hraje ji nejvýš '+DIFF[MPL.diff].n+' hráčů.'}</b> `:''}${gpb('B')} zpět · hra začne, až budou všichni přihlášení připraveni (aspoň 2). Mapu, menu a dialogy ovládá vedoucí (hráč 1).</p>
-    <div class="mbtns" style="margin-top:10px"><button class="mbtn ghost" data-menu="mp">Zpět</button></div></div>`;}
+    ${MPL.mode==='cont'&&MPL.sv.RUN.mpOwn?`<p class="hint" style="text-align:center">Minule: ${MPL.sv.RUN.mpOwn.map((l,i)=>`<b>P${i+1}</b> ${l.map(c=>escH(MPL.sv.RUN.chars[c].name)).join(' + ')}`).join(' · ')}. Přihlaste se ve stejném pořadí, nebo postavy prohoďte ${gpb('Y')}.</p>`:''}
+    <p class="hint" style="text-align:center">Jména jde přepsat myší a klávesnicí.</p>
+    <div class="mbtns" style="margin-top:10px"><button class="mbtn ghost" data-menu="mp">Zpět</button></div></div>`;
+  if(keep){const el=m.querySelector(`[data-lnm="${keep.k}"]`);if(el){el.focus();try{el.setSelectionRange(keep.s,keep.e);}catch(e){}}}}
+document.addEventListener('input',e=>{const t=e.target;if(!t||!t.dataset||t.dataset.lnm==null||!MPL)return;const cid=+t.dataset.lnm,v=t.value.trim().slice(0,14);if(!v)return;
+  if(MPL.mode==='cont')MPL.sv.RUN.chars[cid].name=v;else MPL.names[cid]=v;});
+document.addEventListener('keydown',e=>{const t=e.target;if(t&&t.dataset&&t.dataset.lnm!=null&&e.key==='Enter')t.blur();});
 function lobbyInput(evs){
   if(!MPL)return;let dirty=false;const n=gpList().length;
   if(n!==MPL.n){MPL.n=n;dirty=true;}
@@ -4380,7 +4402,8 @@ function lobbyInput(evs){
       else if(ev.down.has(1)&&!MPL.slots.length){MPL=null;showMenu('mp');}
       return;}
     if(si===0&&MPL.mode==='new'&&(ev.dir==='l'||ev.dir==='r')){const ks=['easy','normal','hard'];let k=ks.indexOf(MPL.diff);k=(k+(ev.dir==='r'?1:2))%3;MPL.diff=ks[k];MPL.slots.forEach(q=>q.ready=false);SF('tick');dirty=true;}
-    if(ev.down.has(2)&&MPL.mode==='new'&&!s.ready){const own=lobbyOwn()[si]||[],used=MPL.names;own.forEach(c=>{MPL.names[c]=pick(NAMES.filter(x=>!used.includes(x)));});SF('tick');dirty=true;}
+    if(ev.down.has(3)&&MPL.mode==='cont'&&!s.ready){MPL.rot=((MPL.rot||0)+1)%Math.max(1,MPL.slots.length);MPL.slots.forEach(q=>q.ready=false);SF('tick');dirty=true;}
+    if(ev.down.has(2)&&!s.ready){const own=lobbyOwn()[si]||[];if(MPL.mode==='new'){const used=MPL.names;own.forEach(c=>{MPL.names[c]=pick(NAMES.filter(x=>!used.includes(x)));});}else{const R=MPL.sv.RUN;own.forEach(c=>{const used=R.chars.map(q=>q.name);R.chars[c].name=pick(NAMES.filter(x=>!used.includes(x)));});}SF('tick');dirty=true;}
     if(ev.down.has(0)&&!s.ready){s.ready=true;SF('clink');dirty=true;}
     else if(ev.down.has(1)){if(s.ready)s.ready=false;else{MPL.slots.splice(si,1);MPL.slots.forEach(q=>q.ready=false);}dirty=true;}});
   if(MPL&&lobbyValid()&&MPL.slots.every(s=>s.ready)){if(!MPL.start)MPL.start=performance.now()+700;else if(performance.now()>MPL.start){lobbyStart();return;}}else if(MPL)MPL.start=0;
@@ -4389,7 +4412,8 @@ function lobbyInput(evs){
 function lobbyStart(){
   const L=MPL,own=lobbyOwn();MPL=null;endTut();
   if(L.mode==='new'){RUN=null;newRun(L.names.slice(),L.diff);RUN.mp=true;clearSave();UI.live=true;hideMenu();closeModal();showMap();}
-  else{continueRun();if(RUN)RUN.mp=true;}
+  else{try{localStorage.setItem('hlubina-save',JSON.stringify(L.sv));}catch(e){}continueRun();if(RUN)RUN.mp=true;}   /* i s přejmenovanými postavami */
+  if(RUN)RUN.mpOwn=own.map(l=>l.slice());
   MP.on=true;MP.gp=L.slots.map(s=>s.gp);MP.own=own;MP.lead=0;MP.shop=[];MP.ready=[];GPF.key=null;GPF.menu=false;SF('portal');
   if(typeof render==='function'&&G)render();
 }
@@ -4458,9 +4482,11 @@ function gameInput(ev,own){
 function menuActs(){return [...document.querySelectorAll('#actions .acts button:not([disabled])')].filter(e=>e.dataset.a!=='end'&&e.dataset.a!=='endall'&&visible(e));}
 
 /* ---------- obchod: mřížka (řádky odspodu: tlačítka, nabídka, sloty, sloty, životy) ---------- */
+function shopCidOf(el,cids){const v=el&&(el.dataset.rrnd||el.dataset.cid||(el.dataset.up||el.dataset.slot||'').split('|')[0]);const c=v!==''&&v!=null?+v:NaN;return cids.includes(c)?c:cids.find(q=>RUN.chars[q]&&RUN.chars[q].alive);}
 function shopRows(cids,pickId,mpMode){const mb=document.getElementById('mbox'),rows=[];
   if(pickId){[0,1].forEach(i=>{const row=cids.map(cid=>{const r=RUN.chars[cid];if(!r||!r.alive||r.abil[i]||r.abil.some(q=>q&&q.id===pickId))return null;return mb.querySelector(`[data-slot="${cid}|${i}"]`);}).filter(Boolean);if(row.length)rows.push(row);});
     const off=mb.querySelector(`[data-offer="${pickId}"]`);if(off)rows.push([off]);return rows;}
+  rows.push(cids.map(cid=>mb.querySelector(`[data-rrnd="${cid}"]`)).filter(Boolean));   /* jiné jméno */
   rows.push(cids.map(cid=>mb.querySelector(`[data-a="buyhp"][data-cid="${cid}"]:not([disabled])`)).filter(Boolean));
   [0,1].forEach(i=>rows.push(cids.map(cid=>mb.querySelector(`[data-up="${cid}|${i}"]:not([disabled])`)).filter(Boolean)));
   rows.push([...mb.querySelectorAll('[data-a="buytime"]:not([disabled])')]);
@@ -4479,6 +4505,7 @@ function spShopInput(ev){const mb=document.getElementById('mbox'),sec=mb.querySe
   const rows=shopRows(RUN.chars.map(r=>r.id),RUN.sel,false);if(!rows.length)return;const flat=rows.flat();
   let cur=findKey(GPF.key,mb);if(!cur||!flat.includes(cur)){cur=flat[0];GPF.key=keyOf(cur);}
   if(ev.dir){const n=gridMove(rows,cur,ev.dir);if(n&&n!==cur){cur=n;GPF.key=keyOf(n);SF('tick',.3);n.scrollIntoView({block:'nearest',behavior:'smooth'});}}
+  if(ev.down.has(2)){const cid=shopCidOf(cur,RUN.chars.map(r=>r.id));const b=mb.querySelector(`[data-rrnd="${cid}"]`);if(b)b.click();return;}   /* X = jiné jméno */
   if(ev.down.has(0)){
     if(cur.dataset.offer){if(RUN.sel===cur.dataset.offer){RUN.sel=null;renderShop();GPF.key=keyOf(cur);return;}if(RUN.gems<ABIL_NEW){SF('hurt');return;}
       RUN.sel=cur.dataset.offer;renderShop();SF('card');const r2=shopRows(RUN.chars.map(r=>r.id),RUN.sel,false);GPF.key=r2.length&&r2[0][0].dataset.slot?keyOf(r2[0][0]):keyOf(cur);return;}
@@ -4494,6 +4521,8 @@ function shopInput(evs){
     let cur=findKey(st.key,mb);if(!cur||!flat.includes(cur)){cur=flat[0];st.key=keyOf(cur);st.arm=false;}
     if(ev.dir){const n=gridMove(rows,cur,ev.dir);if(n&&n!==cur){cur=n;st.key=keyOf(n);st.arm=false;SF('tick',.3);}}
     if(ev.down.has(1)){if(st.pick){st.key=`[data-offer="${st.pick}"]`;st.pick=null;}else if(st.arm)st.arm=false;else if(MP.ready[sl])MP.ready[sl]=false;}
+    if(ev.down.has(2)){const cid=shopCidOf(cur,own);const b=mb.querySelector(`[data-rrnd="${cid}"]`);if(b){b.click();st.key=keyOf(cur);}return;}
+    if(cur.dataset.rrnd!=null&&ev.down.has(0)){cur.click();return;}
     if(ev.down.has(0)){
       if(cur.dataset.a==='nextlvl'){MP.ready[sl]=true;SF('clink');}
       else if(cur.dataset.offer){if(RUN.gems<ABIL_NEW){SF('hurt');return;}const r2=shopRows(own,cur.dataset.offer,true);if(!r2.length||!r2[0][0].dataset.slot){SF('hurt');return;}st.pick=cur.dataset.offer;st.key=keyOf(r2[0][0]);SF('card');}
@@ -4573,6 +4602,62 @@ if(typeof window!=='undefined'){window.addEventListener('gamepadconnected',()=>{
 /* myš: najetí na Ošetřit / Zvednout rozsvítí cílovou postavu */
 document.addEventListener('mouseover',e=>{const b=e.target.closest&&e.target.closest('#actions [data-heal],#actions [data-rv2]');document.querySelectorAll('.tok.gphov').forEach(t=>{t.classList.remove('gphov','gptgt');});
   if(b){const t=tokEl(+(b.dataset.heal!=null?b.dataset.heal:b.dataset.rv2));if(t)t.classList.add('gphov','gptgt');}});
+/* ================= ULOŽENÉ HRY: pojmenované sloty v prohlížeči + soubor ================= */
+const SLOTS_KEY='hlubina-slots';
+function loadSlots(){try{const a=JSON.parse(localStorage.getItem(SLOTS_KEY)||'[]');return Array.isArray(a)?a:[];}catch(e){return [];}}
+function storeSlots(a){try{localStorage.setItem(SLOTS_KEY,JSON.stringify(a));return true;}catch(e){return false;}}
+/* co se dá právě uložit: živá výprava (v levelu jen když se nic nepřehrává) */
+function liveSaveData(){if(!RUN||!UI.live||(G&&(G.tut||G.test)))return null;
+  if(RUN.onMap||UI.onMap||!G||G.over)return {v:VERSION,RUN:JSON.parse(JSON.stringify(RUN)),G:null};
+  if(UI.playing||UI.busy||G.placing)return null;return {v:VERSION,RUN:JSON.parse(JSON.stringify(RUN)),G:JSON.parse(JSON.stringify(G))};}
+function lvlName(R,G2){const nd=R.map&&G2&&G2.node&&R.map.nodes[G2.node];return nd?`level ${G2.nodeNum||nd.tier} · ${nd.name}`:`level ${R.level}`;}
+function saveSummary(d){if(!d||!d.RUN)return '';const R=d.RUN,where=d.G?`${lvlName(R,d.G)} · kolo ${d.G.round}`:'plán laboratoře';
+  return `${where}${R.act>1?' · akt '+R.act:''} · ${(DIFF[R.diff||'normal']||DIFF.normal).name} · ${R.chars.map(c=>c.alive?c.name:c.name+' †').join(', ')}${R.mp?' · multiplayer':''}`;}
+function defSaveName(d){const R=d.RUN;return `${R.chars.filter(c=>c.alive).map(c=>c.name).join(', ')||'Výprava'} · ${d.G?lvlName(R,d.G):'plán'}${R.act>1?' · akt '+R.act:''}`;}
+function fmtDate(ts){const d=new Date(ts),p=n=>String(n).padStart(2,'0');return `${d.getDate()}. ${d.getMonth()+1}. ${d.getFullYear()} ${p(d.getHours())}:${p(d.getMinutes())}`;}
+function addSlot(name,d){const a=loadSlots(),s={id:Date.now().toString(36)+Math.random().toString(36).slice(2,6),name:String(name||defSaveName(d)).slice(0,40),ts:Date.now(),v:d.v||VERSION,data:{v:d.v||VERSION,RUN:d.RUN,G:d.G||null}};
+  a.unshift(s);while(a.length>30)a.pop();if(!storeSlots(a)){/* plno: zahodit nejstarší */while(a.length>1){a.pop();if(storeSlots(a))return s;}return null;}return s;}
+function downloadSave(name,d){try{const blob=new Blob([JSON.stringify({hlubinaSave:1,name,ts:Date.now(),v:d.v||VERSION,RUN:d.RUN,G:d.G||null})],{type:'application/json'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=('hlubina-'+String(name).replace(/[^\w\-áčďéěíňóřšťúůýžÁČĎÉĚÍŇÓŘŠŤÚŮÝŽ ]+/g,'').trim().replace(/\s+/g,'-')||'hlubina-save')+'.json';document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove();},500);}catch(e){}}
+function useSave(d){try{localStorage.setItem('hlubina-save',JSON.stringify({v:d.v||VERSION,RUN:d.RUN,G:d.G||null}));return true;}catch(e){return false;}}
+/* ---------- obrazovka: uložit ---------- */
+function showSaveScreen(back){const d=liveSaveData(),m=menuEl();m.hidden=false;UI.inMenu=true;UI.saveBack=back||'menu';
+  if(!d){m.innerHTML=`<div class="mwrap"><div class="mtitle"><span class="mt-k">ULOŽENÍ</span><h1 style="font-size:40px">Teď nejde uložit</h1><p>Uložit jde rozehraná výprava, ne tutoriál ani test room. Během animace chvilku počkej.</p></div><div class="mbtns"><button class="mbtn ghost" data-menu="${UI.saveBack}">Zpět</button></div></div>`;return;}
+  m.innerHTML=`<div class="mwrap"><div class="mtitle"><span class="mt-k">ULOŽENÍ VÝPRAVY</span><h1 style="font-size:40px">Uložit hru</h1><p>${escH(saveSummary(d))}</p></div>
+    <label class="svlab">Název uložené hry<input id="svName" maxlength="40" value="${escH(defSaveName(d))}"></label>
+    <div class="mbtns"><button class="mbtn primary" data-sv="slot">Uložit do prohlížeče<small>najdeš v Načíst uloženou hru</small></button>
+      <button class="mbtn" data-sv="file">Uložit i jako soubor<small>stáhne .json, pro jistotu mimo prohlížeč</small></button>
+      <button class="mbtn ghost" data-menu="${UI.saveBack}">Zpět</button></div><div id="svMsg" class="hint"></div></div>`;}
+/* ---------- obrazovka: načíst ---------- */
+function showLoadScreen(mode){const m=menuEl();m.hidden=false;UI.inMenu=true;UI.loadMode=mode;const a=loadSlots();
+  const row=s=>`<div class="ldrow"><div class="ldinfo"><b>${escH(s.name)}</b><small>${escH(saveSummary(s.data))}</small><small class="ldd">${fmtDate(s.ts)} · verze ${escH(s.v||'?')}</small></div>
+    <div class="ldbtn"><button class="mbtn sm primary" data-ld="${s.id}">Načíst</button><button class="mbtn sm" data-ldf="${s.id}" title="Stáhnout jako soubor">⤓</button><button class="mbtn sm" data-ldx="${s.id}" title="Smazat">✕</button></div></div>`;
+  m.innerHTML=`<div class="mwrap wide"><div class="mtitle"><span class="mt-k">${mode==='mp'?'MULTIPLAYER':'HRA PRO JEDNOHO'}</span><h1 style="font-size:40px">Načíst uloženou hru</h1><p>Načtená výprava se dá hrát sólo i v multiplayeru. Stane se z ní poslední hra, takže pak pokračuje i přes Pokračovat.</p></div>
+    <div class="ldlist">${a.length?a.map(row).join(''):'<p class="hint">V tomhle prohlížeči zatím žádná uložená hra není.</p>'}</div>
+    <div class="mbtns" style="margin-top:12px"><button class="mbtn" data-ldfile="1">Načíst ze souboru…<small>.json uložený dřív tlačítkem Uložit jako soubor</small></button><button class="mbtn ghost" data-menu="${mode}">Zpět</button></div>
+    <input type="file" id="ldFile" accept=".json,application/json" hidden><div id="ldMsg" class="hint"></div></div>`;}
+function startLoaded(d){if(!useSave(d)){const e=document.getElementById('ldMsg');if(e)e.textContent='Hru se nepodařilo načíst (plné úložiště prohlížeče).';return;}
+  if(UI.loadMode==='mp')showLobby('cont');else{MP.on=false;continueRun();}}
+function validSave(d){return d&&d.RUN&&Array.isArray(d.RUN.chars)&&d.RUN.chars.length&&(d.G==null||Array.isArray(d.G.board));}
+document.addEventListener('click',e=>{const b=e.target.closest('[data-sv],[data-ld],[data-ldf],[data-ldx],[data-ldfile],[data-rrnd]');if(!b)return;
+  if(b.dataset.rrnd!=null){const r=RUN&&RUN.chars[+b.dataset.rrnd];if(!r)return;const used=RUN.chars.map(q=>q.name);r.name=pick(NAMES.filter(x=>!used.includes(x)));if(G&&G.chars[r.id])G.chars[r.id].name=r.name;SF('tick');
+    const inp=document.querySelector(`[data-rn="${r.id}"]`);if(inp)inp.value=r.name;else if(typeof renderShop==='function')renderShop();return;}
+  SF('card');
+  if(b.dataset.sv){const d=liveSaveData(),msg=document.getElementById('svMsg');if(!d){if(msg)msg.textContent='Teď uložit nejde.';return;}
+    const name=(document.getElementById('svName')||{}).value||defSaveName(d);const s=addSlot(name,d);
+    if(b.dataset.sv==='file')downloadSave(name,d);
+    if(msg)msg.innerHTML=s?`Uloženo jako <b>${escH(s.name)}</b>${b.dataset.sv==='file'?' a stažen soubor':''}.`:'Úložiště prohlížeče je plné, hru jsem jen stáhl jako soubor.';if(!s&&b.dataset.sv!=='file')downloadSave(name,d);return;}
+  if(b.dataset.ld){const s=loadSlots().find(q=>q.id===b.dataset.ld);if(s&&validSave(s.data))startLoaded(s.data);return;}
+  if(b.dataset.ldf){const s=loadSlots().find(q=>q.id===b.dataset.ldf);if(s)downloadSave(s.name,s.data);return;}
+  if(b.dataset.ldx){const a=loadSlots().filter(q=>q.id!==b.dataset.ldx);storeSlots(a);showLoadScreen(UI.loadMode);return;}
+  if(b.dataset.ldfile){const f=document.getElementById('ldFile');if(f)f.click();return;}});
+document.addEventListener('change',e=>{if(e.target.id!=='ldFile')return;const f=e.target.files&&e.target.files[0];if(!f)return;const rd=new FileReader();
+  rd.onload=()=>{const msg=document.getElementById('ldMsg');let d=null;try{d=JSON.parse(rd.result);}catch(err){}
+    if(!validSave(d)){if(msg)msg.textContent='Tohle není uložená hra Hlubiny.';return;}
+    const data={v:d.v,RUN:d.RUN,G:d.G||null};addSlot(d.name||defSaveName(data),data);startLoaded(data);};rd.readAsText(f);});
+/* jména v obchodě: psaní z klávesnice */
+document.addEventListener('input',e=>{const t=e.target;if(!t||!t.dataset||t.dataset.rn==null||!RUN)return;const v=t.value.trim().slice(0,14);if(!v)return;const r=RUN.chars[+t.dataset.rn];if(r){r.name=v;if(G&&G.chars[r.id])G.chars[r.id].name=v;}});
+document.addEventListener('keydown',e=>{const t=e.target;if(t&&t.dataset&&t.dataset.rn!=null&&e.key==='Enter')t.blur();});
 
 /* ================= SEKVENCE ANIMACÍ ================= */
 const sleep=ms=>new Promise(res=>{const t0=Date.now();const tick=()=>{if(UI.fast||Date.now()-t0>=ms)res();else setTimeout(tick,40);};tick();});
@@ -4868,7 +4953,8 @@ function pickOffers(n){const alive=RUN.chars.filter(r=>r.alive),pool=Object.keys
 function renderShop(){
   const intro=!!RUN.intro,aff=RUN.gems>=ABIL_NEW;
   const offers=RUN.offers.map(id=>`<div class="offer ${RUN.sel===id?'sel':''} ${aff?'aff':'poor'}" data-offer="${id}"><span class="oic">${ABIL_IC[id]||'✦'}</span><b>${ABIL[id].name}</b><small>${fmtL(ABIL[id].desc(1))}</small><span class="price">${ABIL_NEW} ${CUR}</span></div>`).join('')||'<p class="hint">Nabídka je vyprodaná.</p>';
-  const chars=RUN.chars.map(r=>{
+  const chOrd=RUN.chars.slice();if(MP.on)chOrd.sort((a,b)=>((ownerOf(a.id)+9)%9-(ownerOf(b.id)+9)%9)||a.id-b.id);
+  const chars=chOrd.map(r=>{
     const g=G.chars[r.id],lost=r.lostNow;
     let hp='';for(let i=0;i<r.permMax+(lost?1:0);i++)hp+=`<i class="${i<r.permMax?(RUN.hpFlash===r.id&&i===r.permMax-1?'pop':''):'gone strike'}"></i>`;if(!r.alive&&!lost)hp=`<span class="skull">${IC.skull}</span>`;else if(!r.alive)hp+=`<span class="skull late">${IC.skull}</span>`;
     const carry=(RUN.carry&&RUN.carry[r.id])||0,hc=(RUN.hpBuys||0)+1,canHp=r.alive&&r.permMax<hpCap();
@@ -4877,7 +4963,7 @@ function renderShop(){
       const uc=a?upCost(a.lvl):0,nx=a&&a.lvl<ABIL_MAX?[...Array(ABIL_MAX-a.lvl)].map((_,k)=>`${ROMAN[a.lvl+k+1]}: ${ABIL[a.id].desc(a.lvl+k+1)}`).join('\n'):'';
       const tgt=RUN.sel&&!a&&r.alive&&!r.abil.some(q=>q&&q.id===RUN.sel);
       return `<div class="slot ${a?'full':''} ${RUN.sel?(tgt?'tgt':'dim'):''}" data-slot="${r.id}|${i}">${a?`<b>${ABIL[a.id].name} ${ROMAN[a.lvl]}</b><small>${fmtL(ABIL[a.id].desc(a.lvl))}</small>${a.lvl<ABIL_MAX?`<button class="btn up ${RUN.gems>=uc?'aff':''}" data-up="${r.id}|${i}" ${RUN.gems>=uc?'':'disabled'}>Vylepšit na ${ROMAN[a.lvl+1]} · ${uc} ${CUR}</button><span class="uptip">${ROMAN[a.lvl+1]}: ${ABIL_UPS[a.id](a.lvl+1)}</span>`:'<small class="maxl">nejvyšší úroveň</small>'}`:(tgt?`<small class="tgtl">sem: ${ABIL[RUN.sel].name}</small>`:'<small>prázdný slot · přetáhni sem schopnost</small>')}</div>`;}).join('');
-    return `<div class="scharc ${r.alive?'':'gone'}" data-sc="${r.id}"><div class="schead"><span class="sport">${portraitSVG(r)}${!g.escaped&&r.alive?'<span class="stun">✦✧✦</span>':''}</span><div><b>${r.name}</b><div class="hp">${hp}</div>${hpBtn}<small>${!r.alive?'ztracen(a) v hlubině':g.escaped?'prošel(a) portálem · plné životy':'neprošel(a) · max −1'}</small></div>${carry?`<span class="carry">${Array(carry).fill(`<i class="cg">${IC.idol}</i>`).join('')}</span>`:''}</div>${r.alive?slots:''}</div>`;
+    return `<div class="scharc ${r.alive?'':'gone'}" data-sc="${r.id}"><div class="schead"><span class="sport">${portraitSVG(r)}${!g.escaped&&r.alive?'<span class="stun">✦✧✦</span>':''}</span><div><span class="rnrow"><input class="rnin" data-rn="${r.id}" maxlength="14" value="${escH(r.name)}" aria-label="Jméno postavy" title="Klikni a přepiš jméno"><button class="btn rrnd" data-rrnd="${r.id}" title="Jiné jméno (na ovladači X)">⟳</button></span><div class="hp">${hp}</div>${hpBtn}<small>${!r.alive?'ztracen(a) v hlubině':g.escaped?'prošel(a) portálem · plné životy':'neprošel(a) · max −1'}</small></div>${carry?`<span class="carry">${Array(carry).fill(`<i class="cg">${IC.idol}</i>`).join('')}</span>`:''}</div>${r.alive?slots:''}</div>`;
   }).join('');
   const nm=G.node&&RUN.map&&RUN.map.nodes[G.node];
   const fail=!G.over.esc;
@@ -5032,6 +5118,7 @@ function boot(){
   setupShopDnD();
   document.getElementById('modal').addEventListener('click',e=>{if(e.target.id==='modal')closeModal();});
   document.addEventListener('keydown',e=>{
+    if(e.target&&e.target.matches&&e.target.matches('input,textarea'))return;   /* psaní jména neovládá hru */
     if((e.ctrlKey||e.metaKey)&&e.key==='z'){e.preventDefault();if(!UI.playing){UI.ladShown=null;undo();}}
     if(e.key==='r'&&G.placing&&tAllow('rot'))rotatePlacing();
     if(e.key==='Enter'&&G.placing)tryPlace();
