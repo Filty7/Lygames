@@ -967,6 +967,34 @@ p,small,li,em,.hint,.clore,.cdesc{text-wrap:pretty}
 #nettoast.on{opacity:1}
 #netlost{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:200;display:flex;align-items:center;justify-content:center}
 #netlost>div{background:#1a1d20;border:1px solid rgba(255,255,255,.2);border-radius:12px;padding:20px 26px;max-width:420px;text-align:center}
+
+/* obrazovka po misi: bez vodorovného posuvníku, karty postav se vejdou */
+.mbox.shopbox{max-width:min(1120px,96vw);overflow-x:hidden}
+.shopbox .schars{grid-template-columns:repeat(auto-fit,minmax(215px,1fr))}
+.shopbox .scharc{min-width:0}
+.shopbox .schead{align-items:flex-start;flex-wrap:wrap;min-width:0;min-height:86px}
+.shopbox .schead>div{flex:1;min-width:0;display:flex;flex-direction:column;gap:3px}
+.shopbox .schead>div>small{line-height:1.25;color:var(--muted)}
+.shopbox .rnrow{min-width:0}.shopbox .rnin{flex:1;min-width:0;width:auto}
+.shopbox .btn.hpbuy{white-space:normal;align-self:flex-start;max-width:100%;margin-top:2px}
+.shopbox .carry{flex-basis:100%;margin-left:0;justify-content:flex-start}
+.shopbox .offers{grid-template-columns:repeat(auto-fit,minmax(240px,1fr))}
+.shopbox .shopsec>.hint{font-size:12.5px;margin:2px 0 8px}
+.shopbox .tally{flex-wrap:wrap;gap:4px 14px}
+.shopbox .mhead h2{min-width:0}
+
+/* ping */
+#pings{z-index:30;pointer-events:none}
+.pingm{position:absolute;pointer-events:none}
+.pingm .pr{position:absolute;inset:3px;border:4px solid var(--pc);box-shadow:0 0 18px var(--pc),inset 0 0 18px var(--pc);animation:pingb .5s steps(1) infinite}
+.pingm .pr.d2{inset:-10px;border-width:2px;box-shadow:none;animation:pingr 1s ease-out 3 forwards}
+.pingm b{position:absolute;left:50%;top:-30px;transform:translateX(-50%);background:var(--wc);color:#111;font-size:15px;padding:1px 8px;border-radius:4px;white-space:nowrap;font-weight:700}
+@keyframes pingb{0%{opacity:1}50%{opacity:.25}}
+@keyframes pingr{0%{opacity:1;transform:scale(.6)}100%{opacity:0;transform:scale(1.25)}}
+#poffs{position:absolute;inset:0;pointer-events:none;z-index:25}
+.pinga{position:absolute;width:34px;height:34px;margin:-17px 0 0 -17px;border-radius:50%;border:2px solid var(--pc);background:#1a1206;color:var(--pc);font-weight:800;font-size:18px;padding:0;pointer-events:auto;cursor:pointer;animation:pingb .5s steps(1) infinite;box-shadow:0 0 14px var(--pc)}
+.pinga i{position:absolute;left:50%;top:50%;width:0;height:0;margin:-7px 0 0 -7px;border:7px solid transparent;border-left-color:var(--pc);transform-origin:7px 7px}
+.pinga i{margin:-7px 0 0 -7px}
 </style>
 
 <div id="app">
@@ -995,7 +1023,6 @@ p,small,li,em,.hint,.clore,.cdesc{text-wrap:pretty}
   <div id="topr">
     <button class="ib" id="bUndo" title="Vrátit krok (Ctrl+Z)">↶</button>
     <button class="ib" id="bLog" title="Deník výpravy">Deník</button>
-    <button class="ib" id="bDeck" title="Dílky v balíčku">Balíček</button>
     <button class="ib" id="bRules" title="Pravidla">?</button>
     <button class="ib" id="bSnd" title="Zvuk">♪</button>
     <button class="ib" id="bNew" title="Hlavní menu">Menu</button>
@@ -3275,8 +3302,9 @@ function setupCamera(){
 }
 
 /* ================= MENU, ULOŽENÍ, PRAVIDLA ================= */
-const VERSION='0.80-beta';
+const VERSION='0.81-beta';
 const CHANGELOG=[
+  ['0.81-beta','Ping a úpravy',['Ping: prostřední tlačítko myši blikne oranžovým rámečkem na dílku a ozve se zvuk. Online ho vidí všichni i se jménem toho, kdo pingnul. Kdo má místo mimo obrazovku, vidí u okraje blikající šipku, klik na ni tam posune kameru.','Deník vidí jen ten, kdo ho otevřel.','Tlačítko Balíček je pryč.','Obrazovka po levelu je širší a bez vodorovného posuvníku. Karty postav se vejdou vedle sebe a texty nepřetékají.','Kritická radiace: lísteček události se ukáže jen jednou a pak už běží jen testy (dřív problikl před testy znovu).']],
   ['0.80-beta','Online multiplayer (beta)',['Nová položka v menu Online multiplayer: hostitel založí novou výpravu, pokračuje v rozehrané nebo načte uloženou a dostane kód hry. Kamarádi se připojí přes Připojit se a zadají kód.','Každý hraje na svém počítači myší a klávesnicí. V online lobby si hráči klikem vezmou postavy a přepíšou jim jména. Hra začne, až má každý aspoň jednu postavu.','Celá hra běží u hostitele a ukládá se u něj. Ostatní ovládají jen své postavy a na konci levelu potvrdí, že jsou hotoví. Plán laboratoře a dialogy ovládá hostitel.','Když se hráč odpojí, může se vrátit stejným kódem a jménem. Do té doby za jeho postavy hraje hostitel.','Hra pro jednoho a lokální multiplayer s ovladači fungují dál úplně stejně a bez internetu.']],
   ['0.70','Uložené hry a jména',['Uložit hru (v menu během výpravy): pojmenovaná uložená hra v prohlížeči a volitelně i jako soubor .json. Rozehraná hra z předchozích verzí zůstává a Pokračovat ji načte jako dřív.','Hra pro jednoho i Multiplayer mají Načíst uloženou hru: seznam uložených her s detaily, stažení, smazání a načtení ze souboru. Načtenou hru jde hrát sólo i v multiplayeru.','Multiplayer si pamatuje, kdo hrál za které postavy. Při pokračování dostane každý hráč zpátky své postavy podle pořadí přihlášení. V lobby si každý může vzít kteroukoli postavu: Y otevře výběr, páčkou vybere, A potvrdí, B zruší. Hra začne, až má každý hráč aspoň jednu postavu.','Jména postav jde přepsat myší a klávesnicí v lobby i na konci levelu, X dá náhodné jméno.','V multiplayeru jsou postavy jednoho hráče v dolní liště vedle sebe.','Automatická kamera: výběr postavy v dolní liště (nebo LB / RB) ji plynule vycentruje. Při pádu kamera počká nahoře a pak jede s postavou dolů. Testy, střílna, potrubí a karanténa se posunou doprostřed obrazovky.']],
   ['0.69','Stopař a střílna',['Stopař má výměny dílku 1 / 2 / 3× za každý level (dřív za celou výpravu).','Střílnu spustí i přízrak, který vstoupí do laseru. Trefí první postavu nebo přízrak v cestě.']],
@@ -4881,8 +4909,8 @@ async function playSeqRun(){
       else{el.style.transition='transform .65s cubic-bezier(.5,0,1,.6),opacity .65s';el.style.transform=`translateY(${full*.9}px)`;el.style.opacity='0';await sleep(800);el.remove();lb.remove();}
       continue;
     }else if(s.k==='mini'){
+      lay.hidden=true;   /* lísteček události už neukazovat znovu (kritická radiace: test, test …) */
       if(camAttend(s.x,s.y))await sleep(420);   /* test ať je uprostřed obrazovky */
-      lay.hidden=true;
       const fxl=document.getElementById('fx'),el=document.createElement('div');el.className='minit'+(s.panic?' panic':'');
       el.style.left=((s.x+.5)*CS)+'px';el.style.top=(s.y*CS+4)+'px';
       el.innerHTML=`<span class="tre">${s.panic?EVICON.panic:EVICON.radiation}</span><b class="roll">?</b>`;fxl.appendChild(el);
@@ -4982,7 +5010,7 @@ function showDeck(){
     <p class="hint">Zbývá ${G.deck.length} dílků. ${G.board.some(c=>c&&c.exit)?'Portál už leží na desce.':'Portál je v balíčku mezi posledními 10 dílky (počítadlo zezelená).'} Zařízení, které portál probudí, v balíčku není: je ve vyznačené zóně 3 × 3. Každé další odhalené pole zóny má větší šanci (1/9, 2/9 … 9/9).</p>
     ${sec('Běžné',arr.filter(g=>!g.t.feat&&!g.t.gem&&g.t.kind!=='stairs'&&g.t.kind!=='exit'))}${sec('Se zvláštností',arr.filter(g=>g.t.feat||g.t.gem))}${sec('Žebříky',arr.filter(g=>g.t.kind==='stairs'))}`);
 }
-function showLog(){openModal(`<div class="mhead"><h2>Deník výpravy</h2><button class="btn" data-a="close">Zavřít</button></div><ul class="loglist" id="logList" style="max-height:70vh">${logHTML()}</ul>`);}
+function showLog(){openModal(`<div class="mhead"><h2>Deník výpravy</h2><button class="btn" data-a="close">Zavřít</button></div><ul class="loglist" id="logList" style="max-height:70vh">${logHTML()}</ul>`);document.getElementById('mbox').classList.add('logbox');}
 function showOver(){
   if(!G||!G.over)return;const o=G.over;
   // nikdo neprošel: výprava pokračuje dál, jen bez vynesených sošek a všem ubude maximum (v tutoriálu i když už nikdo nežije, konec)
@@ -5169,7 +5197,6 @@ function boot(){
   document.addEventListener('pointerdown',()=>SND.init(),{once:false,passive:true});
   document.addEventListener('click',onClick,true);
   document.getElementById('bUndo').onclick=()=>{if(UI.playing)return;UI.ladShown=null;undo();};
-  document.getElementById('bDeck').onclick=showDeck;
   document.getElementById('bLog').onclick=showLog;
   document.getElementById('bRules').onclick=showRules;
   document.getElementById('bSnd').onclick=()=>{SND.init();SND.toggle();sb.textContent=SND.on?'♪':'♪̸';sb.classList.toggle('off',!SND.on);};
@@ -5323,6 +5350,7 @@ function netOnMsg(m){if(!m||m.from===NET.id||!NET.role)return;
     if(m.t==='ltake'){netTake(p,m.cid);return;}
     if(m.t==='lname'){netRename(p,m.cid,String(m.name||'').slice(0,14),true);return;}
     if(!NET.started)return;
+    if(m.t==='ping'){pingShow(m.x,m.y,p,NET.players[p].name);return;}
     if(m.t==='click'){netHostClick(p,m);return;}
     if(m.t==='key'){netHostKey(p,m.k);return;}
     if(m.t==='buy'){if((MP.own[p]||[]).includes(m.c)&&RUN&&RUN.offers.includes(m.id)){const sel=RUN.sel;buyAbility(m.c,m.i,m.id);RUN.sel=sel&&RUN.offers.includes(sel)?sel:null;netQueueState(true);}return;}
@@ -5332,6 +5360,7 @@ function netOnMsg(m){if(!m||m.from===NET.id||!NET.role)return;
   /* host */
   if(m.to&&m.to!==NET.id)return;
   if(m.t==='reject'){const w=m.why;netReset();showNetMenu(w);return;}
+  if(m.t==='ping'){if(NET.started){const k=NET.players.findIndex(q=>q.id===m.from);pingShow(m.x,m.y,k>=0?k:m.s,(NET.players[k>=0?k:m.s]||{}).name);}return;}
   if(NET.hostId&&m.from!==NET.hostId)return;
   NET.hostSeen=Date.now();
   if(m.t==='lobby'){if(!NET.hostId){NET.hostId=m.from;clearTimeout(NET.joinT);}if(!m.players.some(p=>p.id===NET.id)){netSend({t:'hello',name:NET.name,v:VERSION});return;}if(!NET.started)renderNetLobby(m);return;}
@@ -5348,7 +5377,7 @@ function netGuestLost(why){if(document.getElementById('netlost'))return;const d=
 function netView(){return {lag:UI.lag,oxyLag:UI.oxyLag,wDisp:UI.wDisp,leftDisp:UI.leftDisp,noOxDisp:UI.noOxDisp,pending:UI.pending,endConfirm:UI.endConfirm,own:MP.own,ready:MP.ready,
   players:NET.players.map(p=>({name:p.name,on:p.on!==false}))};}
 function netScr(){const md=document.getElementById('modal'),mb=document.getElementById('mbox'),rm=document.getElementById('rmap'),cf=document.getElementById('mconf');
-  const modal=md&&!md.hidden&&mb&&!mb.classList.contains('bookbox')&&!UI.localModal?{html:mb.innerHTML,cls:mb.className}:null;
+  const modal=md&&!md.hidden&&mb&&!netLocalModal()?{html:mb.innerHTML,cls:mb.className}:null;
   return {map:!!(rm&&!rm.hidden),conf:cf?((cf.querySelector('[data-mgo]')||{dataset:{}}).dataset.mgo||null):null,modal};}
 function netQueueState(now){if(NET.role!=='host'||!NET.started)return;clearTimeout(NET.stT);NET.stT=setTimeout(netSendState,now?20:120);}
 function netSendState(){if(NET.role!=='host'||!NET.started)return;if(UI.playing){netQueueState();return;}
@@ -5380,6 +5409,7 @@ function netHostKey(p,k){if(!G||!G.placing||!(MP.own[p]||[]).includes(G.placing.
 /* hostitel sám: smí jen své postavy (a za odpojené); na plánu a v dialozích je vedoucí */
 window.addEventListener('click',e=>{if(!NET.started||NET.injecting)return;const t=e.target;
   if(NET.role==='host'){const nr=t.closest('#mbox [data-a="newrun"]');if(nr){e.stopPropagation();e.preventDefault();netRelobby();return;}
+    if(t.closest('#mbox')&&netLocalModal())return;
     const el=t.closest(NET_SEL);if(!el)return;const ctx=netCtx(el);if(!ctx)return;
     if(!netAllowed(0,el,ctx)){e.stopPropagation();e.preventDefault();netToast('Tohle je postava jiného hráče.');return;}
     if(el.dataset.a==='nextlvl'&&!netNextLvl(0)){e.stopPropagation();e.preventDefault();return;}
@@ -5388,6 +5418,7 @@ window.addEventListener('click',e=>{if(!NET.started||NET.injecting)return;const 
     if(t.closest('#bNew')){e.stopPropagation();e.preventDefault();netGameMenu();return;}
     if(t.closest('#bUndo')){e.stopPropagation();e.preventDefault();return;}
     if(t.closest('#netlost')||t.closest('#menu'))return;
+    if(t.closest('#mbox')&&netLocalModal())return;
     const el=t.closest(NET_SEL);if(!el)return;const ctx=netCtx(el);if(!ctx)return;
     if(el.dataset.offer!=null)return;   /* výběr schopnosti řeší lokální obchod (klik / tažení) */
     e.stopPropagation();e.preventDefault();if(el.disabled)return;
@@ -5424,12 +5455,14 @@ function netApply(m){
   netScreen(m.scr||{});
   if(G&&!(m.scr&&m.scr.map)){render();if(NET.needCam){NET.needCam=false;initCam();}}
   netBar();}
-function netScreen(s){const rm=document.getElementById('rmap');
+function netLocalModal(){const md=document.getElementById('modal'),mb=document.getElementById('mbox');return !!(md&&!md.hidden&&mb&&(mb.classList.contains('bookbox')||mb.classList.contains('logbox')));}   /* deník a pravidla vidí jen ten, kdo je otevřel */
+function netScreen(s){NET.lastScr=s;const rm=document.getElementById('rmap');
   if(s.map){const m=mapEl();if(m.hidden||NET.mapRun!==RUN){m.hidden=false;UI.onMap=true;renderMap();NET.mapRun=RUN;}}
   else if(rm&&!rm.hidden){rm.hidden=true;UI.onMap=false;}
   const cf=document.getElementById('mconf'),cid=cf?((cf.querySelector('[data-mgo]')||{dataset:{}}).dataset.mgo||null):null;
   if(s.conf&&s.conf!==cid)openConf(s.conf);else if(!s.conf&&cf)closeConf();
   const md=document.getElementById('modal'),mb=document.getElementById('mbox');
+  if(netLocalModal()){NET.modalFromHost=false;return;}
   if(s.modal){const ae=document.activeElement,typing=ae&&mb.contains(ae)&&ae.matches('input');
     if(/shopbox/.test(s.modal.cls)&&RUN&&!RUN.intro&&NET.shop0){if(!typing){md.hidden=false;NET.shop0();netShopDecor();}}
     else{if(!typing&&mb.innerHTML!==s.modal.html)mb.innerHTML=s.modal.html;mb.className=s.modal.cls;}md.hidden=false;NET.modalFromHost=true;}
@@ -5466,5 +5499,40 @@ function netShopDecor(){if(!NET.started)return;const mb=document.getElementById(
   const nx=mb.querySelector('[data-a="nextlvl"]');if(!nx)return;
   if(MP.ready[me]){nx.textContent='✓ Hotovo · čeká se na ostatní';nx.classList.add('netready');}
   if(NET.role==='guest'){const cl=mb.querySelector('[data-a="close"]');if(cl)cl.remove();}}
+
+(function(){const C0=closeModal;closeModal=function(){const loc=netLocalModal();const r=C0.apply(this,arguments);
+  if(loc&&NET.role==='guest'&&NET.started&&NET.lastScr)setTimeout(()=>{if(!netLocalModal())netScreen(NET.lastScr);},0);
+  if(loc&&NET.role==='host'&&NET.started)netQueueState(true);return r;};})();
+
+/* ================= PING (prostřední tlačítko myši) =================
+   Blikne značkou na dílku: zvuk, oranžový rámeček na pár vteřin. Kdo to má mimo obrazovku, vidí u okraje šipku.
+   Funguje i offline (jedna obrazovka), online se pošle všem. */
+const PING_MS=4500,PING_COL='#ff9a2e';UI.pings=[];
+SND.ping=function(){this.tone(1046,.16,{type:'sine',gain:.1});this.tone(1568,.32,{type:'sine',gain:.08,delay:.11});this.tone(1568,.18,{type:'sine',gain:.035,delay:.5});};
+function pingCell(e){const v=document.getElementById('view'),r=v.getBoundingClientRect(),c=UI.cam;
+  const x=Math.floor(((e.clientX-r.left)-c.x)/c.z/CS),y=Math.floor(((e.clientY-r.top)-c.y)/c.z/CS);
+  if(x<0||y<0||x>=COLS||y>=ROWS)return null;return {x,y};}
+function pingColor(s){return s==null||s<0?PING_COL:(NET_COLS[s]||PING_COL);}
+function pingShow(x,y,s,who){if(!G||!UI.ready)return;const col=pingColor(s);
+  UI.pings=UI.pings.filter(p=>!(p.x===x&&p.y===y));const p={x,y,col,who:who||'',t0:Date.now(),id:Math.random().toString(36).slice(2,7)};UI.pings.push(p);
+  let L=document.getElementById('pings');if(!L){L=document.createElement('div');L.id='pings';L.className='layer';document.getElementById('board').appendChild(L);}
+  const el=document.createElement('div');el.className='pingm';el.dataset.pid=p.id;el.style.cssText=`left:${x*CS}px;top:${y*CS}px;width:${CS}px;height:${CS}px;--pc:${PING_COL};--wc:${col}`;
+  el.innerHTML=`<i class="pr"></i><i class="pr d2"></i>${who?`<b>${escH(who)}</b>`:''}`;L.appendChild(el);
+  SF('ping');setTimeout(()=>{el.remove();UI.pings=UI.pings.filter(q=>q!==p);pingOffs();},PING_MS);pingOffs();}
+function pingOffs(){let o=document.getElementById('poffs');if(!o){o=document.createElement('div');o.id='poffs';document.getElementById('view').appendChild(o);}
+  if(!UI.pings.length||!G){if(o.innerHTML)o.innerHTML='';return;}
+  const {w,h}=viewSize(),c=UI.cam,m=26;let s='';
+  UI.pings.forEach(p=>{const px=(p.x+.5)*CS*c.z+c.x,py=(p.y+.5)*CS*c.z+c.y;if(px>=0&&px<=w&&py>=0&&py<=h)return;
+    const ax=Math.max(m,Math.min(w-m,px)),ay=Math.max(m+100,Math.min(h-m,py)),ang=Math.atan2(py-ay,px-ax)*180/Math.PI;
+    s+=`<button class="pinga" data-ping="${p.x},${p.y}" style="left:${ax}px;top:${ay}px;--pc:${PING_COL}" title="Ping${p.who?' · '+escH(p.who):''}"><span>!</span><i style="transform:rotate(${ang}deg) translateX(21px)"></i></button>`;});
+  if(o._s!==s){o._s=s;o.innerHTML=s;}}
+setInterval(()=>{if(UI.pings&&UI.pings.length)pingOffs();},120);
+document.addEventListener('click',e=>{const b=e.target.closest('[data-ping]');if(!b)return;const [x,y]=b.dataset.ping.split(',').map(Number);centerOn(x,y,true);});
+let pingLast=0;
+document.addEventListener('mousedown',e=>{if(e.button!==1)return;const v=document.getElementById('view');if(!v||!v.contains(e.target)||UI.onMap||UI.inMenu||!G)return;
+  e.preventDefault();if(Date.now()-pingLast<500)return;const cl=pingCell(e);if(!cl)return;pingLast=Date.now();
+  if(NET.started){const me=netMe();pingShow(cl.x,cl.y,me,(NET.players[me]||{}).name);netSend({t:'ping',x:cl.x,y:cl.y,s:me});}
+  else pingShow(cl.x,cl.y,null,'');},true);
+document.addEventListener('auxclick',e=>{if(e.button===1&&e.target.closest&&e.target.closest('#view'))e.preventDefault();},true);
 
 </script>
