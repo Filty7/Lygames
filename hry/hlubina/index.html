@@ -316,6 +316,7 @@ h1,h2,h3{font-family:var(--display);font-weight:700;margin:0;letter-spacing:.02e
 .gl.laser.dim{opacity:0;transition:opacity .12s}
 .lpick{flex-wrap:wrap;justify-content:center}.lpick:has(.lpc+.lpc) .pimg{width:46px!important;height:46px!important}.lpick:has(.lpc+.lpc) .lnm{width:78px;font-size:15px}.lpick:has(.lpc+.lpc){gap:6px}
 .lslot{display:flex;flex-direction:column}.lslot .lst{margin-top:auto;padding-top:6px}.lslot.empty .lwait{margin:auto 0}
+.lpick .lpc.pk{outline:3px solid var(--pkc);outline-offset:3px;border-radius:4px;animation:pkpulse .9s ease-in-out infinite alternate}@keyframes pkpulse{from{outline-color:var(--pkc)}to{outline-color:transparent}}.lnone{color:var(--bad)}
 .lst .lk{display:flex;align-items:center;gap:6px;white-space:nowrap;justify-content:flex-start;margin:3px auto;width:max-content;min-width:120px}
 .lpick .lnm{font-family:var(--display);font-size:17px;font-weight:700;background:transparent;border:0;border-bottom:1px dashed rgba(255,255,255,.25);text-align:center;width:120px;padding:1px 2px;outline:none}.lpick .lnm:focus{border-bottom-color:var(--lamp);background:rgba(255,255,255,.05)}
 .rnrow{display:flex;align-items:center;gap:4px}.rnin{font-family:var(--display);font-size:16px;font-weight:700;color:var(--ink);background:transparent;border:0;border-bottom:1px dashed rgba(255,255,255,.22);width:120px;padding:1px 2px;outline:none}.rnin:focus{border-bottom-color:var(--lamp);background:rgba(255,255,255,.05)}.btn.rrnd{padding:1px 6px;font-size:13px;line-height:1.2}
@@ -3206,7 +3207,13 @@ function centerOn(x,y,smooth){const {w,h}=viewSize(),c=UI.cam;c.x=w/2-(x+.5)*CS*
 function fitWidth(){UI.cam.z=zLimits().fit;}
 // automatická kamera: při událostech odjede/odzoomuje tak, aby bylo vidět co nejvíc dění
 function camVisible(x,y){const {w,h}=viewSize(),c=UI.cam,px2=c.x+(x+.5)*CS*c.z,py=c.y+(y+.5)*CS*c.z;return px2>CS*c.z*.4&&px2<w-CS*c.z*.4&&py>CS*c.z*.4&&py<h-CS*c.z*.6;}
-function focusBox(pts){if(!UI.autoCam||!pts.length)return;if(pts.every(p=>camVisible(p[0],p[1])))return;
+/* pohodlná střední část obrazovky: když tam věc není, kamera ji plynule vycentruje */
+function camComfort(x,y){const {w,h}=viewSize(),c=UI.cam,px2=c.x+(x+.5)*CS*c.z,py=c.y+(y+.5)*CS*c.z;return px2>w*.22&&px2<w*.78&&py>h*.26&&py<h*.72;}
+function camAttend(x,y){if(UI.autoCam&&!camComfort(x,y)){centerOn(x,y,true);return true;}return false;}
+/* pád: kamera počká nahoře, pak jede s postavou dolů stejně rychle jako pád */
+function camFollowFall(c,via,an){if(!UI.autoCam)return;clearTimeout(UI.camFT);if(!camComfort(via.x,via.y))centerOn(via.x,via.y,true);
+  const dur=(0.25+0.14*an)*1000;UI.camFT=setTimeout(()=>{if(camComfort(c.x,c.y))return;const b=document.getElementById('board');b.style.transition=`transform ${dur}ms cubic-bezier(.5,0,1,.6)`;centerOn(c.x,c.y,false);setTimeout(()=>{b.style.transition='';},dur+50);},330);}
+function focusBox(pts){if(!UI.autoCam||!pts.length)return;if(pts.every(p=>camComfort(p[0],p[1])))return;
   const xs=pts.map(p=>p[0]),ys=pts.map(p=>p[1]),x0=Math.min(...xs),x1=Math.max(...xs),y0=Math.min(...ys),y1=Math.max(...ys);
   const {w,h}=viewSize(),L=zLimits();let z=Math.min(UI.cam.z,(w*.85)/((x1-x0+1.4)*CS),(h*.8)/((y1-y0+1.4)*CS));z=Math.max(L.min,Math.min(L.max,z));
   UI.cam.z=z;centerOn((x0+x1)/2,(y0+y1)/2,true);}
@@ -3241,7 +3248,7 @@ function setupCamera(){
 /* ================= MENU, ULOŽENÍ, PRAVIDLA ================= */
 const VERSION='0.70';
 const CHANGELOG=[
-  ['0.70','Uložené hry a jména',['Uložit hru (v menu během výpravy): pojmenovaná uložená hra v prohlížeči a volitelně i jako soubor .json. Rozehraná hra z předchozích verzí zůstává a Pokračovat ji načte jako dřív.','Hra pro jednoho i Multiplayer mají Načíst uloženou hru: seznam uložených her s detaily, stažení, smazání a načtení ze souboru. Načtenou hru jde hrát sólo i v multiplayeru.','Multiplayer si pamatuje, kdo hrál za které postavy. Při pokračování dostane každý hráč zpátky své postavy podle pořadí přihlášení. V lobby si každý může tlačítkem Y vzít jinou postavu (opakovaným stiskem vybírá dál, kdo by zůstal bez postavy, dostane náhradu).','Jména postav jde přepsat myší a klávesnicí v lobby i na konci levelu, X dá náhodné jméno.','V multiplayeru jsou postavy jednoho hráče v dolní liště vedle sebe.']],
+  ['0.70','Uložené hry a jména',['Uložit hru (v menu během výpravy): pojmenovaná uložená hra v prohlížeči a volitelně i jako soubor .json. Rozehraná hra z předchozích verzí zůstává a Pokračovat ji načte jako dřív.','Hra pro jednoho i Multiplayer mají Načíst uloženou hru: seznam uložených her s detaily, stažení, smazání a načtení ze souboru. Načtenou hru jde hrát sólo i v multiplayeru.','Multiplayer si pamatuje, kdo hrál za které postavy. Při pokračování dostane každý hráč zpátky své postavy podle pořadí přihlášení. V lobby si každý může vzít kteroukoli postavu: Y otevře výběr, páčkou vybere, A potvrdí, B zruší. Hra začne, až má každý hráč aspoň jednu postavu.','Jména postav jde přepsat myší a klávesnicí v lobby i na konci levelu, X dá náhodné jméno.','V multiplayeru jsou postavy jednoho hráče v dolní liště vedle sebe.','Automatická kamera: výběr postavy v dolní liště (nebo LB / RB) ji plynule vycentruje. Při pádu kamera počká nahoře a pak jede s postavou dolů. Testy, střílna, potrubí a karanténa se posunou doprostřed obrazovky.']],
   ['0.69','Stopař a střílna',['Stopař má výměny dílku 1 / 2 / 3× za každý level (dřív za celou výpravu).','Střílnu spustí i přízrak, který vstoupí do laseru. Trefí první postavu nebo přízrak v cestě.']],
   ['0.68','Ladění typů levelů a střílny',['Ztracení: každý začíná v jiném rohu (nahoře a patro nad dnem; ve dvou šikmo, ve třech dva nahoře a jeden dole, ve čtyřech všechny rohy), voda začíná úplně dole, zóna je uprostřed.','Na dohled: zóna se zařízením je 4 × 2 a dotýká se dna.','Tma: vidíš 2 kroky po chodbách (ne vzdušnou čarou). Dílky mimo dosah se po chvíli zatáhnou do úplné tmy s texturou (zůstane jen křídový obrys chodeb, ať víš, kde už jsi byl) a při přiblížení se zase vynoří. Nic z nich neprosvítá: přízraky, lasery, záře ani světlo z chodeb.','Dusno: kyslík se přesune až po stoupnutí vody a jsou jen 2 řady bez kyslíku. Na začátku nikdy v řadě, kde stojí postavy. Oheň odhalený bez kyslíku hned zhasne.','Střílna trefí první postavu nebo přízrak v cestě, ať laser spustil kdokoli. Při testu bliká jen laser ve směru spuštění, ostatní na chvíli zhasnou. Střílna i test radiace počkají, až postava dojde (i po rozvinutí žebříku).','Kryt: postava v něm stojí v suchu i pod hladinou. Kratší popisek a popisky dílků jsou vždy nahoře.','Sliz zraní hned při vstupu, až potom přijde pád šachtou. Prasklé potrubí spustí i ten, kdo jím jen propadne.','Teleport se počítá jako vstup na pole (střílna vystřelí). Střílna nevidí do krytu ani přes zavřené dveře pasti. Jádro radiace nemá prkna nad šachtou.','Kantýna + jádro radiace: nejdřív přibudou akce, jádro pak sebere tu poslední.','Razítko u události jen při kritickém zásahu (u dynamitu už ne).','Stopař: tlačítko ⇄ na odhaleném dílku vedle otočení (na ovladači X), dílek počká i když jde natočit jen jedním směrem. Zával ve tmě se neanimuje, jen je slyšet. Při ošetřování svítí postavy, které jde ošetřit, a po najetí myší ta vybraná.']],
   ['0.67','Pasti, střílny a animace',['Běžná událost už nemá razítko SPUŠTĚNO, razítko dostane jen kritický zásah a dynamit.','Past chytí i toho, kdo do ní propadá, a zavře se až ve chvíli, kdy je postava uvnitř. Chytí i přízrak. Dveře se otevírají pohybem zvenku do pasti (značka na poli), už to není speciální akce.','Střílna střílí jen při vstupu do laseru (při každém), přímo na jejím poli je mrtvý úhel. Před výstřelem se rozblikají červené diody, pak buď vystřelí, nebo se zeleně rozsvítí i s laserem.','Karanténa, ke které se přízrak vydá, se rozsvítí a zabzučí. Prasklé potrubí při zvednutí vody blikne a roztočí ventil.','Jádro radiace: kratší kaskáda od jádra do okolí, zasažená postava sebou trhne a ztracená akce je v profilu světle zelená.','Opraveno: pohyb před vyčerpáním (třeba šplhání po laně) se přehrával jako běh a teprve pak se postava chytila lana.','Karty událostí už po najetí neukazují systémový tooltip (text je na kartě). Tutoriál: kamera v klidu přejede k zóně a portálu, u vody je vysvětleno, že na konci kola klesá o patro.']],
@@ -4374,38 +4381,31 @@ function lobbyOwnBase(){const p=MPL.slots.length,n=lobbyN(),own=MPL.slots.map(()
   const mo=MPL.mode==='cont'&&MPL.sv.RUN.mpOwn;if(mo&&mo.length===p){const o=mo.map(l=>(l||[]).filter(c=>c<n&&lobbyAlive(c)));if(o.every(l=>l.length))return o;}
   let j=0;for(let c=0;c<n;c++)if(lobbyAlive(c))own[(j++)%p].push(c);return own;}
 function lobbyOwn(){const p=MPL.slots.length,n=lobbyN(),o=MPL.ownOv;   /* ruční rozdělení (Y), dokud se nezmění hráči ani obtížnost */
-  if(o&&o.length===p){const all=o.flat();let ok=o.every(l=>l.length)&&all.length===new Set(all).size;for(let c=0;c<n&&ok;c++)if(lobbyAlive(c)&&!all.includes(c))ok=false;if(ok&&all.every(c=>c<n&&lobbyAlive(c)))return o.map(l=>l.slice());}
+  if(o&&o.length===p){const all=o.flat();let ok=all.length===new Set(all).size&&all.every(c=>c<n&&lobbyAlive(c));for(let c=0;c<n&&ok;c++)if(lobbyAlive(c)&&!all.includes(c))ok=false;if(ok)return o.map(l=>l.slice());}
   MPL.ownOv=null;return lobbyOwnBase();}
-/* Y: hráč si vezme další postavu (opakovaný stisk vybírá dál). Komu by nezbyla žádná, dostane náhradu od hráče, který má postav víc. */
-function lobbyTake(si){const own=lobbyOwn(),n=lobbyN(),mine=own[si];if(own.length<2)return false;
-  const last=MPL.takeLast&&MPL.takeLast[si];
-  if(last&&mine.includes(last.c)&&own[last.from]){mine.splice(mine.indexOf(last.c),1);own[last.from].unshift(last.c);}   /* vrátit tu, co jsem si vzal minule (domů, na začátek) */
-  const start=last?last.c:(mine[mine.length-1]??-1),cands=[];for(let k=1;k<=n;k++){const c=(start+k+n)%n;if(lobbyAlive(c)&&!mine.includes(c)&&!cands.includes(c))cands.push(c);}
-  if(last&&cands.length&&cands[0]===last.c&&cands.length>1)cands.push(cands.shift());
-  const c=cands[0];if(c==null)return false;const from=own.findIndex(l=>l.includes(c));
-  own[from].splice(own[from].indexOf(c),1);mine.push(c);
-  if(!own[from].length){let d=own.findIndex((l,k)=>k!==si&&k!==from&&l.length>1);let g;
-    if(d>=0)g=own[d].pop();else{const sp=mine.filter(q=>q!==c);g=sp.length?sp[sp.length-1]:null;d=si;if(g!=null)mine.splice(mine.indexOf(g),1);}
-    if(g==null)return false;own[from].push(g);}
-  MPL.ownOv=own;MPL.takeLast=MPL.takeLast||{};MPL.takeLast[si]={c,from};return true;}
+function lobbyCids(){const r=[];for(let c=0;c<lobbyN();c++)if(lobbyAlive(c))r.push(c);return r;}
+/* Y: výběr postavy. Páčkou vybereš, A si ji vezmeš (komu patřila, tomu zmizí), B výběr zruší. */
+function lobbyAssign(si,c){const own=lobbyOwn();own.forEach(l=>{const k=l.indexOf(c);if(k>=0)l.splice(k,1);});own[si].push(c);MPL.ownOv=own;}
 function lobbyFix(){const p=MPL.slots.length;if(MPL.mode!=='new'||DIFF[MPL.diff].n>=p)return;MPL.diff=['hard','normal','easy'].find(k=>DIFF[k].n>=p)||'easy';}
 function lobbyChar(cid){if(MPL.mode==='cont'){const r=MPL.sv.RUN.chars[cid];return {cid,color:r.color,name:r.name,dead:!r.alive};}return {cid,color:CHARS[cid].color,name:MPL.names[cid]};}
-function lobbyValid(){const p=MPL.slots.length;return p>=2&&p<=4&&lobbyAliveN()>=p;}
+function lobbyValid(){const p=MPL.slots.length;return p>=2&&p<=4&&lobbyAliveN()>=p&&lobbyOwn().every(l=>l.length);}
 function renderLobby(){
+  const pk={};MPL.slots.forEach((q,k)=>{if(q.pick!=null){const c=lobbyCids()[q.pick];if(c!=null)(pk[c]=pk[c]||[]).push(k);}});
+  const pkOn=cid=>pk[cid]?' pk':'',pkSty=cid=>{if(!pk[cid])return '';const o=lobbyOwn()[pk[cid][0]]||[],cl=o.length?lobbyChar(o[0]).color:(PCOL[pk[cid][0]]||'#ffe23a');return ` style="--pkc:${cl}"`;};
   const m=menuEl(),n=gpList().length,own=lobbyOwn(),ae=document.activeElement,keep=ae&&ae.dataset&&ae.dataset.lnm!=null?{k:ae.dataset.lnm,s:ae.selectionStart,e:ae.selectionEnd}:null;
   const box=i=>{const s=MPL.slots[i];
     if(!s)return `<div class="lslot empty"><div class="lsn">Hráč ${i+1}${i>=2?' (nepovinný)':''}</div><div class="lwait">${n>i?'zmáčkni '+gpb('A'):'připoj ovladač'}</div></div>`;
-    const cs=(own[i]||[]).map(lobbyChar),col=cs[0]?cs[0].color:'#888';
+    const cs=(own[i]||[]).map(lobbyChar),col=cs[0]?cs[0].color:(PCOL[i]||'#888');
     return `<div class="lslot ${s.ready?'lock':''}" style="--pc:${col}"><div class="lsn">Hráč ${i+1}${i===0?' · vedoucí':''}</div>
-      <div class="lpick">${cs.map(c=>`<span class="lpc"><img class="pimg" src="${portraitURL({color:c.color})}" alt="">${c.dead?`<b style="color:${shade(c.color,.35)}">${escH(c.name)} †</b>`:`<input class="lnm" data-lnm="${c.cid}" maxlength="14" value="${escH(c.name)}" aria-label="Jméno postavy" title="Klikni a přepiš jméno" style="color:${shade(c.color,.35)}">`}</span>`).join('')||'<small>bez postavy</small>'}</div>
-      <div class="lst">${s.ready?'<span class="lready">PŘIPRAVEN ✓</span>':`<span class="lk">${gpb('A')} připraven</span><span class="lk">${gpb('X')} jiná jména</span>`+(MPL.slots.length>1?`<span class="lk">${gpb('Y')} vzít postavu</span>`:'')}</div></div>`;};
+      <div class="lpick">${cs.map(c=>`<span class="lpc${pkOn(c.cid)}" data-pc="${c.cid}"${pkSty(c.cid)}><img class="pimg" src="${portraitURL({color:c.color})}" alt="">${c.dead?`<b style="color:${shade(c.color,.35)}">${escH(c.name)} †</b>`:`<input class="lnm" data-lnm="${c.cid}" maxlength="14" value="${escH(c.name)}" aria-label="Jméno postavy" title="Klikni a přepiš jméno" style="color:${shade(c.color,.35)}">`}</span>`).join('')||'<small class="lnone">bez postavy</small>'}</div>
+      <div class="lst">${s.pick!=null?`<span class="lk">◀ ▶ vyber postavu</span><span class="lk">${gpb('A')} vzít</span><span class="lk">${gpb('B')} zpět</span>`:s.ready?'<span class="lready">PŘIPRAVEN ✓</span>':`<span class="lk">${gpb('A')} připraven</span><span class="lk">${gpb('X')} jiná jména</span>`+(MPL.slots.length>1?`<span class="lk">${gpb('Y')} vzít postavu</span>`:'')}</div></div>`;};
   const dsel=MPL.mode==='new'?`<div class="dsel">${['easy','normal','hard'].map(k=>`<span class="mbtn sm dbtn ${k===MPL.diff?'on':''} ${DIFF[k].n<Math.max(2,MPL.slots.length)?'off':''}">${DIFF[k].name}<small>${DIFF[k].n} postavy · ${DIFF[k].hp} životů · skóre × ${String(DIFF[k].mult).replace('.',',')}</small></span>`).join('')}</div><p class="hint" style="text-align:center">vedoucí mění obtížnost ◀ ▶</p>`:`<p class="hint" style="text-align:center">Obtížnost: <b>${DIFF[MPL.diff].name}</b> (${lobbyN()} postavy)</p>`;
   m.innerHTML=`<div class="mwrap wide"><div class="mtitle"><span class="mt-k">LOKÁLNÍ MULTIPLAYER · 2–4 OVLADAČE</span><h1 style="font-size:40px">${MPL.mode==='cont'?'Pokračovat ve výpravě':'Nová výprava'}</h1>
     <p>Připojeno ovladačů: <b>${n}</b>. Každý hráč se přihlásí ${gpb('A')}. Postavy se mezi hráče rozdělí podle počtu hráčů.</p></div>
     ${dsel}<div class="lslots">${[0,1,2,3].map(box).join('')}</div>
-    <p class="hint" style="margin-top:12px">${!lobbyValid()&&MPL.slots.length>=2?`<b style="color:var(--bad)">${MPL.mode==='cont'?'Ve výpravě zbývá jen '+lobbyAliveN()+' živých postav, víc hráčů ji hrát nemůže.':DIFF[MPL.diff].name+' obtížnost má jen '+DIFF[MPL.diff].n+' postavy, hraje ji nejvýš '+DIFF[MPL.diff].n+' hráčů.'}</b> `:''}${gpb('B')} zpět · hra začne, až budou všichni přihlášení připraveni (aspoň 2). Mapu, menu a dialogy ovládá vedoucí (hráč 1).</p>
+    <p class="hint" style="margin-top:12px">${MPL.slots.length>=2&&own.some(l=>!l.length)?`<b style="color:var(--bad)">Každý hráč musí mít aspoň jednu postavu (${own.map((l,k)=>l.length?null:'hráč '+(k+1)).filter(Boolean).join(', ')} nemá žádnou).</b> `:''}${!lobbyValid()&&MPL.slots.length>=2&&!own.some(l=>!l.length)?`<b style="color:var(--bad)">${MPL.mode==='cont'?'Ve výpravě zbývá jen '+lobbyAliveN()+' živých postav, víc hráčů ji hrát nemůže.':DIFF[MPL.diff].name+' obtížnost má jen '+DIFF[MPL.diff].n+' postavy, hraje ji nejvýš '+DIFF[MPL.diff].n+' hráčů.'}</b> `:''}${gpb('B')} zpět · hra začne, až budou všichni přihlášení připraveni (aspoň 2). Mapu, menu a dialogy ovládá vedoucí (hráč 1).</p>
     ${MPL.mode==='cont'&&MPL.sv.RUN.mpOwn?`<p class="hint" style="text-align:center">Minule: ${MPL.sv.RUN.mpOwn.map((l,i)=>`<b>P${i+1}</b> ${l.map(c=>escH(MPL.sv.RUN.chars[c].name)).join(' + ')}`).join(' · ')}. Přihlaste se ve stejném pořadí, nebo si postavy přeberte.</p>`:''}
-    <p class="hint" style="text-align:center">${gpb('Y')} vzít postavu: vezmeš si další postavu od ostatních, dalším stiskem vybíráš jinou. Kdo by zůstal bez postavy, dostane náhradu od hráče, který jich má víc. Jména jde přepsat myší a klávesnicí.</p>
+    <p class="hint" style="text-align:center">${gpb('Y')} vzít postavu: páčkou vyber kteroukoli postavu, ${gpb('A')} si ji vezmeš, ${gpb('B')} výběr zruší. Hra začne, až má každý hráč aspoň jednu postavu. Jména jde přepsat myší a klávesnicí.</p>
     <div class="mbtns" style="margin-top:10px"><button class="mbtn ghost" data-menu="mp">Zpět</button></div></div>`;
   if(keep){const el=m.querySelector(`[data-lnm="${keep.k}"]`);if(el){el.focus();try{el.setSelectionRange(keep.s,keep.e);}catch(e){}}}}
 document.addEventListener('input',e=>{const t=e.target;if(!t||!t.dataset||t.dataset.lnm==null||!MPL)return;const cid=+t.dataset.lnm,v=t.value.trim().slice(0,14);if(!v)return;
@@ -4415,14 +4415,19 @@ function lobbyInput(evs){
   if(!MPL)return;let dirty=false;const n=gpList().length;
   if(n!==MPL.n){MPL.n=n;dirty=true;}
   evs.forEach(ev=>{const si=MPL.slots.findIndex(s=>s.gp===ev.i),s=MPL.slots[si];
-    if(!s){if(ev.down.has(0)&&MPL.slots.length<4){MPL.slots.push({gp:ev.i,ready:false});lobbyFix();MPL.ownOv=null;MPL.takeLast=null;MPL.slots.forEach(q=>q.ready=false);SF('card');dirty=true;}
+    if(!s){if(ev.down.has(0)&&MPL.slots.length<4){MPL.slots.push({gp:ev.i,ready:false});lobbyFix();MPL.ownOv=null;MPL.slots.forEach(q=>q.ready=false);SF('card');dirty=true;}
       else if(ev.down.has(1)&&!MPL.slots.length){MPL=null;showMenu('mp');}
       return;}
-    if(si===0&&MPL.mode==='new'&&(ev.dir==='l'||ev.dir==='r')){const ks=['easy','normal','hard'];let k=ks.indexOf(MPL.diff);k=(k+(ev.dir==='r'?1:2))%3;MPL.diff=ks[k];MPL.ownOv=null;MPL.takeLast=null;MPL.slots.forEach(q=>q.ready=false);SF('tick');dirty=true;}
-    if(ev.down.has(3)&&!s.ready){if(lobbyTake(si)){MPL.slots.forEach(q=>q.ready=false);SF('card');}else SF('hurt');dirty=true;}
+    if(si===0&&s.pick==null&&MPL.mode==='new'&&(ev.dir==='l'||ev.dir==='r')){const ks=['easy','normal','hard'];let k=ks.indexOf(MPL.diff);k=(k+(ev.dir==='r'?1:2))%3;MPL.diff=ks[k];MPL.ownOv=null;MPL.slots.forEach(q=>q.pick=null);MPL.slots.forEach(q=>q.ready=false);SF('tick');dirty=true;}
+    if(s.pick!=null){const cs=lobbyCids();if(!cs.length){s.pick=null;dirty=true;return;}
+      if(ev.dir){s.pick=(s.pick+(ev.dir==='l'||ev.dir==='u'?cs.length-1:1))%cs.length;SF('tick',.4);dirty=true;}
+      if(ev.down.has(0)){lobbyAssign(si,cs[s.pick]);s.pick=null;MPL.slots.forEach(q=>q.ready=false);SF('card');dirty=true;}
+      else if(ev.down.has(1)||ev.down.has(3)){s.pick=null;SF('tick');dirty=true;}
+      return;}
+    if(ev.down.has(3)&&!s.ready){const cs=lobbyCids(),mine=lobbyOwn()[si]||[];let k=cs.findIndex(c=>!mine.includes(c));s.pick=k<0?0:k;SF('tick');dirty=true;return;}
     if(ev.down.has(2)&&!s.ready){const own=lobbyOwn()[si]||[];if(MPL.mode==='new'){const used=MPL.names;own.forEach(c=>{MPL.names[c]=pick(NAMES.filter(x=>!used.includes(x)));});}else{const R=MPL.sv.RUN;own.forEach(c=>{const used=R.chars.map(q=>q.name);R.chars[c].name=pick(NAMES.filter(x=>!used.includes(x)));});}SF('tick');dirty=true;}
     if(ev.down.has(0)&&!s.ready){s.ready=true;SF('clink');dirty=true;}
-    else if(ev.down.has(1)){if(s.ready)s.ready=false;else{MPL.slots.splice(si,1);MPL.ownOv=null;MPL.takeLast=null;MPL.slots.forEach(q=>q.ready=false);}dirty=true;}});
+    else if(ev.down.has(1)){if(s.ready)s.ready=false;else{MPL.slots.splice(si,1);MPL.ownOv=null;MPL.slots.forEach(q=>q.ready=false);}dirty=true;}});
   if(MPL&&lobbyValid()&&MPL.slots.every(s=>s.ready)){if(!MPL.start)MPL.start=performance.now()+700;else if(performance.now()>MPL.start){lobbyStart();return;}}else if(MPL)MPL.start=0;
   if(dirty&&MPL)renderLobby();
 }
@@ -4472,11 +4477,11 @@ function gameInput(ev,own){
     return;}
   if(!a){
     if(lead&&ev.down.has(9)){const b=document.querySelector('[data-a="endall"]:not([disabled])');if(b)b.click();return;}
-    if(MP.on){if(ev.down.has(0)){const c=mine.map(i=>G.chars[i]).find(canSelect);if(c){G.active=c.id;G.mode='move';GPF.key=null;GPF.menu=false;SF('card');render();}}return;}
-    if(ev.down.has(0)||ev.down.has(5)||ev.down.has(4)){const s=G.chars.filter(canSelect);if(s.length){G.active=s[ev.down.has(4)?s.length-1:0].id;G.mode='move';GPF.key=null;render();}}
+    if(MP.on){if(ev.down.has(0)){const c=mine.map(i=>G.chars[i]).find(canSelect);if(c){G.active=c.id;UI.camSel=true;G.mode='move';GPF.key=null;GPF.menu=false;SF('card');render();}}return;}
+    if(ev.down.has(0)||ev.down.has(5)||ev.down.has(4)){const s=G.chars.filter(canSelect);if(s.length){G.active=s[ev.down.has(4)?s.length-1:0].id;UI.camSel=true;G.mode='move';GPF.key=null;render();}}
     return;}
   if(!ctl)return;
-  if((ev.down.has(4)||ev.down.has(5))&&!a.started){const s=G.chars.filter(c=>canSelect(c)&&(!MP.on||mine.includes(c.id)));if(s.length>1){const k=s.indexOf(a),n=s[(k+(ev.down.has(5)?1:s.length-1))%s.length];G.active=n.id;G.mode='move';GPF.key=null;GPF.menu=false;render();}return;}
+  if((ev.down.has(4)||ev.down.has(5))&&!a.started){const s=G.chars.filter(c=>canSelect(c)&&(!MP.on||mine.includes(c.id)));if(s.length>1){const k=s.indexOf(a),n=s[(k+(ev.down.has(5)?1:s.length-1))%s.length];G.active=n.id;UI.camSel=true;G.mode='move';GPF.key=null;GPF.menu=false;render();}return;}
   if(lead&&ev.down.has(9)){const b=document.querySelector('[data-a="endall"]');if(b&&!b.disabled)b.click();}
   // B: krátce zpět / deaktivace, podržet = ukončit tah
   const s=GPS[ev.i];
@@ -4725,13 +4730,13 @@ async function playSeqRun(){
     if(s.k==='roundtick'){lay.hidden=true;if(UI.leftDisp!=null)UI.leftDisp=Math.max(0,UI.leftDisp-1);renderInfo();SF('tick');await sleep(450);continue;}
     if(s.k==='slam'){lay.hidden=true;await sleep(UI.fast?0:480);const sc=B(s.x,s.y);if(sc)delete sc.slamPending;SF('slam',.8);shakeView(true);flash('org',250);dustPuff((s.x+.5)*CS,s.y*CS+70,14);render();await sleep(520);continue;}
     if(s.k==='noox'){lay.hidden=true;UI.noOxDisp=null;SF('breath',1);render();await sleep(700);continue;}
-    if(s.k==='qlure'){lay.hidden=true;const q=document.querySelector(`#glows .gl.quar[data-qu="${idx(s.x,s.y)}"]`);if(q){q.classList.remove('lure');void q.offsetWidth;q.classList.add('lure');setTimeout(()=>q.classList.remove('lure'),1500);}SF('hum');await sleep(380);continue;}
-    if(s.k==='pipe'){lay.hidden=true;if(UI.autoCam&&!camVisible(s.x,s.y))centerOn(s.x,s.y,true);const cl=B(s.x,s.y),fxl=document.getElementById('fx'),pv=cl?(cl.pipeV!=null?cl.pipeV:!(cl.e[1]||cl.e[3])):true;
+    if(s.k==='qlure'){lay.hidden=true;if(camAttend(s.x,s.y))await sleep(380);const q=document.querySelector(`#glows .gl.quar[data-qu="${idx(s.x,s.y)}"]`);if(q){q.classList.remove('lure');void q.offsetWidth;q.classList.add('lure');setTimeout(()=>q.classList.remove('lure'),1500);}SF('hum');await sleep(380);continue;}
+    if(s.k==='pipe'){lay.hidden=true;if(camAttend(s.x,s.y))await sleep(380);const cl=B(s.x,s.y),fxl=document.getElementById('fx'),pv=cl?(cl.pipeV!=null?cl.pipeV:!(cl.e[1]||cl.e[3])):true;
       const f=document.createElement('div');f.className='pipefl';f.style.left=s.x*CS+'px';f.style.top=s.y*CS+'px';
       const wx=pv?37:35,wy=pv?TPX.cy0+13:TPX.cy0+10;f.innerHTML=`<i class="valve" style="left:${wx*2-9}px;top:${wy*2-9}px"></i>`;fxl.appendChild(f);
       SF('valve');particles((s.x+.5)*CS,(s.y+.55)*CS,18,['#5aa8e0','#c8ecff','#2a6a9a'],{sp:34,t:.8,sz:3});flash('blu',300);await sleep(900);setTimeout(()=>f.remove(),400);continue;}
     if(s.k==='turret'){lay.hidden=true;const fxl=document.getElementById('fx'),L=document.createElement('div');const x0=(s.tx+.5)*CS,y0=(s.ty+.45)*CS,x1=(s.x+.5)*CS,y1=(s.y+.45)*CS,len=Math.hypot(x1-x0,y1-y0),ang=Math.atan2(y1-y0,x1-x0);
-      if(UI.autoCam&&!camVisible(s.x,s.y))centerOn(s.x,s.y,true);
+      if(camAttend((s.x+s.tx)/2,(s.y+s.ty)/2))await sleep(300);
       await sleep(UI.fast?0:300);renderGlows();await sleep(220);   /* nejdřív dojde postava, pak se zbraň natočí */
       const ti=s.ti!=null?s.ti:idx(s.tx,s.ty),all=[...document.querySelectorAll(`#glows [data-tl="${ti}"]`)],inDir=s.d!=null?all.filter(e=>+e.dataset.td===s.d):all,off=all.filter(e=>!inDir.includes(e)),els=[...document.querySelectorAll(`#glows [data-tu="${ti}"]`)].concat(inDir);
       off.forEach(e=>e.classList.add('dim'));   /* ostatní lasery na chvíli zhasnou */
@@ -4760,6 +4765,7 @@ async function playSeqRun(){
     if(s.k==='mmove'){lay.hidden=true;const m=G.monsters.find(q=>q.id===s.mid);if(m){m.sx=s.x;m.sy=s.y;}render();await sleep(1100);continue;}
     if(s.k==='tok'){
       lay.hidden=true;const el=tokEl(s.cid),c=G.chars[s.cid];
+      if(UI.autoCam&&!UI.fast&&!camComfort(s.x,s.y)){const b=document.getElementById('board'),du=s.sink?1600:s.fall?380:340;b.style.transition=`transform ${du}ms ${s.fall?'cubic-bezier(.5,0,1,.6)':'ease-in-out'}`;centerOn(s.x,s.y,false);setTimeout(()=>{b.style.transition='';},du+50);}   /* kamera jde s postavou */
       if(!s.fall&&!s.sink&&!s.end&&c&&c.x===s.x&&c.y===s.y&&!SEQ.some(q=>q.k==='tok'&&q.cid===s.cid)){c.seqLock=false;if(el)el._animTo=0;renderTokens(G.active!=null?G.chars[G.active]:null);await sleep(560);continue;}
       if(el){const pose=s.fall?'fall':restPose({...c,x:s.x,y:s.y,rope:null,ledge:false});setPose(el,c,s.fall?'fall':pose==='idle'?'walk':pose);
         if(s.fall&&!el._gasp){el._gasp=1;SF('gasp');}
@@ -4841,7 +4847,7 @@ async function playSeqRun(){
       else{el.style.transition='transform .65s cubic-bezier(.5,0,1,.6),opacity .65s';el.style.transform=`translateY(${full*.9}px)`;el.style.opacity='0';await sleep(800);el.remove();lb.remove();}
       continue;
     }else if(s.k==='mini'){
-      if(UI.autoCam&&!camVisible(s.x,s.y)){centerOn(s.x,s.y,true);await sleep(350);}
+      if(camAttend(s.x,s.y))await sleep(420);   /* test ať je uprostřed obrazovky */
       lay.hidden=true;
       const fxl=document.getElementById('fx'),el=document.createElement('div');el.className='minit'+(s.panic?' panic':'');
       el.style.left=((s.x+.5)*CS)+'px';el.style.top=(s.y*CS+4)+'px';
@@ -4881,13 +4887,16 @@ function render(){
   const WD=UI.wDisp!=null?UI.wDisp:G.W;
   const wEl=document.getElementById('water');wEl.hidden=!G.waterKnown;wEl.classList.toggle('dry',WD>=ROWS);wEl.style.top=(Math.min(WD,ROWS)*CS)+'px';   // i poslední patro vody opadne animací
   renderRopes();renderGlows();renderBadges();computeLight();drawDark();
+  const fc=G.chars.find(c=>c.anim&&c.via&&(a?c.id===a.id:c.id===UI.lastActive))||null,fallCam=fc?{c:fc,via:{...fc.via},an:fc.anim}:null;   /* kdo právě padá */
   renderMons();renderFog();renderTokens(a);if(!UI.playing)renderMarks(a);else renderMarks(null);
   renderInfo();renderCrew();renderActions(a);renderEvents();renderLog();
   fxQueue.forEach((f,k)=>setTimeout(()=>floatText(f.x*CS+CS/2,f.y*CS+12,f.text,f.good),k*120));fxQueue=[];
   (UI.bloodQ||[]).forEach(b=>{SF('bite');flash('red',260);particles((b.x+.5)*CS,b.y*CS+48,22,['#8a0f1a','#c21a2a','#5a0a10'],{grav:1,sp:38,t:.9,sz:3,fall:50});});UI.bloodQ=[];
-  if(a){const k=a.x+','+a.y;if(UI.lastActive===a.id&&UI.lastPos!==k)ensureVisible(a);
+  if(a){const k=a.x+','+a.y;if(UI.camSel){UI.camSel=false;if(UI.autoCam)centerOn(a.x,a.y,true);}
+    else if(UI.lastActive===a.id&&UI.lastPos!==k){if(fallCam)camFollowFall(a,fallCam.via,fallCam.an);else if(!a.seqLock)ensureVisible(a);}
+    else if(fallCam)camFollowFall(fallCam.c,fallCam.via,fallCam.an);
     if(UI.lastActive!==a.id)SF('breath',a.id);UI.lastActive=a.id;UI.lastPos=k;}
-  if(!a)UI.lastActive=null;
+  if(!a){if(fallCam)camFollowFall(fallCam.c,fallCam.via,fallCam.an);UI.lastActive=null;}
   if(G.placing)ensureVisible({x:G.placing.x,y:G.placing.y});
   G.chars.forEach(c=>{if(c.downed&&!UI.wasDown[c.id]){UI.wasDown[c.id]=1;SF('faint');}else if(!c.downed)UI.wasDown[c.id]=0;});
   if(SEQ.length)playSeq();
@@ -5094,7 +5103,7 @@ function onClick(ev){
     else if(k==='swap'&&G.placing)swapPlacing();
     return;
   }
-  if(t.dataset.c!=null){const id=+t.dataset.c,c=G.chars[id];if(!canSelect(c)||!tAllow('sel',id))return;
+  if(t.dataset.c!=null){const id=+t.dataset.c,c=G.chars[id];if(!canSelect(c)||!tAllow('sel',id))return;if(t.closest('#crewList'))UI.camSel=true;   /* výběr v dolní liště: kamera na postavu */
     const cur=G.active!=null?G.chars[G.active]:null;
     if(cur&&cur.id===id){if(UI.pending!=null){UI.pending=null;render();}return;}   // rozmyslel sis to: zpět k původní postavě
     if(cur&&cur.started&&cur.id!==id){
