@@ -945,7 +945,8 @@ button.pd-cell { cursor: default; } .pd-cell.full { cursor: pointer; border-styl
 .shop.center h2 { margin: 0 0 4px; font: 600 22px var(--f-disp); color: var(--paper); }
 .shop.center .shoprow { display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 8px; margin: 10px 0; }
 .shopit.big { display: flex; gap: 8px; align-items: center; text-align: left; padding: 8px; }
-.shopit.big .mport { width: 40px; height: 40px; flex: none; } .shopit.big span { display: grid; } .shopit.big small { color: var(--muted); }
+.shopit.big .mport { width: 40px; height: 40px; flex: none; } .shopit.big span { display: grid; flex: 1; } .shopit.big small { color: var(--muted); }
+.sh-cost { margin-left: auto; display: inline-flex; align-items: center; gap: 3px; font: 800 22px var(--f-num); font-style: normal; color: #ff8a76; } .sh-cost .ic { width: 16px; height: 16px; } .sh-cost.dim { opacity: .5; }
 /* hlavní menu */
 #menu { place-items: stretch; padding: 0; }
 #menu:has(#legacy:not([hidden])) { place-items: center; padding-block: 32px; }
@@ -7952,7 +7953,7 @@ function respawnShop(G) {
     }
   }
   if (!items.length) return '';
-  if (items.length) return `<div class="shop center"><h2>Konec kola: návrat monster</h2><p class="muted">Hrozba <b>${threat}</b>. Kup monstrum a pak klikni na zrcadlo, kde se vrátí. Každý další návrat v kole stojí o 1 víc.</p><div class="shoprow">${items.map(it => `<button class="shopit big${it.tok.endsWith('*') ? ' el' : ''}" data-shop="${it.tok}" ${it.why ? 'disabled' : ''}>${monPortrait(it.tok.replace('*', ''), it.tok.endsWith('*'))}<span><b>${esc(C.respawnLabel(it.tok))}</b><small>cena ${it.cost} Hrozby${it.why ? ' · ' + esc(it.why) : ''}${it.n > 1 ? ' · padlých ' + it.n : ''}</small></span></button>`).join('')}</div><div class="dlg-btns"><button class="btn primary" data-shoppass="1">Ukončit kolo</button></div></div>`;
+  if (items.length) return `<div class="shop center"><h2>Konec kola: návrat monster</h2><p class="muted">Hrozba <b>${threat}</b>. Kup monstrum a pak klikni na zrcadlo, kde se vrátí. Každý další návrat v kole stojí o 1 víc.</p><div class="shoprow">${items.map(it => `<button class="shopit big${it.tok.endsWith('*') ? ' el' : ''}" data-shop="${it.tok}" ${it.why ? 'disabled' : ''}>${monPortrait(it.tok.replace('*', ''), it.tok.endsWith('*'))}<span><b>${esc(C.respawnLabel(it.tok))}</b><small>${it.why ? esc(it.why) : 'můžeš vrátit'}${it.n > 1 ? ' · padlých ' + it.n : ''}</small></span><em class="sh-cost${!it.why || it.why === 'chybí Hrozba' ? '' : ' dim'}">${A.icon('threat')}${it.cost}</em></button>`).join('')}</div><div class="dlg-btns"><button class="btn primary" data-shoppass="1">Ukončit kolo</button></div></div>`;
   return `<div class="shop"><span class="hand-title">Návrat zrcadlem · Hrozba ${threat} · každé další v kole +1</span><div class="shoprow">${items.map(it => `<button class="shopit${it.tok.endsWith('*') ? ' el' : ''}" data-shop="${it.tok}" ${it.why ? 'disabled' : ''} title="${esc(it.why || 'Klikni a pak na zrcadlo')}">${monPortrait(it.tok.replace('*', ''), it.tok.endsWith('*'))}<span><b>${esc(C.respawnLabel(it.tok))}</b><small>${it.cost} Hrozby${it.n ? ' · padlo ' + it.n : ''}${it.why ? ' · ' + esc(it.why) : ''}</small></span></button>`).join('')}</div></div>`;
 }
 function olPilesHTML(G) {
