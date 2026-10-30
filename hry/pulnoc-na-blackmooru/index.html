@@ -748,7 +748,7 @@ body.dragging, body.dragging * { cursor: grabbing !important; }
 .hs-c, .hs-b { display: inline-flex; gap: 2px; align-items: center; color: var(--muted); font: 800 12px var(--f-num); font-variant-numeric: lining-nums; }
 .hs-c .ic, .hs-b .ic { width: 13px; height: 13px; }
 .hs-c.pan { color: #ff9d86; }
-.hs-b { color: var(--good); } .hs-b.key { color: var(--candle-2); } .hs-b.key.two { background: var(--candle-2); color: #1a1208; padding: 0 4px; border-radius: 3px; }
+.hs-b { color: var(--good); } .hs-b.psn { color: #9fe070; } .hs-b.bld { color: #ff5a4a; } .hs-b.key { color: var(--candle-2); } .hs-b.key.two { background: var(--candle-2); color: #1a1208; padding: 0 4px; border-radius: 3px; }
 .msum { border: 1px solid var(--line); border-radius: 8px; background: var(--ink-0); padding: 5px 7px; display: grid; gap: 2px; cursor: pointer; }
 .msum:hover { background: #17141c; border-color: #5a4a50; }
 .msum.done { opacity: .7; } .msum.gone { opacity: .45; filter: grayscale(.7); }
@@ -5363,6 +5363,7 @@ const IC = {
   sabre: '<path d="M20 3 Q16 11 8.5 15.5 L7.5 14.5 Q13 9 20 3 Z" fill="currentColor"/><path d="M6 13 L10 17 M7.5 15.5 L4 19 L5 20 L8.5 16.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>',
   gun: '<path d="M3 8 H19 V11 H11 L10 13 H8 L7 19 H3.5 L5 11 H3 Z" fill="currentColor"/><path d="M19 9.5 H21" stroke="currentColor" stroke-width="1.6"/><circle cx="9" cy="10.5" r="1.1" fill="#000" opacity=".4"/>',
   shotgun: '<path d="M2 15 L6 13 L21 7 L21.6 8.6 L7 14.4 L7.5 16 L4 18 Z" fill="currentColor"/><path d="M8 13 L21 8" stroke="#000" stroke-opacity=".35" stroke-width=".8"/>',
+  bleed: '<path d="M8 3 C8 3 3.5 9 3.5 12 a4.5 4.5 0 0 0 9 0 C12.5 9 8 3 8 3z" fill="currentColor"/><path d="M17 10 C17 10 14 14 14 16 a3 3 0 0 0 6 0 C20 14 17 10 17 10z" fill="currentColor" opacity=".85"/><path d="M6.2 12.5 a2 2 0 0 0 1.6 2" stroke="#fff" stroke-opacity=".5" stroke-width="1.2" fill="none" stroke-linecap="round"/>',
   lob: '<path d="M3 19 Q11 -1 20 15" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-dasharray="2.6 2.4"/><path d="M16.5 13.2 L20.4 15.6 L21 11.2" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><circle cx="3.5" cy="19.5" r="1.6" fill="currentColor"/>',
   crosshair: '<circle cx="12" cy="12" r="7" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M12 2 V7 M12 17 V22 M2 12 H7 M17 12 H22" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><circle cx="12" cy="12" r="1.5" fill="currentColor"/>',
   hex: '<path d="M12 2.5 L20.5 7.2 V16.8 L12 21.5 L3.5 16.8 V7.2 Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>',
@@ -6471,7 +6472,7 @@ function badgesFor(kind, ent) {
     if (ent.noReact && ent.noReact >= G.round) b.push(BADGE('react', '#ff8a76', '', 'b-noreact'));
     if (ent.nofearRound === G.round) b.push(BADGE('mask', '#dfe6ec', '', 'b-nofear'));
     if (ent.poison) b.push(BADGE('drop', '#9fe070', ent.poison, 'b-poison'));
-    if (ent.bleed) b.push(BADGE('drop', '#ff5a4a', '', 'b-bleed'));
+    if (ent.bleed) b.push(BADGE('bleed', '#ff5a4a', ent.bleed > 1 ? ent.bleed : '', 'b-bleed'));
     if (ent.markRound === G.round) b.push(BADGE(ent.eyeRound === G.round ? 'eyeopen' : 'crosshair', '#ff9a6a', '', 'b-mark'));
     if (C.isGrabbed(G, ent)) b.push(BADGE('hand', '#c09070', '', 'b-grab'));
     if (ent.pecked) b.push(BADGE('die', '#ff8a76', '−1', 'b-peck'));
@@ -6829,6 +6830,8 @@ function bindSetupSide(root) {
 const lgIc = (n, c) => `<span class="lg lg-ic" style="color:${c}">${A.icon(n)}</span>`;
 function legendHTML() {
   return `<section class="panel legend">${true ? `<ul>
+    <li>${lgIc('drop', '#9fe070')}<span><b>Jed</b>: na konci tahu tolik zranění, kolik je jedu, pak jed o 1 slábne.</span></li>
+    <li>${lgIc('bleed', '#ff5a4a')}<span><b>Krvácení</b>: na konci dalšího tahu lovec utrží zranění.</span></li>
     <li><span class="lg lg-block"></span><span><b>Vysoký nábytek</b> (regál, skříň, hodiny): neprojdeš, blokuje výhled. Přízraky skrz něj proletí.</span></li>
     <li><span class="lg lg-rough"></span><span><b>Nízký nábytek</b> (stůl, židle, lavice, tečkované pole): vstup stojí 2 pohyby, výhled neblokuje.</span></li>
     <li><span class="lg lg-spot">?</span><span><b>Místo k prohledání</b>: jen akcí „Prohledej“ ze sousedního pole.</span></li>
@@ -7577,6 +7580,8 @@ function heroCard(h) {
   const bf = [];
   if (h.buff && h.buff.round === G.round) bf.push(`<span class="hs-b" title="útok +${h.buff.mod}${h.buff.dmg ? ', dmg +' + h.buff.dmg : ''}">${A.icon('focus')}+${h.buff.mod}</span>`);
   if (h.armorUp && h.armorUp.round === G.round) bf.push(`<span class="hs-b" title="armor">${A.icon('shield')}${h.armorUp.n}</span>`);
+  if (h.poison) bf.push(`<span class="hs-b psn" title="otrávený: na konci tahu ${h.poison} zranění">${A.icon('drop')}${h.poison}</span>`);
+  if (h.bleed) bf.push(`<span class="hs-b bld" title="krvácí: na konci dalšího tahu ${h.bleed} zranění">${A.icon('bleed')}${h.bleed > 1 ? h.bleed : ''}</span>`);
   if (h.phaseRound === G.round) bf.push(`<span class="hs-b" title="průlom">${A.icon('ghoststep')}</span>`);
   if (h.keys.length) bf.push(`<span class="hs-b key${h.keys.length > 1 ? ' two' : ''}" title="${h.keys.length > 1 ? 'nese oba klíče' : 'nese klíč'}${heroView() ? '' : ' (' + h.keys.map(k => k === 'key' ? 'pravý' : 'falešný').join(', ') + ')'}">${A.icon('key')}${h.keys.length > 1 ? '×2' : ''}</span>`);
   return `<div class="hsum${active ? ' active' : ''}${h.escaped ? ' gone' : ''}${h.downed ? ' down' : ''}" style="--c:${HERO_COLORS[h.id]}" data-hero="${h.id}" role="button" tabindex="0" title="Klikni pro detail lovce">
@@ -7590,7 +7595,7 @@ function statRow(st, elite, t) {
   return chip('heart', st.hp, 'Zdraví') + chip('boot', st.move, 'Pohyb') + chip(st.range === 1 ? 'sword' : 'crosshair', st.range, st.range === 1 ? 'Útok zblízka' : 'Dosah') + chip('die', C.sgn(st.mod), 'Bonus k útoku', 'mod') + chip('drop', st.dmg, 'Zranění', 'dmg') + (st.fear ? chip('panic', st.fear, 'Strach při zásahu', 'fear') : '') + (st.evasion ? chip('wind', st.evasion, 'Únik', 'ev') : '') + (st.armor ? chip('shield', st.armor, 'Armor', 'ar') : '');
 }
 const MON_AB = { sluha: [['ghoststep', 'Létá a prochází zdmi']], krysy: [['rally', 'Roj: +1 za další krysu u cíle']], zbroj: [], polt: [['eyeoff', 'Neviditelný na začátku kola'], ['ghoststep', 'Létá']], vdova: [['mirror', 'Cestuje zrcadly'], ['whisper', 'Nářek: Strach okolním lovcům']] };
-const MON_ABE = { zbroj: [['push', 'Zásah odhodí o 1']], polt: [['voice', 'Řev: Strach lovcům do 3']], sluha: [], krysy: [] };
+const MON_ABE = { panenky: [['bleed', 'Nůžky: zásah způsobí krvácení']], kvety: [['drop', 'Jed: zásah otráví']], mury: [['drop', 'Jed: každý zásah otráví']], zbroj: [['push', 'Zásah odhodí o 1']], polt: [['voice', 'Řev: Strach lovcům do 3']], sluha: [], krysy: [] };
 function monSum(t) {
   const G = S.G, hv = heroView(), d = C.MDEF[t];
   const ms = G.monsters.filter(m => m.type === t), shownMs = hv ? ms.filter(m => C.visibleToHeroes(G, m)) : ms, killed = G.killed[t] || 0;
