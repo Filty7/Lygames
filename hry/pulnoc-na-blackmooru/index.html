@@ -8300,6 +8300,8 @@ async function startGame() {
   if (host) NETS.conn.send({ t: 'brief', who: 'Dům', title: scTitle, forRoles: ['overlord'] });
   if (S.ctl.overlord === 'human') await ask('briefing', { who: 'Dům', title: scTitle, body: BRIEF_O() });
   await ctl.O.setup(G);
+  S.mirrorGame = false; S.mirrorSnap = NETS.role ? null : { s: Net.encodeState(G, { fullLog: true }), uid: maxUidOf(G) + 1 };
+  if (!S.camp) S.campHold = null;
   if (host) { sendSnap(G); NETS.conn.send({ t: 'brief', who: 'Lovci duchů', title: scTitle, forRoles: ['ashford', 'varga', 'wren'] }); }
   if (S.ctl.heroes === 'human') { G.phase = 'heroes'; await ask('briefing', { who: 'Lovci duchů', title: scTitle, body: BRIEF_H() }); }
   render();
@@ -8314,16 +8316,18 @@ function showEnd(res) {
   sfx(win ? 'win' : 'lose');
   box.innerHTML = `<div class="dialog end ${win ? 'win' : 'lose'}"><p class="eyebrow">Kolo ${G.round} z ${G.maxRound}</p><h2>${win ? 'Lovci uspěli' : 'Dům vyhrál'}</h2><p>${esc(res.reason)}</p>
    <p class="muted">Utekli: ${G.escaped} · Padlá monstra: ${G.log.filter(l => l.t.endsWith(' padá.')).length} · Panik celkem: ${G.heroes.reduce((a, h) => a + h.deck.concat(h.discard, h.hand, h.removed).filter(c => c.panic).length, 0)}</p>
-   <div class="dlg-btns"><button class="btn" id="endmap">Prohlédnout mapu</button>${isClient() ? '<span class="muted">Pokračování řídí hostitel.</span>' : S.camp ? '<button class="btn primary" id="endcamp">Pokračovat v kampani</button>' : '<button class="btn primary" id="endnew">Do menu</button>'}</div></div>`;
+   <div class="dlg-btns"><button class="btn" id="endmap">Prohlédnout mapu</button>${!NETS.role && S.mirrorSnap ? '<button class="btn" id="endmirror" title="Stejná mapa, stejná příprava Domu i výbava lovců, jen hraješ za druhou stranu">Odveta za druhou stranu</button>' : ''}${isClient() ? '<span class="muted">Pokračování řídí hostitel.</span>' : S.camp ? '<button class="btn primary" id="endcamp">Pokračovat v kampani</button>' : '<button class="btn primary" id="endnew">Do menu</button>'}</div></div>`;
   if ($('#endnew')) $('#endnew').addEventListener('click', () => { box.hidden = true; if (NETS.role === 'host') { NETS.conn.send({ t: 'menu' }); netReset(); } showMenu(); });
   if ($('#endcamp')) $('#endcamp').addEventListener('click', () => {
-    const r = Camp.applyResult(S.camp, G);
+    if (S.campHold) S.ctl = S.campHold.ctl;
+    const r = Camp.applyResult(S.camp, S.campHold ? S.campHold.G : G); S.campHold = null;
     const heroBots = NETS.role ? ['ashford', 'varga', 'wren'].every(k => NETS.roles[k] === 'bot') : S.ctl.heroes === 'bot';
     const olBot = NETS.role ? NETS.roles.overlord === 'bot' : S.ctl.overlord === 'bot';
     if (heroBots) { Camp.botShop(S.camp); Camp.botUpgrade(S.camp, 'heroes'); }
     if (olBot) Camp.botUpgrade(S.camp, 'ol');
     S.campTab = null; if (NETS.role === 'host') NETS.conn.send({ t: 'camp', st: S.camp, reward: r }); showCamp(r);
   });
+  if ($('#endmirror')) $('#endmirror').addEventListener('click', () => { box.hidden = true; if (S.camp && !S.campHold) S.campHold = { G, ctl: Object.assign({}, S.ctl) }; startMirror(); });
   $('#endmap').addEventListener('click', () => { box.hidden = true; S.viewMode = 'all'; render(); });
 }
 function initSound() {
@@ -8751,11 +8755,25 @@ const campMay = side => !NETS.role || (side === 'o' ? myRoles().includes('overlo
 // ---------- uložení a načtení ----------
 let lastCheckpoint = null;
 UIF.checkpoint = G => checkpoint(G);
+function maxUidOf(G) { return Math.max(0, ...G.monsters.map(m => m.uid), ...G.heroes.flatMap(h => ['deck', 'hand', 'discard', 'removed'].flatMap(p => h[p].map(c => c.uid || 0))), ...['hand', 'deck', 'discard'].flatMap(p => G.ol[p].map(c => c.uid || 0))); }
+// odveta: stejný stav po přípravě, prohozené strany (jen hra pro jednoho)
+async function startMirror() {
+  const snap = S.mirrorSnap; if (!snap) return;
+  const sw = v => v === 'human' ? 'bot' : 'human';
+  S.ctl = { heroes: sw(S.ctl.heroes), overlord: sw(S.ctl.overlord) };
+  const G = Net.decodeState(snap.s, C, null); G.fx = [];
+  C.setUid(snap.uid); C.useMap(G.mapId); S.G = G; S.mirrorGame = true;
+  await enterGameScreen();
+  const ctl = { H: S.ctl.heroes === 'human' ? human.H : botWrap(Bots.heroBot), O: S.ctl.overlord === 'human' ? human.O : botWrap(Bots.overlordBot) };
+  await ask('briefing', S.ctl.overlord === 'human' ? { who: 'Dům · odveta', title: 'Scénář ' + G.scen.n + ': ' + G.scen.name, body: '<p>Odveta: stejná mapa a stejná příprava, jakou měl Dům v minulé hře. Teď hraješ za Dům.</p>' + BRIEF_O() } : { who: 'Lovci duchů · odveta', title: 'Scénář ' + G.scen.n + ': ' + G.scen.name, body: '<p>Odveta: stejná mapa, stejná příprava Domu a stejná výbava. Teď hraješ za lovce.</p>' + BRIEF_H() });
+  render(); await UIF.anim({ type: 'round' });
+  const res = await C.runGame(G, ctl, UIF);
+  finishGame(res);
+}
 function checkpoint(G) {
-  if (isClient()) return;
+  if (isClient() || S.mirrorGame) return;
   const names = {}; ROLE_KEYS.forEach(k => { names[k] = NETS.roles[k] === 'bot' ? 'bot' : pName(NETS.roles[k]); });
-  const maxUid = Math.max(0, ...G.monsters.map(m => m.uid), ...G.heroes.flatMap(h => ['deck', 'hand', 'discard', 'removed'].flatMap(p => h[p].map(c => c.uid || 0))), ...['hand', 'deck', 'discard'].flatMap(p => G.ol[p].map(c => c.uid || 0)));
-  lastCheckpoint = { v: 1, at: Date.now(), label: G.scen.name + ' · kolo ' + G.round, G: Net.encodeState(G, { fullLog: true }), camp: S.camp, play: S.play, scenPick: S.scenPick, ctl: S.ctl, net: NETS.role === 'host' ? { names } : null, uid: maxUid + 1 };
+  lastCheckpoint = { v: 1, at: Date.now(), label: G.scen.name + ' · kolo ' + G.round, G: Net.encodeState(G, { fullLog: true }), camp: S.camp, play: S.play, scenPick: S.scenPick, ctl: S.ctl, net: NETS.role === 'host' ? { names } : null, uid: maxUidOf(G) + 1 };
   lsSet(NETS.role === 'host' ? SAVE_MP : SAVE_SP, JSON.stringify(lastCheckpoint));
 }
 function loadGame(key) {
