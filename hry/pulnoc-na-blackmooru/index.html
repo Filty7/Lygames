@@ -656,6 +656,9 @@ body.busy svg.map .flick, body.busy .tok-idle, body.busy .mir-eye, body.busy .li
 .pickpanel h3 { color: var(--paper); margin-bottom: 6px; }
 #handdock { position: absolute; left: 50%; bottom: 0; transform: translateX(-50%); --ch: 272px; }
 #handdock.empty { display: none; }
+/* zóna, kde najetí myší vytáhne karty: o ~20 % níž než celý dok */
+#handdock { pointer-events: none; } #handdock > * { pointer-events: auto; }
+#handdock::before { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: calc(var(--ch) * .8 + 20px); pointer-events: auto; }
 .dock-hand { display: flex; align-items: flex-end; padding: 26px 40px 0; transform: translateY(calc(var(--ch) * .6)); transition: transform .3s cubic-bezier(.3,.8,.3,1) .22s; min-height: 40px; }
 #handdock:hover .dock-hand, #handdock.locked .dock-hand, #handdock.force .dock-hand { transform: translateY(-12px); transition-delay: 0s; }
 body.dragging #handdock .dock-hand { transform: translateY(calc(var(--ch) * .9)) !important; transition-delay: 0s; }
@@ -1323,20 +1326,25 @@ MAPS.kobka = {
   heroStart: [[8, 11], [9, 11], [10, 11]], startRoom: 'S', setupBanned: ['S'],
 };
 
-// zrcadlová varianta mapy (osa svisle): x' = S + 1 − x, kde S je nejpravější hrana místností
-function mirrorMap(M, id) {
+// varianta mapy: prohodí jen dvě boční místnosti v jedné řadě (ostatní zůstává), aby nešlo poznat, kde je východ
+// zrcadlí se jen hexy těchto místností (osa x' = S + 1 − x), včetně dveří, východu, nábytku, míst a zrcadel v nich
+function swapRooms(M, id, ids) {
   const S = Math.max(...M.rooms.map(r => r.k1));
-  const mh = h => [S + 1 - h[0] - (h[1] & 1), h[1]];
+  const RR = M.rooms.filter(r => ids.includes(r.id));
+  const xc = h => h[0] + 0.5 * (h[1] & 1);
+  const inside = h => RR.some(R => xc(h) >= R.k0 + 0.5 && xc(h) <= R.k1 + 0.5 && h[1] >= R.y0 && h[1] <= R.y1);
+  const mh = h => inside(h) ? [S + 1 - h[0] - (h[1] & 1), h[1]] : h.slice();
   const cp = o => Object.assign({}, o, o.hex ? { hex: mh(o.hex) } : {});
   return Object.assign({}, M, {
-    id, baseId: M.id, mirrored: S + 1,
-    rooms: M.rooms.map(r => Object.assign({}, r, { k0: S - r.k1, k1: S - r.k0 })),
+    id, baseId: M.id, swapped: { S: S + 1, rows: [Math.min(...RR.map(r => r.y0)), Math.max(...RR.map(r => r.y1))], ks: RR.map(r => [r.k0, r.k1]) },
+    rooms: M.rooms.map(r => ids.includes(r.id) ? Object.assign({}, r, { k0: S - r.k1, k1: S - r.k0 }) : Object.assign({}, r)),
     doors: M.doors.map(cp), spots: M.spots.map(cp), furn: M.furn.map(cp), spawns: M.spawns.map(cp),
-    exit: M.exit ? mh(M.exit) : M.exit, heroStart: M.heroStart.map(mh).reverse(),
+    exit: M.exit ? mh(M.exit) : M.exit, heroStart: M.heroStart.map(h => h.slice()),
     obeliskSites: (M.obeliskSites || []).map(mh),
   });
 }
-MAPS.blackmoor_m = mirrorMap(MAPS.blackmoor, 'blackmoor_m');
+MAPS.blackmoor_m = swapRooms(MAPS.blackmoor, 'blackmoor_m', ['H', 'S']);
+
 
 return { MAPS };
 })();
@@ -5840,8 +5848,9 @@ function calcView() {
 const THEME = () => (C.MAP && C.MAP.theme) || 'house';
 const isBM = () => C.MAP && (C.MAP.id === 'blackmoor' || C.MAP.baseId === 'blackmoor');
 // zrcadlená mapa: ručně umístěné dekorace převádíme stejnou osou
-const mxc = xc => C.MAP && C.MAP.mirrored ? C.MAP.mirrored - xc : xc;
-const mhx = h => C.MAP && C.MAP.mirrored ? [C.MAP.mirrored - h[0] - (h[1] & 1), h[1]] : h;
+const mxc = xc => xc;
+// varianta s prohozenými bočními místnostmi: ručně umístěné dekorace v nich převedeme stejnou osou
+const mhx = h => { const w = C.MAP && C.MAP.swapped; if (!w) return h; const x = h[0] + 0.5 * (h[1] & 1); const inn = h[1] >= w.rows[0] && h[1] <= w.rows[1] && w.ks.some(([a, b]) => x >= a + 0.5 && x <= b + 0.5); return inn ? [w.S - h[0] - (h[1] & 1), h[1]] : h; };
 const sleep = ms => new Promise(r => setTimeout(r, reduced ? Math.min(ms, 40) : ms));
 const dur = ms => ms * S.speed;
 function hexAtPoint(x, y) {
@@ -6247,7 +6256,7 @@ function decorMarkup() {
   for (const h of [[4, 2], [2, 3], [4, 4]]) { const [x, y] = P(h); s += `<path d="M${x - 8} ${y + 1}l7 -2l2 4l-7 2z" fill="#c8bca4" opacity=".4"/>`; }
   for (const h of [[8, 2], [11, 2], [9, 4]]) { const [x, y] = P(h); s += `<path d="M${x - 4} ${y + 2}l3 -2l1 2zM${x + 4} ${y + 4}l2 -3l2 3z" fill="#8aa4b8" opacity=".5"/>`; }
   for (const h of [[2, 12], [4, 9], [3, 10]]) { const [x, y] = P(h); s += `<path d="M${x - 6} ${y + 2}l3 -2l2 1l-1 2zM${x + 4} ${y}l2 -1l1 2l-2 1z" fill="#5a5650" opacity=".8"/><path d="M${x - 10} ${y - 2}l6 3l4 -1l5 4" stroke="#121216" stroke-width=".8" fill="none" opacity=".7"/>`; }
-  for (const sp of C.SPAWN_DEFS) { const [x, y] = P(sp.hex), ry = KY;
+  for (const sp of C.SPAWN_DEFS) { const [x, y] = px(sp.hex), ry = KY;
     s += `<path d="${hexPts(x, y, SIZE - 2.5)}" fill="#2a0e3a" fill-opacity=".55" stroke="#a060d0" stroke-opacity=".75" stroke-width="1.1"/><ellipse cx="${x}" cy="${y}" rx="13" ry="${13 * ry}" fill="none" stroke="#c890ff" stroke-opacity=".8" stroke-width="1"/><ellipse cx="${x}" cy="${y}" rx="9" ry="${9 * ry}" fill="none" stroke="#c890ff" stroke-opacity=".45" stroke-width=".7" stroke-dasharray="1.4 1.6"/>`;
     for (let i = 0; i < 6; i++) { const a = i / 6 * Math.PI * 2 + .5; s += `<rect x="${(x + Math.cos(a) * 15.5 - .8).toFixed(1)}" y="${(y + Math.sin(a) * 15.5 * ry - .8).toFixed(1)}" width="1.6" height="1.6" fill="#d8b0ff" fill-opacity=".8"/>`; }
     s += `<path d="M${x} ${y - 6 * ry}L${x + 4.5} ${y + 3 * ry}L${x - 4.5} ${y + 3 * ry}Z" fill="none" stroke="#d8b0ff" stroke-opacity=".7" stroke-width=".8"/>`; }
@@ -8239,6 +8248,7 @@ ${C.MAP.revealAll ? '<li>Celý hřbitov je vidět. Monstra se probudí ve 2. kol
 async function startGame() {
   try { if (SND) SND.start(); } catch (e) { /* bez zvuku */ }
   let opts = { scenario: S.scenPick || 'blackmoor' };
+  if (S.mapPick) opts.mapId = S.mapPick; // jen pro testy
   if (S.play !== 'single') { S.camp = Camp.load(); if (!S.camp || Camp.finished(S.camp)) { S.camp = Camp.fresh(); Camp.save(S.camp); } opts = Camp.gameOpts(S.camp); } else S.camp = null;
   const G = C.newGame(opts); S.G = G;
   if (builtMap !== C.MAP.id) { $('#menu').hidden = true; $('#game').hidden = false; const ld = el('div', { class: 'maploading' }, 'Připravuji ' + esc(C.MAP.name) + '…'); $('#game').appendChild(ld); await ensureMap(); ld.remove(); }
