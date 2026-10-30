@@ -900,17 +900,37 @@ button.pd-cell { cursor: default; } .pd-cell.full { cursor: pointer; border-styl
 .sb-btns { display: flex; gap: 6px; }
 .sb-errs { margin: 0; padding-left: 18px; font-size: 13px; color: #ffb89a; }
 .sb-obel .chips { display: flex; flex-wrap: wrap; gap: 6px; }
+/* barvy žetonů */
+.sb-tok.tk-card { border-color: #6a98c0; background: linear-gradient(#18263a, #070c14); } .sb-tok.tk-card .ic { color: #a8d0f0; } .sb-tok.tk-card b { color: #e2eef8; }
+.sb-tok.tk-trap { border-color: #c0503a; background: linear-gradient(#3a1410, #120605); } .sb-tok.tk-trap .ic { color: #ff8a76; } .sb-tok.tk-trap b { color: #ffd8cc; }
+.sb-tok.tk-fake { border-color: #8a7a9a; background: linear-gradient(#262230, #0e0c12); } .sb-tok.tk-fake .ic { color: #c8b8d8; } .sb-tok.tk-fake b { color: #e6dcf0; }
+.sb-tok.tk-misc { border-color: #9a8a5a; }
+.tok-ghost.tk-card { border-color: #a8d0f0; background: #18263a; } .tok-ghost.tk-card .ic { color: #a8d0f0; }
+.tok-ghost.tk-trap { border-color: #ff8a76; background: #3a1410; } .tok-ghost.tk-trap .ic { color: #ff8a76; }
+.tok-ghost.tk-fake { border-color: #c8b8d8; background: #262230; } .tok-ghost.tk-fake .ic { color: #c8b8d8; }
+#tokpv { position: fixed; z-index: 150; pointer-events: none; filter: drop-shadow(0 12px 24px #000c); }
+#tokpv[hidden] { display: none; }
+#tokpv .card { zoom: .9; } .tpv-row { display: flex; gap: 6px; } .tpv-row .card { zoom: .75; }
+.tpv-info { width: 220px; padding: 10px 12px; border-radius: 10px; background: #15110c; border: 1px solid #9a7a44; display: grid; gap: 4px; }
+.tpv-info .ic { width: 22px; height: 22px; color: #f3cf8e; } .tpv-info b { color: var(--paper); } .tpv-info p { margin: 0; font-size: 12.5px; color: #cfc5b6; }
+.tpv-info.tk-trap { border-color: #c0503a; background: #1e0c0a; } .tpv-info.tk-trap .ic { color: #ff8a76; }
+.tpv-info.tk-fake { border-color: #8a7a9a; } .tpv-info.tk-fake .ic { color: #c8b8d8; }
 /* okno nákupu monster */
-.dialog.buydlg { width: min(1180px, 94vw); max-height: 88vh; overflow-y: auto; }
+.dialog.buydlg { width: min(1320px, 96vw); max-height: 92vh; overflow-y: auto; padding: 14px 16px; }
+.buydlg h2 { font-size: 22px; margin: 0; } .buydlg > .muted { margin: 4px 0 0; font-size: 12.5px; }
+.bd-head { position: sticky; top: -14px; z-index: 2; background: var(--panel, #141018); padding: 4px 0 6px; }
 .bd-head { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
 .threat-pill.big { font-size: 15px; padding: 6px 12px; }
-.buygrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 12px; margin: 12px 0; }
-.buycard { border: 1px solid var(--line); border-radius: 10px; background: #0f0d14; padding: 10px; display: grid; gap: 6px; align-content: start; }
+.ess-left { font-size: 15px; color: #f0dfbe; padding: 6px 14px; border-radius: 99px; border: 1px solid var(--candle); background: #2a1e0c; } .ess-left b { font: 800 22px var(--f-num); color: #f3cf8e; margin: 0 2px; }
+.buygrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(205px, 1fr)); gap: 8px; margin: 8px 0; }
+.buycard { border: 1px solid var(--line); border-radius: 8px; background: #0f0d14; padding: 7px 8px; display: grid; gap: 4px; align-content: start; font-size: 12px; }
+.buycard .ms-st, .buycard .grp-stats { font-size: 11px; } .buycard .mabil { margin: 4px 0 0; gap: 2px; } .buycard .mabil b { font-size: 12px; } .buycard .mabil span { font-size: 10.5px; line-height: 1.15; } .buycard .mabil li { gap: 0; } .buycard .mab-h { margin: 4px 0 0; }
+.buycard .btn { padding: 5px 8px; font-size: 13px; }
 .buycard.owned { border-color: var(--candle); background: linear-gradient(#1e170c, #0f0d14); } .buycard.poor { opacity: .55; }
 .bc-top { display: grid; grid-template-columns: auto 1fr auto; gap: 10px; align-items: center; }
-.bc-port { display: flex; gap: 2px; } .bc-port .mport { width: 44px; height: 44px; }
-.bc-top h3 { margin: 0; font-size: 16px; color: var(--paper); } .bc-top small { color: var(--muted); font-size: 11.5px; }
-.bc-cost { font: 800 20px var(--f-num); color: #f3cf8e; }
+.bc-port { display: flex; gap: 2px; } .bc-port .mport { width: 30px; height: 30px; }
+.bc-top { gap: 6px; } .bc-top h3 { margin: 0; font-size: 13.5px; line-height: 1.15; color: var(--paper); } .bc-top small { color: var(--muted); font-size: 10.5px; }
+.bc-cost { font: 800 17px var(--f-num); color: #f3cf8e; }
 .buycard .btn { justify-self: stretch; margin-top: 4px; }
 .shop.center { position: fixed; left: 50%; top: 46%; transform: translate(-50%, -50%); z-index: 40; width: min(760px, 92vw); background: #0c0b10f6; border: 1px solid var(--candle); border-radius: 12px; padding: 16px 18px; box-shadow: 0 20px 60px #000d; pointer-events: auto; }
 .shop.center h2 { margin: 0 0 4px; font: 600 22px var(--f-disp); color: var(--paper); }
@@ -6855,6 +6875,12 @@ function onMapHover(ev) {
   if (S.pan && S.pan.moved) return;
   const hit = hitFrom(ev); if (!hit || !hit.hex || !S.G) return;
   hoverHex(S.mode && ['move', 'monsterAction', 'target', 'olPick', 'setup'].includes(S.mode.type) ? hit.hex : null);
+  // příprava: najetí na nábytek se žetonem ukáže, co tam leží
+  if (S.mode && S.mode.type === 'setup' && STEPS[S.setup.step] && STEPS[S.setup.step].id === 'tokens' && !document.querySelector('.tok-ghost')) {
+    const sp = S.G.spots.find(x => x.token && [hit.hex, hit.furnHex, hit.tokHex].some(h => h && C.eq(x.hex, h)));
+    if (sp) { if (S._pvSpot !== sp.id) { S._pvSpot = sp.id; const z = Z(); showTokPreview(sp.token, { left: ev.clientX - 1, top: ev.clientY - 30, width: 2, height: 2, right: ev.clientX + 1, bottom: ev.clientY }); } }
+    else if (S._pvSpot) { S._pvSpot = null; hideTokPreview(); }
+  }
   if (hovEl && S.mode) { const mm = S.mode, hx0 = hit.hex, K0 = C.K(hx0); let ok = false;
     if (mm.type === 'move') ok = mm.opts.reach.has(K0) || mm.opts.inter.some(i => C.eq(i.hex, hx0));
     else if (mm.type === 'monsterAction') ok = mm.opts.reach.has(K0) || mm.opts.targets.some(h => C.eq(h.pos, hx0));
@@ -6881,13 +6907,16 @@ function onMapHover(ev) {
 function setDetail(t) { const d = $('#detail'); if (d) d.textContent = t; }
 
 // ---------- efekty ----------
+// zoom celého UI (html { zoom }): souřadnice myši a getBoundingClientRect jsou ve vizuálních px, styly v CSS px
+const Z = () => parseFloat(getComputedStyle(document.documentElement).zoom) || 1;
+const rz = r => { const z = Z(); return { left: r.left / z, top: r.top / z, right: r.right / z, bottom: r.bottom / z, width: r.width / z, height: r.height / z }; };
 function screenPos(hex, lift = 0) {
   const wrap = $('#mapwrap'), r = wrap.getBoundingClientRect(), pt = svg.createSVGPoint();
   const [x, y] = px(hex); pt.x = x; pt.y = y - lift;
   const s = pt.matrixTransform(svg.getScreenCTM());
-  return [s.x - r.left + wrap.scrollLeft, s.y - r.top + wrap.scrollTop];
+  const z = Z(); return [(s.x - r.left) / z + wrap.scrollLeft, (s.y - r.top) / z + wrap.scrollTop];
 }
-function clientPos(hex, lift = 0) { const pt = svg.createSVGPoint(); const [x, y] = px(hex); pt.x = x; pt.y = y - lift; const s = pt.matrixTransform(svg.getScreenCTM()); return [s.x, s.y]; }
+function clientPos(hex, lift = 0) { const pt = svg.createSVGPoint(); const [x, y] = px(hex); pt.x = x; pt.y = y - lift; const s = pt.matrixTransform(svg.getScreenCTM()), z = Z(); return [s.x / z, s.y / z]; }
 function floatText(hex, text, cls, lift = 40) {
   const [x, y] = screenPos(hex, lift);
   const f = el('div', { class: 'float ' + (cls || '') }, esc(text));
@@ -7252,7 +7281,7 @@ async function panicAnim(id) {
 function flyCard(fromHex, toSel, heroId, kind) {
   const target = document.querySelector(toSel);
   if (!target || target.dataset.hero !== heroId) return;
-  const [sx, sy] = clientPos(fromHex, 50), r = target.getBoundingClientRect();
+  const [sx, sy] = clientPos(fromHex, 50), r = rz(target.getBoundingClientRect());
   const c = el('div', { class: 'flycard ' + (kind || '') }, kind === 'panic' ? A.icon('panic') : '');
   document.body.appendChild(c);
   c.animate([{ transform: `translate(${sx - 14}px,${sy - 20}px) scale(.6) rotate(-10deg)`, opacity: 0 }, { transform: `translate(${sx - 14}px,${sy - 40}px) scale(1) rotate(0)`, opacity: 1, offset: .25 }, { transform: `translate(${r.left + r.width / 2 - 14}px,${r.top + 6}px) scale(.8) rotate(8deg)`, opacity: 1 }], { duration: dur(800), easing: 'cubic-bezier(.5,0,.3,1)', fill: 'forwards' }).finished.then(() => { c.remove(); renderBottom(); const t2 = document.querySelector(toSel); if (t2) { t2.classList.add('bump'); setTimeout(() => t2.classList.remove('bump'), 400); } });
@@ -7261,7 +7290,7 @@ async function shuffleAnim(id) {
   sfx('shuffle');
   const deck = document.querySelector('#pile-deck'), disc = document.querySelector('#pile-discard');
   if (deck && deck.dataset.hero === id) {
-    if (disc) { const r1 = disc.getBoundingClientRect(), r2 = deck.getBoundingClientRect(); for (let i = 0; i < 4; i++) { const c = el('div', { class: 'flycard' }); document.body.appendChild(c); c.animate([{ transform: `translate(${r1.left + 6}px,${r1.top + 6}px)` }, { transform: `translate(${r2.left + 6}px,${r2.top + 6}px)` }], { duration: dur(380), delay: i * 70, easing: 'ease-in-out', fill: 'forwards' }).finished.then(() => c.remove()); } }
+    if (disc) { const r1 = rz(disc.getBoundingClientRect()), r2 = rz(deck.getBoundingClientRect()); for (let i = 0; i < 4; i++) { const c = el('div', { class: 'flycard' }); document.body.appendChild(c); c.animate([{ transform: `translate(${r1.left + 6}px,${r1.top + 6}px)` }, { transform: `translate(${r2.left + 6}px,${r2.top + 6}px)` }], { duration: dur(380), delay: i * 70, easing: 'ease-in-out', fill: 'forwards' }).finished.then(() => c.remove()); } }
     await sleep(dur(450)); renderBottom();
     const d2 = document.querySelector('#pile-deck'); if (d2) { d2.classList.add('riffle'); await sleep(dur(700)); d2.classList.remove('riffle'); }
   } else { const G = S.G, h = G.heroes.find(x => x.id === id); if (h && !h.escaped) floatText(h.pos, 'míchá balíček', 'info', 70); await sleep(dur(300)); }
@@ -7283,9 +7312,9 @@ async function peekPopup(e) {
 async function threatAnim(e) {
   const G = S.G, tgt = $('#threat'); if (!tgt) return;
   sfx('threat');
-  const r = tgt.getBoundingClientRect();
+  const r = rz(tgt.getBoundingClientRect());
   let sx, sy;
-  if (e.hero) { const h = G.heroes.find(x => x.id === e.hero); [sx, sy] = clientPos(h.pos, 40); } else { const w = $('#mapwrap').getBoundingClientRect(); sx = w.left + w.width / 2; sy = w.top + w.height / 2; }
+  if (e.hero) { const h = G.heroes.find(x => x.id === e.hero); [sx, sy] = clientPos(h.pos, 40); } else { const w = rz($('#mapwrap').getBoundingClientRect()); sx = w.left + w.width / 2; sy = w.top + w.height / 2; }
   const fly = async k => { const orb = el('div', { class: 'threatorb' }, '+1'); document.body.appendChild(orb); const ox = k * 26 - (e.n - 1) * 13;
     await orb.animate([{ transform: `translate(${sx - 16 + ox}px,${sy - 16}px) scale(.3)`, opacity: 0 }, { transform: `translate(${sx - 16 + ox}px,${sy - 46}px) scale(1.2)`, opacity: 1, offset: .3 }, { transform: `translate(${r.left + r.width / 2 - 16}px,${r.top + r.height / 2 - 16}px) scale(.6)`, opacity: .9 }], { duration: dur(1100), easing: 'cubic-bezier(.5,0,.3,1)', fill: 'forwards' }).finished;
     orb.remove(); };
@@ -7478,7 +7507,7 @@ function initPanZoom() {
   const wrap = $('#mapwrap');
   wrap.addEventListener('wheel', e => {
     e.preventDefault();
-    const r = wrap.getBoundingClientRect(), mx = e.clientX - r.left, my = e.clientY - r.top;
+    const r = wrap.getBoundingClientRect(), mx = (e.clientX - r.left) / Z(), my = (e.clientY - r.top) / Z();
     const fx = (wrap.scrollLeft - S.padX + mx) / svg.clientWidth, fy = (wrap.scrollTop - S.padY + my) / svg.clientHeight;
     const z = Math.min(3, Math.max(1, S.zoom * (e.deltaY < 0 ? 1.12 : 0.89)));
     if (z === S.zoom) return;
@@ -7545,10 +7574,30 @@ function monSum(t) {
 }
 // ---------- příprava Domu: spodní lišta kroků ----------
 const TOK_IC = { key: 'key', fake: 'key', trap: 'crack', lantern: 'lantern', water: 'water', candle: 'candleoff', hammer: 'bolt', relic: 'cross' };
+// barvy žetonů: klíč zlatý, falešný šedofialový, past červená, nálezy-karty modré
+const TOK_KIND = { key: 'key', fake: 'fake', trap: 'trap', water: 'card', lantern: 'card', hammer: 'card', relic: 'card', candle: 'misc' };
+const TOK_INFO = { key: 'Pravý klíč. Lovec, který ho donese k hlavním dveřím, je odemkne a uteče.', fake: 'Falešný klíč. Vypadá jako pravý, ale ve dveřích se zlomí.', trap: 'Past. Kdo místo prohledá, utrží 2 zranění nebo 2 Strach (vybírá Dům).', candle: 'Svíce vyvolávače: kdo ji najde, získá lovcům +1 vyvolání.' };
+function tokPreviewHTML(t) {
+  const card = { water: C.WATER, lantern: C.LANTERN, hammer: C.D.HAMMER }[t];
+  if (card) return cardHTML(Object.assign({ uid: -1 }, card), 'mini');
+  if (t === 'relic') { const e = C.EQUIP.kopi; return '<div class="tpv-row">' + e.cards.map(([name, pri, sec]) => cardHTML({ item: 'kopi', itemName: e.name + ' · relikvie', name, pri, sec, uid: -1 }, 'mini')).join('') + '</div>'; }
+  return `<div class="tpv-info tk-${TOK_KIND[t] || 'misc'}">${A.icon(TOK_IC[t] || 'star')}<b>${esc(C.TOKENS[t])}</b><p>${esc(TOK_INFO[t] || '')}</p></div>`;
+}
+let tokPvT = null;
+function showTokPreview(t, rect) {
+  clearTimeout(tokPvT);
+  tokPvT = setTimeout(() => {
+    let pv = $('#tokpv'); if (!pv) { pv = el('div', { id: 'tokpv' }); document.body.appendChild(pv); }
+    pv.innerHTML = tokPreviewHTML(t); pv.hidden = false;
+    const r = rz(rect), w = pv.offsetWidth, h = pv.offsetHeight, vw = window.innerWidth / Z();
+    pv.style.left = Math.max(8, Math.min(vw - w - 8, r.left + r.width / 2 - w / 2)) + 'px'; pv.style.top = Math.max(8, r.top - h - 10) + 'px';
+  }, 350);
+}
+function hideTokPreview() { clearTimeout(tokPvT); const pv = $('#tokpv'); if (pv) pv.hidden = true; }
 const stepEnabled = (G, id) => id !== 'place' || Object.keys(G.groups).length > 0;
 function goStep(i) {
   const G = S.G; if (!STEPS[i] || !stepEnabled(G, STEPS[i].id)) { S.msg = 'Nejdřív nakup monstra.'; render(); return; }
-  S.setup.step = i;
+  S.setup.step = i; hideTokPreview(); S._pvSpot = null;
   const id = STEPS[i].id;
   if (id === 'place' && !S.setup.group) S.setup.group = nextGroup();
   if (id === 'buy') S.detail = { buy: true }; else if (S.detail && S.detail.buy) S.detail = null;
@@ -7562,7 +7611,7 @@ function tokenTrayHTML(G) {
   const list = G.scen.tokens.slice(), used = {};
   return list.map(t => {
     const placed = G.spots.filter(x => x.token === t), k = used[t] = (used[t] || 0) + 1, sp = placed[k - 1];
-    return `<div class="sb-tok${sp ? ' placed' : ''}${S.setup.tok === t && !sp ? ' sel' : ''}" data-dtok="${t}" title="Přetáhni na nábytek s otazníkem">${A.icon(TOK_IC[t] || 'star')}<b>${esc(C.TOKENS[t])}</b><small>${sp ? esc(sp.name) : 'nepoložen'}</small></div>`;
+    return `<div class="sb-tok tk-${TOK_KIND[t] || 'misc'}${sp ? ' placed' : ''}${S.setup.tok === t && !sp ? ' sel' : ''}" data-dtok="${t}">${A.icon(TOK_IC[t] || 'star')}<b>${esc(C.TOKENS[t])}</b><small>${sp ? esc(sp.name) : 'nepoložen'}</small></div>`;
   }).join('');
 }
 function setupTrayHTML(G, id) {
@@ -7595,7 +7644,7 @@ function renderSetupBar() {
     if (v === 'randpart') { Bots.botSetupPart(G, cur.id, Bots.overlordBot.pool); if (cur.id === 'buy') renderModal(); sfx('card'); render(); return; }
   }));
   bindSetupSide(bar);
-  bar.querySelectorAll('[data-dtok]').forEach(t => t.addEventListener('pointerdown', ev => tokenDragStart(ev, t.dataset.dtok)));
+  bar.querySelectorAll('[data-dtok]').forEach(t => { t.addEventListener('pointerdown', ev => { hideTokPreview(); tokenDragStart(ev, t.dataset.dtok); }); t.addEventListener('mouseenter', () => { if (!document.querySelector('.tok-ghost')) showTokPreview(t.dataset.dtok, t.getBoundingClientRect()); }); t.addEventListener('mouseleave', hideTokPreview); });
   bar.querySelectorAll('[data-obel]').forEach(b => b.addEventListener('click', () => { S.setup.obel = b.dataset.obel; render(); }));
 }
 function hideSetupBar() { const b = $('#setupbar'); if (b) b.hidden = true; }
@@ -7603,8 +7652,8 @@ function hideSetupBar() { const b = $('#setupbar'); if (b) b.hidden = true; }
 function tokenDragStart(ev, tok) {
   ev.preventDefault();
   S.setup.tok = tok;
-  const ghost = el('div', { class: 'tok-ghost' }); ghost.innerHTML = A.icon(TOK_IC[tok] || 'star') + '<b>' + esc(C.TOKENS[tok]) + '</b>'; document.body.appendChild(ghost);
-  const mv = e => { ghost.style.left = e.clientX + 'px'; ghost.style.top = e.clientY + 'px'; const sp = spotAtClient(e); hoverHex(sp ? sp.hex : null); };
+  const ghost = el('div', { class: 'tok-ghost tk-' + (TOK_KIND[tok] || 'misc') }); ghost.innerHTML = A.icon(TOK_IC[tok] || 'star') + '<b>' + esc(C.TOKENS[tok]) + '</b>'; document.body.appendChild(ghost);
+  const mv = e => { ghost.style.left = e.clientX / Z() + 'px'; ghost.style.top = e.clientY / Z() + 'px'; const sp = spotAtClient(e); hoverHex(sp ? sp.hex : null); };
   mv(ev);
   const up = e => {
     window.removeEventListener('pointermove', mv); window.removeEventListener('pointerup', up); ghost.remove(); hoverHex(null);
@@ -7620,15 +7669,22 @@ function spotAtClient(e) {
   const p = svgPoint(e), h = hexAtPoint(p.x, p.y), h2 = hexAtPoint(p.x, p.y + 26);
   return G.spots.find(s => C.eq(s.hex, h)) || G.spots.find(s => C.eq(s.hex, h2)) || null;
 }
+// nákup se má vejít na obrazovku bez posouvání: když přeteče, zmenšíme ho
+function fitBuyDialog(box) {
+  const d = box.querySelector('.buydlg'); if (!d) return;
+  d.style.zoom = ''; d.style.maxHeight = 'none';
+  const avail = window.innerHeight * 0.95, h = d.getBoundingClientRect().height;
+  if (h > avail) d.style.zoom = Math.max(0.6, avail / h).toFixed(3);
+}
 function buyDialogHTML() {
   const G = S.G;
   const cards = Object.keys(C.MDEF).filter(t => C.scenAllowed(G, t)).map(t => {
     const d = C.MDEF[t], b = d.base, owned = !!G.groups[t], afford = owned || C.goldUsed(G) + d.cost <= G.budget;
-    return `<div class="buycard${owned ? ' owned' : ''}${afford ? '' : ' poor'}"><div class="bc-top"><div class="bc-port">${monPortrait(t)}${monPortrait(t, true)}</div><div><h3>${esc(d.name)}</h3><small>1 elita + ${d.minions[C.NH]} (pro ${C.NH} lovce) · ${esc(C.CATS[d.cat] || '')}</small></div><span class="bc-cost">${d.cost}</span></div>
+    return `<div class="buycard${owned ? ' owned' : ''}${afford ? '' : ' poor'}"><div class="bc-top"><div class="bc-port">${monPortrait(t)}${monPortrait(t, true)}</div><div><h3>${esc(d.name)}</h3><small>elita + ${d.minions[C.NH]} · ${esc(C.CATS[d.cat] || '')}</small></div><span class="bc-cost">${d.cost}</span></div>
       ${grpStats(b)}<div class="grp-txt">${abilHTML(d.abil, d.text)}</div>${d.eliteAbil && d.eliteAbil.length ? `<div class="grp-txt elite-t"><span class="mab-h">★ ${esc(d.eliteName)}</span>${abilHTML(d.eliteAbil)}</div>` : ''}
       <button class="btn ${owned ? '' : 'primary'}" data-buy="${t}" ${afford ? '' : 'disabled'}>${owned ? 'Vrátit' : 'Koupit za ' + d.cost}</button></div>`;
   }).join('');
-  return `<div class="dialog buydlg"><div class="bd-head"><h2>Nákup monster</h2><span class="threat-pill gold big">Temná esence ${G.budget - C.goldUsed(G)} zbývá z ${G.budget}</span></div><p class="muted">Kupuješ celou skupinu: elitu a přisluhovače podle počtu lovců. Kategorie scénáře: ${G.scen.cats.map(c => C.CATS[c]).join(', ')}.</p><div class="buygrid">${cards}</div>
+  return `<div class="dialog buydlg"><div class="bd-head"><h2>Nákup monster</h2><span class="ess-left">Zbývá <b>${G.budget - C.goldUsed(G)}</b> z ${G.budget} temné esence</span></div><p class="muted">Kupuješ celou skupinu: elitu a přisluhovače podle počtu lovců. Kategorie scénáře: ${G.scen.cats.map(c => C.CATS[c]).join(', ')}.</p><div class="buygrid">${cards}</div>
     <div class="dlg-btns"><button class="btn" data-bd="rand">Náhodný nákup</button><button class="btn primary" data-bd="done" ${Object.keys(G.groups).length ? '' : 'disabled'}>Hotovo · rozmístit</button></div></div>`;
 }
 function renderSide() {
@@ -8056,7 +8112,7 @@ document.addEventListener('pointermove', ev => {
     document.body.appendChild(d.ghost); d.el.classList.add('lifted'); sfx('card');
     S.selected = null; document.body.classList.add('dragging'); renderZones();
   }
-  d.ghost.style.left = (ev.clientX - d.dx) + 'px'; d.ghost.style.top = (ev.clientY - d.dy) + 'px';
+  d.ghost.style.left = (ev.clientX / Z() - d.dx) + 'px'; d.ghost.style.top = (ev.clientY / Z() - d.dy) + 'px';
   const under = document.elementFromPoint(ev.clientX, ev.clientY);
   const z = under && under.closest('#zones [data-zone]');
   document.querySelectorAll('#zones .zh').forEach(x => x.classList.remove('over', 'bad'));
@@ -8108,7 +8164,7 @@ function renderModal0() {
     box.hidden = false; box.classList.remove('peek');
     if (S.detail.hero) box.innerHTML = heroDetailHTML(S.G.heroes.find(h => h.id === S.detail.hero));
     else if (S.detail.hands) box.innerHTML = handsDialogHTML();
-    else if (S.detail.buy) { box.innerHTML = buyDialogHTML(); box.querySelectorAll('[data-buy]').forEach(b => b.addEventListener('click', () => { const w = C.toggleGroup(S.G, b.dataset.buy); if (w) S.msg = w; else sfx('coin'); render(); renderModal(); })); box.querySelectorAll('[data-bd]').forEach(b => b.addEventListener('click', () => { if (b.dataset.bd === 'rand') { Bots.botSetupPart(S.G, 'buy', Bots.overlordBot.pool); render(); renderModal(); return; } S.detail = null; const i = STEPS.findIndex(x => x.id === 'place'); goStep(i >= 0 ? i : S.setup.step + 1); })); return; }
+    else if (S.detail.buy) { box.innerHTML = buyDialogHTML(); hideTokPreview(); fitBuyDialog(box); box.querySelectorAll('[data-buy]').forEach(b => b.addEventListener('click', () => { const w = C.toggleGroup(S.G, b.dataset.buy); if (w) S.msg = w; else sfx('coin'); render(); renderModal(); })); box.querySelectorAll('[data-bd]').forEach(b => b.addEventListener('click', () => { if (b.dataset.bd === 'rand') { Bots.botSetupPart(S.G, 'buy', Bots.overlordBot.pool); render(); renderModal(); return; } S.detail = null; const i = STEPS.findIndex(x => x.id === 'place'); goStep(i >= 0 ? i : S.setup.step + 1); })); return; }
     else if (S.detail.legend) box.innerHTML = `<div class="dialog legdlg"><h2>Legenda</h2>${legendHTML()}<div class="dlg-btns"><button class="btn primary" id="detclose">Zavřít</button></div></div>`;
     else box.innerHTML = monDetailHTML(S.detail.mon);
     stripTitles(box);
@@ -8394,7 +8450,7 @@ function showCamp(r) {
     if (row) { const up = row.querySelector('[data-up]') || null; const hero = C.HEROES[[...box.querySelectorAll('.cp-hero')].indexOf(b.closest('.cp-hero'))].id; const ab = C.ABIL[hero][[...b.closest('.cp-abil').querySelectorAll('.ab-row')].indexOf(row)]; html = cardHTML(C.D.abilityCard(hero, ab, v), 'mini', hero); }
     else if (olu) { const id = C.OL_DECK[[...box.querySelectorAll('.olu')].indexOf(olu)]; html = olCardHTML({ id, v }, 'mini'); }
     let pv = $('#treepv'); if (!pv) { pv = el('div', { id: 'treepv' }); document.body.appendChild(pv); }
-    pv.innerHTML = html; const r = b.getBoundingClientRect(); pv.style.left = Math.min(window.innerWidth - 170, r.right + 8) + 'px'; pv.style.top = Math.max(8, Math.min(window.innerHeight - 260, r.top - 60)) + 'px'; pv.hidden = false;
+    pv.innerHTML = html; const r = rz(b.getBoundingClientRect()); pv.style.left = Math.min(window.innerWidth / Z() - 170, r.right + 8) + 'px'; pv.style.top = Math.max(8, Math.min(window.innerHeight / Z() - 260, r.top - 60)) + 'px'; pv.hidden = false;
   }));
   box.querySelectorAll('[data-pv]').forEach(b => b.addEventListener('mouseleave', () => { const pv = $('#treepv'); if (pv) pv.hidden = true; }));
   box.querySelectorAll('[data-next]').forEach(b => b.addEventListener('click', () => { if (isClient()) return; const pv = $('#treepv'); if (pv) pv.hidden = true; Camp.nextScenario(st); S.campReward = null; box.hidden = true; startGame(); }));
