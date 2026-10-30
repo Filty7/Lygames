@@ -3556,7 +3556,11 @@ async function overlordStep(G, C, ui, phase, groups) {
     await ui.refresh();
     const s = await C.O.olStep(G, phase, groups);
     if (!s) return;
-    if (s.type === 'card') await playOlCard(G, s.uid, C, ui, phase);
+    if (s.type === 'card') {
+      await playOlCard(G, s.uid, C, ui, phase);
+      // karta (např. Probuzení) vzbudila skupinu a Dům v tomto tahu ještě neaktivoval: může ji hned aktivovat
+      if (phase === 'turn' && !G.over) { const gs = awakeTypes(G).filter(t => !G.activated.has(t)); if (gs.length) { phase = 'activation'; groups = gs; } }
+    }
     else if (s.type === 'respawn' && phase === 'house') await doRespawn(G, s.mtype, s.point, ui);
     else if (s.type === 'group' && phase === 'activation' && groups.includes(s.mtype)) {
       G.activated.add(s.mtype);
@@ -7948,7 +7952,7 @@ function respawnShop(G) {
     }
   }
   if (!items.length) return '';
-  if (items.some(it => G.dead.includes(it.tok))) return `<div class="shop center"><h2>Konec kola: návrat monster</h2><p class="muted">Hrozba <b>${threat}</b>. Kup monstrum a pak klikni na zrcadlo, kde se vrátí. Každý další návrat v kole stojí o 1 víc.</p><div class="shoprow">${items.filter(it => G.dead.includes(it.tok)).map(it => `<button class="shopit big${it.tok.endsWith('*') ? ' el' : ''}" data-shop="${it.tok}" ${it.why ? 'disabled' : ''}>${monPortrait(it.tok.replace('*', ''), it.tok.endsWith('*'))}<span><b>${esc(C.respawnLabel(it.tok))}</b><small>${it.why ? esc(it.why) : 'cena ' + it.cost + ' Hrozby'}${it.n > 1 ? ' · padlých ' + it.n : ''}</small></span></button>`).join('')}</div><div class="dlg-btns"><button class="btn primary" data-shoppass="1">Ukončit kolo</button></div></div>`;
+  if (items.length) return `<div class="shop center"><h2>Konec kola: návrat monster</h2><p class="muted">Hrozba <b>${threat}</b>. Kup monstrum a pak klikni na zrcadlo, kde se vrátí. Každý další návrat v kole stojí o 1 víc.</p><div class="shoprow">${items.map(it => `<button class="shopit big${it.tok.endsWith('*') ? ' el' : ''}" data-shop="${it.tok}" ${it.why ? 'disabled' : ''}>${monPortrait(it.tok.replace('*', ''), it.tok.endsWith('*'))}<span><b>${esc(C.respawnLabel(it.tok))}</b><small>cena ${it.cost} Hrozby${it.why ? ' · ' + esc(it.why) : ''}${it.n > 1 ? ' · padlých ' + it.n : ''}</small></span></button>`).join('')}</div><div class="dlg-btns"><button class="btn primary" data-shoppass="1">Ukončit kolo</button></div></div>`;
   return `<div class="shop"><span class="hand-title">Návrat zrcadlem · Hrozba ${threat} · každé další v kole +1</span><div class="shoprow">${items.map(it => `<button class="shopit${it.tok.endsWith('*') ? ' el' : ''}" data-shop="${it.tok}" ${it.why ? 'disabled' : ''} title="${esc(it.why || 'Klikni a pak na zrcadlo')}">${monPortrait(it.tok.replace('*', ''), it.tok.endsWith('*'))}<span><b>${esc(C.respawnLabel(it.tok))}</b><small>${it.cost} Hrozby${it.n ? ' · padlo ' + it.n : ''}${it.why ? ' · ' + esc(it.why) : ''}</small></span></button>`).join('')}</div></div>`;
 }
 function olPilesHTML(G) {
