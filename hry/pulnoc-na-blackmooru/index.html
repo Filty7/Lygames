@@ -909,6 +909,12 @@ button.pd-cell { cursor: default; } .pd-cell.full { cursor: pointer; border-styl
 .sb-btns { display: flex; gap: 6px; }
 .sb-errs { margin: 0; padding-left: 18px; font-size: 13px; color: #ffb89a; }
 .sb-obel .chips { display: flex; flex-wrap: wrap; gap: 6px; }
+/* výhoda a nevýhoda */
+.pill.pill-atk.adv rect { fill: #3a2c08; stroke: #d8b04a; } .pill.pill-atk.adv text { fill: #ffe08a; }
+.pill.pill-atk.dis rect { fill: #2a1840; stroke: #a07ad8; } .pill.pill-atk.dis text { fill: #e0c8ff; }
+.roll-adv { text-align: center; font: 700 11px var(--f-body); letter-spacing: .06em; text-transform: uppercase; padding: 2px 8px; border-radius: 99px; margin: 0 auto 4px; width: max-content; }
+.roll-adv.adv { background: #4a3a10; color: #ffe08a; } .roll-adv.dis { background: #33204a; color: #e0c8ff; }
+.die.die2 { margin-right: 4px; } .die.die2.dropped { opacity: .35; transform: scale(.82); filter: grayscale(.7); }
 /* barvy žetonů */
 .sb-tok.tk-card { border-color: #6a98c0; background: linear-gradient(#18263a, #070c14); } .sb-tok.tk-card .ic { color: #a8d0f0; } .sb-tok.tk-card b { color: #e2eef8; }
 .sb-tok.tk-trap { border-color: #c0503a; background: linear-gradient(#3a1410, #120605); } .sb-tok.tk-trap .ic { color: #ff8a76; } .sb-tok.tk-trap b { color: #ffd8cc; }
@@ -2148,12 +2154,15 @@ function canStrike(G, from, to, range) {
   return los(G, from, to);
 }
 // hod: k10 + modifikátory, zásah při součtu 5+, přirozená 10 = kritik (vždy zásah, ×2), přirozená 1 = vždy vedle
-function chanceFor(sum, critOn) { const co = critOn || 10; let n = 0; for (let r = 1; r <= 10; r++) { if (r >= co) n++; else if (r !== 1 && r + sum >= 5) n++; } return n / 10; }
-function rollCheck(mods, critOn) {
+// výhoda (adv > 0): dvě kostky, platí vyšší; nevýhoda (adv < 0): platí nižší. Nesčítají se, navzájem se ruší.
+function chanceFor(sum, critOn, adv) { const co = critOn || 10; let n = 0; for (let r = 1; r <= 10; r++) { if (r >= co) n++; else if (r !== 1 && r + sum >= 5) n++; } const p = n / 10; return adv > 0 ? 1 - (1 - p) * (1 - p) : adv < 0 ? p * p : p; }
+const advOf = (plus, minus) => (plus ? 1 : 0) - (minus ? 1 : 0);
+function rollCheck(mods, critOn, adv) {
   const co = critOn || 10;
-  const sum = mods.reduce((a, m) => a + m.v, 0), roll = d10(), total = roll + sum;
+  const a = d10(), b = adv ? d10() : null, roll = !adv ? a : adv > 0 ? Math.max(a, b) : Math.min(a, b);
+  const sum = mods.reduce((x, m) => x + m.v, 0), total = roll + sum;
   const crit = roll >= co, hit = crit || (roll !== 1 && total >= 5);
-  return { roll, sum, total, crit, hit };
+  return { roll, sum, total, crit, hit, adv: adv || 0, dice: adv ? [a, b] : null };
 }
 // ---------- stavy ----------
 const evadeOf = (G, h) => h.evade && (h.evade.round === G.round || h.evade.long) ? h.evade.n : 0;
@@ -2472,7 +2481,9 @@ function attackInfo(G, h, m, spec, extraMod) {
   if (h.rage && h.rage.round === G.round && dist(h.pos, m.pos) === 1) dmg += Math.min(h.rage.max, G.monsters.filter(o => !mdef(o).object && dist(o.pos, h.pos) === 1).length - 1);
   const guard = !mdef(m).object && !mdef(m).guardAdj && G.monsters.some(o => o !== m && mdef(o).guardAdj && !o.dormant && dist(o.pos, m.pos) === 1) ? 1 : 0;
   const ar = (bf && bf.ignoreAr) || (m.analyzed && m.analyzed.round === G.round && m.analyzed.ignoreAr) ? 0 : s.armor + guard;
-  return { m, mods, sum, chance: chanceFor(sum, critOn), critOn, dmg, armor: ar };
+  // útok na dálku na sousední pole = nevýhoda (zatím nic nedává výhodu)
+  const adv = advOf(false, spec.range > 1 && spec.range < 90 && dist(h.pos, m.pos) === 1);
+  return { m, mods, sum, chance: chanceFor(sum, critOn, adv), critOn, dmg, armor: ar, adv };
 }
 function attackTargets(G, h, spec) {
   const bf = buffOf(G, h), rng = spec.range + (bf && bf.range && spec.range > 1 ? bf.range : 0);
@@ -2536,12 +2547,12 @@ async function resolveHeroAttack(G, h, m, spec, C, ui, noLine) {
   h.invis = false; if (!mdef(m).object) m.awake = true;
   const retal = mdef(m).retaliate && dist(h.pos, m.pos) === 1 && !m.dormant ? { elite: !!m.elite } : null;
   const info = attackInfo(G, h, m, spec, extra);
-  const r = rollCheck(info.mods, info.critOn);
+  const r = rollCheck(info.mods, info.critOn, info.adv);
   let base = info.dmg;
   if (r.hit && h.duel && h.duel.double && h.duel.round === G.round && h.duel.uids.includes(m.uid) && !h.duel.used) { base *= 2; h.duel.used = true; }
   const armor = info.armor + stArmor;
   const dmg = r.hit ? Math.max(0, base * (r.crit ? 2 : 1) - armor) : 0;
-  await ui.anim({ type: 'roll', at: m.pos, from: noLine ? null : h.pos, roll: r.roll, mods: info.mods, total: r.total, hit: r.hit, crit: r.crit, base, armor, dmg, label: r.crit ? 'Kritický zásah' : r.hit ? 'Zásah' : 'Vedle' });
+  await ui.anim({ type: 'roll', at: m.pos, from: noLine ? null : h.pos, adv: r.adv, dice: r.dice, roll: r.roll, mods: info.mods, total: r.total, hit: r.hit, crit: r.crit, base, armor, dmg, label: r.crit ? 'Kritický zásah' : r.hit ? 'Zásah' : 'Vedle' });
   if (r.hit) {
     m.hp -= dmg;
     if (spec.silver || spec.burn) m.noRegenRound = G.round;
@@ -2841,7 +2852,7 @@ async function resolveCard(G, h, card, half, C, ui) {
       const m = await pick('monster', pairs.flat()); if (!m) return false;
       const pair = pairs.find(p => p.includes(m));
       log(G, h.name + ' je v křížové palbě a pálí na obě strany.');
-      for (const t of pair) { if (G.over) break; if (G.monsters.includes(t)) await resolveHeroAttack(G, h, t, { range: 99, dmg: s.dmg, mod: s.mod + s.cross, stun: s.stun }, C, ui); }
+      for (const t of pair) { if (G.over) break; if (G.monsters.includes(t)) await resolveHeroAttack(G, h, t, { range: s.range, dmg: s.dmg, mod: s.mod + s.cross, stun: s.stun }, C, ui); }
       return true;
     }
     case 'rootarea': {
@@ -3156,8 +3167,8 @@ function monsterAttackInfo(G, m, h) {
   const vg = vargaHero(G); if (vg && dist(vg.pos, h.pos) <= 3) mods.push({ label: 'aura Ilony', v: -1 });
   if (d.dive && m.dived) mods.push({ label: 'nálet', v: Math.min(d.dive, m.dived) });
   if (d.swarm) { const n = Math.min(3, G.monsters.filter(o => o !== m && o.type === m.type && dist(o.pos, h.pos) === 1).length); if (n) mods.push({ label: 'smečka', v: n }); }
-  const sum = mods.reduce((a, x) => a + x.v, 0);
-  return { mods, sum, chance: chanceFor(sum) };
+  const sum = mods.reduce((a, x) => a + x.v, 0), adv = advOf(false, s.range > 1 && dist(m.pos, h.pos) === 1);
+  return { mods, sum, chance: chanceFor(sum, 10, adv), adv };
 }
 async function walkMonster(G, m, path, ui) {
   for (const hex of path) {
@@ -3206,10 +3217,10 @@ async function monsterAttack(G, m, h, C, ui) {
   const d = mdef(m), s = mstats(G, m), info = monsterAttackInfo(G, m, h);
   if (d.invisible) m.visibleRound = G.round;
   m.dormant = false;
-  let r = rollCheck(info.mods);
+  let r = rollCheck(info.mods, 10, info.adv);
   const har = heroArmor(G, h) + (h.armorAdj && h.armorAdj.round === G.round ? Math.min(h.armorAdj.max, G.monsters.filter(o => !mdef(o).object && dist(o.pos, h.pos) === 1).length) : 0);
   let dmg = r.hit ? Math.max(0, s.dmg * (r.crit ? 2 : 1) - har) : 0, fear = r.hit ? s.fear * (r.crit ? 2 : 1) : 0;
-  await ui.anim({ type: 'roll', at: h.pos, from: m.pos, roll: r.roll, mods: info.mods, total: r.total, hit: r.hit, crit: r.crit, base: s.dmg, baseFear: s.fear, armor: har, dmg, fear, label: r.crit ? 'Kritický zásah' : r.hit ? 'Zásah' : 'Vedle', enemy: true });
+  await ui.anim({ type: 'roll', at: h.pos, from: m.pos, adv: r.adv, dice: r.dice, roll: r.roll, mods: info.mods, total: r.total, hit: r.hit, crit: r.crit, base: s.dmg, baseFear: s.fear, armor: har, dmg, fear, label: r.crit ? 'Kritický zásah' : r.hit ? 'Zásah' : 'Vedle', enemy: true });
   if (!r.hit) {
     log(G, mname(m) + ' útočí na ' + h.name + ': hod ' + r.roll + ' ' + sgn(r.sum) + ' = ' + r.total + ', vedle.');
     if (h.riposte && h.riposte.round === G.round) { m.hp -= h.riposte.n; log(G, h.name + ' kontruje: ' + mname(m) + ' −' + h.riposte.n + '.'); await ui.anim({ type: 'float', at: m.pos, text: '−' + h.riposte.n, cls: 'dmg' }); if (m.hp <= 0) { killMonster(G, m); await ui.anim({ type: 'kill', who: 'm:' + m.uid }); } }
@@ -3227,8 +3238,8 @@ async function monsterAttack(G, m, h, C, ui) {
     log(G, who.name + ' reaguje: ' + c.name + (who === h ? '' : ' (chrání ' + h.name + ')') + '.');
     if (rr.reroll) {
       const rm = rr.rerollMod ? info.mods.concat([{ label: 'odvrácení', v: -rr.rerollMod }]) : info.mods;
-      r = rollCheck(rm);
-      await ui.anim({ type: 'roll', at: h.pos, from: m.pos, roll: r.roll, mods: info.mods, total: r.total, hit: r.hit, crit: r.crit, base: s.dmg, baseFear: s.fear, armor: har, dmg: r.hit ? dmg : 0, fear: r.hit ? fear : 0, label: r.hit ? 'Zásah' : 'Vedle', enemy: true });
+      r = rollCheck(rm, 10, info.adv);
+      await ui.anim({ type: 'roll', at: h.pos, from: m.pos, adv: r.adv, dice: r.dice, roll: r.roll, mods: info.mods, total: r.total, hit: r.hit, crit: r.crit, base: s.dmg, baseFear: s.fear, armor: har, dmg: r.hit ? dmg : 0, fear: r.hit ? fear : 0, label: r.hit ? 'Zásah' : 'Vedle', enemy: true });
       if (!r.hit) { dmg = 0; fear = 0; log(G, 'Útok se odvrátil.'); if (rr.stunOnMiss) { m.stunned = true; log(G, mname(m) + ' je omráčen.'); } }
     }
     if (rr.cancel) { dmg = 0; fear = 0; }
@@ -3558,7 +3569,8 @@ async function overlordStep(G, C, ui, phase, groups) {
     const s = await C.O.olStep(G, phase, groups);
     if (!s) return;
     if (s.type === 'card') {
-      await playOlCard(G, s.uid, C, ui, phase);
+      const okPlay = await playOlCard(G, s.uid, C, ui, phase);
+      if (!okPlay) { const fc = G.ol.hand.find(x => x.uid === s.uid); if (fc) fc.failTag = G.round + ':' + phase; }
       // karta (např. Probuzení) vzbudila skupinu a Dům v tomto tahu ještě neaktivoval: může ji hned aktivovat
       if (phase === 'turn' && !G.over) { const gs = awakeTypes(G).filter(t => !G.activated.has(t)); if (gs.length) { phase = 'activation'; groups = gs; } }
     }
@@ -4150,6 +4162,9 @@ function posBonus(G, h, hx) {
   const hasMelee = h.hand.some(c => c.pri && ((c.pri.t === 'attack' && c.pri.range === 1) || ['sweep', 'swapatk', 'charge', 'lunge'].includes(c.pri.t)));
   let b = 0;
   if (h.id === 'ashford' && h.hp > h.maxHp * 0.4 && hasMelee) { const n = vis.filter(m => dist(m.pos, hx) === 1).length; if (n >= 2) b -= 0.6 + 0.3 * Math.min(n - 2, 2); else if (n === 1) b -= 0.2; }
+  // střelec (většina útoků na dálku) nechce stát u monstra: útok na dálku zblízka má nevýhodu
+  const rngAtk = h.hand.filter(c => c.pri && ['attack', 'crossfire'].includes(c.pri.t) && (c.pri.range || 1) > 1).length, melAtk = h.hand.filter(c => c.pri && ((c.pri.t === 'attack' && c.pri.range === 1) || ['sweep', 'swapatk', 'charge', 'lunge'].includes(c.pri.t))).length;
+  if (rngAtk > melAtk && vis.some(m => dist(m.pos, hx) === 1)) b += 0.7;
   if (h.id === 'varga') b -= 0.25 * G.heroes.filter(o => o !== h && !o.downed && !o.escaped && dist(o.pos, hx) <= 3).length;
   if (h.id === 'wren') {
     const cf = h.hand.find(c => c.pri && c.pri.t === 'crossfire');
@@ -4254,6 +4269,11 @@ const heroBot = {
     if (h.plays >= 1 && h.hp > 3 && (sp = h.hand.find(c => c.cursed))) return play(sp);
     let bestC = null, bv = 0;
     for (const c of h.hand) { const v = cardAttackValue(G, h, c); if (v > bv) { bv = v; bestC = c; } }
+    // útok na dálku zblízka má nevýhodu: když je čím, nejdřív odstup
+    if (bestC && bv >= 0.6 && !hurry && h.plays <= 1 && (bestC.pri.range || 1) > 1 && ['attack', 'crossfire'].includes(bestC.pri.t) && C.attackTargets(G, h, bestC.pri).every(t => t.adv < 0) && !h.rooted) {
+      const step = h.hand.filter(c => c !== bestC && moveValue(c) >= 2 && !C.cannotPlay(G, h, c, 'sec') && !['attack', 'crossfire', 'grenade'].includes(c.pri.t)).sort((a, b) => cardAttackValue(G, h, a) - cardAttackValue(G, h, b))[0];
+      if (step) return { type: 'play', uid: step.uid, half: 'sec' };
+    }
     if (bestC && bv >= (hurry ? 1.6 : 0.6)) return { type: 'play', uid: bestC.uid, half: 'pri' };
     const panic = h.hand.find(c => c.panic);
     if (panic && h.plays === 0 && !visible.length) return { type: 'play', uid: panic.uid, half: 'pri' };
@@ -4290,7 +4310,7 @@ const heroBot = {
     // zbývá-li po pohybu akce a v ruce je útok, táhni na pole, odkud jde zaútočit
     const atkC = h.plays <= 1 && !urgent ? h.hand.filter(c => c.pri && ['attack', 'crossfire', 'grenade', 'swapatk', 'sweep'].includes(c.pri.t) && !c.cursed) : [];
     const vis = atkC.length ? G.monsters.filter(m => C.visibleToHeroes(G, m) && !m.dormant && !MDEF[m.type].object) : [];
-    const atkBonus = hx => { if (!vis.length) return 0; for (const c of atkC) { const r = c.pri.t === 'sweep' || c.pri.t === 'swapatk' ? 1 : c.pri.range || 1; if (vis.some(m => dist(m.pos, hx) <= r && C.canStrike(G, hx, m.pos, r))) return h._atkIntent === G.round + ':' + h.id ? -2 : G.scen.goal === 'circles' ? 0 : -0.5; } return 0; };
+    const atkBonus = hx => { if (!vis.length) return 0; for (const c of atkC) { const r = c.pri.t === 'sweep' || c.pri.t === 'swapatk' ? 1 : c.pri.range || 1; if (vis.some(m => dist(m.pos, hx) <= r && (r === 1 || dist(m.pos, hx) >= 2) && C.canStrike(G, hx, m.pos, r))) return h._atkIntent === G.round + ':' + h.id ? -2 : G.scen.goal === 'circles' ? 0 : -0.5; } return 0; };
     let best = null, bv = here + dangerAt(G, h.pos) * dw + atkBonus(h.pos);
     for (const [k, e] of opts.reach) {
       const v = gm.has(k) ? gm.get(k) : 999;
@@ -4421,7 +4441,7 @@ const overlordBot = {
   pool: null,
   async olStep(G, phase, groups) {
     for (const c of G.ol.hand) {
-      if (C.olCannot(G, c, phase)) continue;
+      if (C.olCannot(G, c, phase) || c.failTag === G.round + ':' + phase) continue;
       if (this._cardValue(G, c, phase) > 0) return { type: 'card', uid: c.uid };
     }
     if (phase === 'turn' || phase === 'after') return { type: 'pass' };
@@ -6688,11 +6708,11 @@ function renderHighlights() {
   if (m.type === 'move' || m.type === 'monsterAction') {
     hlArea([...m.opts.reach.keys()].map(C.unK), m.type === 'move' ? 'a-move' : 'a-mmove');
     if (m.opts.inter) m.opts.inter.forEach((it, i) => { hlRing(it.hex, 'ring-act'); hlPill(it.hex, INTER_LBL[it.kind], 'pill-act', { 'data-inter': i }, -2); });
-    if (m.opts.targets) m.opts.targets.forEach(h => { const i = C.monsterAttackInfo(G, m.monster, h); hlRing(h.pos, 'ring-atk'); hlPill(h.pos, Math.round(i.chance * 100) + ' %', 'pill-atk', { 'data-k': C.K(h.pos) }, liftOf(h.pos) + 12); });
+    if (m.opts.targets) m.opts.targets.forEach(h => { const i = C.monsterAttackInfo(G, m.monster, h); hlRing(h.pos, 'ring-atk'); hlPill(h.pos, Math.round(i.chance * 100) + ' %', 'pill-atk' + (i.adv > 0 ? ' adv' : i.adv < 0 ? ' dis' : ''), { 'data-k': C.K(h.pos) }, liftOf(h.pos) + 12); });
   } else if (m.type === 'target') {
     const r = m.req, rng = r.spec && (r.spec.range || r.spec.move) && m.hero && !['hand', 'discard', 'spot'].includes(r.kind) ? (r.spec.range || 1) : 0;
     if (rng > 1 && !r.chain) hlArea(rangeHexes(m.hero.pos, rng), r.kind === 'hero' || r.kind === 'door' ? 'a-ally' : 'a-range');
-    if (r.kind === 'attack') r.cands.forEach(t => { hlRing(t.m.pos, 'ring-atk'); hlPill(t.m.pos, Math.round(t.chance * 100) + ' %', 'pill-atk', { 'data-k': C.K(t.m.pos) }, liftOf(t.m.pos) + 12); });
+    if (r.kind === 'attack') r.cands.forEach(t => { hlRing(t.m.pos, 'ring-atk'); hlPill(t.m.pos, Math.round(t.chance * 100) + ' %', 'pill-atk' + (t.adv > 0 ? ' adv' : t.adv < 0 ? ' dis' : ''), { 'data-k': C.K(t.m.pos) }, liftOf(t.m.pos) + 12); });
     else if (r.kind === 'spot') r.cands.forEach(s => { hlRing(s.hex, 'ring-act'); const f = gDepth.querySelector(`.furn[data-k="${C.K(s.hex)}"]`); if (f) f.classList.add('cand'); });
     else if (r.kind === 'hex') r.cands.forEach(h => hlHex(h, 'hl-pick'));
     else if (r.kind === 'hero') r.cands.forEach(h => hlRing(h.pos, 'ring-act'));
@@ -6924,7 +6944,7 @@ function onMapHover(ev) {
   const hx = hit.tokHex || hit.hex;
   if (m && m.type === 'target' && m.req.kind === 'attack') {
     const t = m.req.cands.find(x => C.eq(x.m.pos, hx));
-    if (t) { setDetail(C.mname(t.m) + ': hod k10 ' + (t.mods.length ? t.mods.map(x => C.sgn(x.v) + ' ' + x.label).join(' ') : '') + ', zásah při 5+ (' + Math.round(t.chance * 100) + ' %)' + (t.armor ? ' · armor ' + t.armor : '')); return; }
+    if (t) { setDetail(C.mname(t.m) + ': hod k10 ' + (t.mods.length ? t.mods.map(x => C.sgn(x.v) + ' ' + x.label).join(' ') : '') + ', zásah při 5+ (' + Math.round(t.chance * 100) + ' %)' + (t.adv < 0 ? ', nevýhoda: útok na dálku na sousední pole' : t.adv > 0 ? ', výhoda' : '') + (t.armor ? ' · armor ' + t.armor : '')); return; }
   }
   const mon = C.monsterAt(G, hx);
   if (mon && monsterShown(mon)) { const s = C.stats(mon); setDetail((mon.elite ? '★ ' : '') + C.mname(mon) + ': ' + mon.hp + '/' + s.hp + '♥ · pohyb ' + s.move + ' · útok ' + C.sgn(s.mod) + (s.evasion ? ' · únik ' + s.evasion : '') + (s.armor ? ' · armor ' + s.armor : '')); return; }
@@ -7399,13 +7419,14 @@ async function rollAnim(ev) {
   const below = y - wrap.scrollTop < 140;
   const box = el('div', { class: 'roll' + (ev.enemy ? ' enemy' : '') + (below ? ' below' : '') });
   box.style.left = x + 'px'; box.style.top = (below ? screenPos(ev.at, -24)[1] : y) + 'px';
-  box.innerHTML = `<div class="roll-who">${ev.pry ? 'Páčení dveří' : ev.friendly ? 'Výbuch zasahuje lovce' : ev.enemy ? 'Útok Domu' : 'Hod lovce'}</div><div class="roll-row"><div class="die"><span>?</span></div><div class="roll-calc"></div><div class="roll-total"></div></div><div class="roll-res"></div><div class="roll-dmg"></div>`;
+  box.innerHTML = `${ev.adv ? `<div class="roll-adv ${ev.adv > 0 ? 'adv' : 'dis'}">${ev.adv > 0 ? 'Výhoda · platí vyšší kostka' : 'Nevýhoda · platí nižší kostka'}</div>` : ''}<div class="roll-who">${ev.pry ? 'Páčení dveří' : ev.friendly ? 'Výbuch zasahuje lovce' : ev.enemy ? 'Útok Domu' : 'Hod lovce'}</div><div class="roll-row">${ev.dice ? '<div class="die die2"><span>?</span></div>' : ''}<div class="die"><span>?</span></div><div class="roll-calc"></div><div class="roll-total"></div></div><div class="roll-res"></div><div class="roll-dmg"></div>`;
   wrap.appendChild(box);
-  const span = box.querySelector('.die span'), calc = box.querySelector('.roll-calc'), tot = box.querySelector('.roll-total');
+  const span = box.querySelector('.die:not(.die2) span'), span2 = box.querySelector('.die2 span'), calc = box.querySelector('.roll-calc'), tot = box.querySelector('.roll-total');
   sfx('dice');
   box.classList.add('rolling');
   { const t0 = performance.now(), T = reduced ? 40 : dur(720); let last = -1; await new Promise(res => { const step = now => { const f = (now - t0) / T, k = Math.floor(Math.pow(f, .6) * 10); if (k !== last) { last = k; span.textContent = 1 + Math.floor(Math.random() * 10); } if (f < 1) requestAnimationFrame(step); else res(); }; requestAnimationFrame(step); }); }
   span.textContent = ev.roll;
+  if (span2 && ev.dice) { const other = ev.dice[0] === ev.roll ? ev.dice[1] : ev.dice[0]; span2.textContent = other; span2.parentElement.classList.add('dropped'); }
   box.classList.remove('rolling'); box.classList.add('landed');
   if (ev.crit) { box.classList.add('crit'); sfx('crit'); }
   if (ev.roll === 1) box.classList.add('fumble');
@@ -8806,7 +8827,7 @@ function finishGame(res) {
   showEnd(res);
 }
 
-window.__UI = { S, toks, px, hexAtPoint, render, cardHTML, olCardHTML, SPR, showCamp, startGame, NETS, human, Bots, showLegacy: () => { $('#mainmenu').hidden = true; $('#legacy').hidden = false; } };
+window.__UI = { UIF, S, toks, px, hexAtPoint, render, cardHTML, olCardHTML, SPR, showCamp, startGame, NETS, human, Bots, showLegacy: () => { $('#mainmenu').hidden = true; $('#legacy').hidden = false; } };
 if (document.readyState === 'loading') window.addEventListener('DOMContentLoaded', initMenu); else initMenu();
 })();
 
