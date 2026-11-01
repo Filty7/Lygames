@@ -6978,6 +6978,9 @@ function badgesFor(kind, ent) {
     if (C.isGrabbed(G, ent)) b.push(BADGE('hand', '#c09070', '', 'b-grab'));
     if (ent.pecked) b.push(BADGE('die', '#ff8a76', '−1', 'b-peck'));
     if (C.griefed(G, ent)) b.push(BADGE('whisper', '#9fb8d8', '', 'b-grief'));
+    if (ent.advNext === G.round || ent.advRound === G.round || ent.advTurn === G.round) b.push(BADGE('die', '#9fe070', '▲', 'b-adv'));
+    { const ingoo = (G.goo || []).some(x => x.hex && x.hex[0] === ent.pos[0] && x.hex[1] === ent.pos[1]);
+      if (ingoo || ent.evilEye === G.round || G.veilRound === G.round) b.push(BADGE('die', '#d090f0', '▼', 'b-disadv')); }
     if (ent.acted && !(G.active && G.active.hero === ent.id) && G.phase !== 'setup' && !ent.escaped) b.push(BADGE('hourglass', '#a59b8f', '', 'b-done'));
   } else {
     const st = C.stats(ent), d = C.MDEF[ent.type];
@@ -6988,6 +6991,7 @@ function badgesFor(kind, ent) {
     if (ent.dormant) b.push(BADGE('zzz', '#e0a050', '', 'b-dormant'));
     if (ent.batsRound === G.round) b.push(BADGE('eyeoff', '#d6b8f4', '', 'b-bats'));
     if (ent.unseenRound === G.round || ent.feastRound === G.round) b.push(BADGE('bolt', '#ff6a5a', '', 'b-frenzy'));
+    if ((ent.disUntil || -1) >= G.round) b.push(BADGE('die', '#d090f0', '▼', 'b-disadv'));
     if (ent.rooted) b.push(BADGE('chain', '#d8b070', '', 'b-root'));
     if (ent.disarmed || C.saltAt(G, ent.pos)) b.push(BADGE('disarm', '#f0e8dc', '', 'b-dis'));
     if (ent.taunt) b.push(BADGE('taunt', HERO_COLORS[ent.taunt] || '#d79e48', '', 'b-taunt'));
@@ -6997,7 +7001,7 @@ function badgesFor(kind, ent) {
   }
   return b;
 }
-const ALWAYS = new Set(['b-poison', 'b-bleed', 'b-mark', 'b-grab', 'b-peck', 'b-grief', 'b-dormant', 'b-bats', 'b-frenzy', 'b-stun', 'b-root', 'b-dis', 'b-taunt', 'b-done', 'b-zzz', 'b-key', 'b-key b-keys', 'b-inv', 'b-ev', 'b-ar', 'b-weak', 'b-shaken']);
+const ALWAYS = new Set(['b-poison', 'b-bleed', 'b-mark', 'b-grab', 'b-peck', 'b-grief', 'b-dormant', 'b-bats', 'b-frenzy', 'b-stun', 'b-root', 'b-dis', 'b-taunt', 'b-done', 'b-zzz', 'b-key', 'b-key b-keys', 'b-inv', 'b-ev', 'b-ar', 'b-adv', 'b-disadv', 'b-weak', 'b-shaken']);
 function renderBadges(t, list) {
   const key = list.map(x => x.ic + x.txt).join('|') + '@' + t.h;
   if (t.bkey === key) return; t.bkey = key;
@@ -8353,11 +8357,11 @@ let dense = '';
 function diagSVG(kind) {
   const H = (x, y, cls) => { const r = 3.3, p = []; for (let i = 0; i < 6; i++) { const a = Math.PI / 180 * (60 * i + 30); p.push((x + r * Math.cos(a)).toFixed(1) + ',' + (y + r * Math.sin(a)).toFixed(1)); } return `<polygon points="${p.join(' ')}" class="${cls}"/>`; };
   let g = '', w = 22;
-  if (kind === 'area') { g = H(11, 7, 'dg-t'); for (let i = 0; i < 6; i++) { const a = Math.PI / 3 * i; g += H(11 + 5.8 * Math.cos(a), 7 + 5.8 * Math.sin(a), 'dg-n'); } w = 22; }
-  else if (kind === 'line') { g = H(5, 7, 'dg-t') + `<path d="M8.6 7 H12.4 M11 5.6 L12.6 7 L11 8.4" class="dg-a"/>` + H(16, 7, 'dg-n'); w = 21; }
-  else if (kind === 'cross') { g = H(4, 7, 'dg-n') + H(11, 7, 'dg-me') + H(18, 7, 'dg-n'); w = 22; }
-  else if (kind === 'two') { g = H(5, 7, 'dg-t') + H(14, 7, 'dg-t'); w = 19; }
-  return `<svg class="diag" viewBox="0 0 ${w} 14" width="${w * 1.55}" height="21.7">${g}</svg>`;
+  if (kind === 'area') { g = H(11, 10, 'dg-t'); for (let i = 0; i < 6; i++) { const a = Math.PI / 3 * i; g += H(11 + 5.8 * Math.cos(a), 10 + 5.8 * Math.sin(a), 'dg-n'); } w = 22; }
+  else if (kind === 'line') { g = H(5, 10, 'dg-t') + `<path d="M8.6 10 H12.4 M11 8.6 L12.6 10 L11 11.4" class="dg-a"/>` + H(16, 10, 'dg-n'); w = 21; }
+  else if (kind === 'cross') { g = H(4, 10, 'dg-n') + H(11, 10, 'dg-me') + H(18, 10, 'dg-n'); w = 22; }
+  else if (kind === 'two') { g = H(5, 10, 'dg-t') + H(14, 10, 'dg-t'); w = 19; }
+  return `<svg class="diag" viewBox="0 ${kind === 'area' ? 0 : 3} ${w} ${kind === 'area' ? 20 : 14}" width="${w * 1.4}" height="${kind === 'area' ? 28 : 19.6}">${g}</svg>`;
 }
 const BI = (n, ic, cls) => `${n}${ic ? A.icon(ic, 'bi' + (cls ? ' ' + cls : '')) : ''}`;
 function bonusDmg(s) {
