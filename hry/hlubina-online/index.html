@@ -3302,8 +3302,9 @@ function setupCamera(){
 }
 
 /* ================= MENU, ULOŽENÍ, PRAVIDLA ================= */
-const VERSION='0.81-beta';
+const VERSION='0.82-beta';
 const CHANGELOG=[
+  ['0.82-beta','Oprava pingu',['Ping už se sám nespouští: kontrola spojení, která běží každých 8 vteřin, se omylem hlásila jako ping od ostatních hráčů.','Ping má odpočet 5 vteřin, nedá se spamovat.']],
   ['0.81-beta','Ping a úpravy',['Ping: prostřední tlačítko myši blikne oranžovým rámečkem na dílku a ozve se zvuk. Online ho vidí všichni i se jménem toho, kdo pingnul. Kdo má místo mimo obrazovku, vidí u okraje blikající šipku, klik na ni tam posune kameru.','Deník vidí jen ten, kdo ho otevřel.','Tlačítko Balíček je pryč.','Obrazovka po levelu je širší a bez vodorovného posuvníku. Karty postav se vejdou vedle sebe a texty nepřetékají.','Kritická radiace: lísteček události se ukáže jen jednou a pak už běží jen testy (dřív problikl před testy znovu).']],
   ['0.80-beta','Online multiplayer (beta)',['Nová položka v menu Online multiplayer: hostitel založí novou výpravu, pokračuje v rozehrané nebo načte uloženou a dostane kód hry. Kamarádi se připojí přes Připojit se a zadají kód.','Každý hraje na svém počítači myší a klávesnicí. V online lobby si hráči klikem vezmou postavy a přepíšou jim jména. Hra začne, až má každý aspoň jednu postavu.','Celá hra běží u hostitele a ukládá se u něj. Ostatní ovládají jen své postavy a na konci levelu potvrdí, že jsou hotoví. Plán laboratoře a dialogy ovládá hostitel.','Když se hráč odpojí, může se vrátit stejným kódem a jménem. Do té doby za jeho postavy hraje hostitel.','Hra pro jednoho a lokální multiplayer s ovladači fungují dál úplně stejně a bez internetu.']],
   ['0.70','Uložené hry a jména',['Uložit hru (v menu během výpravy): pojmenovaná uložená hra v prohlížeči a volitelně i jako soubor .json. Rozehraná hra z předchozích verzí zůstává a Pokračovat ji načte jako dřív.','Hra pro jednoho i Multiplayer mají Načíst uloženou hru: seznam uložených her s detaily, stažení, smazání a načtení ze souboru. Načtenou hru jde hrát sólo i v multiplayeru.','Multiplayer si pamatuje, kdo hrál za které postavy. Při pokračování dostane každý hráč zpátky své postavy podle pořadí přihlášení. V lobby si každý může vzít kteroukoli postavu: Y otevře výběr, páčkou vybere, A potvrdí, B zruší. Hra začne, až má každý hráč aspoň jednu postavu.','Jména postav jde přepsat myší a klávesnicí v lobby i na konci levelu, X dá náhodné jméno.','V multiplayeru jsou postavy jednoho hráče v dolní liště vedle sebe.','Automatická kamera: výběr postavy v dolní liště (nebo LB / RB) ji plynule vycentruje. Při pádu kamera počká nahoře a pak jede s postavou dolů. Testy, střílna, potrubí a karanténa se posunou doprostřed obrazovky.']],
@@ -5350,7 +5351,7 @@ function netOnMsg(m){if(!m||m.from===NET.id||!NET.role)return;
     if(m.t==='ltake'){netTake(p,m.cid);return;}
     if(m.t==='lname'){netRename(p,m.cid,String(m.name||'').slice(0,14),true);return;}
     if(!NET.started)return;
-    if(m.t==='ping'){pingShow(m.x,m.y,p,NET.players[p].name);return;}
+    if(m.t==='mping'){pingRecv(m,p);return;}
     if(m.t==='click'){netHostClick(p,m);return;}
     if(m.t==='key'){netHostKey(p,m.k);return;}
     if(m.t==='buy'){if((MP.own[p]||[]).includes(m.c)&&RUN&&RUN.offers.includes(m.id)){const sel=RUN.sel;buyAbility(m.c,m.i,m.id);RUN.sel=sel&&RUN.offers.includes(sel)?sel:null;netQueueState(true);}return;}
@@ -5360,7 +5361,7 @@ function netOnMsg(m){if(!m||m.from===NET.id||!NET.role)return;
   /* host */
   if(m.to&&m.to!==NET.id)return;
   if(m.t==='reject'){const w=m.why;netReset();showNetMenu(w);return;}
-  if(m.t==='ping'){if(NET.started){const k=NET.players.findIndex(q=>q.id===m.from);pingShow(m.x,m.y,k>=0?k:m.s,(NET.players[k>=0?k:m.s]||{}).name);}return;}
+  if(m.t==='mping'){if(NET.started){const k=NET.players.findIndex(q=>q.id===m.from);pingRecv(m,k>=0?k:m.s);}return;}
   if(NET.hostId&&m.from!==NET.hostId)return;
   NET.hostSeen=Date.now();
   if(m.t==='lobby'){if(!NET.hostId){NET.hostId=m.from;clearTimeout(NET.joinT);}if(!m.players.some(p=>p.id===NET.id)){netSend({t:'hello',name:NET.name,v:VERSION});return;}if(!NET.started)renderNetLobby(m);return;}
@@ -5529,9 +5530,14 @@ function pingOffs(){let o=document.getElementById('poffs');if(!o){o=document.cre
 setInterval(()=>{if(UI.pings&&UI.pings.length)pingOffs();},120);
 document.addEventListener('click',e=>{const b=e.target.closest('[data-ping]');if(!b)return;const [x,y]=b.dataset.ping.split(',').map(Number);centerOn(x,y,true);});
 let pingLast=0;
+/* Pozor: {t:'ping'} je heartbeat spojení (každých 8 s). Ping na mapě má vlastní typ 'mping' – dřív se oba pletly a každý heartbeat pípnul jako ping. */
+const PING_CD=5000,pingSeen={};
+function pingRecv(m,k){if(!Number.isInteger(m.x)||!Number.isInteger(m.y)||k==null||k<0)return;const now=Date.now();
+  if(now-(pingSeen[k]||0)<PING_CD-300)return;pingSeen[k]=now;pingShow(m.x,m.y,k,(NET.players[k]||{}).name);}
 document.addEventListener('mousedown',e=>{if(e.button!==1)return;const v=document.getElementById('view');if(!v||!v.contains(e.target)||UI.onMap||UI.inMenu||!G)return;
-  e.preventDefault();if(Date.now()-pingLast<500)return;const cl=pingCell(e);if(!cl)return;pingLast=Date.now();
-  if(NET.started){const me=netMe();pingShow(cl.x,cl.y,me,(NET.players[me]||{}).name);netSend({t:'ping',x:cl.x,y:cl.y,s:me});}
+  e.preventDefault();const cl=pingCell(e);if(!cl)return;
+  const wait=PING_CD-(Date.now()-pingLast);if(wait>0){netToast(`Ping půjde znovu za ${Math.ceil(wait/1000)} s.`);return;}pingLast=Date.now();
+  if(NET.started){const me=netMe();pingShow(cl.x,cl.y,me,(NET.players[me]||{}).name);netSend({t:'mping',x:cl.x,y:cl.y,s:me});}
   else pingShow(cl.x,cl.y,null,'');},true);
 document.addEventListener('auxclick',e=>{if(e.button===1&&e.target.closest&&e.target.closest('#view'))e.preventDefault();},true);
 
