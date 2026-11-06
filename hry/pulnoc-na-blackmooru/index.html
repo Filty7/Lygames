@@ -1891,8 +1891,8 @@ const MDEF = {
     base: { hp: 4, move: 0, range: 1, mod: 1, dmg: 2, fear: 0, evasion: 0, armor: 0 }, text: 'Řev: na začátku kola dá lovcům do 3 polí +1 Strach.' },
   // ---- Hřbitov: neklid mrtvých ----
   kostlivci: { retaliate: true, cat: 'hrbitov', name: 'Kostlivci', unit: 'Kostlivec', eliteName: 'Kostěný rytíř', glyph: 'K', cost: 6, respawn: 1, eliteRespawn: 3, minions: { 2: 3, 3: 4, 4: 5 }, raiseOn: 6, rangedResist: 1,
-    base: { hp: 3, move: 3, range: 1, mod: 1, dmg: 1, fear: 0, evasion: 0, armor: 1 }, elite: { hp: 5, mod: 1, dmg: 3 },
-    text: 'Armor 1. Kosti: útoky, které nejsou ze sousedního pole, mají −1. Odplata: kdo na ně útočí zblízka, dostane 1 Strach (rytíř i 1 zranění). Z hrobu vstávají už na 6+.', eliteText: 'Kostěný rytíř: 5♥, útok +1, 3 dmg.' },
+    base: { hp: 3, move: 3, range: 1, mod: 2, dmg: 1, fear: 0, evasion: 0, armor: 1 }, elite: { hp: 5, mod: 2, dmg: 3 },
+    text: 'Armor 1. Kosti: útoky, které nejsou ze sousedního pole, mají −1. Odplata: kdo na ně útočí zblízka, dostane 1 Strach (rytíř i 1 zranění). Z hrobu vstávají už na 6+.', eliteText: 'Kostěný rytíř: 5♥, útok +2, 3 dmg.' },
   ghulove: { cat: 'hrbitov', name: 'Ghúlové', unit: 'Ghúl', eliteName: 'Ghúl-žrout', glyph: 'g', cost: 9, respawn: 2, eliteRespawn: 4, minions: { 2: 1, 3: 2, 4: 3 }, feast: true,
     base: { hp: 4, move: 4, range: 1, mod: 1, dmg: 2, fear: 0, evasion: 0, armor: 0 }, elite: { hp: 7, dmg: 3, fear: 1, glutton: true },
     text: 'Hostina: začíná-li aktivaci vedle hrobu nebo ležícího lovce, vyléčí se o 2 a má +1 k útoku.', eliteText: 'Ghúl-žrout: 7♥, 3 dmg + 1 Strach. Když srazí lovce, Dům +1 Hrozba.' },
@@ -1904,7 +1904,7 @@ const MDEF = {
     text: 'Poloboss. Létá. Aura Žal: lovcům do 2 polí nefungují karty snižující Strach.', eliteText: 'Banshee: 14♥, únik 2. Akce Kvílení: každý lovec v místnosti hodí k10 + odvaha − Strach; pod 5 dostane 2 Strach.' },
   // ---- Zahrada: šlahouny a jed ----
   kvety: { cat: 'zahrada', name: 'Masožravé květy', unit: 'Masožravý květ', eliteName: 'Královna rosnatek', glyph: 'f', cost: 6, respawn: 1, eliteRespawn: 3, minions: { 2: 3, 3: 4, 4: 5 }, immobile: true, scatter: true, vine: 1,
-    base: { hp: 5, move: 0, range: 5, mod: 1, dmg: 2, fear: 0, evasion: 0, armor: 0 }, elite: { hp: 6, dmg: 3, poison: 1 },
+    base: { hp: 5, move: 0, range: 5, mod: 2, dmg: 2, fear: 0, evasion: 0, armor: 0 }, elite: { hp: 6, dmg: 3, poison: 1 },
     text: 'Nehýbou se a Dům je smí rozmístit do různých místností. Šlahoun: zásah přitáhne lovce o 1 a přišpendlí ho.', eliteText: 'Královna rosnatek: 6♥, 3 dmg, zásah dá jed 1.' },
   mury: { cat: 'zahrada', name: 'Můry smrtihlavky', unit: 'Můra smrtihlavka', eliteName: 'Smrtihlav', glyph: 'm', cost: 6, respawn: 1, eliteRespawn: 3, minions: { 2: 3, 3: 4, 4: 5 }, flying: true, lightLove: true,
     base: { hp: 1, move: 5, range: 1, mod: 0, dmg: 1, fear: 1, evasion: 2, armor: 0, poison: 1 }, elite: { hp: 3, mod: 1, dmg: 1, poison: 2 },
@@ -1914,7 +1914,7 @@ const MDEF = {
     text: 'Dokud se poprvé nepohne, vypadá jako dekorace a nejde na něj útočit. Oheň mu neublíží.', eliteText: 'Dýňová hlava: 9♥, dosah 4. Hází hořící dýně: pole cíle a všechna sousední hoří do konce příštího kola.' },
   // ---- Půda: zmatení ----
   oci: { cat: 'puda', name: 'Bludné oči', unit: 'Bludné oko', eliteName: 'Oko domu', glyph: 'o', cost: 6, respawn: 1, eliteRespawn: 3, minions: { 2: 2, 3: 3, 4: 4 }, flying: true, markOnHit: true,
-    base: { hp: 2, move: 4, range: 4, mod: 0, dmg: 1, fear: 1, evasion: 2, armor: 0 }, elite: { hp: 5, mod: 2, dmg: 1, attacks: 2, eye2: true },
+    base: { hp: 2, move: 4, range: 4, mod: 0, dmg: 1, fear: 1, evasion: 2, armor: 0 }, elite: { hp: 5, mod: 1, dmg: 1, attacks: 2, eye2: true },
     text: 'Létají, únik 2. Upřený pohled: zasažený lovec je do konce kola Označen (monstra +1 proti němu a ignorují jeho únik; nemůže být neviditelný).', eliteText: 'Oko domu: útočí 2× za aktivaci, pokaždé na jiného lovce (pokud to jde).' },
   grimoar: { cat: 'puda', name: 'Prokleté grimoáry', unit: 'Grimoár', eliteName: 'Kniha bez jména', glyph: 'b', cost: 12, respawn: 3, eliteRespawn: 5, minions: { 2: 1, 3: 2, 4: 3 }, flying: true, swapOnHit: true,
     base: { hp: 5, move: 3, range: 3, mod: 1, dmg: 2, fear: 0, evasion: 0, armor: 0 }, elite: { hp: 8, fear: 1, burnCard: true },
@@ -2381,7 +2381,7 @@ const OL_VAR = {
     AA: ['Paralýza', 'Každý lovec utrží 3 zranění za každou Paniku v ruce. Lovci bez Paniky dostanou 1 Strach.'],
     AB: ['Tíseň', 'Každý lovec utrží 1 zranění za každou Paniku v ruce. Lovci bez Paniky dostanou 3 Strach.'],
     B: ['Upřený pohled', 'Každý lovec dostane 2 Strach.'],
-    BA: ['Děs z temnoty', 'Každý lovec dostane 2 Strach a utrží 1 zranění.'],
+    BA: ['Děs z temnoty', 'Každý lovec dostane 2 Strach. Kdo už má v ruce Paniku, utrží navíc 1 zranění.'],
     BB: ['Všudypřítomná hrůza', 'Každý lovec dostane 3 Strach. Kdo tím propadne panice, utrží navíc 1 zranění.'] },
   nakaza: {
     A: ['Hnisání', 'Otrávení lovci +3 jed, krvácející +1 krvácení. Kdo nemá ani jedno, dostane 1 Strach.'],
@@ -2400,7 +2400,7 @@ const OL_VAR = {
   zleoko: {
     A: ['Zlý pohled', 'Lovci ve vybrané místnosti a v místnostech sousedících dveřmi útočí do konce kola s nevýhodou.'],
     AA: ['Vševidoucí oko', 'Všichni lovci kdekoli útočí do konce kola s nevýhodou.'],
-    AB: ['Vyhlédnutá kořist', 'Lovci ve vybrané místnosti útočí do konce kola s nevýhodou a jsou Označení.'],
+    AB: ['Vyhlédnutá kořist', 'Lovci ve vybrané místnosti a v místnostech sousedících dveřmi útočí do konce kola s nevýhodou a jsou Označení.'],
     B: ['Uřknutí', 'Jeden lovec kdekoli útočí do konce kola s nevýhodou a dostane 1 Strach.'],
     BA: ['Zlá ruka', 'Jeden lovec kdekoli útočí do konce kola s nevýhodou a v příštím tahu má jen 2 zahrání.'],
     BB: ['Dvojí uřknutí', 'Dva lovci kdekoli útočí do konce kola s nevýhodou a dostanou 1 Strach.'] },
@@ -4814,7 +4814,7 @@ async function playOlCard(G, uidC, C, ui, phase) {
     case 'zamceni': fx = [target.hex].concat(extra && extra.second ? [extra.second.hex] : []); break;
     case 'navrat': fx = [target]; break;
     case 'hruza': case 'nakaza': case 'zavoj': case 'ztrata': fx = G.heroes.filter(x => !x.escaped).map(x => x.pos); break;
-    case 'zleoko': fx = v === 'AA' ? hs.map(x => x.pos) : v[0] === 'B' ? [target.pos].concat(extra && extra.second ? [extra.second.pos] : []) : hs.filter(x => zonesOf(x.pos).some(z => z === target || (v === 'A' && adjRooms(target).includes(z)))).map(x => x.pos); break;
+    case 'zleoko': fx = v === 'AA' ? hs.map(x => x.pos) : v[0] === 'B' ? [target.pos].concat(extra && extra.second ? [extra.second.pos] : []) : hs.filter(x => zonesOf(x.pos).some(z => z === target || ((v === 'A' || v === 'AB') && adjRooms(target).includes(z)))).map(x => x.pos); break;
     case 'sepot': fx = v[0] === 'B' ? hs.map(x => x.pos) : roomHexes(target); break;
     case 'zhasnuti': fx = roomHexes(target); break;
     case 'probuzeni': fx = G.monsters.filter(m => m.type === target).map(m => m.pos); secret = true; break;
@@ -4896,7 +4896,7 @@ async function playOlCard(G, uidC, C, ui, phase) {
       let hit;
       if (v === 'AA') hit = hs;
       else if (v[0] === 'B') hit = [target].concat(extra && extra.second ? [extra.second] : []);
-      else { const rooms = v === 'A' ? [target].concat(adjRooms(target)) : [target]; hit = hs.filter(h => zonesOf(h.pos).some(z => rooms.includes(z))); }
+      else { const rooms = (v === 'A' || v === 'AB') ? [target].concat(adjRooms(target)) : [target]; hit = hs.filter(h => zonesOf(h.pos).some(z => rooms.includes(z))); }
       for (const h of hit) {
         h.evilEye = G.round;
         if (v === 'AB') markHero(G, h);
@@ -4917,7 +4917,7 @@ async function playOlCard(G, uidC, C, ui, phase) {
       for (const h of hs) {
         const np = h.hand.filter(x => x.panic).length;
         let d = 0, f = 0;
-        if (v[0] === 'B') { f = v === 'BB' ? 3 : 2; d = v === 'BA' ? 1 : 0; }
+        if (v[0] === 'B') { f = v === 'BB' ? 3 : 2; d = v === 'BA' && np ? 1 : 0; }
         else if (np) d = np * (({ A: 2, AA: 3 })[v] || 1);
         else f = v === 'AB' ? 3 : 1;
         if (d) damageHero(G, h, d);
