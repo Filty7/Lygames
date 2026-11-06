@@ -1117,8 +1117,8 @@ const ROOMS_POS={
     tiles:[{kind:'T',feat:'bunker'},{kind:'T',feat:'bunker'}],short:'+2 kryty (chrání před událostmi)'},
   canteen:{name:'Kantýna',desc:'Do balíčku přibudou 2 kantýny. Kdo v kantýně ukončí tah, začne příští kolo se 2 akcemi navíc.',
     tiles:[{kind:'T',feat:'canteen'},{kind:'straight',feat:'canteen'}],short:'+2 kantýny (+2 akce do dalšího kola)'},
-  serum:{name:'Sklad séra',desc:'Do balíčku přibudou 2 slepé uličky s ampulí regeneračního séra. Ampuli seber a vynes portálem. Za sérum si mezi levely koupíš +1 maximální život.',
-    tiles:[{kind:'dead',serum:true},{kind:'dead',serum:true}],short:'+2 ampule séra'},
+  serum:{name:'Sklad séra',desc:'Do balíčku přibudou 2 rovné chodby s ampulí regeneračního séra. Ampuli seber a vynes portálem. Za sérum si mezi levely koupíš +1 maximální život.',
+    tiles:[{kind:'straight',serum:true},{kind:'straight',serum:true}],short:'+2 ampule séra'},
   idol:{name:'Depozitář artefaktů',desc:'Do balíčku přibude destička s obětní soškou a jedna obyčejná.',
     tiles:[{kind:'straight',gem:true},{kind:'straight'}],short:'+1 destička se soškou, +1 obyčejná'}
 };
@@ -1241,7 +1241,7 @@ function buildTestDeck(){   /* test room: ~50 dílků, od každého druhu aspoň
   a('T','hazard');a('corner','hazard');a('cross','hazard');
   a('T','monster');a('straight','monster');a('corner','monster');a('cross','fire');
   a('straight','squeeze');a('straight','squeeze');a('straight','squeeze');
-  a('straight',null,{gem:true});a('straight',null,{gem:true});a('dead',null,{serum:true});
+  a('straight',null,{gem:true});a('straight',null,{gem:true});a('straight',null,{serum:true});
   a('dead','tele');a('T','tele');a('T','quar',{noLedge:true});a('T','spring');a('T','bunker');a('T','canteen');a('straight','canteen');
   a('cross','turret');a('straight','trap');a('cross','slime');a('T','core');a('straight','pipe');a('straight','pipe');
   ['EW','E','W'].forEach(h=>a('stairs',null,{st:{up:true,down:true,h}}));
@@ -1580,7 +1580,7 @@ function down(c){
   if(!c.dead&&!c.buried&&(held(c)||c.ledge||vsq(c.x,c.y))){c.ledge=false;
     c.rope=null;let y=c.y;while(vConn(c.x,y))y++;
     if(y!==c.y){
-      if(UI.ready&&(SEQ.length||UI.playing)){c.seqLock=true;SEQ.push({k:'tok',cid:c.id,x:c.x,y,fall:true,end:true});c.y=y;}
+      if(UI.ready&&(SEQ.length||UI.playing)){seqWalkFirst(c);c.seqLock=true;SEQ.push({k:'tok',cid:c.id,x:c.x,y,fall:true,end:true});c.y=y;}
       else{c.via={x:c.x,y:c.y};c.anim=y-c.y;c.y=y;}
       log(`${c.name} se pustil(a) a sjel(a) až dolů.`,'bad');}
   }
@@ -1710,15 +1710,18 @@ function ghostsAt(x,y){return G.monsters.filter(m=>m.x===x&&m.y===y);}
 function pushUndo(){undoStack.push(JSON.stringify(G));if(undoStack.length>60)undoStack.shift();}
 function undo(){if(!undoStack.length||G.placing||G.over||UI.playing||UI.busy)return;UI.lag={};UI.pending=null;UI.ladShown=null;G=JSON.parse(undoStack.pop());fresh=new Map();SEQ=[];render();}
 
+/* Postava, která se právě pohnula a hned ji něco zasáhlo (radiace, vyčerpání → pád), musí na dílek nejdřív dojít.
+   Krok se vloží na začátek animací této akce, jinak by token zůstal stát a „spadl dřív, než tam vlezl“. */
+function seqWalkFirst(c){if(!UI.ready||c.seqLock)return;const p=G.preAct;if(!p||p.cid!==c.id||(p.x===c.x&&p.y===c.y))return;
+  c.seqLock=true;SEQ.splice(Math.min(G.exAt||0,SEQ.length),0,{k:'tok',cid:c.id,x:c.x,y:c.y});}
 function afterAction(c){
   diveCheck();
   if(G.pendEx){const k=G.pendEx;G.pendEx=0;c.exhausted=true;log(`${c.name} se vyčerpal(a).`,'bad');
-    const at=Math.min(G.exAt||0,SEQ.length),tail=SEQ.splice(at);
-    // pohyb se nejdřív dohraje, teprve pak přijde zranění z vyčerpání (a případný pád / potopení)
-    if(UI.ready&&G.preAct&&G.preAct.cid===c.id&&(G.preAct.x!==c.x||G.preAct.y!==c.y)&&!c.anim){c.seqLock=true;SEQ.push({k:'tok',cid:c.id,x:c.x,y:c.y});}
+    // pořadí: krok na dílek → co se stalo na dílku (test radiace, sliz…) → zranění z vyčerpání → případný pád / potopení
+    if(UI.ready&&!c.anim)seqWalkFirst(c);
     else if(UI.ready&&c.anim)SEQ.push({k:'wait',ms:420+c.anim*160});   /* po skoku/pádu nejdřív dopad, pak zranění */
-    dmg(c,k,'vyčerpání');
-    if(tail.length){SEQ.push({k:'wait',ms:300});SEQ.push(...tail);}}
+    if(UI.ready&&SEQ.length>(G.exAt||0)+(c.seqLock?1:0))SEQ.push({k:'wait',ms:250});
+    dmg(c,k,'vyčerpání');}
   if(G.info){undoStack=[];G.info=false;}
   if(G.active===c.id&&!c.done&&remaining(c)<=0&&!G.tut)endTurn(c,false);   // v tutoriálu se tah ukončuje ručně
 }
@@ -1927,14 +1930,23 @@ function actDyn(c,d){
   // nejdřív spadnou postavy, teprve potom přijde zával
   if(UI.ready){
     SEQ.push({k:'wait',ms:250});const at=SEQ.length,pos=G.chars.map(o=>o.y);
-    applyGravity();surfaceLedge();
+    if(d===S)dynOneHolds(c);applyGravity();surfaceLedge();
     const tail=SEQ.splice(at),falls=[];
     G.chars.forEach((o,i)=>{if(o.y!==pos[i]&&onBoard(o)){o.seqLock=true;o.anim=0;o.via=null;falls.push({k:'tok',cid:o.id,x:o.x,y:o.y,fall:true,end:true});}});
     SEQ.push(...falls,...tail);if(falls.length)SEQ.push({k:'wait',ms:500});
-  }else{applyGravity();surfaceLedge();}
+  }else{if(d===S)dynOneHolds(c);applyGravity();surfaceLedge();}
   dynBlast();
   G.mode='move';afterAction(c);settle();
 }
+/* Díra pod nohama: na lanu / žebříku se udrží jen jeden (náhodný), ostatní spadnou. */
+function dynOneHolds(c){const x=c.x,y0=c.y,grp=G.chars.filter(o=>onBoard(o)&&!o.buried&&!o.downed&&o.x===x&&o.y===y0);if(grp.length<2)return;
+  const rope=G.ropes.find(r=>r.x===x&&r.yTop<=y0&&r.yBottom>=y0),lad=ladderSet().has(x+','+y0);if(!rope&&!lad)return;
+  const keep=pick(grp);grp.forEach(o=>{if(o===keep){o.ledge=false;if(rope)o.rope=rope.id;return;}
+    o.rope=null;o.ledge=false;let y=y0;while(vConn(x,y)&&!flooded(y))y++;const dd=y-y0;if(!dd)return;
+    o.via={x,y:y0};o.anim=dd;o.y=y;log(`${o.name} se na ${rope?'laně':'žebříku'} neudržel(a) – je tam místo jen pro jednoho – a padá o ${dd}!`,'bad');
+    slimePass(o,y0+1,y-1);pipePass(o,y0,y-1);
+    if(!flooded(y)){dmg(o,Math.max(0,dd-alv(o,'jumper')),'pád');if(!o.downed&&!o.dead){landInSqueeze(o);landEffects(o);}}});
+  if(keep!==c)log(`Lana / žebříku se chytil(a) ${keep.name}.`);}
 function dynBlast(){
   const c=G.chars[G.dynBy!=null?G.dynBy:(G.active!=null?G.active:0)];
   if(c&&alv(c,'demo')>=1){SEQ.push({k:'shake'});log('Demolice: výbuch bez závalu.','good');return;}SEQ.push({k:'shake'});SEQ.push({k:'event',ev:'cavein',dyn:true,round:G.round});caveIn({});}
@@ -3302,8 +3314,9 @@ function setupCamera(){
 }
 
 /* ================= MENU, ULOŽENÍ, PRAVIDLA ================= */
-const VERSION='0.82-beta';
+const VERSION='0.83-beta';
 const CHANGELOG=[
+  ['0.83-beta','Pořadí animací, dynamit, kamera u závalu',['Dílek s ampulí séra je rovná chodba, ne slepá ulička. Uložené hry se převedou samy, dílky už vyložené v rozehraném levelu zůstanou.','Pořadí animací: postava nejdřív dojde na dílek, pak dostane zranění (radiace, vyčerpání) a teprve pak spadne. Dřív občas spadla dřív, než tam vůbec vlezla, třeba při lezení po laně do radiace.','Dynamit pod nohama: na lanu nebo žebříku se udrží jen jeden (náhodně vybraný), ostatní spadnou.','Zával: po hodu kostkou jede kamera na každý padající zával zvlášť, jeden po druhém.','Online: hostům se přehrají i animace, které přibyly až během přehrávání.']],
   ['0.82-beta','Oprava pingu',['Ping už se sám nespouští: kontrola spojení, která běží každých 8 vteřin, se omylem hlásila jako ping od ostatních hráčů.','Ping má odpočet 5 vteřin, nedá se spamovat.']],
   ['0.81-beta','Ping a úpravy',['Ping: prostřední tlačítko myši blikne oranžovým rámečkem na dílku a ozve se zvuk. Online ho vidí všichni i se jménem toho, kdo pingnul. Kdo má místo mimo obrazovku, vidí u okraje blikající šipku, klik na ni tam posune kameru.','Deník vidí jen ten, kdo ho otevřel.','Tlačítko Balíček je pryč.','Obrazovka po levelu je širší a bez vodorovného posuvníku. Karty postav se vejdou vedle sebe a texty nepřetékají.','Kritická radiace: lísteček události se ukáže jen jednou a pak už běží jen testy (dřív problikl před testy znovu).']],
   ['0.80-beta','Online multiplayer (beta)',['Nová položka v menu Online multiplayer: hostitel založí novou výpravu, pokračuje v rozehrané nebo načte uloženou a dostane kód hry. Kamarádi se připojí přes Připojit se a zadají kód.','Každý hraje na svém počítači myší a klávesnicí. V online lobby si hráči klikem vezmou postavy a přepíšou jim jména. Hra začne, až má každý aspoň jednu postavu.','Celá hra běží u hostitele a ukládá se u něj. Ostatní ovládají jen své postavy a na konci levelu potvrdí, že jsou hotoví. Plán laboratoře a dialogy ovládá hostitel.','Když se hráč odpojí, může se vrátit stejným kódem a jménem. Do té doby za jeho postavy hraje hostitel.','Hra pro jednoho a lokální multiplayer s ovladači fungují dál úplně stejně a bez internetu.']],
@@ -3410,7 +3423,10 @@ function startRun(){
   RUN=null;newRun(names,UI.nameDiff||'normal');clearSave();UI.live=true;hideMenu();closeModal();showMap();
 }
 // starší uložené výpravy (bez plánu laboratoře) se dopočítají, ať se dá pokračovat
+/* 0.83: dílek se sérem je rovná chodba, ne slepá ulička (staré uložené hry se převedou: nevytažené dílky i plán laboratoře) */
+function fixSerumTiles(arr){(arr||[]).forEach(t=>{if(t&&t.serum&&t.kind==='dead')t.kind='straight';});}
 function migrateRun(){
+  fixSerumTiles(RUN.extra);if(RUN.map&&RUN.map.nodes)Object.values(RUN.map.nodes).forEach(n=>fixSerumTiles(n.tiles));
   if(RUN.act==null)RUN.act=1;if(!RUN.diff)RUN.diff=RUN.chars.length>=4?'easy':RUN.chars.length<=2?'hard':'normal';RUN.chars.forEach(r=>{const cap=Math.max(hpCap(),HP_CAP);if(r.permMax>cap)r.permMax=cap;});if(RUN.hpBuys==null)RUN.hpBuys=RUN.chars.reduce((a,r)=>a+(r.hpBuys||0),0);if(RUN.serum==null)RUN.serum=0;if(RUN.act>=3&&RUN.map&&RUN.map.nodes['5A']&&RUN.map.nodes['5A'].gem){Object.assign(RUN.map.nodes['5A'],{gem:false,win:true,short:'poslední level · vítězství',name:'Srdce reaktoru',desc:'Poslední level celé výpravy. Kdo projde portálem, dovede výpravu k vítězství.'});}if(RUN.gemsTotal==null)RUN.gemsTotal=RUN.gems||0;if(RUN.maxLvl==null)RUN.maxLvl=0;if(RUN.depth==null)RUN.depth=0;if(!RUN.extra)RUN.extra=[];if(!RUN.path)RUN.path=[];
   if(!RUN.map){RUN.map=genMap();const lv=Math.max(1,Math.min(5,RUN.level||1));RUN.path=MAP_TIERS.slice(0,lv).map(t=>t[0]);RUN.pos=RUN.path[RUN.path.length-1];}
   Object.values(RUN.map.nodes).forEach(n=>{if(n.num==null)n.num=(RUN.act-1)*5+n.tier;if(!n.tag)n.tag=n.id.toLowerCase();if(!n.short)n.short='';if(!n.theme)n.theme=n.pool==='start'?'start':n.pool==='final'?'final':n.room?(n.pool==='hos'?'h_'+n.room:n.room):'dead';});
@@ -3418,7 +3434,7 @@ function migrateRun(){
 function continueRun(){
   const sv=loadSave();if(!sv){showNaming();return;}
   hideMenu();closeModal();RUN=sv.RUN;migrateRun();UI.live=true;if(RUN.onMap||!sv.G){showMap();return;}
-  resetView();setSize('9x'+Math.round(sv.G.board.length/9));G=sv.G;undoStack=[];fresh=new Map();SEQ=[];G.chars.forEach(c=>{const r=RUN.chars[c.id];if(r)c.name=r.name;});
+  resetView();setSize('9x'+Math.round(sv.G.board.length/9));G=sv.G;fixSerumTiles(G.deck);undoStack=[];fresh=new Map();SEQ=[];G.chars.forEach(c=>{const r=RUN.chars[c.id];if(r)c.name=r.name;});
   G.chars.forEach(c=>{c.seqLock=false;c.anim=0;c.via=null;});G.ropes.forEach(r=>r.anim=false);G.board.forEach(c=>{if(c){c.rubbleAnim=false;c.fireAnim=false;c.fireNew=false;}});
   G.evPhase=false;UI.busy=false;
   if(!G.over&&G.chars.every(c=>c.done||c.dead||c.escaped)){G.chars.forEach(c=>{if(onBoard(c)){c.done=false;c.used=0;c.started=false;}});}
@@ -3635,7 +3651,7 @@ ${RR(RF('T','tele',[0,1,1,1],{},'teleport'),RF('T','spring',[0,1,1,1],{},'regene
 <tr><td>Regenerace</td><td colspan="2">Konec tahu tady: +3 životy, sraženého postaví. Pod vodou ne.</td></tr>
 <tr><td>Kryt</td><td colspan="2">Nedostane se do něj zával, přízrak ani voda (stojíš v suchu i pod hladinou), nezasáhne tě událost. Dynamit ho neprorazí.</td></tr>
 <tr><td>Kantýna</td><td colspan="2">Konec tahu tady: příští kolo +2 akce.</td></tr>
-<tr><td>Sklad séra</td><td colspan="2">2 slepé uličky s ampulí. Vynes ji portálem.</td></tr>
+<tr><td>Sklad séra</td><td colspan="2">2 rovné chodby s ampulí. Vynes ji portálem.</td></tr>
 <tr><td>Depozitář</td><td colspan="2">1 destička se soškou a 1 obyčejná.</td></tr></table>`,
 
 `${RX('II','Nepřátelské místnosti (patro 4)')}<p class="small">Každá přidá 2 nebezpečné destičky a jedna událost má v tom levelu <b>vždy kritický zásah</b>. Na plánu je označená razítkem.</p>
@@ -4835,7 +4851,7 @@ async function playSeqRun(){
         if(s.sink){setPose(el,c,'sunk');el.style.transitionDuration='1.6s';el.style.transitionTimingFunction='ease-in-out';el.style.transform=tf(tokXY(c,s.x,s.y,'sunk',0));}
         else{el.style.transitionDuration=s.fall?'.35s':'';el.style.transitionTimingFunction=s.fall?'cubic-bezier(.5,0,1,.6)':'';
         el.style.transform=tf(tokXY(c,s.x,s.y,s.fall?'fall':'idle',0));}el._lx=s.x;el._ly=s.y;}
-      await sleep(s.sink?1650:s.fall?380:340);
+      await sleep(s.sink?1650:s.fall?380:440);   /* krok musí doběhnout, než přijde zásah */
       if(s.end){c.seqLock=false;if(el){el._gasp=0;if(!s.sink)landed(el,c,restPose(c));}render();}
       continue;
     }
@@ -4848,6 +4864,7 @@ async function playSeqRun(){
     if(s.k==='rubble'){
       lay.hidden=true;
       if(typeof unlit==='function'&&unlit(s.x,s.y)){SF('rumble',.4);const t=B(s.x,s.y);if(t)t.rubbleAnim=false;G.chars.filter(o=>onBoard(o)&&o.x===s.x&&o.y>=s.y0&&o.y<s.y).forEach(o=>{o._dragged=true;});if(s.apply)s.apply();render();await sleep(150);continue;}   /* ve tmě zával nevidíš, jen slyšíš */
+      if(UI.autoCam&&!UI.fast&&(!camComfort(s.x,s.y0)||!camComfort(s.x,s.y))){centerOn(s.x,Math.round((s.y0+s.y)/2),true);await sleep(460);}   /* kamera na zával, který právě padá (po hodu kostkou, jeden po druhém) */
       SF('rumble');
       const fxl=document.getElementById('fx'),el=document.createElement('div');el.className='rubanim';el.innerHTML=`<img src="${RUB_URL}" alt="">`;
       el.style.left=(s.x*CS)+'px';el.style.top=(s.y0*CS-30)+'px';fxl.appendChild(el);
@@ -5384,7 +5401,9 @@ function netQueueState(now){if(NET.role!=='host'||!NET.started)return;clearTimeo
 function netSendState(){if(NET.role!=='host'||!NET.started)return;if(UI.playing){netQueueState();return;}
   const g=NET.snapDirty&&NET.snapG?NET.snapG:(G?JSON.stringify(G):null);NET.snapDirty=false;
   const body={t:'st',G:g,RUN:RUN?JSON.stringify(RUN):null,view:netView(),scr:netScr()};const key=JSON.stringify(body);if(key===NET.lastSt)return;NET.lastSt=key;netSend(body);netBar();}
-function netSendAct(){const body={t:'act',G:NET.snapG||JSON.stringify(G),RUN:RUN?JSON.stringify(RUN):null,view:netView(),scr:netScr(),fr:NET.snapFr||[],seq:JSON.stringify(SEQ)};NET.lastSt='';netSend(body);}
+const NET_SENT=new WeakSet();   /* položky animací, které už hosté dostali */
+function netSendAct(){const items=SEQ.filter(x=>x&&typeof x==='object'&&!NET_SENT.has(x));if(!items.length)return;items.forEach(x=>NET_SENT.add(x));
+  const body={t:'act',G:NET.snapG||JSON.stringify(G),RUN:RUN?JSON.stringify(RUN):null,view:netView(),scr:netScr(),fr:NET.snapFr||[],seq:JSON.stringify(items)};NET.lastSt='';netSend(body);}
 
 /* ---------- host: příkazy od hostů ---------- */
 function netCtx(el){return ['marks','actions','crewList','tokens','mbox','rmap'].find(id=>el.closest('#'+id))||null;}
@@ -5436,7 +5455,7 @@ document.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest
 (function(){const R0=render;
   render=function(){if(NET.role==='host'&&NET.started&&G&&UI.ready){NET.snapG=JSON.stringify(G);NET.snapFr=[...fresh.keys()];NET.snapDirty=true;}
     const r=R0.apply(this,arguments);if(NET.started){netLockUI();if(NET.role==='host')netQueueState();}return r;};
-  const P0=playSeq;playSeq=function(){if(NET.role==='host'&&NET.started&&SEQ.length&&!UI.playing)netSendAct();const p=P0.apply(this,arguments);
+  const P0=playSeq;playSeq=function(){if(NET.role==='host'&&NET.started&&SEQ.length)netSendAct();   /* i položky přidané během přehrávání */const p=P0.apply(this,arguments);
     if(NET.role==='host'&&NET.started&&p&&p.then)p.then(()=>netQueueState());return p;};
   ['openModal','closeModal','showMap','hideMap','openConf','closeConf','renderShop','renderMap'].forEach(fn=>{const F=window[fn];if(typeof F!=='function')return;
     window[fn]=function(){const r=F.apply(this,arguments);if(NET.role==='host'&&NET.started){if(fn==='renderShop')netShopDecor();netQueueState();}return r;};});})();
