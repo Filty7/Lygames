@@ -2079,9 +2079,9 @@ const EQUIP = {
     ['Úder holí', { t: 'attack', range: 1, dmg: 2, mod: 2, stunGround: true, x2: true }, mv(3)],
     ['Očistný kruh', { t: 'cleanse', range: 2, n: 2, heal: 2, all: true }, mv(3)]] },
   // tělo
-  templar: { name: 'Zbroj padlého templáře', slot: 'telo', tier: 2, cards: [
-    ['Nezlomný', { t: 'armorup', n: 3 }, mv(3)],
-    ['Templářský úder', { t: 'attack', range: 1, dmg: 2, mod: 2, perArmor: 'dmg' }, mv(3)],
+  templar: { name: 'Zbroj padlého templáře', slot: 'telo', tier: 3, cards: [
+    ['Nezlomný', { t: 'armorup', n: 3, steady: true, free: true }, mv(3)],
+    ['Templářský úder', { t: 'attack', range: 1, dmg: 3, mod: 2, perArmor: 'dmg', push: 1 }, mv(3)],
     ['Posedlost', { t: 'cursed' }, { t: 'cursed' }, { cursed: true }]] },
   plast: { name: 'Plášť z rubáše', slot: 'telo', tier: 2, cards: [
     ['Splynout se stínem', { t: 'invis' }, mv(3)],
