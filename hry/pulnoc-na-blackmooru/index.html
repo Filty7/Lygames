@@ -1443,7 +1443,7 @@ const MDEF = {
   sluha: { terror: 1, elusive: true, cat: 'sal', name: 'Služebné přízraky', unit: 'Služebný přízrak', eliteName: 'Komorník', glyph: 'P', cost: 9, respawn: 2, eliteRespawn: 4, minions: { 2: 2, 3: 3, 4: 4 }, ghost: true, flying: true,
     base: { hp: 3, move: 4, range: 1, mod: 1, dmg: 1, fear: 1, evasion: 0, armor: 0 }, elite: { hp: 5, mod: 2, fear: 2 },
     text: 'Přízračný: útoky na něj mají nevýhodu. Přízrak: prochází zdmi i nábytkem, ale nesmí v nich skončit. Létá.', eliteText: 'Komorník: 5♥, útok +2, při zásahu lovec dostane 2 Strach.' },
-  krysy: { cat: 'kobka', name: 'Krysy z hrobky', unit: 'Krysa', eliteName: 'Krysí král', glyph: 'k', cost: 6, respawn: 1, eliteRespawn: 3, minions: { 2: 3, 3: 4, 4: 5 }, swarm: true,
+  krysy: { cat: 'kobka', name: 'Krysy z hrobky', unit: 'Krysa', eliteName: 'Krysí král', glyph: 'k', cost: 6, respawn: 1, eliteRespawn: 3, minions: { 2: 4, 3: 5, 4: 6 }, swarm: true,
     base: { hp: 2, move: 5, range: 1, mod: 1, dmg: 1, fear: 0, evasion: 0, armor: 0 }, elite: { hp: 4, mod: 2, dmg: 2, fear: 1 },
     text: '+1 k útoku za každou další krysu u cíle (max +3).', eliteText: 'Krysí král: 4♥, útok +2, 2 dmg + 1 strach.' },
   zbroj: { guardAdj: true, cat: 'sal', name: 'Posedlé zbroje', unit: 'Posedlá zbroj', eliteName: 'Rytířská zbroj', glyph: 'Z', cost: 12, respawn: 3, eliteRespawn: 6, minions: { 2: 0, 3: 1, 4: 1 },
@@ -1457,7 +1457,7 @@ const MDEF = {
     base: { hp: 4, move: 3, range: 1, mod: 1, dmg: 3, fear: 0, evasion: 0, armor: 0 }, elite: { hp: 7, split: true },
     text: 'Slizová stopa: pole, ze kterého odejde, je do konce příštího kola slizké (vstup za 2 pohyby, kdo na něm skončí tah, utrží 1). Rozprsk: když zemře, jeho pole a sousední pokryje sliz.', eliteText: 'Mateční sliz: 7♥. Když zemře, rozpadne se na 2 malé slimáky.' },
   zalarnik: { cat: 'kobka', name: 'Žalářníci', unit: 'Žalářník', eliteName: 'Kat', glyph: 'Ž', cost: 15, respawn: 3, eliteRespawn: 6, minions: { 2: 1, 3: 1, 4: 2 },
-    base: { hp: 8, move: 3, range: 2, mod: 1, dmg: 2, fear: 0, evasion: 0, armor: 1, chain: 1 }, elite: { hp: 12, mod: 0, dmg: 4, vsHeld: 3 },
+    base: { hp: 8, move: 3, range: 2, mod: 1, dmg: 3, fear: 0, evasion: 0, armor: 1, chain: 1 }, elite: { hp: 12, mod: 0, dmg: 4, vsHeld: 3 },
     text: 'Armor 1. Řetěz: zásah přitáhne lovce o 1 a přišpendlí ho.', eliteText: 'Kat: 12♥, dosah 2, 4 dmg. Zásah přitáhne o 1 a přišpendlí. +3 k útoku na lovce, který už byl přišpendlený.' },
   troll: { cat: 'kobka', boss: true, name: 'Trollové z kanálů', unit: 'Mladý troll', eliteName: 'Obří troll', glyph: 'T', cost: 24, respawn: 8, eliteRespawn: 16, minions: { 2: 1, 3: 1, 4: 1 }, regen: 2,
     base: { hp: 10, move: 3, range: 1, mod: 1, dmg: 3, fear: 0, evasion: 0, armor: 0, push: 1 }, elite: { hp: 20, mod: 2, dmg: 4, fear: 1, armor: 1, push: 1, dismember: true },
@@ -1470,8 +1470,8 @@ const MDEF = {
     base: { hp: 4, move: 0, range: 1, mod: 1, dmg: 2, fear: 0, evasion: 0, armor: 0 }, text: 'Řev: na začátku kola dá lovcům do 3 polí +1 Strach.' },
   // ---- Hřbitov: neklid mrtvých ----
   kostlivci: { retaliate: true, cat: 'hrbitov', name: 'Kostlivci', unit: 'Kostlivec', eliteName: 'Kostěný rytíř', glyph: 'K', cost: 6, respawn: 1, eliteRespawn: 3, minions: { 2: 3, 3: 4, 4: 5 }, raiseOn: 6, rangedResist: 1,
-    base: { hp: 2, move: 3, range: 1, mod: 0, dmg: 1, fear: 0, evasion: 0, armor: 1 }, elite: { hp: 5, mod: 1, dmg: 2 },
-    text: 'Armor 1. Kosti: útoky, které nejsou ze sousedního pole, mají −1. Odplata: kdo na ně útočí zblízka, dostane 1 Strach (rytíř i 1 zranění). Z hrobu vstávají už na 6+.', eliteText: 'Kostěný rytíř: 5♥, útok +1, 2 dmg.' },
+    base: { hp: 2, move: 3, range: 1, mod: 1, dmg: 1, fear: 0, evasion: 0, armor: 1 }, elite: { hp: 5, mod: 1, dmg: 3 },
+    text: 'Armor 1. Kosti: útoky, které nejsou ze sousedního pole, mají −1. Odplata: kdo na ně útočí zblízka, dostane 1 Strach (rytíř i 1 zranění). Z hrobu vstávají už na 6+.', eliteText: 'Kostěný rytíř: 5♥, útok +1, 3 dmg.' },
   ghulove: { cat: 'hrbitov', name: 'Ghúlové', unit: 'Ghúl', eliteName: 'Ghúl-žrout', glyph: 'g', cost: 9, respawn: 2, eliteRespawn: 4, minions: { 2: 1, 3: 2, 4: 3 }, feast: true,
     base: { hp: 4, move: 4, range: 1, mod: 1, dmg: 2, fear: 0, evasion: 0, armor: 0 }, elite: { hp: 7, dmg: 3, fear: 1, glutton: true },
     text: 'Hostina: začíná-li aktivaci vedle hrobu nebo ležícího lovce, vyléčí se o 2 a má +1 k útoku.', eliteText: 'Ghúl-žrout: 7♥, 3 dmg + 1 Strach. Když srazí lovce, Dům +1 Hrozba.' },
@@ -1483,7 +1483,7 @@ const MDEF = {
     text: 'Poloboss. Létá. Aura Žal: lovcům do 2 polí nefungují karty snižující Strach.', eliteText: 'Banshee: 14♥, únik 2. Akce Kvílení: každý lovec v místnosti hodí k10 + odvaha − Strach; pod 5 dostane 2 Strach.' },
   // ---- Zahrada: šlahouny a jed ----
   kvety: { cat: 'zahrada', name: 'Masožravé květy', unit: 'Masožravý květ', eliteName: 'Královna rosnatek', glyph: 'f', cost: 6, respawn: 1, eliteRespawn: 3, minions: { 2: 3, 3: 4, 4: 5 }, immobile: true, scatter: true, vine: 1,
-    base: { hp: 4, move: 0, range: 4, mod: 1, dmg: 2, fear: 0, evasion: 0, armor: 0 }, elite: { hp: 6, dmg: 3, poison: 1 },
+    base: { hp: 4, move: 0, range: 5, mod: 1, dmg: 2, fear: 0, evasion: 0, armor: 0 }, elite: { hp: 6, dmg: 3, poison: 1 },
     text: 'Nehýbou se a Dům je smí rozmístit do různých místností. Šlahoun: zásah přitáhne lovce o 1 a přišpendlí ho.', eliteText: 'Královna rosnatek: 6♥, 3 dmg, zásah dá jed 1.' },
   mury: { cat: 'zahrada', name: 'Můry smrtihlavky', unit: 'Můra smrtihlavka', eliteName: 'Smrtihlav', glyph: 'm', cost: 6, respawn: 1, eliteRespawn: 3, minions: { 2: 3, 3: 4, 4: 5 }, flying: true, lightLove: true,
     base: { hp: 1, move: 5, range: 1, mod: 0, dmg: 1, fear: 1, evasion: 2, armor: 0, poison: 1 }, elite: { hp: 3, mod: 1, dmg: 1, poison: 2 },
@@ -1493,7 +1493,7 @@ const MDEF = {
     text: 'Dokud se poprvé nepohne, vypadá jako dekorace a nejde na něj útočit. Oheň mu neublíží.', eliteText: 'Dýňová hlava: 9♥, dosah 4. Hází hořící dýně: pole cíle a všechna sousední hoří do konce příštího kola.' },
   // ---- Půda: zmatení ----
   oci: { cat: 'puda', name: 'Bludné oči', unit: 'Bludné oko', eliteName: 'Oko domu', glyph: 'o', cost: 6, respawn: 1, eliteRespawn: 3, minions: { 2: 2, 3: 3, 4: 4 }, flying: true, markOnHit: true,
-    base: { hp: 3, move: 4, range: 4, mod: 1, dmg: 1, fear: 1, evasion: 2, armor: 0 }, elite: { hp: 5, mod: 2, dmg: 1, attacks: 2, eye2: true },
+    base: { hp: 2, move: 4, range: 4, mod: 1, dmg: 1, fear: 1, evasion: 2, armor: 0 }, elite: { hp: 5, mod: 2, dmg: 1, attacks: 2, eye2: true },
     text: 'Létají, únik 2. Upřený pohled: zasažený lovec je do konce kola Označen (monstra +1 proti němu a ignorují jeho únik; nemůže být neviditelný).', eliteText: 'Oko domu: útočí 2× za aktivaci, pokaždé na jiného lovce (pokud to jde).' },
   grimoar: { cat: 'puda', name: 'Prokleté grimoáry', unit: 'Grimoár', eliteName: 'Kniha bez jména', glyph: 'b', cost: 12, respawn: 3, eliteRespawn: 5, minions: { 2: 1, 3: 2, 4: 3 }, flying: true, swapOnHit: true,
     base: { hp: 5, move: 3, range: 3, mod: 1, dmg: 2, fear: 0, evasion: 0, armor: 0 }, elite: { hp: 8, fear: 1, burnCard: true },
@@ -1510,14 +1510,14 @@ const MDEF = {
     text: 'Poloboss. Aura Okouzlení: lovci do 2 polí mají −1 k útokům. Pití krve: vyléčí se zraněním, které způsobí. Svěcená voda a oheň mu dávají +2. Na lovce ve Tmě útočí s výhodou.', eliteText: 'Hrabě: 18♥. Akce Netopýři: pohyb 6 skrz lovce a do konce kola nejde zasáhnout.' },
   // ---- Chatrč: lov ----
   havrani: { dive: 5, cat: 'chatrc', name: 'Havrani', unit: 'Havran', eliteName: 'Krkavec', glyph: 'v', cost: 6, respawn: 1, eliteRespawn: 3, minions: { 2: 3, 3: 4, 4: 5 }, flying: true, peck: true,
-    base: { hp: 2, move: 5, range: 1, mod: -2, dmg: 1, fear: 0, evasion: 2, armor: 0 }, elite: { hp: 4, fear: 1, omen: true },
+    base: { hp: 2, move: 5, range: 1, mod: -1, dmg: 1, fear: 0, evasion: 2, armor: 0 }, elite: { hp: 4, fear: 1, omen: true },
     text: 'Létají, únik 2. Nálet: +1 k útoku za každé pole, které v aktivaci uletěli. Vyklovat: zasažený lovec má −1 k útokům do konce svého příštího tahu.', eliteText: 'Krkavec: když zasáhne, Dům si lízne kartu.' },
   vlci: { cat: 'chatrc', name: 'Vlci', unit: 'Vlk', eliteName: 'Alfa', glyph: 'W', cost: 9, respawn: 2, eliteRespawn: 4, minions: { 2: 1, 3: 2, 4: 3 }, pack: true,
     base: { hp: 4, move: 5, range: 1, mod: 0, dmg: 2, fear: 0, evasion: 0, armor: 0 }, elite: { hp: 7, mod: 1, dmg: 3, howl: 3 },
     text: 'Smečka: +1 zranění za každého dalšího vlka u cíle (nejvýš +3).', eliteText: 'Alfa: 7♥, 3 dmg. Akce Vytí: lovci do 3 polí +1 Strach.' },
   carodejnice: { darkAdv: true, cat: 'chatrc', name: 'Čarodějnice z hájovny', unit: 'Čarodějnice', eliteName: 'Baba z chatrče', glyph: 'C', cost: 15, respawn: 3, eliteRespawn: 6, minions: { 2: 1, 3: 1, 4: 2 }, auraDark: 1,
-    base: { hp: 5, move: 3, range: 4, mod: 1, dmg: 2, fear: 0, evasion: 0, armor: 0, poison: 1 }, elite: { hp: 8, mod: 2, fear: 1, cauldron: 2 },
-    text: 'Aura Temný šat: pole do 1 od ní jsou v Tmě. Zásah dá jed 1. Na lovce ve Tmě útočí s výhodou.', eliteText: 'Baba z chatrče: 8♥. Kotel: na konci aktivace vyléčí monstra do 2 polí o 2.' },
+    base: { hp: 5, move: 3, range: 4, mod: 1, dmg: 2, fear: 0, evasion: 0, armor: 0, poison: 1 }, elite: { hp: 7, mod: 2, fear: 1, cauldron: 2 },
+    text: 'Aura Temný šat: pole do 1 od ní jsou v Tmě. Zásah dá jed 1. Na lovce ve Tmě útočí s výhodou.', eliteText: 'Baba z chatrče: 7♥. Kotel: na konci aktivace vyléčí monstra do 2 polí o 2.' },
   vlkodlak: { cat: 'chatrc', boss: true, name: 'Vlkodlaci', unit: 'Prokletý hajný', eliteName: 'Vlkodlak', glyph: 'L', cost: 24, respawn: 8, eliteRespawn: 16, minions: { 2: 1, 3: 1, 4: 1 }, regen: 2, transform: true,
     base: { hp: 8, move: 3, range: 5, mod: 1, dmg: 3, fear: 0, evasion: 0, armor: 0 }, elite: { hp: 18, move: 5, range: 1, mod: 2, dmg: 3, fear: 1, attacks: 2 },
     text: 'Poloboss. Regenerace 2 (oheň ji ruší). Hajný se ve Tmě nebo po prvním zranění promění v menšího vlkodlaka.', eliteText: 'Vlkodlak: 18♥, pohyb 5, dva útoky za aktivaci.' },
@@ -1536,7 +1536,7 @@ const MDEF = {
     text: 'Poručík. Únik 2. Létá, zrcadlem do zrcadla za 1 pohyb. Nářek: když zasáhne, ostatní lovci do 2 polí od cíle dostanou 1 Strach. Nevrací se.' },
 };
 // schopnosti monster pro přehled: [název, krátký popis]
-const MABIL = {"sluha":{"n":[["Přízračný","Útoky na něj mají vždy nevýhodu."],["Přízrak","Prochází zdmi i nábytkem, ale nesmí v nich skončit pohyb."],["Létá","Prochází lovci a ignoruje terén na zemi (náročný terén, oheň, pasti)."],["Teror","+1 k útoku proti lovci, který má 2 a více Strachu."]],"e":[["Mrazivý dotek","Při zásahu lovec dostane 2 Strach."]]},"krysy":{"n":[["Roj","+1 k útoku za každou další krysu u cíle (max +3)."]],"e":[["Krysí král","Při zásahu lovec dostane navíc 1 Strach."]]},"zbroj":{"n":[["Pancíř","Armor 1."],["Strážce","Sousední monstra mají +1 armor."]],"e":[["Úder štítem","Při zásahu lovec dostane 1 Strach a je odhozen o 1."]]},"polt":{"n":[["Přízračný","Útoky na něj mají vždy nevýhodu."],["Létá","Prochází lovci a ignoruje terén na zemi (náročný terén, oheň, pasti)."],["Neviditelný","Na začátku kola ho nevidíš, útokem se odhalí."],["Teror","+1 k útoku proti lovci, který má 2 a více Strachu."]],"e":[["Řev","Akce 1× za aktivaci: lovci do 3 polí +1 Strach."]]},"slimak":{"n":[["Slizová stopa","Opuštěné pole je slizké do konce příštího kola: vstup za 2, konec tahu na něm = 1 zranění."],["Rozprsk","Když zemře, jeho pole a sousední pokryje sliz do konce příštího kola."]],"e":[["Rozpad","Po smrti se rozpadne na 2 malé slimáky."]]},"zalarnik":{"n":[["Pancíř","Armor 1."],["Řetěz","Zásah přitáhne lovce o 1 a přišpendlí ho."]],"e":[["Sekera","Dosah 2, 4 zranění; zásah přitáhne o 1 a přišpendlí."],["Poprava","+3 k útoku na lovce, který už byl přišpendlený před útokem."]]},"troll":{"n":[["Poloboss",""],["Regenerace","Na konci kola +2 ♥ (ne po ohni)."]],"e":[["Rozpad těla","Při 15, 10 a 5 ♥ upadne ruka, noha a hlava a jednají samy."]]},"trollruka":{"n":[["Sevření","Zasažený lovec se nehne, dokud ruka znovu nejedná nebo nezemře."]],"e":[]},"trollnoha":{"n":[["Kopanec","Odhodí lovce o 2."]],"e":[]},"trollhlava":{"n":[["Řev","Na začátku kola lovci do 3 polí +1 Strach."]],"e":[]},"kostlivci":{"n":[["Pancíř","Armor 1."],["Kosti","Útoky, které nejsou ze sousedního pole, mají −1."],["Neklid","Z hrobu vstávají už na 6+."],["Odplata","Kdo na něj útočí ze sousedního pole, dostane 1 Strach."]],"e":[["Kostěná odplata","Odplata dá navíc 1 zranění."]]},"ghulove":{"n":[["Hostina","Začíná vedle hrobu nebo ležícího lovce: +2 ♥ a +1 k útoku."]],"e":[["Žrout","Když srazí lovce, Dům +1 Hrozba."]]},"hrobnik":{"n":[["Pán hřbitova","Aura 3: všechna ostatní monstra +1 k útoku."]],"e":[["Pohřební obřad","Akce: hned zvedne hrob do 3 polí."]]},"banshee":{"n":[["Poloboss",""],["Přízrak","Prochází zdmi i nábytkem, ale nesmí v nich skončit pohyb."],["Létá","Prochází lovci a ignoruje terén na zemi (náročný terén, oheň, pasti)."],["Žal","Aura 2: lovcům nefungují karty snižující Strach."],["Teror","+1 k útoku proti lovci, který má 2 a více Strachu."]],"e":[["Kvílení","Akce: lovci v místnosti hodí k10 + odvaha − Strach; pod 5 = +2 Strach."]]},"kvety":{"n":[["Kořeny","Nehýbe se; Dům je smí rozmístit do různých místností."],["Šlahoun","Zásah přitáhne lovce o 1 a přišpendlí ho."]],"e":[["Jed","Zásah dá jed 1."]]},"mury":{"n":[["Létá","Prochází lovci a ignoruje terén na zemi (náročný terén, oheň, pasti)."],["Světlomilné","+1 k útoku na lovce mimo Tmu."],["Jed","Zásah dá jed 1."]],"e":[["Silný jed","Zásah dá jed 2."]]},"strasaci":{"n":[["Dekorace","Dokud se nepohne, nejde na něj útočit."],["Ohnivzdorný","Oheň mu neublíží."]],"e":[["Hořící dýně","Zasažené pole a všechna sousední hoří do konce příštího kola."]]},"oci":{"n":[["Létá","Prochází lovci a ignoruje terén na zemi (náročný terén, oheň, pasti)."],["Upřený pohled","Zasažený lovec je do konce kola Označený: monstra +1 proti němu a ignorují jeho únik, nemůže být neviditelný."]],"e":[["Dvojí pohled","Útočí 2× za aktivaci, pokaždé na jiného lovce (pokud to jde)."]]},"grimoar":{"n":[["Létá","Prochází lovci a ignoruje terén na zemi (náročný terén, oheň, pasti)."],["Prohození","Po zásahu si s lovcem prohodí místo."]],"e":[["Prázdné stránky","Při zásahu lovec dostane 1 Strach a odhodí náhodnou kartu."]]},"panenky":{"n":[["Když se nikdo nedívá","Nevidí-li ji na začátku aktivace žádný lovec (výhled blokují zdi, vysoký nábytek i jiné postavy): +3 pohyb, +2 k útoku."],["Dítě noci","Na lovce, který stojí ve Tmě, útočí s výhodou."]],"e":[["Nůžky","Zásah dá krvácení 1."]]},"kapela":{"n":[["Přízrak","Prochází zdmi i nábytkem, ale nesmí v nich skončit pohyb."],["Létá","Prochází lovci a ignoruje terén na zemi (náročný terén, oheň, pasti)."],["Valčík","Aura 3: monstra +1 pohyb."],["Teror","+1 k útoku proti lovci, který má 2 a více Strachu."]],"e":[["Crescendo","Aura navíc +1 k útoku."],["Danse macabre","Akce: přesune lovce do 3 polí o 2."]]},"upir":{"n":[["Poloboss",""],["Okouzlení","Aura 2: lovci −1 k útokům."],["Pití krve","Vyléčí se o způsobené zranění."],["Slabina","Svěcená voda a oheň +2 zranění."],["Dítě noci","Na lovce, který stojí ve Tmě, útočí s výhodou."]],"e":[["Netopýři","Akce: pohyb 6 skrz lovce, do konce kola nezasažitelný."]]},"havrani":{"n":[["Létá","Prochází lovci a ignoruje terén na zemi (náročný terén, oheň, pasti)."],["Nálet","Útok −2, ale +1 za každé pole, které v této aktivaci uletěl (max +3 při plném letu)."],["Vyklovat","Zasažený lovec −1 k útokům do konce svého tahu."]],"e":[["Zlé znamení","Když zasáhne, Dům si lízne kartu."]]},"vlci":{"n":[["Smečka","+1 zranění za každého dalšího vlka u cíle (max +3)."]],"e":[["Vytí","Akce: lovci do 3 polí +1 Strach."]]},"carodejnice":{"n":[["Temný šat","Aura 1: pole kolem ní jsou v Tmě."],["Jed","Zásah dá jed 1."],["Dítě noci","Na lovce, který stojí ve Tmě, útočí s výhodou."]],"e":[["Kotel","Na konci aktivace léčí monstra do 2 polí o 2."]]},"vlkodlak":{"n":[["Poloboss",""],["Regenerace","Na konci kola +2 ♥ (ne po ohni)."],["Proměna","Ve Tmě nebo po zranění se z hajného stane vlkodlak."]],"e":[["Běsnění","Dva útoky za aktivaci."]]},"obel_tma":{"n":[["Pancíř","Armor 1."],["Věčná tma","Jeho místnost je v Tmě, světlo nepomůže."]],"e":[]},"obel_bolest":{"n":[["Pancíř","Armor 1."],["Paprsek bolesti","Lovec skončí tah v jeho místnosti: všichni lovci v ní −1 ♥."]],"e":[]},"obel_led":{"n":[["Pancíř","Armor 1."],["Mráz","Lovec začne tah v jeho místnosti: o 1 akci méně."]],"e":[]},"obel_hlad":{"n":[["Pancíř","Armor 1."],["Hlad","Na konci kola léčí monstra v místnosti o 2, Dům +1 Hrozba."]],"e":[]},"vdova":{"n":[["Poručík","Nevrací se."],["Létá","Prochází lovci a ignoruje terén na zemi (náročný terén, oheň, pasti)."],["Zrcadla","Ze zrcadla do zrcadla za 1 pohyb."],["Nářek","Když zasáhne, lovci do 2 od cíle +1 Strach."]],"e":[]}};
+const MABIL = {"sluha":{"n":[["Přízračný","Útoky na něj mají vždy nevýhodu."],["Přízrak","Prochází zdmi i nábytkem, ale nesmí v nich skončit pohyb."],["Létá","Prochází lovci a ignoruje terén na zemi (náročný terén, oheň, pasti)."],["Teror","+1 k útoku proti lovci, který má 2 a více Strachu."]],"e":[["Mrazivý dotek","Při zásahu lovec dostane 2 Strach."]]},"krysy":{"n":[["Roj","+1 k útoku za každou další krysu u cíle (max +3)."]],"e":[["Krysí král","Při zásahu lovec dostane navíc 1 Strach."]]},"zbroj":{"n":[["Pancíř","Armor 1."],["Strážce","Sousední monstra mají +1 armor."]],"e":[["Úder štítem","Při zásahu lovec dostane 1 Strach a je odhozen o 1."]]},"polt":{"n":[["Přízračný","Útoky na něj mají vždy nevýhodu."],["Létá","Prochází lovci a ignoruje terén na zemi (náročný terén, oheň, pasti)."],["Neviditelný","Na začátku kola ho nevidíš, útokem se odhalí."],["Teror","+1 k útoku proti lovci, který má 2 a více Strachu."]],"e":[["Řev","Akce 1× za aktivaci: lovci do 3 polí +1 Strach."]]},"slimak":{"n":[["Slizová stopa","Opuštěné pole je slizké do konce příštího kola: vstup za 2, konec tahu na něm = 1 zranění."],["Rozprsk","Když zemře, jeho pole a sousední pokryje sliz do konce příštího kola."]],"e":[["Rozpad","Po smrti se rozpadne na 2 malé slimáky."]]},"zalarnik":{"n":[["Pancíř","Armor 1."],["Řetěz","Zásah přitáhne lovce o 1 a přišpendlí ho."]],"e":[["Sekera","Dosah 2, 4 zranění; zásah přitáhne o 1 a přišpendlí."],["Poprava","+3 k útoku na lovce, který už byl přišpendlený před útokem."]]},"troll":{"n":[["Poloboss",""],["Regenerace","Na konci kola +2 ♥ (ne po ohni)."]],"e":[["Rozpad těla","Při 15, 10 a 5 ♥ upadne ruka, noha a hlava a jednají samy."]]},"trollruka":{"n":[["Sevření","Zasažený lovec se nehne, dokud ruka znovu nejedná nebo nezemře."]],"e":[]},"trollnoha":{"n":[["Kopanec","Odhodí lovce o 2."]],"e":[]},"trollhlava":{"n":[["Řev","Na začátku kola lovci do 3 polí +1 Strach."]],"e":[]},"kostlivci":{"n":[["Pancíř","Armor 1."],["Kosti","Útoky, které nejsou ze sousedního pole, mají −1."],["Neklid","Z hrobu vstávají už na 6+."],["Odplata","Kdo na něj útočí ze sousedního pole, dostane 1 Strach."]],"e":[["Kostěná odplata","Odplata dá navíc 1 zranění."]]},"ghulove":{"n":[["Hostina","Začíná vedle hrobu nebo ležícího lovce: +2 ♥ a +1 k útoku."]],"e":[["Žrout","Když srazí lovce, Dům +1 Hrozba."]]},"hrobnik":{"n":[["Pán hřbitova","Aura 3: všechna ostatní monstra +1 k útoku."]],"e":[["Pohřební obřad","Akce: hned zvedne hrob do 3 polí."]]},"banshee":{"n":[["Poloboss",""],["Přízrak","Prochází zdmi i nábytkem, ale nesmí v nich skončit pohyb."],["Létá","Prochází lovci a ignoruje terén na zemi (náročný terén, oheň, pasti)."],["Žal","Aura 2: lovcům nefungují karty snižující Strach."],["Teror","+1 k útoku proti lovci, který má 2 a více Strachu."]],"e":[["Kvílení","Akce: lovci v místnosti hodí k10 + odvaha − Strach; pod 5 = +2 Strach."]]},"kvety":{"n":[["Kořeny","Nehýbe se; Dům je smí rozmístit do různých místností."],["Šlahoun","Zásah přitáhne lovce o 1 a přišpendlí ho."]],"e":[["Jed","Zásah dá jed 1."]]},"mury":{"n":[["Létá","Prochází lovci a ignoruje terén na zemi (náročný terén, oheň, pasti)."],["Světlomilné","+1 k útoku na lovce mimo Tmu."],["Jed","Zásah dá jed 1."]],"e":[["Silný jed","Zásah dá jed 2."]]},"strasaci":{"n":[["Dekorace","Dokud se nepohne, nejde na něj útočit."],["Ohnivzdorný","Oheň mu neublíží."]],"e":[["Hořící dýně","Zasažené pole a všechna sousední hoří do konce příštího kola."]]},"oci":{"n":[["Létá","Prochází lovci a ignoruje terén na zemi (náročný terén, oheň, pasti)."],["Upřený pohled","Zasažený lovec je do konce kola Označený: monstra +1 proti němu a ignorují jeho únik, nemůže být neviditelný."]],"e":[["Dvojí pohled","Útočí 2× za aktivaci, pokaždé na jiného lovce (pokud to jde)."]]},"grimoar":{"n":[["Létá","Prochází lovci a ignoruje terén na zemi (náročný terén, oheň, pasti)."],["Prohození","Po zásahu si s lovcem prohodí místo."]],"e":[["Prázdné stránky","Při zásahu lovec dostane 1 Strach a odhodí náhodnou kartu."]]},"panenky":{"n":[["Když se nikdo nedívá","Nevidí-li ji na začátku aktivace žádný lovec (výhled blokují zdi, vysoký nábytek i jiné postavy): +3 pohyb, +2 k útoku."],["Dítě noci","Na lovce, který stojí ve Tmě, útočí s výhodou."]],"e":[["Nůžky","Zásah dá krvácení 1."]]},"kapela":{"n":[["Přízrak","Prochází zdmi i nábytkem, ale nesmí v nich skončit pohyb."],["Létá","Prochází lovci a ignoruje terén na zemi (náročný terén, oheň, pasti)."],["Valčík","Aura 3: monstra +1 pohyb."],["Teror","+1 k útoku proti lovci, který má 2 a více Strachu."]],"e":[["Crescendo","Aura navíc +1 k útoku."],["Danse macabre","Akce: přesune lovce do 3 polí o 2."]]},"upir":{"n":[["Poloboss",""],["Okouzlení","Aura 2: lovci −1 k útokům."],["Pití krve","Vyléčí se o způsobené zranění."],["Slabina","Svěcená voda a oheň +2 zranění."],["Dítě noci","Na lovce, který stojí ve Tmě, útočí s výhodou."]],"e":[["Netopýři","Akce: pohyb 6 skrz lovce, do konce kola nezasažitelný."]]},"havrani":{"n":[["Létá","Prochází lovci a ignoruje terén na zemi (náročný terén, oheň, pasti)."],["Nálet","Útok −1, ale +1 za každé pole, které v této aktivaci uletěl (max +3 při plném letu)."],["Vyklovat","Zasažený lovec −1 k útokům do konce svého tahu."]],"e":[["Zlé znamení","Když zasáhne, Dům si lízne kartu."]]},"vlci":{"n":[["Smečka","+1 zranění za každého dalšího vlka u cíle (max +3)."]],"e":[["Vytí","Akce: lovci do 3 polí +1 Strach."]]},"carodejnice":{"n":[["Temný šat","Aura 1: pole kolem ní jsou v Tmě."],["Jed","Zásah dá jed 1."],["Dítě noci","Na lovce, který stojí ve Tmě, útočí s výhodou."]],"e":[["Kotel","Na konci aktivace léčí monstra do 2 polí o 2."]]},"vlkodlak":{"n":[["Poloboss",""],["Regenerace","Na konci kola +2 ♥ (ne po ohni)."],["Proměna","Ve Tmě nebo po zranění se z hajného stane vlkodlak."]],"e":[["Běsnění","Dva útoky za aktivaci."]]},"obel_tma":{"n":[["Pancíř","Armor 1."],["Věčná tma","Jeho místnost je v Tmě, světlo nepomůže."]],"e":[]},"obel_bolest":{"n":[["Pancíř","Armor 1."],["Paprsek bolesti","Lovec skončí tah v jeho místnosti: všichni lovci v ní −1 ♥."]],"e":[]},"obel_led":{"n":[["Pancíř","Armor 1."],["Mráz","Lovec začne tah v jeho místnosti: o 1 akci méně."]],"e":[]},"obel_hlad":{"n":[["Pancíř","Armor 1."],["Hlad","Na konci kola léčí monstra v místnosti o 2, Dům +1 Hrozba."]],"e":[]},"vdova":{"n":[["Poručík","Nevrací se."],["Létá","Prochází lovci a ignoruje terén na zemi (náročný terén, oheň, pasti)."],["Zrcadla","Ze zrcadla do zrcadla za 1 pohyb."],["Nářek","Když zasáhne, lovci do 2 od cíle +1 Strach."]],"e":[]}};
 for (const k of Object.keys(MABIL)) if (MDEF[k]) { MDEF[k].abil = MABIL[k].n; MDEF[k].eliteAbil = MABIL[k].e; }
 const CATS = { kobka: 'Kobka', hrbitov: 'Hřbitov', zahrada: 'Zahrada', puda: 'Půda', sal: 'Panství', chatrc: 'Chatrč', boss: 'Poručík' };
 const CAT_MECH = {
@@ -1566,7 +1566,7 @@ const EQUIP = {
   stit: { name: 'Okovaný štít', slot: 'ruka', tier: 0, cards: [
     ['Štítem napřed', { t: 'charge', n: 2, dmg: 2, mod: 1, push: 1 }, mv(3)],
     ['Úder štítem', { t: 'attack', range: 1, dmg: 2, mod: 1, perArmor: 'dmg', uncapped: true }, mv(3)],
-    ['Přehoz', { t: 'swapatk', range: 1, dmg: 2, mod: 1 }, mv(3)]] },
+    ['Přehoz', { t: 'swapatk', range: 1, dmg: 3, mod: 1 }, mv(3)]] },
   kyrys: { name: 'Kyrys', slot: 'telo', tier: 0, cards: [
     ['Pevný postoj', { t: 'armorup', n: 1 }, mv(3)],
     ['Ramenem', { t: 'shove', n: 2 }, mv(3)],
@@ -1580,7 +1580,7 @@ const EQUIP = {
     ['Hrst soli', { t: 'attack', range: 2, dmg: 1, mod: 3, disarm: true, x2: true }, mv(2)],
     ['Očista', { t: 'cleanse', range: 2, n: 2, heal: 1 }, SE]] },
   lekarnicka: { name: 'Lékárnička', slot: 'telo', tier: 1, cards: [
-    ['Obvaz', { t: 'heal', range: 1, n: 3, free: true }, mv(3)],
+    ['Obvaz', { t: 'heal', range: 1, n: 2, free: true }, mv(3)],
     ['Čichací sůl', { t: 'heal', range: 2, n: 2 }, mv(3)],
     ['Kapky na nervy', { t: 'cleanse', range: 1, n: 3, heal: 0 }, SE]] },
   svice: { name: 'Černá svíce', slot: 'telo', tier: 0, cards: [
@@ -1615,7 +1615,7 @@ const EQUIP = {
   // ruka
   dyka: { name: 'Lovecká dýka', slot: 'ruka', tier: 1, cards: [
     ['Bodnutí', { t: 'attack', range: 1, dmg: 3, mod: 1, ignoreEv: true, flank: 2 }, mv(4)],
-    ['Dvojitý výpad', { t: 'attack', range: 1, dmg: 1, mod: 3, shots: 2, bleed: 1 }, mv(3)],
+    ['Dvojitý výpad', { t: 'attack', range: 1, dmg: 1, mod: 3, shots: 2, bleed: 1, bleedFirst: true }, mv(3)],
     ['Hod dýkou', { t: 'attack', range: 3, dmg: 2, mod: 2, mark: true }, mv(3)]] },
   derringer: { name: 'Derringer', slot: 'ruka', tier: 2, cards: [
     ['Kulka', { t: 'attack', range: 5, dmg: 3, mod: 1, ignoreAr: true }, mv(3)],
@@ -1636,7 +1636,7 @@ const EQUIP = {
   krucifix: { name: 'Krucifix', slot: 'ruka', tier: 1, cards: [
     ['Zpět!', { t: 'repel', range: 2, n: 2, freeIfAdj: true }, mv(3)],
     ['Požehnání', { t: 'react', kind: 'ward', fear: 2, dmg: 0, ally: 1, both: true, pushBack: 1 }, mv(3)],
-    ['Svatá pečeť', { t: 'salt', around: true }, SE]] },
+    ['Svatá pečeť', { t: 'salt', around: true, calm: 1 }, SE]] },
   // obě ruce
   kopi: { name: 'Stříbrné kopí opata Benedikta', slot: 'obourucni', tier: 4, rare: true, cards: [
     ['Bodnutí kopím', { t: 'attack', range: 2, dmg: 4, mod: 2, ignoreEv: true, pierce: true, holy: true }, mv(3)],
@@ -1655,15 +1655,15 @@ const EQUIP = {
     ['Úder holí', { t: 'attack', range: 1, dmg: 2, mod: 2, stunGround: true, x2: true }, mv(3)],
     ['Očistný kruh', { t: 'cleanse', range: 2, n: 2, heal: 2, all: true }, mv(3)]] },
   // tělo
-  templar: { name: 'Zbroj padlého templáře', slot: 'telo', tier: 2, cards: [
-    ['Nezlomný', { t: 'armorup', n: 2 }, mv(3)],
+  templar: { name: 'Zbroj padlého templáře', slot: 'telo', tier: 3, cards: [
+    ['Nezlomný', { t: 'armorup', n: 3 }, mv(3)],
     ['Templářský úder', { t: 'attack', range: 1, dmg: 2, mod: 2, perArmor: 'dmg' }, mv(3)],
     ['Posedlost', { t: 'cursed' }, { t: 'cursed' }, { cursed: true }]] },
   plast: { name: 'Plášť z rubáše', slot: 'telo', tier: 2, cards: [
     ['Splynout se stínem', { t: 'invis' }, mv(3)],
     ['Mlha', { t: 'phase', evade: 1, free: true }, mv(3)],
     ['Prázdný plášť', { t: 'react', kind: 'dodge', selfFear: 1 }, mv(2)]] },
-  vesta: { name: 'Polní lékařská vesta', slot: 'telo', tier: 1, cards: [
+  vesta: { name: 'Polní lékařská vesta', slot: 'telo', tier: 2, cards: [
     ['Morfium', { t: 'heal', range: 1, n: 3, fearCost: 1 }, mv(3)],
     ['Škrtidlo', { t: 'raise', range: 1, half: true, heal: 4 }, mv(3)],
     ['Kapsy plné všeho', { t: 'drawdisc', draw: 2, disc: 0, free: true }, SE]] },
@@ -1675,7 +1675,7 @@ const EQUIP = {
   utopenec: { name: 'Boty utopence', slot: 'nohy', tier: 3, cards: [
     ['Bez stopy', { t: 'invis' }, mv(3)],
     ['Tichý krok', { t: 'haste', n: 2, noPhase: true, free: true }, mv(3)],
-    ['Mokré stopy', { t: 'blink', range: 5, advNext: true }, mv(3)]] },
+    ['Mokré stopy', { t: 'blink', range: 5, advNext: true, free: true }, mv(3)]] },
   okovane: { name: 'Okované boty', slot: 'nohy', tier: 1, cards: [
     ['Dupnutí', { t: 'stomp' }, mv(2)],
     ['Pevně stát', { t: 'armorup', n: 1, steady: true, free: true }, mv(2)],
@@ -1690,11 +1690,11 @@ const EQUIP = {
     ['Seč z místa', { t: 'attack', range: 2, dmg: 3, mod: 1, stillBonus: { mod: 1, dmg: 1 } }, mv(2)]] },
   sekera: { name: 'Bojová sekera', slot: 'obourucni', tier: 2, cards: [
     ['Rozpolcení', { t: 'attack', range: 1, dmg: 5, mod: 0, selfDmg: 1 }, mv(3)],
-    ['Krvavá sklizeň', { t: 'sweep', range: 1, dmg: 2, mod: 1, lifesteal: 1 }, mv(3)],
-    ['Bojová extáze', { t: 'buff', mod: 1, dmg: 1, lifesteal: 1 }, mv(3)]] },
+    ['Krvavá sklizeň', { t: 'sweep', range: 1, dmg: 2, mod: 1, lifesteal: 1, selfDmg: 2 }, mv(3)],
+    ['Bojová extáze', { t: 'buff', mod: 1, dmg: 1, lifesteal: 1, selfDmg: 2 }, mv(3)]] },
   lebka: { name: 'Lebka věštkyně', slot: 'ruka', tier: 2, cards: [
     ['Hlas zemřelých', { t: 'attack', range: 4, dmg: 3, mod: 2, selfFear: 1, panicBoost: { dmg: 2 } }, mv(3)],
-    ['Výkřik z hrobu', { t: 'repel', range: 2, n: 2, one: true, panicBoost: { one: false, stun: true } }, mv(3)],
+    ['Výkřik z hrobu', { t: 'repel', range: 2, n: 2, one: true, dmg: 1, panicBoost: { one: false, stun: true } }, mv(3)],
     ['Temný pakt', { t: 'drawdisc', draw: 2, disc: 0, selfFear: 2, free: true }, mv(2)]] },
   zvonek: { name: 'Zvoneček duchů', slot: 'ruka', tier: 3, rare: true, cards: [
     ['Přivolání', { t: 'summon', kind: 'ohnik', dmg: 2, mod: 2, move: 5, rounds: 99, selfFear: 1 }, mv(3)],
@@ -1713,13 +1713,13 @@ const EQUIP = {
     ['Lampička', { t: 'light' }, mv(3)],
     ['Nástražná past', { t: 'htrap', range: 2, dmg: 2, root: true }, mv(3)]] },
   jed: { name: 'Lahvička jedu', slot: 'telo', tier: 1, cards: [
-    ['Napuštění čepele', { t: 'venom', free: true }, mv(3)],
+    ['Napuštění čepele', { t: 'venom' }, mv(3)],
     ['Jedová šipka', { t: 'attack', range: 4, dmg: 1, mod: 2, poison: 2 }, mv(3)],
     ['Protijed', { t: 'antidote', heal: 1 }, mv(3)]] },
   lehke: { name: 'Lehké boty', slot: 'nohy', tier: 1, cards: [
-    ['Úskok', { t: 'phase', evade: 1 }, mv(3)],
+    ['Úskok', { t: 'phase', evade: 2 }, mv(3)],
     ['Kličkování', { t: 'evade', n: 2 }, mv(4)],
-    ['Sprint', { t: 'sprint' }, mv(3)]] },
+    ['Sprint', { t: 'sprint', free: true }, mv(3)]] },
   // amulety: pasivní schopnost, žádné karty
   zajic: { name: 'Zaječí tlapka', slot: 'trinket', tier: 1, passive: 'Jednou za kolo: když tvůj útok mine, hoď znovu.', cards: [] },
   medailon: { name: 'Medailon odvahy', slot: 'trinket', tier: 1, passive: 'Odvaha +1.', cards: [] },
@@ -1746,15 +1746,15 @@ const ABIL = {
     { key: 'basta', cat: 'Bašta', tree: {
       '': T('Kryt', { t: 'react', kind: 'guard', dmg: 2, fear: 1, ally: 1 }, SE_),
       A: T('Železná zeď', { t: 'armorup', n: 2, ally: 2, allyN: 1 }, SE_),
-      AA: T('Nedobytný', { t: 'armorup', n: 3, ally: 2, allyN: 2 }, SE_),
+      AA: T('Nedobytný', { t: 'armorup', n: 2, ally: 2, allyN: 2 }, SE_),
       AB: T('Hradba', { t: 'armorup', n: 2, ally: 99, allyN: 1 }, SE_),
       B: T('Drtivý štít', { t: 'react', kind: 'guard', dmg: 3, fear: 2, ally: 1, retort: 1, retortAdj: true }, SE_),
       BA: T('Kovadlina', { t: 'react', kind: 'guard', dmg: 4, fear: 3, ally: 1, retort: 2, retortAdj: true }, SE_),
-      BB: T('Odplata', { t: 'react', kind: 'guard', dmg: 2, fear: 2, ally: 1, retort: 3 }, SE_) } },
+      BB: T('Odplata', { t: 'react', kind: 'guard', dmg: 2, fear: 2, ally: 1, retort: 2 }, SE_) } },
     { key: 'stoj', cat: 'Nehybný', tree: {
-      '': T('Výzva', { t: 'pull', range: 3 }, mv(2)),
+      '': T('Výzva', { t: 'pull', range: 3, root: true }, mv(2)),
       A: T('Hák a štít', { t: 'pull', range: 3, disarm: true }, mv(2)),
-      AA: T('Strach z vojáka', { t: 'yank', range: 3, all: true, pull: 2, disarm: true, perHex: 1 }, mv(2)),
+      AA: T('Strach z vojáka', { t: 'yank', range: 3, all: true, pull: 2, disarm: true, dmgEach: 1 }, mv(2)),
       AB: T('Dvě výzvy', { t: 'yank', range: 5, n: 2, pull: 3, disarm: true }, mv(4)),
       B: T('Kotva', { t: 'anchor', armor: 1, mod: 1, dmg: 0 }, mv(2)),
       BA: T('Skála', { t: 'anchor', armor: 2, mod: 1, dmg: 1 }, mv(2)),
@@ -1762,37 +1762,37 @@ const ABIL = {
     { key: 'zurivost', cat: 'Zuřivost', tree: {
       '': T('Krvavá daň', { t: 'buff', mod: 1, dmg: 1, selfDmg: 1 }),
       A: T('Rudá mlha', { t: 'buff', mod: 1, dmg: 2, selfDmg: 1 }),
-      AA: T('Berserk', { t: 'buff', mod: 2, dmg: 2, selfDmg: 2, lifesteal: true }),
+      AA: T('Berserk', { t: 'buff', mod: 2, dmg: 1, selfDmg: 2, lifesteal: true }),
       AB: T('Krvavý tanec', { t: 'buff', mod: 2, dmg: 3, selfDmg: 1 }),
-      B: T('Krvelačný sek', { t: 'attack', range: 1, dmg: 3, mod: 0, selfDmg: 2, lifesteal: true }),
-      BA: T('Žízeň', { t: 'attack', range: 1, dmg: 3, mod: 2, selfDmg: 2, lifesteal: true }),
+      B: T('Krvelačný sek', { t: 'attack', range: 1, dmg: 3, mod: 1, selfDmg: 2, lifesteal: true }),
+      BA: T('Žízeň', { t: 'attack', range: 1, dmg: 3, mod: 3, selfDmg: 2, lifesteal: true }),
       BB: T('Krvavý vír', { t: 'sweep', range: 1, dmg: 2, mod: 1, selfDmg: 2, lifesteal: true }) } },
   ],
   varga: [
     // Panika: odstrkování; každá karta dá Iloně 1 Strach; s odhozenou Panikou zasáhne všechna monstra v dosahu
     { key: 'panika', cat: 'Panika', tree: {
-      '': T('Odpuzení', { t: 'blast', range: 2, n: 2, one: true, root: true, selfFear: 1, panicBoost: { one: false } }),
-      A: T('Náraz děsu', { t: 'blast', range: 2, n: 2, one: true, dmg: 1, root: true, selfFear: 1, panicBoost: { one: false } }, mv(3)),
-      B: T('Roztřesení', { t: 'blast', range: 2, n: 2, one: true, disNext: true, selfFear: 1, panicBoost: { one: false } }),
-      AA: T('Drtivý děs', { t: 'blast', range: 2, n: 2, one: true, dmg: 2, root: true, selfFear: 1, panicBoost: { one: false } }, mv(2)),
-      AB: T('Vlna děsu', { t: 'blast', range: 3, n: 2, one: true, dmg: 1, root: true, selfFear: 1, panicBoost: { one: false } }, mv(4)),
-      BA: T('Cejch strachu', { t: 'blast', range: 2, n: 2, one: true, disNext: true, mark: true, selfFear: 1, panicBoost: { one: false } }, mv(2)),
-      BB: T('Výkřik', { t: 'blast', range: 4, n: 3, one: true, disNext: true, selfFear: 1, panicBoost: { one: false } }, mv(4)) } },
+      '': T('Odpuzení', { t: 'blast', range: 2, n: 2, one: true, dmg: 1, root: true, selfFear: 1, panicBoost: { one: false } }),
+      A: T('Náraz děsu', { t: 'blast', range: 2, n: 2, one: true, dmg: 2, root: true, selfFear: 1, panicBoost: { one: false } }, mv(3)),
+      B: T('Roztřesení', { t: 'blast', range: 2, n: 2, one: true, dmg: 1, disNext: true, selfFear: 1, panicBoost: { one: false } }),
+      AA: T('Drtivý děs', { t: 'blast', range: 2, n: 2, one: true, dmg: 3, root: true, selfFear: 1, panicBoost: { one: false } }, mv(2)),
+      AB: T('Vlna děsu', { t: 'blast', range: 3, n: 2, one: true, dmg: 2, root: true, selfFear: 1, panicBoost: { one: false } }, mv(4)),
+      BA: T('Cejch strachu', { t: 'blast', range: 2, n: 2, one: true, dmg: 1, disNext: true, mark: true, selfFear: 1, panicBoost: { one: false } }, mv(2)),
+      BB: T('Výkřik', { t: 'blast', range: 4, n: 3, one: true, dmg: 1, disNext: true, selfFear: 1, panicBoost: { one: false } }, mv(4)) } },
     // Kletby: bez hodu, skrz armor, dvojnásob proti monstru s negativním stavem; postih k útoku do konce kola
     { key: 'kletby', cat: 'Kletby', tree: {
-      '': T('Kletba', { t: 'hex', range: 4, weaken: 1, dmg: 1, x2: true }),
-      A: T('Uhranutí', { t: 'hex', range: 4, weaken: 2, dmg: 1, x2: true }),
-      AA: T('Okovy duší', { t: 'hex', range: 4, weaken: 3, dmg: 1, x2: true }),
-      AB: T('Zlá kletba', { t: 'hex', range: 4, weaken: 2, dmg: 2, x2: true }),
-      B: T('Zmatení', { t: 'confuse', range: 4 }),
-      BA: T('Zrádný hlas', { t: 'confuse', range: 4, stun: true }),
-      BB: T('Zlé znamení', { t: 'confuse', range: 4, n: 2 }) } },
+      '': T('Kletba', { t: 'hex', range: 4, tn: 2, weaken: 1, dmg: 1, x2: true }),
+      A: T('Uhranutí', { t: 'hex', range: 4, tn: 2, weaken: 2, dmg: 1, x2: true }),
+      AA: T('Okovy duší', { t: 'hex', range: 4, tn: 2, weaken: 3, dmg: 1, x2: true }),
+      AB: T('Zlá kletba', { t: 'hex', range: 4, tn: 2, weaken: 2, dmg: 2, x2: true }),
+      B: T('Zmatení', { t: 'confuse', range: 4, tn: 2 }),
+      BA: T('Zrádný hlas', { t: 'confuse', range: 4, tn: 2, stun: true }),
+      BB: T('Zlé znamení', { t: 'confuse', range: 4, tn: 2, n: 2 }) } },
     // Požehnání: dvojnásobné léčení, má-li cíl pozitivní stav
     { key: 'pozehnani', cat: 'Požehnání', tree: {
       '': T('Vložení rukou', { t: 'heal', range: 1, n: 2, x2: true }, SE_),
       A: T('Hojivé světlo', { t: 'heal', range: 3, n: 2, x2: true }, SE_),
       AA: T('Zázrak', { t: 'heal', range: 99, n: 2, x2: true, all: true }, SE_),
-      AB: T('Požehnání', { t: 'heal', range: 3, n: 4, x2: true, all: true }, SE_),
+      AB: T('Požehnání', { t: 'heal', range: 3, n: 3, x2: true, all: true }, SE_),
       B: T('Vedení', { t: 'guide', range: 3, armor: 1 }, SE_),
       BA: T('Prozřetelnost', { t: 'guide', range: 99, armor: 1, all: true }, SE_),
       BB: T('Druhý dech', { t: 'guide', range: 3, armor: 3, all: true }, SE_) } },
@@ -1803,9 +1803,9 @@ const ABIL = {
       A: T('Turbína', { t: 'haste', n: 2 }, mv(4)),
       AA: T('Plný plyn', { t: 'haste', n: 2, free: true }, mv(4)),
       AB: T('Prorážeč', { t: 'haste', n: 2, trample: { mark: true, dmg: 1 } }, mv(4)),
-      B: T('Rozběh', { t: 'momentum', per: 2 }, mv(4)),
+      B: T('Rozběh', { t: 'momentum', per: 1 }, mv(4)),
       BA: T('Nájezd', { t: 'momentum', per: 2, dmgToo: true }, mv(4)),
-      BB: T('Za jízdy', { t: 'momentum', per: 1 }, mv(4)) } },
+      BB: T('Za jízdy', { t: 'momentum', per: 1, amt: 2 }, mv(4)) } },
     { key: 'pozice', cat: 'Pozice', tree: {
       '': T('Analýza', { t: 'markone', range: 4, n: 1 }, SE_),
       A: T('Slabé místo', { t: 'markone', range: 4, n: 1, pierce: true }, SE_),
@@ -1813,7 +1813,7 @@ const ABIL = {
       AB: T('Lanko', { t: 'markone', range: 6, n: 1, pierce: true, pull: 2 }, SE_),
       B: T('Odstřel', { t: 'attack', range: 4, dmg: 2, mod: 1, ignoreAr: true }, SE_),
       BA: T('Průstřel', { t: 'attack', range: 4, dmg: 3, mod: 2, ignoreAr: true }, SE_),
-      BB: T('Skrz naskrz', { t: 'attack', range: 3, dmg: 2, mod: 1, pierce: true }, SE_) } },
+      BB: T('Skrz naskrz', { t: 'attack', range: 3, dmg: 3, mod: 1, pierce: true }, SE_) } },
     // Dálka: čistě posílení do konce kola
     { key: 'dalka', cat: 'Dálka', tree: {
       '': T('Mířidla', { t: 'buff', mod: 1, dmg: 1 }, mv(2)),
@@ -1822,14 +1822,14 @@ const ABIL = {
       AB: T('Smrtící klid', { t: 'buff', mod: 2, dmg: 2, stillAdv: true }, mv(2)),
       B: T('Skrz dav', { t: 'buff', mod: 1, dmg: 1, range: 2, through: true }, mv(2)),
       BA: T('Bez překážek', { t: 'buff', mod: 2, dmg: 2, range: 2, through: true }, mv(2)),
-      BB: T('Daleký dostřel', { t: 'buff', mod: 1, dmg: 1, range: 4, through: true }, mv(2)) } },
+      BB: T('Daleký dostřel', { t: 'buff', mod: 1, dmg: 2, range: 4, through: true }, mv(2)) } },
   ],
 };
 const UPCOST = { 2: 2, 3: 3 }; // cena vylepšení na úroveň 2 a 3 (zkušenosti)
 const levelOf = v => v ? v.length + 1 : 1;
 
 const HEROES = [
-  { id: 'ashford', name: 'Edmund Ashford', role: 'Voják', archetype: 'Rváč', hp: 14, courage: 4, passive: 'Voják: +1 k útoku, když s tebou sousedí ještě jiné monstrum než cíl.', equip: ['savle', 'stit', 'kyrys'] },
+  { id: 'ashford', name: 'Edmund Ashford', role: 'Voják', archetype: 'Rváč', hp: 15, courage: 4, passive: 'Voják: +1 k útoku, když s tebou sousedí ještě jiné monstrum než cíl.', equip: ['savle', 'stit', 'kyrys'] },
   { id: 'varga', name: 'Ilona Varga', role: 'Medium', archetype: 'Mystička', hp: 9, courage: 5, passive: 'Ochranná aura: monstra mají −1 k útoku na lovce do 3 polí od Ilony (i na ni).', equip: ['kyvadlo', 'sul', 'svice'] },
   { id: 'wren', name: 'Thomas Wren', role: 'Vynálezce', archetype: 'Mechanik', hp: 9, courage: 4, passive: 'Mechanik: tvůj první pohyb v každém tahu má +1 pole.', equip: ['brokovnice', 'kamera', 'brasna'] },
 ];
@@ -1858,7 +1858,7 @@ const LOOT = {
   voda: Object.assign({}, WATER, { item: 'loot_voda', loot: 'voda' }),
   lucerna: Object.assign({}, LANTERN, { item: 'loot_lucerna', loot: 'lucerna' }),
   kladivo: Object.assign({}, HAMMER, { item: 'loot_kladivo', loot: 'kladivo' }),
-  kulka: LOOT_ITEM('kulka', 'Stříbrná kulka', { t: 'attack', range: 5, dmg: 4, mod: 2, ignoreEv: true, ignoreAr: true }, { t: 'move', n: 4 }),
+  kulka: LOOT_ITEM('kulka', 'Stříbrná kulka', { t: 'attack', range: 5, dmg: 5, mod: 2, ignoreEv: true, ignoreAr: true }, { t: 'move', n: 4 }),
   laudanum: LOOT_ITEM('laudanum', 'Laudanum', { t: 'heal', range: 0, n: 4, fear: 2, self: true }, { t: 'heal', all: true, range: 99, n: 2, fear: 1 }),
   zrcatko: LOOT_ITEM('zrcatko', 'Kapesní zrcátko', { t: 'stunone', range: 4, dmg: 2 }, { t: 'move', n: 3 }),
   planek: LOOT_ITEM('planek', 'Plánek domu', { t: 'kickdoor', unlock: true }, { t: 'move', n: 6 }),
@@ -1882,7 +1882,7 @@ const OL_CARDS = {
   hruza: { name: 'Hrůza', cat: 'kletba', text: 'Každý lovec utrží 1 zranění za každou Paniku v ruce. Lovci bez Paniky dostanou 1 Strach.' },
   nakaza: { name: 'Nákaza', cat: 'kletba', text: 'Otrávení lovci +1 jed, krvácející +1 krvácení. Kdo nemá ani jedno, dostane 1 Strach.' },
   zleoko: { name: 'Zlé oko', cat: 'kletba', text: 'Lovci ve vybrané místnosti útočí do konce kola s nevýhodou.' },
-  zavoj: { name: 'Závoj', cat: 'dum', text: 'Do konce kola mají všichni lovci dosah nejvýš 3 (bonusy ho nezvýší).' },
+  zavoj: { name: 'Závoj', cat: 'dum', text: 'Do konce kola mají všichni lovci dosah nejvýš 3 (bonusy ho nezvýší) a −1 ke všem útokům.' },
   navrat: { name: 'Návrat z hrobu', cat: 'vyvolani', text: 'Vrať 1 padlého přisluhovače k zrcadlu v odkryté místnosti bez placení Hrozby.' },
 };
 const OL_DECK = ['studeny', 'zamceni', 'sepot', 'zhasnuti', 'podlaha', 'ztrata', 'zjeveni', 'hlad', 'prohozeni', 'hruza', 'nakaza', 'navrat', 'zleoko', 'zavoj'];
@@ -1917,18 +1917,18 @@ const OL_VAR = {
     BB: ['Mrazivá clona', 'Reakce: útočník −2 k hodu; monstrum má do konce kola armor +1.'] },
   zjeveni: {
     A: ['Pevný stisk', 'Reakce: když monstrum mine útok, hází znovu s +1.'],
-    AA: ['Osudová ruka', 'Reakce: když monstrum mine útok, hází znovu s +2.'],
+    AA: ['Osudová ruka', 'Reakce: když monstrum mine útok, hází znovu s +2 k útoku a +1 zraněním.'],
     AB: ['Krutá ruka', 'Reakce: když monstrum mine útok, hází znovu s +1 k útoku a +1 zraněním.'],
-    B: ['Škrábnutí', 'Reakce: když monstrum mine útok, cíl i tak utrží 1 zranění (bez ohledu na armor a štíty).'],
+    B: ['Škrábnutí', 'Reakce: když monstrum mine útok, cíl i tak utrží 2 zranění (bez ohledu na armor a štíty).'],
     BA: ['Rozervání', 'Reakce: když monstrum mine útok, cíl i tak utrží 2 zranění (bez ohledu na armor) a krvácení 1.'],
     BB: ['Jedovatý dotek', 'Reakce: když monstrum mine útok, cíl i tak utrží 1 zranění (bez ohledu na armor) a jed 2.'] },
   hlad: {
-    A: ['Krvelačnost', 'Aktivuj už aktivovanou skupinu znovu, 1 akce každý, +1 zranění.'],
+    A: ['Krvelačnost', 'Aktivuj už aktivovanou skupinu znovu, 1 akce každý, +1 k útoku.'],
     AA: ['Běsnění', 'Aktivuj už aktivovanou skupinu znovu, 1 akce každý, +1 k útoku a +1 zranění.'],
     AB: ['Lovecký pud', 'Aktivuj už aktivovanou skupinu znovu, 1 akce každý, +2 k útoku.'],
     B: ['Hnaní hladem', 'Aktivuj už aktivovanou skupinu znovu, 2 akce každý, −2 k útoku.'],
     BA: ['Štvanice', 'Aktivuj už aktivovanou skupinu znovu, 2 akce každý, −1 k útoku.'],
-    BB: ['Lavina těl', 'Aktivuj už aktivovanou skupinu znovu, 2 akce každý, −1 zranění.'] },
+    BB: ['Lavina těl', 'Aktivuj už aktivovanou skupinu znovu, 2 akce každý, +1 k útoku a −1 zranění.'] },
   zamceni: {
     A: ['Magický zámek', 'Zamkni jedny dveře: páčení má −2.'],
     AA: ['Pečeť', 'Zamkni jedny dveře: páčení má −4.'],
@@ -1942,11 +1942,11 @@ const OL_VAR = {
     AB: ['Ruce z podlahy', 'Až 3 tajné pasti: 2 zranění, konec pohybu a přišpendlení.'],
     B: ['Prohnilá prkna', 'Až 5 tajných pastí: 1 zranění a konec pohybu.'],
     BA: ['Shnilá podlaha', 'Až 5 tajných pastí: 2 zranění a konec pohybu.'],
-    BB: ['Chňapající ruce', 'Až 5 tajných pastí: konec pohybu a přišpendlení (bez zranění).'] },
+    BB: ['Chňapající ruce', 'Až 5 tajných pastí: 1 zranění, konec pohybu a přišpendlení.'] },
   prohozeni: {
     A: ['Rozdělení', 'Prohoď dva lovce do 8 polí od sebe, oba +1 Strach.'],
     AA: ['Ztracení', 'Prohoď dva lovce do 8 polí od sebe, oba +2 Strach.'],
-    AB: ['Výměna', 'Prohoď dva lovce kdekoli v domě.'],
+    AB: ['Výměna', 'Prohoď dva lovce kdekoli v domě, oba +1 Strach.'],
     B: ['Zakřivená chodba', 'Prohoď dva lovce do 6 polí od sebe; náhodný z nich je přišpendlen.'],
     BA: ['Spoutaná výměna', 'Prohoď dva lovce do 6 polí od sebe; oba jsou přišpendleni.'],
     BB: ['Dlouhá chodba', 'Prohoď dva lovce do 10 polí od sebe; náhodný z nich je přišpendlen.'] },
@@ -1955,15 +1955,15 @@ const OL_VAR = {
     AA: ['Paralýza', 'Každý lovec utrží 3 zranění za každou Paniku v ruce. Lovci bez Paniky dostanou 1 Strach.'],
     AB: ['Tíseň', 'Každý lovec utrží 1 zranění za každou Paniku v ruce. Lovci bez Paniky dostanou 3 Strach.'],
     B: ['Upřený pohled', 'Každý lovec dostane 2 Strach.'],
-    BA: ['Děs z temnoty', 'Každý lovec dostane 2 Strach a utrží 2 zranění.'],
-    BB: ['Všudypřítomná hrůza', 'Každý lovec dostane 4 Strach.'] },
+    BA: ['Děs z temnoty', 'Každý lovec dostane 2 Strach a utrží 1 zranění.'],
+    BB: ['Všudypřítomná hrůza', 'Každý lovec dostane 3 Strach.'] },
   nakaza: {
     A: ['Hnisání', 'Otrávení lovci +2 jed, krvácející +1 krvácení. Kdo nemá ani jedno, dostane 1 Strach.'],
     AA: ['Sněť', 'Otrávení a krvácející lovci hned utrží zranění rovné jedu + krvácení. Kdo nemá ani jedno, dostane 2 Strach.'],
     AB: ['Otrávená krev', 'Otrávení +1 jed, krvácející +1 krvácení a do konce svého příštího tahu je nejde léčit. Kdo nemá ani jedno, dostane 2 Strach.'],
-    B: ['Mor', 'Náhodný lovec bez krvácení dostane krvácení 1, náhodný lovec bez jedu jed 1.'],
+    B: ['Mor', 'Náhodný lovec bez krvácení dostane krvácení 1, náhodný lovec bez jedu jed 2.'],
     BA: ['Epidemie', 'Každý lovec bez krvácení dostane krvácení 1.'],
-    BB: ['Morová rána', 'Každý lovec bez jedu dostane jed 3.'] },
+    BB: ['Morová rána', 'Dva náhodní lovci bez jedu dostanou jed 2.'] },
   navrat: {
     A: ['Hromadný hrob', 'Vrať 2 padlé přisluhovače k zrcadlu v odkryté místnosti.'],
     AA: ['Vzkříšení', 'Vrať 3 padlé přisluhovače k zrcadlu v odkryté místnosti.'],
@@ -1979,9 +1979,9 @@ const OL_VAR = {
     BA: ['Zlá ruka', 'Jeden lovec kdekoli útočí do konce kola s nevýhodou a v příštím tahu má jen 2 zahrání.'],
     BB: ['Dvojí uřknutí', 'Dva lovci kdekoli útočí do konce kola s nevýhodou a dostanou 1 Strach.'] },
   zavoj: {
-    A: ['Mlha', 'Do konce kola mají všichni lovci dosah nejvýš 2.'],
-    AA: ['Hustá mlha', 'Do konce kola mají všichni lovci dosah nejvýš 1.'],
-    AB: ['Klamné stíny', 'Do konce kola mají všichni lovci dosah nejvýš 2 a −1 k útokům.'],
+    A: ['Mlha', 'Do konce kola mají všichni lovci dosah nejvýš 2 a −1 ke všem útokům.'],
+    AA: ['Hustá mlha', 'Do konce kola mají všichni lovci dosah nejvýš 1 a −1 ke všem útokům.'],
+    AB: ['Klamné stíny', 'Do konce kola mají všichni lovci dosah nejvýš 2 a −2 ke všem útokům.'],
     B: ['Stíny', 'Do konce kola mají všichni lovci dosah nejvýš 3 a −1 zranění.'],
     BA: ['Šero', 'Do konce kola mají všichni lovci dosah nejvýš 2, −1 k útokům a −1 zranění.'],
     BB: ['Temný závoj', 'Do konce kola mají všichni lovci dosah nejvýš 3 a −2 zranění.'] },
@@ -2145,11 +2145,12 @@ const RESPAWN_SAFE = 3; // respawn nejde, když je lovec do této vzdálenosti
 let API = null;
 useMap('blackmoor');
 
-// vylepšení skupin monster za zlato (kampaň): { [typ]: { hp, plus, elite } }; nastaví newGame / klient při synchronizaci
+// vylepšení skupin monster za temnou esenci (kampaň, klíč ol.gold): { [typ]: { hp, plus, elite } }; nastaví newGame / klient při synchronizaci
 let GRP_UP = {};
 function setGrpUp(u) { GRP_UP = u || {}; }
 const grpUp = t => (GRP_UP && GRP_UP[t]) || {};
-const groupSize = t => 1 + MDEF[t].minions[NH] + (MDEF[t].lieutenant || MDEF[t].object ? 0 : (grpUp(t).plus || 0));
+// Elita navíc (kampaň): +1 elita k základní sestavě (skupina je o 1 větší)
+const groupSize = t => 1 + MDEF[t].minions[NH] + (MDEF[t].lieutenant || MDEF[t].object ? 0 : (grpUp(t).plus || 0) + (grpUp(t).elite || 0));
 const maxElites = t => MDEF[t].lieutenant ? 0 : 1 + (grpUp(t).elite || 0);
 const eliteFull = (G, t) => G.monsters.filter(m => m.type === t && m.elite).length >= maxElites(t);
 const stats = m => { const o = Object.assign({}, MDEF[m.type].base, m.elite ? (MDEF[m.type].elite || {}) : {}); const u = grpUp(m.type).hp; if (u && o.hp && !MDEF[m.type].object) o.hp += u; return o; };
@@ -2166,7 +2167,7 @@ function describe(s) {
   if (s.stillBonus) t += '; když ses v tomto tahu nepohnul: ' + [s.stillBonus.mod ? '+' + s.stillBonus.mod + ' k útoku' : '', s.stillBonus.dmg ? '+' + s.stillBonus.dmg + ' dmg' : ''].filter(Boolean).join(' a ');
   if (s.perStep) t += '; ' + per(s.perStep, 'každé pole ušlé v tomto tahu' + cap);
   if (s.perDist) t += '; ' + per(s.perDist, 'každá 2 pole vzdálenosti cíle' + cap);
-  if (s.bleed) t += ', krvácení ' + (s.bleed === true ? 1 : s.bleed);
+  if (s.bleed) t += ', krvácení ' + (s.bleed === true ? 1 : s.bleed) + (s.bleedFirst ? ' (jen první zásah)' : '');
   if (s.vsLone) t += '; proti monstru, které nesousedí s jiným monstrem: ' + [s.vsLone.mod ? '+' + s.vsLone.mod + ' k útoku' : '', s.vsLone.dmg ? '+' + s.vsLone.dmg + ' dmg' : ''].filter(Boolean).join(' a ');
   if (s.perSummon) t += '; ' + per(s.perSummon, 'každého tvého vyvolance (max 3)');
   if (s.ignoreAr) t += ', ignoruje armor';
@@ -2204,18 +2205,18 @@ function describe0(s) {
   if (!s) return '';
   if ((s.t === 'salt' || s.t === 'fire') && s.area) return (s.light ? 'Zruš Tmu; ' : '') + (s.t === 'salt' ? 'Sůl' : 'Oheň (' + FIRE_DMG + ' dmg)') + ' na pole do ' + s.range + ' ve výhledu a všechna sousední' + (s.t === 'salt' ? '. Monstra do soli nevstoupí a v soli nemohou útočit; lovce stojícího v soli napadají s nevýhodou' : '. Kdo na něm stojí nebo do něj vstoupí, utrží zranění') + '. Do konce příštího kola';
   if (s.t === 'blast') return (s.one === false ? 'Všechna monstra' : 'Monstrum') + ' do ' + s.range + ' odstrč o ' + s.n + (s.dmg ? ', ' + s.dmg + ' dmg (bez hodu)' : '') + (s.root ? ', přišpendlí' : '') + (s.disNext ? ', příští útok s nevýhodou' : '') + (s.mark ? ', Označí' : '') + '. Narazí-li, je omráčené';
-  if (s.t === 'yank') return (s.all ? 'Monstra' : s.n > 1 ? s.n + ' monstra' : 'Monstrum') + ' do ' + s.range + ' ve výhledu přitáhni o ' + s.pull + (s.disarm ? ', odzbroj' : '') + (s.perHex ? '; za každé pole přitažení utrží ' + s.perHex : '');
+  if (s.t === 'yank') return (s.all ? 'Monstra' : s.n > 1 ? s.n + ' monstra' : 'Monstrum') + ' do ' + s.range + ' ve výhledu přitáhni o ' + s.pull + (s.disarm ? ', odzbroj' : '') + (s.perHex ? '; za každé pole přitažení utrží ' + s.perHex : '') + (s.dmgEach ? '; každé přitažené utrží ' + s.dmgEach : '');
   if (s.t === 'recall') return 'Další karta, kterou v tomto tahu zahraješ, se ti po zahrání vrátí do ruky (ne Panika ani jednorázové)';
   if (s.t === 'armorup' && s.ally) return 'Do konce kola +' + s.n + ' armor tobě a +' + (s.allyN || s.n) + ' lovcům ' + (s.ally >= 90 ? 'kdekoli' : 'do ' + s.ally);
   if (s.t === 'react' && s.kind === 'guard' && s.retortArmor) return 'Reakce: −' + s.dmg + ' zranění tobě' + (s.ally ? ' nebo lovci do ' + s.ally : '') + '; útočník utrží tolik zranění, kolik máš právě armoru';
   if (s.t === 'react' && s.kind === 'guard' && s.retort) return 'Reakce: −' + s.dmg + ' zranění' + (s.fear ? ', −' + s.fear + ' Strach' : '') + ' tobě' + (s.ally ? ' nebo lovci do ' + s.ally : '') + '; útočník utrží ' + s.retort + (s.retortAdj ? ', když s tebou sousedí' : '');
-  if (s.t === 'repel' && s.one) return 'Jedno monstrum do ' + s.range + ' odstrč o ' + s.n + (s.weaken ? ', −' + s.weaken + ' k útoku' : '');
+  if (s.t === 'repel' && s.one) return 'Jedno monstrum do ' + s.range + ' odstrč o ' + s.n + (s.weaken ? ', −' + s.weaken + ' k útoku' : '') + (s.dmg ? ', utrží ' + s.dmg + ' (bez hodu)' : '');
   if (s.t === 'repel' && (s.weaken || s.dmg)) return 'Monstra do ' + s.range + ' odstrč o ' + s.n + (s.weaken ? ', do konce kola −' + s.weaken + ' k útoku' : '') + (s.dmg ? ', utrží ' + s.dmg : '');
   if (s.t === 'armorup' && s.ally) return 'Do konce kola +' + s.n + ' armor tobě a lovcům do ' + s.ally;
   if (s.t === 'react' && s.kind === 'guard' && s.perArmor) return 'Reakce: −' + s.dmg + ' zranění a −1 za každý tvůj armor' + (s.fear ? ', −' + s.fear + ' Strach' : '') + ' tobě' + (s.ally ? ' nebo lovci do ' + s.ally : '') + (s.counter ? '; pak protiútok ' + s.counter.dmg + ' dmg +1 za armor' : '');
   if (s.t === 'heal' && (s.x2 || s.bless)) return (s.all ? (s.range >= 90 ? 'Všichni lovci kdekoli' : 'Lovci do ' + s.range + ' (i ty)') : 'Lovec do ' + s.range + ' (i ty)') + ' vyléčí ' + s.n + (s.x2 ? ' (dvojnásob, má-li pozitivní stav: armor, přípravu, únik…)' : '') + (s.fear ? ' a −' + s.fear + ' Strach' : '') + (s.bless ? '; dostane do konce kola +1 k útokům a +1 armor' : '') + '; ležícího zvedne';
   if (s.t === 'buff' && (s.stillAdv || s.lifesteal || s.selfDmg || s.through)) return 'Do konce kola +' + s.mod + ' k útokům a +' + s.dmg + ' dmg' + (s.range ? '; dosah útoků na dálku +' + s.range : '') + (s.through ? '; střílíš skrz figurky' : '') + (s.stillAdv ? '; dokud se v tomto kole nepohneš, útoky mají výhodu' : '') + (s.crit9 ? '; kritik už na 9' : '') + (s.lifesteal ? '; zásahy tě vyléčí o zranění, které projde' : '');
-  if (s.t === 'momentum' && s.per) return 'Do konce tahu: +1 k útokům' + (s.dmgToo ? ' a +1 dmg' : '') + ' za ' + (s.per === 2 ? 'každá 2 ušlá pole' : 'každé ušlé pole') + ' (bez stropu, počítá se i pohyb před zahráním)';
+  if (s.t === 'momentum' && s.per) return 'Do konce tahu: +' + (s.amt || 1) + ' k útokům' + (s.dmgToo ? ' a +1 dmg' : '') + ' za ' + (s.per === 2 ? 'každá 2 ušlá pole' : 'každé ušlé pole') + ' (bez stropu, počítá se i pohyb před zahráním)';
   if (s.t === 'momentum' && (s.dmgToo || s.evade)) return 'Do konce tahu: +1 k útokům za každé ušlé pole (max +' + s.max + ')' + (s.dmgToo ? ' a +1 dmg za každá 2 pole' : '') + (s.evade ? '; únik ' + s.evade : '');
   if (s.t === 'haste' && s.trample) return 'Do konce kola +' + s.n + ' ke každému pohybu a pohybuješ se skrz nepřátele; každé monstrum, kterým projdeš, utrží ' + s.trample.dmg + ' a je Označené';
   if (s.t === 'pry' && s.adv) return 'Vypáčení zamčených dveří s výhodou' + (s.mod ? ', ' + sgn(s.mod) : '');
@@ -2248,7 +2249,7 @@ function describe0(s) {
     case 'sprint': return 'Tvůj příští pohyb v tomto kole je dvojnásobný';
     case 'leapswap': return 'Prohoď se s monstrem do ' + s.range + ' ve výhledu' + (s.stun ? '; je omráčené' : '');
     case 'rootone': return 'Jedno monstrum do ' + s.range + ' ve výhledu přišpendlí (bez hodu)';
-    case 'pull': return 'Přitáhni monstrum do ' + s.range + ' (výhled) až k sobě' + (s.stun ? ' a omráč ho' : '') + (s.disarm ? ' a odzbroj ho' : '');
+    case 'pull': return 'Přitáhni monstrum do ' + s.range + ' (výhled) až k sobě' + (s.stun ? ' a omráč ho' : '') + (s.disarm ? ' a odzbroj ho' : '') + (s.root ? ' a přišpendli ho' : '');
     case 'stomp': return 'Všechna sousední monstra omráčí';
     case 'kickdoor': return s.unlock ? 'Odemkni a otevři sousední zamčené dveře (i magické)' : 'Vykopni sousední zamčené dveře (bez hodu) a vstup na ně';
     case 'blink': return 'Přenes se na volné pole do ' + s.range + ' ve své nebo sousední odkryté místnosti';
@@ -2259,10 +2260,10 @@ function describe0(s) {
     case 'nofear': return 'Do konce kola nedostáváš Strach';
     case 'advturn': return 'Do konce tahu mají tvé útoky výhodu, pokud ses v tomto tahu už pohnul';
     case 'anchor': return 'Do konce kola +' + s.armor + ' armor; dokud se v tomto tahu nepohneš, útoky zblízka +' + s.mod + ' k útoku' + (s.dmg ? ' a +' + s.dmg + ' dmg' : '');
-    case 'hex': return (s.area ? 'Pole do ' + s.range + ' ve výhledu a sousední: monstra na nich' : 'Monstrum do ' + s.range + ' ve výhledu') + ' prokleješ: ' + (s.weaken ? '−' + s.weaken + ' k útoku do konce kola, ' : '') + 'utrží ' + (s.dmg || 0) + ' (bez hodu, skrz armor; dvojnásob, má-li už negativní stav)';
+    case 'hex': return (s.area ? 'Pole do ' + s.range + ' ve výhledu a sousední: monstra na nich' : s.tn > 1 ? s.tn + ' různá monstra do ' + s.range + ' ve výhledu' : 'Monstrum do ' + s.range + ' ve výhledu') + ' prokleješ' + (s.tn > 1 ? ' (každé)' : '') + ': ' + (s.weaken ? '−' + s.weaken + ' k útoku do konce kola, ' : '') + 'utrží ' + (s.dmg || 0) + ' (bez hodu, skrz armor; dvojnásob, má-li už negativní stav)';
     case 'summon': return 'Vyvolej ' + (s.n > 1 ? s.n + '× ' : '') + (SUMMON_NAMES[s.kind] || 'ducha') + ' vedle sebe (útok +' + s.mod + ', ' + s.dmg + ' dmg, let ' + s.move + '). Hraje po tvém tahu sám na nejbližší monstrum, ' + (s.rounds >= 90 ? 'vydrží do konce scénáře' : 'vydrží ' + s.rounds + ' kola') + '. Monstra ho ignorují';
     case 'summonact': return 'Tví vyvolanci hned jednají (pohyb a útok)';
-    case 'confuse': return 'Monstrum do ' + s.range + ' ve výhledu se nepohne a ' + (s.n > 1 ? s.n + '× zaútočí' : 'zaútočí') + ' na náhodné jiné monstrum v dosahu' + (s.stun ? '; pak je omráčené' : '') + '. Bez platného cíle se nestane nic';
+    case 'confuse': return (s.tn > 1 ? s.tn + ' různá monstra do ' + s.range + ' ve výhledu se nepohnou a každé ' : 'Monstrum do ' + s.range + ' ve výhledu se nepohne a ') + (s.n > 1 ? s.n + '× zaútočí' : 'zaútočí') + ' na náhodné jiné monstrum v dosahu' + (s.stun ? '; pak ' + (s.tn > 1 ? 'jsou omráčená' : 'je omráčené') : '') + '. Bez platného cíle se nestane nic';
     case 'dominate': return 'Neelitní monstrum do ' + s.range + ' ovládneš: stane se tvým vyvolancem na ' + s.rounds + ' kola. Utrží ti tolik zranění, kolik má právě zdraví';
     case 'guide': return (s.all ? (s.range >= 90 ? 'Všichni lovci kdekoli' : 'Lovci do ' + s.range + ' (i ty)') : 'Lovec do ' + s.range + (s.extra ? ' (ne ty)' : ' (i ty)')) + (s.extra ? ': příští tah má 4 zahrání' : s.round ? ': do konce kola útočí s výhodou' : ': příští útok s výhodou') + (s.armor ? ' a +' + s.armor + ' armor do konce kola' : '');
     case 'souls': return 'Lovci do ' + s.range + ' (i ty): do konce kola +1 k útoku za každého tvého vyvolance (max +3)';
@@ -2307,7 +2308,7 @@ function describe0(s) {
     case 'discipline': return 'Vyhoď Paniku z ruky mimo hru a lízni 1';
     case 'sense': return s.range ? 'Prohlédni žeton místa do vzdálenosti ' + s.range : 'Odhal nejbližší žeton hledání, u kterého ještě nevíš, co skrývá (kdekoli, vzdušnou čarou)';
     case 'reveal': return 'Monstra do ' + s.range + ' ztrácí do konce kola únik, neviditelná se odhalí' + (s.ally ? '; lovci do ' + s.ally + ' +1 k útokům do konce kola' : '');
-    case 'salt': if (s.around) return 'Sůl na všechna pole kolem tebe (i pod monstra). Monstra do soli nevstoupí a v soli nemohou útočit. Do konce příštího kola'; return 'Sůl na ' + s.len + ' sousedící pole do dosahu ' + s.range + ' (i pod monstra). Monstra do soli nevstoupí a v soli nemohou útočit. Do konce příštího kola';
+    case 'salt': if (s.around) return 'Sůl na všechna pole kolem tebe (i pod monstra). Monstra do soli nevstoupí a v soli nemohou útočit. Do konce příštího kola' + (s.calm ? '. Lovci stojící na té soli −' + s.calm + ' Strach' : ''); return 'Sůl na ' + s.len + ' sousedící pole do dosahu ' + s.range + ' (i pod monstra). Monstra do soli nevstoupí a v soli nemohou útočit. Do konce příštího kola';
     case 'flee': return 'Odhoď 1 kartu z ruky a lízni 1';
     case 'voice': return 'Spoluhráč do vzdálenosti ' + s.range + ' vyhodí Paniku z ruky';
     case 'calm': return 'Sniž Strach libovolného lovce o 1';
@@ -2686,7 +2687,7 @@ async function executeWalk(G, h, path, ui) {
       // varianta pasti je uložená u pole (Zrádná podlaha); pasti z přípravy scénáře = základ
       const tv = (G.trapV && G.trapV.get(K(hex))) || '';
       G.traps.delete(K(hex)); if (G.trapV) G.trapV.delete(K(hex));
-      const tdmg = ({ '': 1, A: 2, AA: 4, AB: 2, B: 1, BA: 2, BB: 0 })[tv] || 0, troot = tv === 'AB' || tv === 'BB';
+      const tdmg = ({ '': 1, A: 2, AA: 4, AB: 2, B: 1, BA: 2, BB: 1 })[tv] || 0, troot = tv === 'AB' || tv === 'BB';
       log(G, h.name + ' šlápl na zrádnou podlahu: ruce ze země ' + (tdmg ? tdmg + ' zranění, ' : '') + (troot ? 'přišpendlení, ' : '') + 'konec pohybu.');
       await ui.anim({ type: 'trap', at: hex, who: 'h:' + h.id, hands: true });
       damageHero(G, h, tdmg);
@@ -2852,7 +2853,7 @@ function attackInfo(G, h, m, spec, extraMod) {
   let xdmg = 0;
   const add = (k, n, lab) => { if (!n) return; if (k === 'mod' || k === 'both') mods.push({ label: lab, v: n }); if (k === 'dmg' || k === 'both') xdmg += n; };
   const cap = spec.uncapped ? 99 : 3;
-  if (h.momentum && h.momentum.round === G.round && h.stepsTurn) { const mo = h.momentum, per = mo.per || 1, n = Math.min(mo.max || 99, Math.floor(h.stepsTurn / per)); if (n) mods.push({ label: 'rozběh', v: n }); if (mo.dmgToo) xdmg += mo.per ? n : Math.floor(Math.min(6, h.stepsTurn) / 2); }
+  if (h.momentum && h.momentum.round === G.round && h.stepsTurn) { const mo = h.momentum, per = mo.per || 1, n = Math.min(mo.max || 99, Math.floor(h.stepsTurn / per)); if (n) mods.push({ label: 'rozběh', v: n * (mo.amt || 1) }); if (mo.dmgToo) xdmg += mo.per ? n : Math.floor(Math.min(6, h.stepsTurn) / 2); }
   if (spec.perArmor) add(spec.perArmor, Math.min(cap, heroArmor(G, h)), 'armor');
   if (spec.stillBonus && still) { if (spec.stillBonus.mod) mods.push({ label: 'z místa', v: spec.stillBonus.mod }); xdmg += spec.stillBonus.dmg || 0; }
   if (h.anchor && h.anchor.round === G.round && still && melee) { if (h.anchor.mod) mods.push({ label: 'kotva', v: h.anchor.mod }); xdmg += h.anchor.dmg || 0; }
@@ -3008,7 +3009,7 @@ async function resolveHeroAttack(G, h, m, spec, C, ui, noLine) {
   return r.hit;
 }
 async function heroAttack(G, h, card, spec, C, ui) {
-  const shots = spec.shots || 1; let any = false;
+  const shots = spec.shots || 1; let any = false, sp = spec;
   for (let s = 0; s < shots && !G.over; s++) {
     const cands = attackTargets(G, h, spec);
     if (!cands.length) break;
@@ -3016,7 +3017,8 @@ async function heroAttack(G, h, card, spec, C, ui) {
     if (!t) { if (!any) return false; break; }
     any = true;
     const center = t.m.pos.slice();
-    await resolveHeroAttack(G, h, t.m, spec, C, ui);
+    // Dvojitý výpad: krvácení jen při prvním zásahu
+    if (await resolveHeroAttack(G, h, t.m, sp, C, ui) && sp.bleedFirst) sp = Object.assign({}, sp, { bleed: 0 });
     if (spec.splash) for (const o of G.monsters.filter(o => o !== t.m && !mdef(o).object && dist(o.pos, center) === 1)) { if (G.over || !G.monsters.includes(o)) continue; await resolveHeroAttack(G, h, o, { dmg: spec.splash, mod: spec.mod, range: 99 }, C, ui, true); }
     if (spec.pierce && !G.over) {
       const A = toCube(h.pos), B = toCube(center), dd = dist(h.pos, center), dir = [(B[0] - A[0]) / dd, (B[1] - A[1]) / dd, (B[2] - A[2]) / dd];
@@ -3234,6 +3236,12 @@ async function resolveCard(G, h, card, half, C, ui) {
     return ok;
   }
   const pick = (kind, cands, extra) => C.H.chooseTarget(G, h, Object.assign({ kind, cands, card, spec: s }, extra || {}));
+  // více RŮZNÝCH monster ve výhledu (Kletby: 2 cíle); první povinně, další volitelně; null = zrušeno
+  const pickN = async (n, prompt2) => {
+    const out = [];
+    for (let i = 0; i < n; i++) { const cs = monstersInSight(G, h, s.range).filter(x => !out.includes(x)); if (!cs.length) break; const m = await pick('monster', cs, i ? { optional: true, prompt: prompt2 } : {}); if (!m) break; out.push(m); }
+    return out.length ? out : null;
+  };
   switch (s.t) {
     case 'blast': {
       // odstrčení: bez Paniky jedno monstrum, s Panikou všechna v dosahu; souběžně (od nejvzdálenějších), náraz omráčí
@@ -3268,7 +3276,7 @@ async function resolveCard(G, h, card, half, C, ui) {
         const moved = dist(m.pos, h.pos) > 1 ? await pullTo(G, h, m, s.pull || 9, ui) : 0;
         if (!G.monsters.includes(m)) continue;
         if (s.disarm) applyStatus(G, m, 'disarm');
-        const d = (s.perHex || 0) * moved;
+        const d = (s.perHex || 0) * moved + (moved > 0 ? (s.dmgEach || 0) : 0);
         if (d) { m.hp -= d; await ui.anim({ type: 'float', at: m.pos, text: '−' + d + (s.disarm ? ', odzbrojen' : ''), cls: 'dmg' }); if (m.hp <= 0) { killMonster(G, m); await ui.anim({ type: 'kill', who: 'm:' + m.uid }); continue; } }
         else if (s.disarm) await ui.anim({ type: 'float', at: m.pos, text: 'Odzbrojen', cls: 'info' });
       }
@@ -3282,14 +3290,15 @@ async function resolveCard(G, h, card, half, C, ui) {
     case 'hex': {
       let targets;
       if (s.area) { const x = await pick('hex', fireStart(G, h, s.range), { area: 'root' }); if (!x) return false; targets = G.monsters.filter(m => !mdef(m).object && dist(m.pos, x) <= 1 && hexRevealed(G, m.pos)); await ui.anim({ type: 'wave', at: x, kind: 'wail', range: 1 }); }
-      else { const m = await pick('monster', monstersInSight(G, h, s.range)); if (!m) return false; targets = [m]; }
+      else { targets = await pickN(s.tn || 1, 'Druhé monstrum (jiné)'); if (!targets) return false; }
       for (const m of targets) {
+        if (!G.monsters.includes(m)) continue;
         const was = negStatus(G, m), d = (s.dmg || 0) * (s.x2 && was ? 2 : 1);
         if (s.weaken) weaken(G, m, s.weaken); m.awake = true; if (s.root) applyStatus(G, m, 'root'); if (s.dis) m.disUntil = G.round + 1;
         if (d) { m.hp -= d; await ui.anim({ type: 'float', at: m.pos, text: 'Kletba −' + d, cls: 'dmg' }); if (m.hp <= 0) { killMonster(G, m); await ui.anim({ type: 'kill', who: 'm:' + m.uid }); continue; } }
         else await ui.anim({ type: 'float', at: m.pos, text: 'Kletba', cls: 'info' });
       }
-      log(G, h.name + ' proklíná ' + targets.length + ' monstra.'); return true;
+      log(G, h.name + ' proklíná ' + (targets.length === 1 ? '1 monstrum' : targets.length + ' monstra') + '.'); return true;
     }
     case 'markone': {
       const picked = [];
@@ -3345,21 +3354,24 @@ async function resolveCard(G, h, card, half, C, ui) {
     }
     case 'confuse': {
       // zmatené monstrum se nepohne a útočí na NÁHODNÝ platný cíl (jiné monstrum v jeho dosahu a výhledu); bez cíle se nic nestane
-      const m = await pick('monster', monstersInSight(G, h, s.range)); if (!m) return false;
-      m.awake = true; let any = false;
-      for (let i = 0; i < (s.n || 1) && !G.over && G.monsters.includes(m); i++) {
-        const st = mstats(G, m);
-        const cands = G.monsters.filter(x => x !== m && !mdef(x).object && !x.dormant && canStrike(G, m.pos, x.pos, st.range || 1));
-        if (!cands.length) break;
-        const o = pickR(cands); any = true;
-        const ost = stats(o), mods = [{ label: 'útok', v: st.mod || 0 }].concat(ost.evasion && !isMarked(G, o) ? [{ label: 'únik', v: -ost.evasion }] : []);
-        const r = rollCheck(mods, 10, mdef(o).elusive ? -1 : 0), oar = isPierced(G, o) ? 0 : (ost.armor || 0), dmg = r.hit ? Math.max(0, st.dmg * (r.crit ? 2 : 1) - oar) : 0;
-        log(G, mname(m) + ' je zmatené a útočí na ' + mname(o) + (r.hit ? ': ' + dmg + ' zranění.' : ': vedle.'));
-        await ui.anim({ type: 'roll', at: o.pos, from: m.pos, roll: r.roll, mods, total: r.total, hit: r.hit, crit: r.crit, base: st.dmg, armor: oar, dmg, label: r.hit ? 'Zmatený zásah' : 'Vedle', confuse: true });
-        if (dmg) { o.hp -= dmg; if (o.hp <= 0) { killMonster(G, o); await ui.anim({ type: 'kill', who: 'm:' + o.uid }); } }
+      const ts = await pickN(s.tn || 1, 'Druhé zmatené monstrum (jiné)'); if (!ts) return false;
+      for (const m of ts) {
+        if (G.over || !G.monsters.includes(m)) continue;
+        m.awake = true; let any = false;
+        for (let i = 0; i < (s.n || 1) && !G.over && G.monsters.includes(m); i++) {
+          const st = mstats(G, m);
+          const cands = G.monsters.filter(x => x !== m && !mdef(x).object && !x.dormant && canStrike(G, m.pos, x.pos, st.range || 1));
+          if (!cands.length) break;
+          const o = pickR(cands); any = true;
+          const ost = stats(o), mods = [{ label: 'útok', v: st.mod || 0 }].concat(ost.evasion && !isMarked(G, o) ? [{ label: 'únik', v: -ost.evasion }] : []);
+          const r = rollCheck(mods, 10, mdef(o).elusive ? -1 : 0), oar = isPierced(G, o) ? 0 : (ost.armor || 0), dmg = r.hit ? Math.max(0, st.dmg * (r.crit ? 2 : 1) - oar) : 0;
+          log(G, mname(m) + ' je zmatené a útočí na ' + mname(o) + (r.hit ? ': ' + dmg + ' zranění.' : ': vedle.'));
+          await ui.anim({ type: 'roll', at: o.pos, from: m.pos, roll: r.roll, mods, total: r.total, hit: r.hit, crit: r.crit, base: st.dmg, armor: oar, dmg, label: r.hit ? 'Zmatený zásah' : 'Vedle', confuse: true });
+          if (dmg) { o.hp -= dmg; if (o.hp <= 0) { killMonster(G, o); await ui.anim({ type: 'kill', who: 'm:' + o.uid }); } }
+        }
+        if (!any) { log(G, mname(m) + ' je zmatené, ale nemá na koho zaútočit.'); await ui.anim({ type: 'float', at: m.pos, text: 'Zmatené', cls: 'info' }); }
+        if (s.stun && G.monsters.includes(m)) { applyStatus(G, m, 'stun'); await ui.anim({ type: 'float', at: m.pos, text: 'Omráčen', cls: 'info' }); }
       }
-      if (!any) { log(G, mname(m) + ' je zmatené, ale nemá na koho zaútočit.'); await ui.anim({ type: 'float', at: m.pos, text: 'Zmatené', cls: 'info' }); }
-      if (s.stun && G.monsters.includes(m)) { applyStatus(G, m, 'stun'); await ui.anim({ type: 'float', at: m.pos, text: 'Omráčen', cls: 'info' }); }
       return true;
     }
     case 'dominate': {
@@ -3402,7 +3414,8 @@ async function resolveCard(G, h, card, half, C, ui) {
       await pullTo(G, h, m, s.n || 9, ui);
       if (G.monsters.includes(m) && s.stun) { applyStatus(G, m, 'stun'); await ui.anim({ type: 'float', at: m.pos, text: 'Omráčen', cls: 'info' }); }
       if (G.monsters.includes(m) && s.disarm) { applyStatus(G, m, 'disarm'); await ui.anim({ type: 'float', at: m.pos, text: 'Odzbrojen', cls: 'info' }); }
-      log(G, h.name + ' přitahuje ' + mname(m) + '.'); return true;
+      if (G.monsters.includes(m) && s.root) { applyStatus(G, m, 'root'); await ui.anim({ type: 'float', at: m.pos, text: 'Přišpendlen', cls: 'info' }); }
+      log(G, h.name + ' přitahuje ' + mname(m) + (s.root ? ' a přišpendluje ho.' : '.')); return true;
     }
     case 'stomp': { const ms = adjMonsters(G, h); ms.forEach(m => m.stunned = true); await ui.anim({ type: 'wave', at: h.pos, kind: 'howl', range: 1 }); for (const m of ms) await ui.anim({ type: 'float', at: m.pos, text: 'Omráčen', cls: 'info' }); log(G, h.name + ' dupe: ' + ms.length + ' monstra omráčena.'); return true; }
     case 'kickdoor': { const d = await pick('door', adjLocked(G, h).filter(d => s.unlock || !d.ward)); if (!d) return false; if (s.unlock) { d.ward = 0; d.reinforced = 0; d.trapped = false; openDoor(G, d); log(G, h.name + ' podle plánku odemyká dveře ' + d.name + '.'); await ui.anim({ type: 'reveal' }); return true; } log(G, h.name + ' vykopl dveře ' + d.name + '.'); sfxHint(G, 'crash'); openDoor(G, d); await ui.anim({ type: 'reveal' }); if (!heroAt(G, d.hex) && !monsterAt(G, d.hex)) { h.pos = d.hex.slice(); await ui.anim({ type: 'step', who: 'h:' + h.id, hex: d.hex }); } return true; }
@@ -3470,7 +3483,7 @@ async function resolveCard(G, h, card, half, C, ui) {
       h.duel = { round: G.round, uids, mod: s.mod, double: !!s.double, used: false };
       log(G, h.name + ' vyzývá na souboj.'); return true;
     }
-    case 'momentum': { h.momentum = { round: G.round, max: s.max, per: s.per || 0, dmgToo: !!s.dmgToo }; if (s.evade) h.evade = { round: G.round, n: Math.max(s.evade, evadeOf(G, h)) }; log(G, h.name + ' nabírá rozběh: útoky +1 za každé ušlé pole (zatím ' + (h.stepsTurn || 0) + ').'); await ui.anim({ type: 'float', at: h.pos, text: 'Rozběh', cls: 'good' }); return true; }
+    case 'momentum': { h.momentum = { round: G.round, max: s.max, per: s.per || 0, amt: s.amt || 1, dmgToo: !!s.dmgToo }; if (s.evade) h.evade = { round: G.round, n: Math.max(s.evade, evadeOf(G, h)) }; log(G, h.name + ' nabírá rozběh: útoky +' + (s.amt || 1) + ' za ' + (s.per === 2 ? 'každá 2 ušlá pole' : 'každé ušlé pole') + ' (zatím ' + (h.stepsTurn || 0) + ').'); await ui.anim({ type: 'float', at: h.pos, text: 'Rozběh', cls: 'good' }); return true; }
     case 'charge': {
       const lanes = chargeLanes(G, h, s.n); const m = await pick('monster', lanes.map(l => l.m)); if (!m) return false;
       const lane = lanes.find(l => l.m === m);
@@ -3652,7 +3665,9 @@ async function resolveCard(G, h, card, half, C, ui) {
         const hexes = neighbors(h.pos).filter(y => !!roomOf(y) && !isBlock(y) && !isWallHex(y) && linkOK(h.pos, y));
         for (const y of hexes) if (!saltAt(G, y)) G.salt.push({ hex: y.slice(), until: G.round + 1 });
         await ui.anim({ type: 'wave', at: h.pos, kind: 'wail', range: 1 }); await ui.refresh();
-        log(G, h.name + ' kreslí kolem sebe svatou pečeť ze soli.'); return true;
+        log(G, h.name + ' kreslí kolem sebe svatou pečeť ze soli.');
+        if (s.calm) for (const o of G.heroes.filter(o => !o.escaped && !o.downed && o.fear > 0 && hexes.some(y => eq(y, o.pos)) && !griefed(G, o))) { o.fear = Math.max(0, o.fear - s.calm); log(G, 'Svatá pečeť: ' + o.name + ' −' + s.calm + ' Strach.'); await ui.anim({ type: 'calm', at: o.pos, range: 0, heroes: [o.id], text: '−' + s.calm + ' strach' }); }
+        return true;
       }
       if (s.area) {
         const x = await pick('hex', s.t === 'salt' ? ROOM_HEXES.filter(x => G.revealed.has(roomOf(x)) && dist(x, h.pos) <= s.range && !isBlock(x) && (eq(x, h.pos) || los(G, h.pos, x))) : fireStart(G, h, s.range), { area: s.t === 'salt' ? 'salt' : 'root' }); if (!x) return false;
@@ -3971,7 +3986,7 @@ async function monsterAttack(G, m, h, C, ui) {
     G.playN = (G.playN || 0) + 1; G.lastPlay = { n: G.playN, ol: true, id: 'zjeveni', v };
     await ui.anim({ type: 'olcard', card: 'zjeveni', v, hexes: [h.pos] });
     if (v[0] === 'B') {
-      const zd = v === 'BA' ? 2 : 1;
+      const zd = v === 'B' || v === 'BA' ? 2 : 1;
       log(G, 'Dům hraje ' + nm + ': ' + h.name + ' i tak utrží ' + zd + ' zranění' + (v === 'BA' ? ' a krvácení 1' : v === 'BB' ? ' a jed 2' : '') + '.', { a: 'ol', c: olCardRef('zjeveni', v) });
       damageHero(G, h, zd);
       if (v === 'BA' && !h.downed) addBleed(G, h, 1);
@@ -3980,7 +3995,7 @@ async function monsterAttack(G, m, h, C, ui) {
       checkWin(G);
       return;
     }
-    const zm = v === 'AA' ? 2 : v ? 1 : 0, zx = v === 'AB' ? 1 : 0;
+    const zm = v === 'AA' ? 2 : v ? 1 : 0, zx = v === 'AB' || v === 'AA' ? 1 : 0;
     log(G, 'Dům hraje ' + nm + ': ' + mname(m) + ' hází znovu' + (zm ? ' s +' + zm : '') + (zx ? ' a +1 zraněním' : '') + '.', { a: 'ol', c: olCardRef('zjeveni', v) });
     const zmods = zm ? info.mods.concat([{ label: nm.toLowerCase(), v: zm }]) : info.mods;
     r = rollCheck(zmods, 10, info.adv); sdmg += zx;
@@ -4264,7 +4279,7 @@ async function playOlCard(G, uidC, C, ui, phase) {
       log(G, nm + ': ' + MDEF[target].name + ' znovu.');
       G.grpBuff = G.grpBuff || {};
       const old = G.grpBuff[target], base = old && old.round === G.round ? old : {};
-      const bm = ({ AA: 1, AB: 2, B: -2, BA: -1 })[v] || 0, bd = ({ A: 1, AA: 1, BB: -1 })[v] || 0;
+      const bm = ({ A: 1, AA: 1, AB: 2, B: -2, BA: -1, BB: 1 })[v] || 0, bd = ({ AA: 1, BB: -1 })[v] || 0;
       G.grpBuff[target] = Object.assign({}, base, { round: G.round, mod: (base.mod || 0) + bm, dmg: (base.dmg || 0) + bd });
       try { await activateGroup(G, target, C, ui, true, { actions: v[0] === 'B' ? 2 : 1 }); }
       finally { if (old) G.grpBuff[target] = old; else delete G.grpBuff[target]; }
@@ -4274,7 +4289,7 @@ async function playOlCard(G, uidC, C, ui, phase) {
       const [a, b] = target, p = a.pos; a.pos = b.pos; b.pos = p;
       log(G, 'Dům prohodil ' + a.name + ' a ' + b.name + '.');
       await ui.anim({ type: 'step', who: 'h:' + a.id, hex: a.pos }); await ui.anim({ type: 'step', who: 'h:' + b.id, hex: b.pos });
-      const fr = v === 'A' ? 1 : v === 'AA' ? 2 : 0;
+      const fr = v === 'A' || v === 'AB' ? 1 : v === 'AA' ? 2 : 0;
       if (fr) for (const h of [a, b]) { addFear(G, h, fr); await fl(h, '+' + fr + ' strach'); }
       const rootd = v === 'BA' ? [a, b] : (v === 'B' || v === 'BB') ? [pickR([a, b])] : [];
       for (const h of rootd) { applyStatus(G, h, 'root'); log(G, h.name + ' je přišpendlen.'); await ui.anim({ type: 'float', at: h.pos, text: 'Přišpendlen', cls: 'info' }); }
@@ -4314,7 +4329,7 @@ async function playOlCard(G, uidC, C, ui, phase) {
       break;
     }
     case 'zavoj': {
-      const cfg = ({ '': [3, 0, 0], A: [2, 0, 0], AA: [1, 0, 0], AB: [2, 1, 0], B: [3, 0, 1], BA: [2, 1, 1], BB: [3, 0, 2] })[v] || [3, 0, 0];
+      const cfg = ({ '': [3, 1, 0], A: [2, 1, 0], AA: [1, 1, 0], AB: [2, 2, 0], B: [3, 0, 1], BA: [2, 1, 1], BB: [3, 0, 2] })[v] || [3, 1, 0];
       G.veil = { round: G.round, max: cfg[0], mod: cfg[1], dmg: cfg[2] };
       log(G, nm + ': do konce kola mají lovci dosah nejvýš ' + cfg[0] + (cfg[1] ? ', −' + cfg[1] + ' k útokům' : '') + (cfg[2] ? ', −' + cfg[2] + ' zranění' : '') + '.');
       break;
@@ -4323,7 +4338,7 @@ async function playOlCard(G, uidC, C, ui, phase) {
       for (const h of hs) {
         const np = h.hand.filter(x => x.panic).length;
         let d = 0, f = 0;
-        if (v[0] === 'B') { f = v === 'BB' ? 4 : 2; d = v === 'BA' ? 2 : 0; }
+        if (v[0] === 'B') { f = v === 'BB' ? 3 : 2; d = v === 'BA' ? 1 : 0; }
         else if (np) d = np * (({ A: 2, AA: 3 })[v] || 1);
         else f = v === 'AB' ? 3 : 1;
         if (d) damageHero(G, h, d); if (f) addFear(G, h, f);
@@ -4334,9 +4349,9 @@ async function playOlCard(G, uidC, C, ui, phase) {
     case 'nakaza': {
       if (v[0] === 'B') {
         const add = [];
-        if (v === 'B') { const nb = hs.filter(h => !(h.bleed > 0)), np = hs.filter(h => !(h.poison > 0)); if (nb.length) { const h = pickR(nb); addBleed(G, h, 1); add.push([h, 'krvácení 1']); } if (np.length) { const h = pickR(np); addPoison(G, h, 1); add.push([h, 'jed 1']); } }
+        if (v === 'B') { const nb = hs.filter(h => !(h.bleed > 0)), np = hs.filter(h => !(h.poison > 0)); if (nb.length) { const h = pickR(nb); addBleed(G, h, 1); add.push([h, 'krvácení 1']); } if (np.length) { const h = pickR(np); addPoison(G, h, 2); add.push([h, 'jed 2']); } }
         if (v === 'BA') hs.filter(h => !(h.bleed > 0)).forEach(h => { addBleed(G, h, 1); add.push([h, 'krvácení 1']); });
-        if (v === 'BB') hs.filter(h => !(h.poison > 0)).forEach(h => { addPoison(G, h, 3); add.push([h, 'jed 3']); });
+        if (v === 'BB') shuffle(hs.filter(h => !(h.poison > 0))).slice(0, 2).forEach(h => { addPoison(G, h, 2); add.push([h, 'jed 2']); });
         for (const [h, t] of add) { log(G, nm + ': ' + h.name + ' ' + t + '.'); await fl(h, t); }
         break;
       }
@@ -5324,7 +5339,7 @@ function botSetupPart(G, part, pool) {
     let g = 0; while (C.obelPoolLeft(G) > 0 && g++ < 60) C.setObeliskHp(G, C.pickR(types), 1);
   } else if (part === 'traps') { for (let i = 0, g = 0; i < (G.scen.setupTraps || 0) && g < 40; g++) { const c = C.trapCands(G).filter(x => roomOf(x) !== C.MAP.startRoom); if (!C.toggleSetupTrap(G, C.pickR(c))) i++; } }
   else if (part === 'buy') {
-    // kampaň: skupiny vylepšené za zlato mají přednost
+    // kampaň: skupiny vylepšené za temnou esenci mají přednost
     const ups = allowed.filter(t => G.grpUp && G.grpUp[t] && !MDEF[t].object).sort((a, b) => upVal(G, b) - upVal(G, a));
     for (const t of ups) if (!G.groups[t] && C.goldUsed(G) + C.slotCost(t) <= G.budget) C.toggleGroup(G, t);
     const pre = PRESETS.map(p => p.filter(t => allowed.includes(t))).filter(p => p.length);
@@ -5491,10 +5506,15 @@ const overlordBot = {
     const hereGuard = guardVal(m.pos);
     let best = null, bv = -1e9;
     const curD = nearestHeroDist(G, m.pos);
+    // odzbrojené monstrum neútočí: jde do pozice, odkud příště zaútočí;
+    // monstrum v soli (tam útočit nemůže) z ní vyleze, když pak může útočit nebo si polepší
+    const disarmed = !!m.disarmed, inSalt = C.saltAt(G, m.pos), noAtkNow = disarmed || inSalt;
     const evalHex = (hex, cost) => {
       let v = 0;
-      const tg = actions >= 2 ? hs.filter(h => C.canStrike(G, hex, h.pos, s.range)) : [];
+      const tg = !disarmed && actions >= 2 && !(inSalt && C.eq(hex, m.pos)) ? hs.filter(h => C.canStrike(G, hex, h.pos, s.range)) : [];
       if (tg.length) v += 40 + Math.max(...tg.map(h => self._targetScore(G, m, h))) * 3;
+      else if (noAtkNow && !(inSalt && C.eq(hex, m.pos))) { const nx = hs.filter(h => C.canStrike(G, hex, h.pos, s.range)); if (nx.length) v += 12 + Math.max(...nx.map(h => self._targetScore(G, m, h))); }
+      if (inSalt && C.eq(hex, m.pos)) v -= 8;
       v += guardVal(hex) * 6;
       const nd = Math.min(99, ...hs.map(h => dist(h.pos, hex)));
       v -= nd * 2;
@@ -5514,9 +5534,9 @@ const overlordBot = {
     const hereV = evalHex(m.pos, 0);
     for (const [k, e] of opts.reach) { const hex = unK(k), v = evalHex(hex, e.cost); if (v > bv) { bv = v; best = hex; } }
     if (!best) return { type: 'end' };
-    if (hereGuard >= 2.5 && bv < 40) return { type: 'end' };
+    if (hereGuard >= 2.5 && bv < 40 && !inSalt) return { type: 'end' };
     if (bv <= hereV + 0.5) return { type: 'end' };
-    if (Math.min(99, ...hs.map(h => dist(h.pos, best))) >= curD && bv < 40 && guardVal(best) <= hereGuard) return { type: 'end' };
+    if (Math.min(99, ...hs.map(h => dist(h.pos, best))) >= curD && bv < 40 && guardVal(best) <= hereGuard && !inSalt && !(noAtkNow && bv >= 12)) return { type: 'end' };
     return { type: 'move', hex: best };
   },
   async react(G, kind, info) {
@@ -5570,7 +5590,7 @@ function unequip(eq, slot) {
 }
 const equipList = eq => [...new Set(HSLOTS.map(s => eq[s]).filter(Boolean))];
 
-// v2: Dům má zlato a vylepšení skupin monster (ol.gold, ol.grp), lovci si nesou nezahrané nálezy (heroes[id].loot)
+// v2: Dům má temnou esenci (klíč ol.gold) a vylepšení skupin monster (ol.gold, ol.grp), lovci si nesou nezahrané nálezy (heroes[id].loot)
 const VER = 2;
 function fresh() {
   const st = { v: VER, scen: 0, esence: 0, chest: [], history: [], streak: { heroes: 0, ol: 0 }, shop: null, rerolled: false, rewarded: -1,
@@ -5599,8 +5619,8 @@ function gameOpts(st) {
 function applyResult(st, G) {
   if (st.rewarded === st.scen) return st.lastReward;
   const win = G.over && G.over.winner === 'heroes';
-  // Dům: za scénář 1 XP + 1 zlato, za výhru +1/+1
-  const r = { scen: st.scen, name: G.scen.name, win, reason: G.over ? G.over.reason : '', heroes: { esence: D.HEROES.length + (G.found || 0), found: G.found || 0, xp: 1 + (win ? 1 : 0), comp: false }, ol: { xp: 1 + (win ? 0 : 1), gold: 1 + (win ? 0 : 1), comp: false } };
+  // Dům: za scénář 2 XP + 1 temná esence (klíč gold), za výhru +1 XP a +1 esence
+  const r = { scen: st.scen, name: G.scen.name, win, reason: G.over ? G.over.reason : '', heroes: { esence: D.HEROES.length + (G.found || 0), found: G.found || 0, xp: 1 + (win ? 1 : 0), comp: false }, ol: { xp: 2 + (win ? 0 : 1), gold: 1 + (win ? 0 : 1), comp: false } };
   // kompenzace: kdo prohraje a prohrál i předchozí scénář (za každou takovou prohru, počítadlo se nenuluje)
   st.streak.heroes = win ? 0 : st.streak.heroes + 1; st.streak.ol = win ? st.streak.ol + 1 : 0;
   if (st.streak.heroes >= 2) { r.heroes.comp = true; r.heroes.esence += COMP.heroEss; }
@@ -5611,7 +5631,7 @@ function applyResult(st, G) {
   for (const h of G.heroes || []) { const hs = st.heroes[h.id]; if (!hs) continue; hs.loot = [].concat(h.hand || [], h.deck || [], h.discard || []).filter(c => c && c.loot && D.LOOT && D.LOOT[c.loot]).map(c => c.loot); }
   r.loot = Object.fromEntries(Object.keys(st.heroes).map(id => [id, (st.heroes[id].loot || []).slice()]));
   st.esence += r.heroes.esence;
-  for (const id of Object.keys(st.heroes)) st.heroes[id].xp += r.heroes.xp + (r.heroes.comp ? 1 : 0);
+  for (const id of Object.keys(st.heroes)) st.heroes[id].xp += r.heroes.xp + (r.heroes.comp ? COMP.heroXp : 0);
   st.ol.xp += r.ol.xp; st.ol.gold = (st.ol.gold || 0) + r.ol.gold;
   st.history.push({ scen: st.scen, win, round: G.round });
   st.rewarded = st.scen; st.lastReward = r;
@@ -5681,12 +5701,12 @@ function upgradeOl(st, id, to) {
   const c = upCost(cur); if (st.ol.xp < c) return 'Málo zkušeností.';
   st.ol.xp -= c; st.ol.up[id] = to; save(st); return null;
 }
-// vylepšení skupin monster za zlato Domu (platí, kdykoli Dům skupinu nasadí)
-const COMP = { heroEss: 3, heroXp: 1, olXp: 1, olGold: 1 };
+// vylepšení skupin monster za temnou esenci Domu (v kódu ol.gold) (platí, kdykoli Dům skupinu nasadí)
+const COMP = { heroEss: 2, heroXp: 1, olXp: 1, olGold: 1 };
 const GRP_UPS = [
   { k: 'hp', name: 'Zocelení', cost: 1, max: 2, text: '+1 zdraví všem figurkám skupiny.' },
   { k: 'plus', name: 'Posila', cost: 2, max: 2, text: '+1 přisluhovač v základní sestavě skupiny.' },
-  { k: 'elite', name: 'Druhá elita', cost: 3, max: 1, text: 'Jeden přisluhovač ze sestavy je elita.' },
+  { k: 'elite', name: 'Elita navíc', cost: 3, max: 1, text: '+1 elita navíc k základní sestavě skupiny.' },
 ];
 const upgradableGroups = () => Object.keys(D.MDEF).filter(t => { const d = D.MDEF[t]; return !d.object && !d.hidden && !d.part && !d.lieutenant && !d.boss && !d.obelisk; });
 // skupiny, které se dají nasadit ve zbývajících scénářích (od indexu `from`)
@@ -5696,8 +5716,7 @@ function grpCan(st, type, k) {
   if (!upgradableGroups().includes(type)) return 'Tuhle skupinu vylepšit nejde.';
   const cur = ((st.ol.grp || {})[type] || {})[k] || 0;
   if (cur >= u.max) return 'Už je na maximu.';
-  if (k === 'elite' && !(D.MDEF[type].minions && D.MDEF[type].minions[3] > 0) && !(((st.ol.grp || {})[type] || {}).plus)) return 'Skupina nemá přisluhovače, kterého by šlo povýšit.';
-  if ((st.ol.gold || 0) < u.cost) return 'Málo zlata.';
+  if ((st.ol.gold || 0) < u.cost) return 'Málo temné esence.';
   return null;
 }
 function buyGroupUp(st, type, k) {
@@ -5706,7 +5725,7 @@ function buyGroupUp(st, type, k) {
   st.ol.gold -= u.cost; st.ol.grp = st.ol.grp || {}; const g = st.ol.grp[type] = st.ol.grp[type] || {}; g[k] = (g[k] || 0) + 1;
   save(st); return null;
 }
-// bot Domu: soustředí zlato do jedné-dvou skupin dalšího scénáře (posila > druhá elita > zocelení)
+// bot Domu: soustředí temnou esenci do jedné-dvou skupin dalšího scénáře (posila > elita navíc > zocelení)
 function botGold(st) {
   const sc = D.SCENARIOS[st.scen + 1]; if (!sc) return;
   let next = groupsFor(st.scen + 1).filter(t => (sc.cats || []).includes(D.MDEF[t].cat)); if (!next.length) next = groupsFor(st.scen + 1); if (!next.length) return;
@@ -8715,7 +8734,7 @@ function monSum(t) {
   const ab = (list) => (list || []).map(([ic, tip]) => `<span class="ms-ab" title="${esc(tip)}">${A.icon(ic)}</span>`).join('');
   const row = (elite) => `<div class="ms-row${elite ? ' el' : ''}"><span class="ms-p">${monPortrait(t, elite)}</span><span class="ms-n" title="${esc(elite ? d.eliteName : d.unit)}">${elite ? '★' : ''}</span><span class="ms-st">${statRow(C.stats({ type: t, elite }), elite, t)}${ab(elite ? (MON_ABE[t] || []).concat(MON_AB[t] || []) : MON_AB[t])}</span></div>`;
   return `<div class="msum${act ? ' done' : ''}${!ms.length ? ' gone' : ''}" data-mon="${t}" role="button" tabindex="0" title="Klikni pro detail monster">
-    <div class="ms-head"><b>${esc(d.name)}${G.grpUp && G.grpUp[t] && grpBadge(t, G.grpUp[t]) ? `<span class="grp-chip" title="Vylepšení skupiny za zlato: ${esc(grpBadge(t, G.grpUp[t]))}">${esc(grpBadge(t, G.grpUp[t]))}</span>` : ''}</b><small>${status}${killed ? ' · padlo ' + killed : ''}</small>${canAct ? `<button class="btn sm primary" data-group="${t}">Aktivovat</button>` : ''}</div>
+    <div class="ms-head"><b>${esc(d.name)}${G.grpUp && G.grpUp[t] && grpBadge(t, G.grpUp[t]) ? `<span class="grp-chip" title="Vylepšení skupiny za temnou esenci: ${esc(grpBadge(t, G.grpUp[t]))}">${esc(grpBadge(t, G.grpUp[t]))}</span>` : ''}</b><small>${status}${killed ? ' · padlo ' + killed : ''}</small>${canAct ? `<button class="btn sm primary" data-group="${t}">Aktivovat</button>` : ''}</div>
     ${row(false)}${d.lieutenant ? '' : row(true)}</div>`;
 }
 // ---------- příprava Domu: spodní lišta kroků ----------
@@ -9036,7 +9055,7 @@ function topHTML(s, c) {
   const statuses = s => {
     if (s.ignoreEv) x('wind', 'ignoruje únik'); if (s.ignoreAr) x('shield', 'ignoruje armor');
     if (s.stun) x('stun', 'omráčí'); if (s.stunGhost) x('stun', 'omráčí přízrak'); if (s.stunGround) x('stun', 'omráčí nelétající'); if (s.dmgFly) x('drop', 'proti létajícím', '+' + s.dmgFly, 'c-dmg'); if (s.root) x('chain', 'přišpendlí'); if (s.disarm) x('disarm', 'odzbrojí');
-    if (s.mark) x('crosshair', 'Označí'); if (s.pierceAr) x('armorpierce', 'bez armoru'); if (s.poison) x('drop', 'jed', s.poison === true ? 1 : s.poison, 'c-poison'); if (s.bleed) x('bleed', 'krvácení', s.bleed === true ? 1 : s.bleed, 'c-dmg'); if (s.burn) x('fire', 'pole hoří');
+    if (s.mark) x('crosshair', 'Označí'); if (s.pierceAr) x('armorpierce', 'bez armoru'); if (s.poison) x('drop', 'jed', s.poison === true ? 1 : s.poison, 'c-poison'); if (s.bleed) x('bleed', s.bleedFirst ? 'krvácení (jen 1. zásah)' : 'krvácení', s.bleed === true ? 1 : s.bleed, 'c-dmg'); if (s.burn) x('fire', 'pole hoří');
     if (s.push) x('push', 'odstrčí', s.push === true ? 1 : s.push, 'c-mv'); if (s.pushAdj) x('push', 'sousedy odstrčí', s.pushAdj, 'c-mv');
     if (s.pullHit) x('pullin', 'přitáhne', s.pullHit, 'c-pull'); if (s.throwOver) x('swap', 'přehodí vedle tebe');
     if (s.flyPush) x('push', 'létající odletí', s.flyPush, 'c-mv');
@@ -9079,7 +9098,7 @@ function topHTML(s, c) {
       else { L.push(LN_('panic', 'strach', s.fear >= 9 ? '0' : '−' + s.fear, 'c-fear')); if (s.dmg) L.push(LN_('shield', s.both ? 'a zranění' : 'nebo zranění', '−' + s.dmg, 'c-ar')); if (s.reflect) x('drop', 'odraz', s.reflect, 'c-dmg'); if (s.heal) x('heart', 'léčí', '+' + s.heal, 'c-heal'); if (s.pushBack) x('push', 'útočník odletí', s.pushBack); }
       break;
     case 'shove': R(s.all ? 'splash' : 'sword'); L.push(LN_('push', s.all ? 'všechny odstrčí' : 'odstrčí', s.n, 'c-mv')); x('stun', 'náraz omráčí' + (s.collide ? ' a zraní' : '')); break;
-    case 'salt': if (s.around) { R('splash', '', { label: 'všechna pole kolem tebe' }); L.push(LN_('salt', 'sůl', '', 'c-fx')); N.push('I pod monstra. Monstra do soli nevstoupí a v soli nemohou útočit. Do konce příštího kola.'); break; } R('crosshair', s.range, { diag: s.area ? 'area' : null }); if (!s.area) L.push(LN_('hex', 'pole', s.len, 'c-rng')); L.push(LN_('salt', 'sůl', '', 'c-fx')); N.push('I pod postavy. Monstra do soli nevstoupí a v soli nemohou útočit; lovce v soli napadají s nevýhodou. Do konce příštího kola.'); break;
+    case 'salt': if (s.around) { R('splash', '', { label: 'všechna pole kolem tebe' }); L.push(LN_('salt', 'sůl', '', 'c-fx')); if (s.calm) L.push(LN_('panic', 'lovci na soli: strach', '−' + s.calm, 'c-fear')); N.push('I pod monstra. Monstra do soli nevstoupí a v soli nemohou útočit. Do konce příštího kola.'); break; } R('crosshair', s.range, { diag: s.area ? 'area' : null }); if (!s.area) L.push(LN_('hex', 'pole', s.len, 'c-rng')); L.push(LN_('salt', 'sůl', '', 'c-fx')); N.push('I pod postavy. Monstra do soli nevstoupí a v soli nemohou útočit; lovce v soli napadají s nevýhodou. Do konce příštího kola.'); break;
     case 'fire': R('lob', s.range, { diag: s.area ? 'area' : null }); if (!s.area) L.push(LN_('hex', 'pole', s.len, 'c-rng')); L.push(LN_('fire', 'oheň', s.dmg, 'c-dmg')); if (s.light) N.push('Rozsvítí Tmu.'); break;
     case 'rootarea': R('lob', s.range, { diag: 'area' }); L.push(LN_('chain', 'přišpendlí všechny', '', 'c-fx')); N.push('I lovce. Bez hodu.'); break;
     case 'flash': R('aura', s.range); L.push(LN_('stun', 'omráčí', '', 'c-fx')); if (s.light) N.push('Rozsvítí Tmu.'); break;
@@ -9095,8 +9114,8 @@ function topHTML(s, c) {
     case 'beam': R('aura', s.range); L.push(LN_('lantern', 'zruš Tmu', '', 'c-fx')); L.push(LN_('wind', 'bez úniku', '', 'c-fx')); break;
     case 'stunone': R('crosshair', s.range); L.push(LN_('stun', 'omráčí', '', 'c-fx')); if (s.dmg) L.push(LN_('drop', 'zranění, skrz armor', s.dmg, 'c-dmg')); N.push('Bez hodu.'); break;
     case 'rootone': R('crosshair', s.range); L.push(LN_('chain', 'přišpendlí', '', 'c-fx')); N.push('Bez hodu.'); break;
-    case 'pull': R('crosshair', s.range); L.push(LN_('pullin', 'přitáhne k tobě', '', 'c-pull')); if (s.stun) x('stun', 'omráčí'); if (s.disarm) x('disarm', 'odzbrojí'); break;
-    case 'yank': R('crosshair', s.range, { label: s.all ? 'všechna monstra' : two(s.n) }); L.push(LN_('pullin', 'přitáhne o', s.pull, 'c-pull')); if (s.disarm) x('disarm', 'odzbrojí'); if (s.perHex) x('drop', 'zranění za pole přitažení', s.perHex, 'c-dmg'); N.push('Ve výhledu.'); break;
+    case 'pull': R('crosshair', s.range); L.push(LN_('pullin', 'přitáhne k tobě', '', 'c-pull')); if (s.stun) x('stun', 'omráčí'); if (s.disarm) x('disarm', 'odzbrojí'); if (s.root) x('chain', 'přišpendlí'); break;
+    case 'yank': R('crosshair', s.range, { label: s.all ? 'všechna monstra' : two(s.n) }); L.push(LN_('pullin', 'přitáhne o', s.pull, 'c-pull')); if (s.disarm) x('disarm', 'odzbrojí'); if (s.perHex) x('drop', 'zranění za pole přitažení', s.perHex, 'c-dmg'); if (s.dmgEach) x('drop', 'každé přitažené: zranění', s.dmgEach, 'c-dmg'); N.push('Ve výhledu.'); break;
     case 'blast': R('aura', s.range, { label: 'jedno monstrum' }); L.push(LN_('push', 'odstrčí', s.n, 'c-mv')); if (s.dmg) L.push(LN_('drop', 'zranění, bez hodu', s.dmg, 'c-dmg')); if (s.root) x('chain', 'přišpendlí'); if (s.disNext) x('die', 'příští útok s nevýhodou'); if (s.mark) x('crosshair', 'Označí'); N.push('Náraz omráčí.'); break;
     case 'recall': L.push(LN_('deck', 'další karta se vrátí do ruky', '', 'c-draw')); N.push('V tomto tahu. Ne Panika ani jednorázové.'); break;
     case 'stomp': R('splash', '', { label: 'všichni kolem' }); L.push(LN_('stun', 'omráčí', '', 'c-fx')); break;
@@ -9116,15 +9135,15 @@ function topHTML(s, c) {
     case 'incense': R('aura', '', { label: 'tvá místnost' }); L.push(LN_('die', 'útok monster', '−' + s.weaken, 'c-mod')); N.push('Do konce kola.'); break;
     case 'invis': L.push(LN_('eyeoff', 'neviditelnost', '', 'c-ev')); N.push('Do tvého příštího tahu. Útok ji zruší.'); break;
     case 'evade': L.push(LN_('wind', 'únik', s.n, 'c-ev')); N.push('Do konce kola.'); break;
-    case 'momentum': L.push(LN_('die', `k útokům <i class="bon">(${BI(s.per === 2 ? '+1/2' : '+1×', 'boot')}${s.max ? ', max ' + s.max : ''})</i>`, '', 'c-mod')); if (s.dmgToo) L.push(LN_('drop', `zranění <i class="bon">(${BI('+1/2', 'boot')})</i>`, '', 'c-dmg')); if (!s.max) X.push(LN_('boot', 'bez stropu', '', 'c-fx')); if (s.evade) L.push(LN_('wind', 'únik', s.evade, 'c-ev')); N.push('Do konce tahu, počítá i pohyb před zahráním.'); break;
+    case 'momentum': L.push(LN_('die', `k útokům <i class="bon">(${BI(s.per === 2 ? '+1/2' : '+' + (s.amt || 1) + '×', 'boot')}${s.max ? ', max ' + s.max : ''})</i>`, '', 'c-mod')); if (s.dmgToo) L.push(LN_('drop', `zranění <i class="bon">(${BI('+1/2', 'boot')})</i>`, '', 'c-dmg')); if (!s.max) X.push(LN_('boot', 'bez stropu', '', 'c-fx')); if (s.evade) L.push(LN_('wind', 'únik', s.evade, 'c-ev')); N.push('Do konce tahu, počítá i pohyb před zahráním.'); break;
     case 'haste': L.push(LN_('boot', 'ke každému pohybu', '+' + s.n, 'c-mv')); if (!s.noPhase) L.push(LN_('ghoststep', 'skrz nepřátele', '', 'c-mv')); else N.push('Do konce kola.'); if (s.evade) L.push(LN_('wind', 'únik', s.evade, 'c-ev')); if (s.draw) L.push(LN_('deck', 'lízni', s.draw, 'c-draw')); if (s.trample) x('crosshair', 'projetá monstra: −' + s.trample.dmg + ', Označí'); if (s.hook) x('pullin', 'hák: přitáhni se k monstru do ' + s.hook, '', 'c-pull'); break;
-    case 'hex': R(s.area ? 'lob' : 'crosshair', s.range, { diag: s.area ? 'area' : null }); if (s.dmg) L.push(LN_('drop', 'bez hodu, skrz armor' + bonusDmg(s), s.dmg, 'c-dmg')); if (s.weaken) L.push(LN_('die', 'jeho útok', '−' + s.weaken, 'c-mod')); if (s.dis) L.push(LN_('die', 'útočí s nevýhodou', '', 'c-dmg')); if (s.root) x('chain', 'přišpendlí'); N.push('Postih do konce kola.'); break;
+    case 'hex': R(s.area ? 'lob' : 'crosshair', s.range, { diag: s.area ? 'area' : s.tn > 1 ? 'two' : null, label: s.area ? '' : two(s.tn) }); if (s.dmg) L.push(LN_('drop', 'bez hodu, skrz armor' + bonusDmg(s), s.dmg, 'c-dmg')); if (s.weaken) L.push(LN_('die', s.tn > 1 ? 'jejich útok' : 'jeho útok', '−' + s.weaken, 'c-mod')); if (s.dis) L.push(LN_('die', 'útočí s nevýhodou', '', 'c-dmg')); if (s.root) x('chain', 'přišpendlí'); N.push('Postih do konce kola.'); break;
     case 'markone': R('crosshair', s.range, { label: two(s.n) }); L.push(LN_('crosshair', 'Označí: lovci +1, bez úniku', '', 'c-fx')); if (s.pierce) x('armorpierce', 'útoky ignorují armor'); if (s.pull) x('pullin', 'přitáhne', s.pull, 'c-pull'); if (s.root) x('chain', 'přišpendlí'); N.push('Do konce kola.'); break;
     case 'nudge': R('crosshair', s.range); L.push(LN_('push', 'posuň o', s.n, 'c-mv')); if (s.mark) x('eye', 'označí'); break;
     case 'summon': L.push(LN_('star', s.n > 1 ? s.n + '× ' + (C.SUMMON_NAMES && C.SUMMON_NAMES[s.kind] || 'vyvolanec') : (C.SUMMON_NAMES && C.SUMMON_NAMES[s.kind] || 'vyvolanec'), '', 'c-pos')); L.push(LN_('drop', 'zranění', s.dmg, 'c-dmg')); L.push(LN_('die', 'k hodu', C.sgn(s.mod), 'c-mod')); L.push(LN_('ghoststep', 'let', s.move, 'c-mv')); if (s.rounds < 90) L.push(LN_('hourglass2', 'kola', s.rounds, 'c-fx')); N.push(s.rounds < 90 ? 'Hraje sám po tvém tahu.' : 'Hraje sám po tvém tahu, vydrží do konce scénáře.'); break;
     case 'summonact': L.push(LN_('star', 'vyvolanci hned jednají', '', 'c-pos')); break;
     case 'souls': R('aura', s.range, { label: 'lovci' }); L.push(LN_('die', `k útokům <i class="bon">(${BI('+1×', 'ally')}, max 3)</i>`, '', 'c-mod')); N.push('Za každého tvého vyvolance.'); break;
-    case 'confuse': R('crosshair', s.range); L.push(LN_('swap', (s.n > 1 ? s.n + '× ' : '') + 'zaútočí na jiné monstrum', '', 'c-fx')); if (s.stun) x('stun', 'pak omráčené'); N.push('Nepohne se, cíl náhodný.'); break;
+    case 'confuse': R('crosshair', s.range, { diag: s.tn > 1 ? 'two' : null, label: two(s.tn) }); L.push(LN_('swap', (s.tn > 1 ? 'každé ' : '') + (s.n > 1 ? s.n + '× ' : '') + 'zaútočí na jiné monstrum', '', 'c-fx')); if (s.stun) x('stun', s.tn > 1 ? 'pak omráčená' : 'pak omráčené'); N.push(s.tn > 1 ? 'Nepohnou se, cíl náhodný.' : 'Nepohne se, cíl náhodný.'); break;
     case 'guide': R(s.all ? 'aura' : 'lob', s.range >= 90 ? '' : s.range, { label: s.extra ? 'spojenec' : s.all ? (s.range >= 90 ? 'všichni kdekoli' : 'lovci') : 'lovec' }); if (s.extra) L.push(LN_('bolt', 'příští tah zahrání', '+1', 'c-draw')); else L.push(LN_('die', s.round ? 'výhoda do konce kola' : 'výhoda na příští útok', '', 'c-pos')); if (s.armor) L.push(LN_('shield', 'armor', '+' + s.armor, 'c-ar')); break;
     case 'dominate': R('crosshair', s.range); L.push(LN_('star', 'ovládneš na ' + s.rounds + ' kola', '', 'c-pos')); x('heart', 'tobě = jeho zdraví', '', 'c-dmg'); N.push('Jen neelitní.'); break;
     case 'cover': L.push(LN_('eyeoff', 'na tebe jen z', s.max, 'c-ev')); L.push(LN_('die', 'k útokům', '+' + s.mod, 'c-mod')); if (s.range) L.push(LN_('crosshair', 'dosah', '+' + s.range, 'c-rng')); N.push('Do konce kola.'); break;
@@ -9178,7 +9197,7 @@ const OL_META = {
   hlad: { cat: 'vyvolani', lines: [['jaws', 'aktivuj skupinu znovu', '', 'c-fx'], ['bolt', 'akce každému', '1', 'c-mv']], note: 'Jen už aktivovaná skupina.' },
   prohozeni: { cat: 'dum', lines: [['swap', 'prohoď dva lovce', '', 'c-fx'], ['hex', 'nejvýš od sebe', '6', 'c-rng']], note: '' },
   zleoko: { cat: 'kletba', lines: [['eye', 'lovci v místnosti', '', 'c-fx'], ['die', 'útoky: nevýhoda', '', 'c-dmg']], note: 'Do konce kola.' },
-  zavoj: { cat: 'dum', lines: [['cloak', 'dosah lovců nejvýš', '3', 'c-rng'], ['crosshair', 'bonusy ho nezvýší', '', 'c-fx']], note: 'Do konce kola.' },
+  zavoj: { cat: 'dum', lines: [['cloak', 'dosah lovců nejvýš', '3', 'c-rng'], ['die', 'všechny útoky lovců', '−1', 'c-dmg'], ['crosshair', 'bonusy dosah nezvýší', '', 'c-fx']], note: 'Do konce kola.' },
   hruza: { cat: 'kletba', lines: [['drop', 'zranění za Paniku', '1', 'c-dmg'], ['panic', 'lovci bez Paniky', '+1', 'c-fear']], note: '' },
   nakaza: { cat: 'kletba', lines: [['drop', 'otrávení: jed', '+1', 'c-dmg'], ['bleed', 'krvácející: krvácení', '+1', 'c-dmg'], ['panic', 'ostatní: strach', '+1', 'c-fear']], note: '' },
   navrat: { cat: 'vyvolani', lines: [['mirror', 'padlý přisluhovač zpět', '1', 'c-fx'], ['threat', 'bez Hrozby', '', 'c-fx']], note: 'K zrcadlu v odkryté místnosti.' },
@@ -9690,8 +9709,8 @@ function treeHTML(nodes, cur, xp, attr, previewFn) {
 function campRewardsHTML(r) {
   if (!r) return '';
   return `<div class="cr"><div class="cr-res ${r.win ? 'win' : 'lose'}"><p class="eyebrow">Scénář ${r.scen + 1} · ${esc(r.name)}</p><h2>${r.win ? 'Lovci uspěli' : 'Dům zvítězil'}</h2><p>${esc(r.reason)}</p></div>
-    <div class="cr-cols"><div class="cr-box h"><h3>Lovci</h3><p><b>+${r.heroes.esence}</b> esence <small>(${C.HEROES.length} za lovce${r.heroes.found ? ', ' + r.heroes.found + ' za nálezy' : ''}${r.heroes.comp ? ', 3 jako kompenzace' : ''})</small></p><p><b>+${r.heroes.xp + (r.heroes.comp ? 1 : 0)}</b> zkušenosti každý${r.heroes.comp ? ' <small>(vč. kompenzace za dvě porážky)</small>' : ''}</p>${r.relic ? `<p class="good-t"><b>Relikvie:</b> ${esc(C.EQUIP[r.relic].name)} je ${r.relicHero && (S.camp && S.camp.heroes[r.relicHero].bag.includes(r.relic)) ? 'v batohu: ' + esc(C.HEROES.find(h => h.id === r.relicHero).name) : 'v truhle'}.</p>` : ''}${r.loot && Object.values(r.loot).some(l => l.length) ? `<p><b>Nálezy s sebou:</b> ${C.HEROES.filter(h => (r.loot[h.id] || []).length).map(h => esc(h.name.split(' ')[0]) + ': ' + r.loot[h.id].map(id => esc(C.D.LOOT[id].name)).join(', ')).join(' · ')}</p>` : ''}</div>
-    <div class="cr-box o"><h3>Dům</h3><p><b>+${r.ol.xp}</b> zkušenosti a <b>+${r.ol.gold || 0}</b> zlato${r.ol.comp ? ' <small>(vč. kompenzace za dvě porážky)</small>' : ''}</p></div></div></div>`;
+    <div class="cr-cols"><div class="cr-box h"><h3>Lovci</h3><p><b>+${r.heroes.esence}</b> esence <small>(${C.HEROES.length} za lovce${r.heroes.found ? ', ' + r.heroes.found + ' za nálezy' : ''}${r.heroes.comp ? ', ' + Camp.COMP.heroEss + ' jako kompenzace' : ''})</small></p><p><b>+${r.heroes.xp + (r.heroes.comp ? 1 : 0)}</b> zkušenosti každý${r.heroes.comp ? ' <small>(vč. kompenzace za dvě porážky)</small>' : ''}</p>${r.relic ? `<p class="good-t"><b>Relikvie:</b> ${esc(C.EQUIP[r.relic].name)} je ${r.relicHero && (S.camp && S.camp.heroes[r.relicHero].bag.includes(r.relic)) ? 'v batohu: ' + esc(C.HEROES.find(h => h.id === r.relicHero).name) : 'v truhle'}.</p>` : ''}${r.loot && Object.values(r.loot).some(l => l.length) ? `<p><b>Nálezy s sebou:</b> ${C.HEROES.filter(h => (r.loot[h.id] || []).length).map(h => esc(h.name.split(' ')[0]) + ': ' + r.loot[h.id].map(id => esc(C.D.LOOT[id].name)).join(', ')).join(' · ')}</p>` : ''}</div>
+    <div class="cr-box o"><h3>Dům</h3><p><b>+${r.ol.xp}</b> zkušenosti a <b>+${r.ol.gold || 0}</b> temné esence${r.ol.comp ? ' <small>(vč. kompenzace za dvě porážky)</small>' : ''}</p></div></div></div>`;
 }
 function campHeroesHTML(st) {
   const shop = Camp.rollShop(st);
@@ -9707,18 +9726,18 @@ function campHeroesHTML(st) {
   html += `<section class="cp-chest" data-drop='{"where":"chest"}'><div class="cp-h"><h3>Truhla družiny</h3><div class="sellzone" data-drop='{"where":"sell"}'>${A.icon('star')} Prodat sem · +1 esence</div></div>${st.chest.length ? `<div class="chest">${st.chest.map((id, i) => `<div class="ci" draggable="true" data-src='{"where":"chest","idx":${i}}'><span class="si-ic">${A.icon(ITEM_IC[id] || 'star')}</span><div><b>${esc(C.EQUIP[id].name)}</b><div class="si-b">${itemBadge(id)}</div></div><div class="ci-b">${C.HEROES.map(h => `<button class="btn sm" data-equip="${id}" data-for="${h.id}">${esc(h.name.split(' ')[0])}</button>`).join('')}<button class="btn sm ghost" data-sell="${id}">Prodat · +1</button></div></div>`).join('')}</div>` : '<p class="muted">Prázdná. Sem padá výbava, kterou nahradíte, nebo kterou koupíte do zásoby. Kliknutím na předmět u lovce ho sem odložíte.</p>'}</section>`;
   return html;
 }
-// vylepšení skupin monster za zlato Domu
+// vylepšení skupin monster za temnou esenci Domu
 function campGrpHTML(st) {
   const types = Camp.groupsFor(st.scen + 1), gold = st.ol.gold || 0;
   if (!types.length) return '';
   const nextCats = new Set((C.SCENARIOS[st.scen + 1] || {}).cats || []);
-  return `<div class="grp-up"><div class="cp-h"><h3>Skupiny monster</h3><span class="ess gold">${A.icon('crown')} ${gold} zlata</span></div>
-    <p class="muted sm">Vylepšení platí natrvalo, kdykoli skupinu nasadíš. Zocelení ${Camp.GRP_UPS[0].cost} zl. (max ${Camp.GRP_UPS[0].max}×), Posila ${Camp.GRP_UPS[1].cost} zl. (max ${Camp.GRP_UPS[1].max}×), Druhá elita ${Camp.GRP_UPS[2].cost} zl. (max ${Camp.GRP_UPS[2].max}×). ★ = skupina z dalšího scénáře.</p>
-    <div class="grp-list">${types.sort((a, b) => (nextCats.has(C.MDEF[b].cat) ? 1 : 0) - (nextCats.has(C.MDEF[a].cat) ? 1 : 0)).map(t => { const g = (st.ol.grp || {})[t] || {}; return `<div class="grp${Object.keys(g).length ? ' has' : ''}">${monPortrait(t)}<div class="grp-b"><b>${nextCats.has(C.MDEF[t].cat) ? '★ ' : ''}${esc(C.MDEF[t].name)}</b><small>${grpBadge(t, g) || 'bez vylepšení'}</small></div><div class="grp-btns">${Camp.GRP_UPS.map(u => { const why = Camp.grpCan(st, t, u.k), n = g[u.k] || 0; return `<button class="btn sm${why ? '' : ' primary'}" data-grpup="${t}|${u.k}" ${why ? 'disabled' : ''} title="${esc(u.text + (why ? ' ' + why : ''))}">${esc(u.name)} ${n}/${u.max} · ${u.cost} zl.</button>`; }).join('')}</div></div>`; }).join('')}</div></div>`;
+  return `<div class="grp-up"><div class="cp-h"><h3>Skupiny monster</h3><span class="ess gold">${A.icon('crown')} ${gold} temné esence</span></div>
+    <p class="muted sm">Vylepšení platí natrvalo, kdykoli skupinu nasadíš. Platí se temnou esencí (${A.icon('crown')}): ${Camp.GRP_UPS.map(u => esc(u.name) + ' ' + u.cost + ' (max ' + u.max + '×)').join(', ')}. ★ = skupina z dalšího scénáře.</p>
+    <div class="grp-list">${types.sort((a, b) => (nextCats.has(C.MDEF[b].cat) ? 1 : 0) - (nextCats.has(C.MDEF[a].cat) ? 1 : 0)).map(t => { const g = (st.ol.grp || {})[t] || {}; return `<div class="grp${Object.keys(g).length ? ' has' : ''}">${monPortrait(t)}<div class="grp-b"><b>${nextCats.has(C.MDEF[t].cat) ? '★ ' : ''}${esc(C.MDEF[t].name)}</b><small>${grpBadge(t, g) || 'bez vylepšení'}</small></div><div class="grp-btns">${Camp.GRP_UPS.map(u => { const why = Camp.grpCan(st, t, u.k), n = g[u.k] || 0; return `<button class="btn sm${why ? '' : ' primary'}" data-grpup="${t}|${u.k}" ${why ? 'disabled' : ''} title="${esc(u.text + (why ? ' ' + why : ''))}">${esc(u.name)} ${n}/${u.max} · ${u.cost} ${A.icon('crown')}</button>`; }).join('')}</div></div>`; }).join('')}</div></div>`;
 }
-const grpBadge = (t, g) => [g.hp ? '+' + g.hp + ' zdraví' : '', g.plus ? '+' + g.plus + ' přisluhovač' + (g.plus > 1 ? 'i' : '') : '', g.elite ? '2 elity' : ''].filter(Boolean).join(' · ');
+const grpBadge = (t, g) => [g.hp ? '+' + g.hp + ' zdraví' : '', g.plus ? '+' + g.plus + ' přisluhovač' + (g.plus > 1 ? 'i' : '') : '', g.elite ? '+' + g.elite + ' elita' : ''].filter(Boolean).join(' · ');
 function campOlHTML(st) {
-  return `<section class="cp-ol">${campGrpHTML(st)}<div class="cp-h"><h3>Dům: karty</h3><span class="ess o">${A.icon('threat')} 3 sloty na skupiny monster</span><span class="ess gold">${A.icon('crown')} ${st.ol.gold || 0} zlata</span><span class="ess">${st.ol.xp} xp</span></div>
+  return `<section class="cp-ol">${campGrpHTML(st)}<div class="cp-h"><h3>Dům: karty</h3><span class="ess o">${A.icon('threat')} 3 sloty na skupiny monster</span><span class="ess gold">${A.icon('crown')} ${st.ol.gold || 0} temné esence</span><span class="ess">${st.ol.xp} xp</span></div>
     <div class="ol-up">${C.OL_DECK.map(id => { const cur = st.ol.up[id] || '', nodes = Object.assign({ '': C.OL_CARDS[id].name }, Object.fromEntries(Object.entries(C.OL_VAR[id] || {}).map(([k, v]) => [k, v[0]]))); return `<div class="olu">${olCardHTML({ id, v: cur }, 'mini')}${C.OL_VAR[id] ? treeHTML(nodes, cur, st.ol.xp, `data-olup="${id}" data-v`, true) : '<p class="muted">Bez vylepšení.</p>'}</div>`; }).join('')}</div></section>`;
 }
 function showCamp(r) {
