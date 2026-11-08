@@ -732,7 +732,7 @@ body.busy svg.map .flick, body.busy .tok-idle, body.busy .mir-eye, body.busy .li
 .dock-hand { display: flex; align-items: flex-end; padding: 26px 40px 0; transform: translateY(calc(var(--ch) * .6)); transition: transform .3s cubic-bezier(.3,.8,.3,1) .22s; min-height: 40px; }
 #handdock:hover .dock-hand, #handdock.locked .dock-hand, #handdock.force .dock-hand { transform: translateY(-12px); transition-delay: 0s; }
 body.dragging #handdock .dock-hand { transform: translateY(calc(var(--ch) * .9)) !important; transition-delay: 0s; }
-.dock-hand > .card { zoom: .88; /* karty v ruce: mezi v58 (1) a v59 (.8) */ transform: translateY(var(--y, 0)) rotate(var(--r, 0deg)); transform-origin: 50% 130%; transition: transform .18s, box-shadow .18s, filter .2s, opacity .14s; }
+.dock-hand > .card { zoom: var(--hz, .88); /* velikost karet v ruce: tlačítka −/+ u zámku */ transform: translateY(var(--y, 0)) rotate(var(--r, 0deg)); transform-origin: 50% 130%; transition: transform .18s, box-shadow .18s, filter .2s, opacity .14s; }
 .dock-hand > .card + .card { margin-left: -28px; }
 .dock-hand.live > .card { cursor: grab; }
 #handdock:is(:hover, .locked, .force) .dock-hand > .card:hover { transform: translateY(-18px) rotate(0deg) scale(1.07); z-index: 30 !important; }
@@ -741,6 +741,10 @@ body.dragging #handdock .dock-hand { transform: translateY(calc(var(--ch) * .9))
 .dock-hand > .card.selected { transform: translateY(-26px) rotate(0deg) !important; }
 .dock-lock { position: absolute; left: calc(100% - 34px); bottom: 10px; width: 34px; height: 34px; border-radius: 50%; display: grid; place-items: center; background: #0a090ce8; border: 1px solid #5a4a30; color: var(--muted); cursor: pointer; z-index: 40; }
 .dock-lock .ic { width: 16px; height: 16px; }
+.dock-size { position: absolute; left: calc(100% + 6px); bottom: 13px; display: flex; gap: 4px; z-index: 40; }
+.dock-size button { width: 28px; height: 28px; border-radius: 50%; display: grid; place-items: center; background: #0a090ce8; border: 1px solid #5a4a30; color: var(--muted); cursor: pointer; font: 600 16px/1 var(--f-body); padding: 0; }
+.dock-size button:hover:not(:disabled) { color: var(--candle-2); border-color: var(--candle); }
+.dock-size button:disabled { opacity: .35; cursor: default; }
 .dock-lock[aria-pressed="true"] { color: #1a1208; background: var(--candle-2); border-color: var(--candle); }
 #pilesdock { position: absolute; left: 12px; bottom: 10px; display: flex; gap: 10px; align-items: flex-end; padding: 10px 14px 8px; background: radial-gradient(120% 120% at 30% 100%, #0c0a10f2, #0c0a10c0 60%, transparent 85%); border-radius: 14px; }
 #pilesdock .piles { gap: 6px; }
@@ -10430,13 +10434,18 @@ function playsHTML(h) {
 function threatHTML(G) { return `<div class="plays thr" title="Hrozba Domu"><div class="torb">${A.icon('threat')}<b>${G.threat}</b></div><small>Hrozba</small></div>`; }
 function initBottom() {
   const bot = $('#bottom'); if (bot._init) return; bot._init = true;
-  bot.innerHTML = `<div id="promptbar" class="promptbar"></div><div id="shopdock"></div><div id="pickdock"></div><div id="played" aria-live="polite"></div><div id="zones"></div><div id="pilesdock"></div><div id="handdock" class="empty"><div class="dock-hand"></div><button class="dock-lock" id="docklock" title="Zamknout karty vysunuté" aria-pressed="false"></button></div>`;
+  bot.innerHTML = `<div id="promptbar" class="promptbar"></div><div id="shopdock"></div><div id="pickdock"></div><div id="played" aria-live="polite"></div><div id="zones"></div><div id="pilesdock"></div><div id="handdock" class="empty"><div class="dock-hand"></div><button class="dock-lock" id="docklock" title="Zamknout karty vysunuté" aria-pressed="false"></button><div class="dock-size"><button id="handsm" title="Menší karty">−</button><button id="handbg" title="Větší karty">+</button></div></div>`;
   $('#docklock').addEventListener('click', () => { S.dockLock = !S.dockLock; sfx('click'); syncDock(); });
+  const hs = d => { const v = Math.max(-2, Math.min(3, (S.handSize || 0) + d)); if (v === (S.handSize || 0)) return; S.handSize = v; try { localStorage.setItem('bm_handsize', String(v)); } catch (e) { } sfx('click'); syncDock(); };
+  $('#handsm').addEventListener('click', () => hs(-1)); $('#handbg').addEventListener('click', () => hs(1));
   syncDock();
 }
 function syncDock() {
   const d = $('#handdock'); if (!d) return;
   d.classList.toggle('locked', !!S.dockLock);
+  if (S.handSize == null) { S.handSize = 0; try { const v = parseInt(localStorage.getItem('bm_handsize'), 10); if (v >= -2 && v <= 3) S.handSize = v; } catch (e) { } }
+  d.style.setProperty('--hz', (0.88 + 0.1 * S.handSize).toFixed(2));
+  { const sm = $('#handsm'), bg = $('#handbg'); if (sm) sm.disabled = S.handSize <= -2; if (bg) bg.disabled = S.handSize >= 3; }
   const b = $('#docklock'); b.setAttribute('aria-pressed', S.dockLock ? 'true' : 'false'); b.innerHTML = A.icon(S.dockLock ? 'lock' : 'lockopen');
   b.title = S.dockLock ? 'Karty jsou zamčené nahoře. Klikni pro odemčení.' : 'Zamknout karty vysunuté';
 }
