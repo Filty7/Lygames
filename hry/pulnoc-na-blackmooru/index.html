@@ -732,7 +732,7 @@ body.busy svg.map .flick, body.busy .tok-idle, body.busy .mir-eye, body.busy .li
 .dock-hand { display: flex; align-items: flex-end; padding: 26px 40px 0; transform: translateY(calc(var(--ch) * .6)); transition: transform .3s cubic-bezier(.3,.8,.3,1) .22s; min-height: 40px; }
 #handdock:hover .dock-hand, #handdock.locked .dock-hand, #handdock.force .dock-hand { transform: translateY(-12px); transition-delay: 0s; }
 body.dragging #handdock .dock-hand { transform: translateY(calc(var(--ch) * .9)) !important; transition-delay: 0s; }
-.dock-hand > .card { zoom: .8; /* v59: karty v ruce o 20 % menší */ transform: translateY(var(--y, 0)) rotate(var(--r, 0deg)); transform-origin: 50% 130%; transition: transform .18s, box-shadow .18s, filter .2s, opacity .14s; }
+.dock-hand > .card { zoom: .88; /* karty v ruce: mezi v58 (1) a v59 (.8) */ transform: translateY(var(--y, 0)) rotate(var(--r, 0deg)); transform-origin: 50% 130%; transition: transform .18s, box-shadow .18s, filter .2s, opacity .14s; }
 .dock-hand > .card + .card { margin-left: -28px; }
 .dock-hand.live > .card { cursor: grab; }
 #handdock:is(:hover, .locked, .force) .dock-hand > .card:hover { transform: translateY(-18px) rotate(0deg) scale(1.07); z-index: 30 !important; }
