@@ -2052,10 +2052,11 @@ function render(){
   else if(S.phase==='race')renderRace();
   else if(S.phase==='end')renderEnd();
 }
-const VERSION='0.24';
+const VERSION='0.25';
 const CHANGELOG=[
+ ['0.25','Multiplayer: tlačítko Start hry, kontrola stejné verze hry u všech hráčů.'],
  ['0.24','Multiplayer: všichni nakupují najednou, každý ze své kopie stejné nabídky. Hra začne, až mají nakoupeno všichni.'],
- ['0.23','Online multiplayer (beta) s kódem a snake draftem, ukládání do souboru, bivak se dá poslat napřed, posádka na přesunu i v čekání regeneruje, pomalejší změny teploty motoru, volba simulovaných hráčů v single playeru.'],
+ ['0.23','Online multiplayer (beta) s kódem a společným nákupem, ukládání do souboru, bivak se dá poslat napřed, posádka na přesunu i v čekání regeneruje, pomalejší změny teploty motoru, volba simulovaných hráčů v single playeru.'],
  ['0.22','Soupeři jezdí jako lidé: neznají ideální rychlost, mají povahu a náladu podle pořadí, stavu auta a únavy, po nehodě zpomalí, nastavení auta občas odhadnou špatně.'],
  ['0.21','Vlastní drag & drop (zmenšená plná karta), užší stan, nový model teploty motoru (počasí, denní doba, chlazení, agresivita) a přehřátí se zastavením, animace nehod (střecha, defekt, zapadnutí, kouř), silnější agresivita, závod 30 s za hodinu, slabší topení.'],
  ['0.20','Nová hudba: teplejší zvuk místo 8bitového (oud, pady, perkuse, dozvuk a delay), živější motor.'],
@@ -2179,7 +2180,7 @@ function renderShop(){
   const html=`
   <div class="topbar"><div><h2>${inBivak?'Trh v bivaku · den volna':S.mp?'Nákup týmů · online':'Nákup před startem'}</h2><span class="mute">${inBivak?'Utrácíš peníze, které sis ušetřil.':'Povinně odejdeš s autem, jezdcem a navigátorem. Levné verze jsou zdarma.'}</span></div>
   <div class="row"><span class="clock num" style="font-size:26px">${money(S.money)}</span>${inBivak?'<button data-act="closeShop" class="primary">Zpět do bivaku</button>':''}</div></div>
-  ${S.mp&&!inBivak&&S.mp.draft?`<div class="draftbar">${S.mp.passed?`<b>Máš nakoupeno.</b> Čekáš, až dokoupí ostatní.`:`<b class="you">${ic('coin')} Nakupuj v klidu.</b> Všichni mají stejnou nabídku, každý svoji.`}<span class="order">${S.mp.players.map(pl=>`<span class="${S.mp.draft.passed.includes(pl.pid)?'on':''}" style="--c:${pl.col}">${S.mp.draft.passed.includes(pl.pid)?'✓ ':''}${esc(pl.team)}</span>`).join('')}</span></div>`:''}
+  ${S.mp&&!inBivak&&S.mp.draft?`<div class="draftbar">${S.mp.passed?`<b>Máš nakoupeno.</b> Čekáš, až dokoupí ostatní.`:`<b class="you">${ic('coin')} Nákup před odletem.</b> Všichni hráči mají stejnou nabídku, ale každý svoji.`}<span class="order">${S.mp.players.map(pl=>`<span class="${S.mp.draft.passed.includes(pl.pid)?'on':''}" style="--c:${pl.col}">${S.mp.draft.passed.includes(pl.pid)?'✓ ':''}${esc(pl.team)}</span>`).join('')}</span></div>`:''}
   <div class="shop-grid"><div><div class="tabs">${SHOP_TABS.filter(t=>!inBivak||t[0]!=='car').map(([k,l])=>`<button class="${tab===k?'on':''}" data-act="tab" data-k="${k}" ${ROLES[k]?`style="border-bottom:3px solid ${ROLES[k].col}"`:''}>${l}</button>`).join('')}</div><div class="cards">${cards}</div></div>
   <aside class="panel"><h3>${esc(tm.name)}</h3>
     ${inBivak?'':`<div class="check"><span style="color:${tm.car?'var(--ok)':'var(--bad)'}">${tm.car?'✓':'✗'} Auto</span><span style="color:${has('jezdec')?'var(--ok)':'var(--bad)'}">${has('jezdec')?'✓':'✗'} Jezdec</span><span style="color:${has('navigator')?'var(--ok)':'var(--bad)'}">${has('navigator')?'✓':'✗'} Navigátor</span></div>
@@ -2190,7 +2191,7 @@ function renderShop(){
       ${tm.people.map(p=>`<div class="team-item"><span style="border-left:4px solid ${ROLES[p.role].col};padding-left:6px">${esc(p.name)} <span class="mute">· ${ROLES[p.role].name}</span></span>${inBivak||(S.mp&&S.mp.passed)?'':`<button class="small" data-act="sell" data-id="${p.id}">Prodat</button>`}</div>`).join('')||'<span class="mute">Zatím nikdo.</span>'}
       <div class="team-item"><span>Rezervní kola</span><span class="num">${tm.spares}</span></div>
     </div>
-    ${inBivak||(S.mp&&S.mp.passed)?'':`<button class="dice" data-act="randomTeam">${ic('dice')} Koupit náhodně a jet</button>`}
+    ${inBivak||(S.mp&&S.mp.passed)?'':`<button class="dice" data-act="randomTeam">${ic('dice')} ${S.mp?'Koupit náhodně':'Koupit náhodně a jet'}</button>`}
     ${inBivak?'':S.mp?`<button class="primary" style="width:100%;margin-top:12px" data-act="mpPass" ${S.mp.passed||!(tm.car&&has('jezdec')&&has('navigator'))?'disabled':''}>${S.mp.passed?'Čekáš na ostatní…':'Hotovo s nákupem →'}</button>${S.mp.passed?`<button class="small" style="width:100%;margin-top:6px" data-act="mpUnpass">Ještě něco dokoupit</button>`:''}`:`<div class="row" style="margin-top:12px;justify-content:space-between"><button class="small" data-act="back">← Rozpočet a nastavení</button><button class="primary" data-act="toBivak" ${tm.car&&has('jezdec')&&has('navigator')?'':'disabled'}>Odletět do bivaku →</button></div>`}
   </aside></div>`;
   if(inBivak){openModal(`<div class="modal" style="width:min(1300px,100%)">${html}</div>`,'shop')}else app.innerHTML=`<div class="shop-fit">${html}</div>`;
@@ -2891,7 +2892,7 @@ function netOn(m){
 const isHost=()=>!!(S&&S.mp&&S.mp.host);
 function mpToHost(m){if(isHost())mpHandle(m);else netSend(m)}
 function newCode(){const a='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';let s='';for(let i=0;i<5;i++)s+=a[Math.floor(Math.random()*a.length)];return s}
-function myPlayer(){return{pid:NET.pid,team:S.settings.teamName,number:S.settings.number,colors:S.settings.colors}}
+function myPlayer(){return{ver:VERSION,pid:NET.pid,team:S.settings.teamName,number:S.settings.number,colors:S.settings.colors}}
 async function mpHost(){
   readSetupInputs();const code=newCode();
   S.mp={host:true,code,pid:NET.pid,players:[{...myPlayer(),col:PCOLS[0],host:true}]};S.phase='lobby';render();
@@ -2930,7 +2931,7 @@ function mpBuildClient(m){
   S.bots.forEach(b=>S.overall[b.id]=0);mp.players=m.players;mp.draft=m.draft;
   S.humans=m.players.filter(p=>p.pid!==NET.pid).map(p=>({id:p.pid,nick:p.team,col:p.col,real:true}));
   UID=Math.max(UID,1000+Math.max(0,...S.pool.map(p=>p.id)));
-  log('Přílet do bivaku. Začíná draft týmů.');render();
+  log('Přílet do bivaku. Nákup před odletem.');render();
 }
 /* --- draft --- */
 const mpTurn=()=>S.mp&&S.mp.draft?S.mp.draft.order[S.mp.draft.pos]:null;
@@ -2975,7 +2976,7 @@ function mpTick(dt){
 }
 function mpHandle(m){
   switch(m.t){
-    case 'hello':{if(!isHost())return;let pl=S.mp.players.find(p=>p.pid===m.pid);
+    case 'hello':{if(!isHost())return;if(m.ver!==VERSION){netSend({t:'full',to:m.pid,why:`Máš jinou verzi hry (${m.ver||'?'}) než hostitel (${VERSION}). Obnov stránku pomocí Ctrl+F5 a připoj se znovu.`});return}let pl=S.mp.players.find(p=>p.pid===m.pid);
       if(!pl){if(S.phase!=='lobby'||S.mp.players.length>=10){netSend({t:'full',to:m.pid,why:S.phase!=='lobby'?'Hra už běží.':'Hra je plná (10 hráčů).'});return}
         pl={pid:m.pid,team:m.team,number:m.number,colors:m.colors,col:PCOLS[S.mp.players.length%PCOLS.length]};S.mp.players.push(pl)}
       else if(S.phase==='lobby')Object.assign(pl,{team:m.team,number:m.number,colors:m.colors});
@@ -2984,9 +2985,6 @@ function mpHandle(m){
     case 'lobby':if(isHost())return;S.mp.players=m.players;S.mp.settings=m.settings;if(S.phase==='lobby')render();break;
     case 'full':S.mp.err=m.why;netClose();render();break;
     case 'init':if(isHost()||S.phase!=='lobby')return;mpBuildClient(m);break;
-    case 'pick':if(isHost())mpPick(m);break;
-    case 'picked':if(!isHost())mpApplyPicked(m);break;
-    case 'pickfail':toastMsg('Kartu už někdo vzal.');break;
     case 'pass':if(isHost())mpPass(m.pid);break;
     case 'unpass':if(isHost()){const d=S.mp.draft;d.passed=d.passed.filter(x=>x!==m.pid);const msg={t:'draft',draft:d};netSend(msg);mpHandle(msg)}break;
     case 'draft':S.mp.draft=m.draft;mpApplyTaken();if(S.phase==='shop')renderShop();break;
@@ -3007,10 +3005,10 @@ function renderLobby(){
     <div class="row" style="justify-content:space-between"><h2>${ic('users')} Online hra</h2><button class="small" data-act="mpLeave">Odejít</button></div>
     ${mp.err?`<div class="banner" style="color:var(--bad)">${esc(mp.err)}</div>`:mp.ok?'':'<p class="hint">Připojuji…</p>'}
     <div class="codebox"><span>KÓD HRY</span><b class="num">${esc(mp.code)}</b>${host?'<button class="small" data-act="copyCode">Kopírovat</button>':''}</div>
-    <p class="hint">${host?'Pošli kód kamarádům. Připojí se přes Multiplayer → Připojit. Maximálně 10 hráčů, zbytek pole doplní boti do 30 týmů.':'Jsi připojený. Čekáme, až hostitel spustí draft.'}</p>
+    <p class="hint">${host?'Pošli kód kamarádům. Připojí se přes Multiplayer → Připojit. Maximálně 10 hráčů, zbytek pole doplní boti do 30 týmů.':'Jsi připojený. Čekáme, až hostitel spustí hru.'}</p>
     <div class="plist">${(mp.players||[]).map(p=>`<div class="pl"><i style="background:${p.col}"></i><span class="pn"><b style="color:${p.col}">${esc(p.team)}</b> <span class="mute">#${p.number}</span></span><span class="ps">${p.host?'hostitel':''}${p.pid===NET.pid?' · ty':''}</span></div>`).join('')||'<span class="hint">Zatím nikdo.</span>'}</div>
     <div class="row" style="gap:8px"><span class="pill">${money(set.budget||0)}</span><span class="pill">${dl}</span><span class="pill">etapy: ${ll}</span><span class="pill">${30-(mp.players||[]).length} botů</span></div>
-    ${host?`<button class="primary" style="font-size:18px;padding:9px" data-act="mpStart" ${mp.ok?'':'disabled'}>Spustit draft →</button>`:''}
+    ${host?`<button class="primary" style="font-size:18px;padding:9px" data-act="mpStart" ${mp.ok?'':'disabled'}>Start hry →</button>`:''}
   </div></div>`;
 }
 /* --- ukládání do souboru --- */
