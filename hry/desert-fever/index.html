@@ -2052,8 +2052,9 @@ function render(){
   else if(S.phase==='race')renderRace();
   else if(S.phase==='end')renderEnd();
 }
-const VERSION='0.23';
+const VERSION='0.24';
 const CHANGELOG=[
+ ['0.24','Multiplayer: všichni nakupují najednou, každý ze své kopie stejné nabídky. Hra začne, až mají nakoupeno všichni.'],
  ['0.23','Online multiplayer (beta) s kódem a snake draftem, ukládání do souboru, bivak se dá poslat napřed, posádka na přesunu i v čekání regeneruje, pomalejší změny teploty motoru, volba simulovaných hráčů v single playeru.'],
  ['0.22','Soupeři jezdí jako lidé: neznají ideální rychlost, mají povahu a náladu podle pořadí, stavu auta a únavy, po nehodě zpomalí, nastavení auta občas odhadnou špatně.'],
  ['0.21','Vlastní drag & drop (zmenšená plná karta), užší stan, nový model teploty motoru (počasí, denní doba, chlazení, agresivita) a přehřátí se zastavením, animace nehod (střecha, defekt, zapadnutí, kouř), silnější agresivita, závod 30 s za hodinu, slabší topení.'],
@@ -2146,7 +2147,7 @@ function personCard(p){
     <div class="pc-bw"><canvas class="pix pc-ban" data-face="${p.id}" data-ban="1" width="48" height="34"></canvas>${p.owned?`<span class="stamp">V TÝMU</span>`:p.takenBy?`<span class="stamp" style="color:${mpPlayerCol(p.takenBy)};border-color:${mpPlayerCol(p.takenBy)};background:rgba(20,12,8,.8)">${esc(mpPlayerName(p.takenBy))}</span>`:''}</div>
     <div class="pc-en"><span class="vy">${ic('heart')} Výdrž <b>${p.sk.vydrz||0}</b></span></div>
     <div class="pc-sl">${skillRows(p)}</div>
-    <div class="sc-f"><span class="price">${p.free?'ZDARMA':money(p.price)}</span>${p.owned?(inBiv||S.mp?'':`<button class="small" data-act="sell" data-id="${p.id}">Prodat</button>`):p.takenBy?'':`<button class="small primary" data-act="buy" data-id="${p.id}" ${p.price>S.money||(S.mp&&!inBiv&&(!mpMyTurn()||S.mp.passed))?'disabled':''}>Koupit</button>`}</div></div>`;
+    <div class="sc-f"><span class="price">${p.free?'ZDARMA':money(p.price)}</span>${p.owned?(inBiv||(S.mp&&S.mp.passed)?'':`<button class="small" data-act="sell" data-id="${p.id}">Prodat</button>`):p.takenBy?'':`<button class="small primary" data-act="buy" data-id="${p.id}" ${p.price>S.money||(S.mp&&!inBiv&&(!mpMyTurn()||S.mp.passed))?'disabled':''}>Koupit</button>`}</div></div>`;
 }
 function carCard(item){
   const m=CAR_MODELS.find(x=>x.id===item.model);const own=!!item.owned;
@@ -2154,7 +2155,7 @@ function carCard(item){
   <div class="pc-bw"><canvas class="pix carc" data-car="${m.shape}|${teamLiv().join(',')}|${S.settings.number}" data-bg="#d9b07a" width="96" height="52"></canvas>${own?'<span class="stamp">V TÝMU</span>':item.takenBy?`<span class="stamp" style="color:${mpPlayerCol(item.takenBy)};border-color:${mpPlayerCol(item.takenBy)};background:rgba(20,12,8,.8)">${esc(mpPlayerName(item.takenBy))}</span>`:''}</div>
   <div class="pc-desc">${esc(m.desc)}</div>
   <div class="pc-sl">${QK.map(k=>{const i=CK.indexOf(k);return `<div><span>${COMPS[k]}</span><i><i style="width:${m.q[i]*10}%"></i></i><b>${m.q[i]}</b></div>`}).join('')}</div>
-  <div class="sc-f"><span class="price">${item.free?'ZDARMA':money(item.price)}</span>${own?(S.mp?'':`<button class="small" data-act="sellCar">Prodat</button>`):item.takenBy?'':`<button class="small primary" data-act="buy" data-id="${item.id}" ${item.price>S.money+(S.team.car?S.team.car.price||0:0)||(S.mp&&(!mpMyTurn()||S.mp.passed))?'disabled':''}>${S.team.car?'Vyměnit':'Koupit'}</button>`}</div></div>`;
+  <div class="sc-f"><span class="price">${item.free?'ZDARMA':money(item.price)}</span>${own?(S.mp&&S.mp.passed?'':`<button class="small" data-act="sellCar">Prodat</button>`):item.takenBy?'':`<button class="small primary" data-act="buy" data-id="${item.id}" ${item.price>S.money+(S.team.car?S.team.car.price||0:0)||(S.mp&&(!mpMyTurn()||S.mp.passed))?'disabled':''}>${S.team.car?'Vyměnit':'Koupit'}</button>`}</div></div>`;
 }
 function randomTeam(){
   const tm=S.team;const reserve=S.settings.budget*.08;const pk=a=>a[Math.floor(rand()*a.length)];
@@ -2176,29 +2177,28 @@ function renderShop(){
   const has=r=>tm.people.some(p=>p.role===r);
   const reserve=S.settings.budget*.1;
   const html=`
-  <div class="topbar"><div><h2>${inBivak?'Trh v bivaku · den volna':S.mp?'Draft týmů':'Nákup před startem'}</h2><span class="mute">${inBivak?'Utrácíš peníze, které sis ušetřil.':'Povinně odejdeš s autem, jezdcem a navigátorem. Levné verze jsou zdarma.'}</span></div>
+  <div class="topbar"><div><h2>${inBivak?'Trh v bivaku · den volna':S.mp?'Nákup týmů · online':'Nákup před startem'}</h2><span class="mute">${inBivak?'Utrácíš peníze, které sis ušetřil.':'Povinně odejdeš s autem, jezdcem a navigátorem. Levné verze jsou zdarma.'}</span></div>
   <div class="row"><span class="clock num" style="font-size:26px">${money(S.money)}</span>${inBivak?'<button data-act="closeShop" class="primary">Zpět do bivaku</button>':''}</div></div>
-  ${S.mp&&!inBivak&&S.mp.draft?`<div class="draftbar">${S.mp.passed?`<b>Máš hotovo.</b> Čekáš, až dokončí ostatní.`:mpMyTurn()?`<b class="you">${ic('play')} Jsi na tahu!</b> Vezmi jednu kartu, nebo ukonči nákup.`:`Na tahu: <b style="color:${mpPlayerCol(mpTurn())}">${esc(mpPlayerName(mpTurn()))}</b>`}<span class="order">${S.mp.draft.order.map((pid,i)=>`<span class="${i===S.mp.draft.pos?'on':''} ${S.mp.draft.passed.includes(pid)?'done':''}" style="--c:${mpPlayerCol(pid)}">${esc(mpPlayerName(pid))}</span>`).join('')}</span></div>`:''}
+  ${S.mp&&!inBivak&&S.mp.draft?`<div class="draftbar">${S.mp.passed?`<b>Máš nakoupeno.</b> Čekáš, až dokoupí ostatní.`:`<b class="you">${ic('coin')} Nakupuj v klidu.</b> Všichni mají stejnou nabídku, každý svoji.`}<span class="order">${S.mp.players.map(pl=>`<span class="${S.mp.draft.passed.includes(pl.pid)?'on':''}" style="--c:${pl.col}">${S.mp.draft.passed.includes(pl.pid)?'✓ ':''}${esc(pl.team)}</span>`).join('')}</span></div>`:''}
   <div class="shop-grid"><div><div class="tabs">${SHOP_TABS.filter(t=>!inBivak||t[0]!=='car').map(([k,l])=>`<button class="${tab===k?'on':''}" data-act="tab" data-k="${k}" ${ROLES[k]?`style="border-bottom:3px solid ${ROLES[k].col}"`:''}>${l}</button>`).join('')}</div><div class="cards">${cards}</div></div>
   <aside class="panel"><h3>${esc(tm.name)}</h3>
     ${inBivak?'':`<div class="check"><span style="color:${tm.car?'var(--ok)':'var(--bad)'}">${tm.car?'✓':'✗'} Auto</span><span style="color:${has('jezdec')?'var(--ok)':'var(--bad)'}">${has('jezdec')?'✓':'✗'} Jezdec</span><span style="color:${has('navigator')?'var(--ok)':'var(--bad)'}">${has('navigator')?'✓':'✗'} Navigátor</span></div>
     <div style="margin:10px 0"><div class="row" style="justify-content:space-between;font-size:13px"><span>Rezerva na závod</span><span class="num">${money(S.money)} / doporučeno ${money(reserve)}</span></div><div class="bar"><i style="width:${clamp(S.money/reserve*100,0,100)}%;background:${S.money>=reserve?'var(--ok)':S.money>=reserve/2?'var(--warn)':'var(--bad)'}"></i></div>
     <p class="hint">Z rezervy platíš nové pneumatiky (3 000 €), rezervní kola a nákupy na trhu o dni volna. Upgrady dílů stojí jen čas. Během závodu žádné příjmy nejsou.</p></div>`}
     <div class="team-list">
-      ${tm.car?`<div class="team-item"><span><b>${esc(tm.car.name)}</b></span>${inBivak||S.mp?'':`<button class="small" data-act="sellCar">Prodat</button>`}</div>`:''}
-      ${tm.people.map(p=>`<div class="team-item"><span style="border-left:4px solid ${ROLES[p.role].col};padding-left:6px">${esc(p.name)} <span class="mute">· ${ROLES[p.role].name}</span></span>${inBivak||S.mp?'':`<button class="small" data-act="sell" data-id="${p.id}">Prodat</button>`}</div>`).join('')||'<span class="mute">Zatím nikdo.</span>'}
+      ${tm.car?`<div class="team-item"><span><b>${esc(tm.car.name)}</b></span>${inBivak||(S.mp&&S.mp.passed)?'':`<button class="small" data-act="sellCar">Prodat</button>`}</div>`:''}
+      ${tm.people.map(p=>`<div class="team-item"><span style="border-left:4px solid ${ROLES[p.role].col};padding-left:6px">${esc(p.name)} <span class="mute">· ${ROLES[p.role].name}</span></span>${inBivak||(S.mp&&S.mp.passed)?'':`<button class="small" data-act="sell" data-id="${p.id}">Prodat</button>`}</div>`).join('')||'<span class="mute">Zatím nikdo.</span>'}
       <div class="team-item"><span>Rezervní kola</span><span class="num">${tm.spares}</span></div>
     </div>
-    ${inBivak||S.mp?'':`<button class="dice" data-act="randomTeam">${ic('dice')} Koupit náhodně a jet</button>`}
-    ${inBivak?'':S.mp?`<button class="primary" style="width:100%;margin-top:12px" data-act="mpPass" ${S.mp.passed||!(tm.car&&has('jezdec')&&has('navigator'))?'disabled':''}>${S.mp.passed?'Čekáš na ostatní…':'Hotovo s nákupem →'}</button>`:`<div class="row" style="margin-top:12px;justify-content:space-between"><button class="small" data-act="back">← Rozpočet a nastavení</button><button class="primary" data-act="toBivak" ${tm.car&&has('jezdec')&&has('navigator')?'':'disabled'}>Odletět do bivaku →</button></div>`}
+    ${inBivak||(S.mp&&S.mp.passed)?'':`<button class="dice" data-act="randomTeam">${ic('dice')} Koupit náhodně a jet</button>`}
+    ${inBivak?'':S.mp?`<button class="primary" style="width:100%;margin-top:12px" data-act="mpPass" ${S.mp.passed||!(tm.car&&has('jezdec')&&has('navigator'))?'disabled':''}>${S.mp.passed?'Čekáš na ostatní…':'Hotovo s nákupem →'}</button>${S.mp.passed?`<button class="small" style="width:100%;margin-top:6px" data-act="mpUnpass">Ještě něco dokoupit</button>`:''}`:`<div class="row" style="margin-top:12px;justify-content:space-between"><button class="small" data-act="back">← Rozpočet a nastavení</button><button class="primary" data-act="toBivak" ${tm.car&&has('jezdec')&&has('navigator')?'':'disabled'}>Odletět do bivaku →</button></div>`}
   </aside></div>`;
   if(inBivak){openModal(`<div class="modal" style="width:min(1300px,100%)">${html}</div>`,'shop')}else app.innerHTML=`<div class="shop-fit">${html}</div>`;
   paintSprites(inBivak?document.getElementById('modalRoot'):app);
 }
 function buy(id){
   const item=S.pool.find(i=>i.id===id);if(!item)return;
-  if(S.mp&&S.phase==='shop'&&!S._applyPick){if(!mpMyTurn()||S.mp.passed||item.takenBy)return;if(item.kind==='car'){const refund=S.team.car?S.team.car.price:0;if(item.price>S.money+refund)return}else if(item.price>S.money||item.owned)return;
-    mpToHost({t:'pick',pid:NET.pid,id,release:item.kind==='car'&&S.team.car?S.team.car.poolId:null});return}
+  if(S.mp&&S.phase==='shop'&&S.mp.passed)return;
   if(item.kind==='car'){
     const m=CAR_MODELS.find(x=>x.id===item.model);
     let refund=0;if(S.team.car)refund=S.team.car.price;
@@ -2782,6 +2782,7 @@ function handleAct(b){
     case 'mpStart':mpStartDraft();break;
     case 'mpLeave':mpLeave();break;
     case 'copyCode':try{navigator.clipboard.writeText(S.mp.code).then(()=>toastMsg('Kód zkopírován.'),()=>toastMsg('Kód: '+S.mp.code))}catch(e){toastMsg('Kód: '+S.mp.code)}break;
+    case 'mpUnpass':S.mp.passed=false;mpToHost({t:'unpass',pid:NET.pid});renderShop();break;
     case 'mpPass':{const tm=S.team;if(!(tm.car&&tm.people.some(p=>p.role==='jezdec')&&tm.people.some(p=>p.role==='navigator')))break;S.mp.passed=true;mpToHost({t:'pass',pid:NET.pid});renderShop();break}
     case 'mpKick':mpKick(b.dataset.pid);break;
     case 'saveFile':saveToFile();break;
@@ -2914,7 +2915,7 @@ function mpStartDraft(){
   S.bots=S.bots.slice(0,Math.max(0,30-players.length));S.overall={me:0};S.bots.forEach(b=>S.overall[b.id]=0);
   for(const pl of players)if(pl.pid!==NET.pid){S.bots.push(playerStub(pl));S.overall[pl.pid]=0}
   S.humans=players.filter(p=>p.pid!==NET.pid).map(p=>({id:p.pid,nick:p.team,col:p.col,real:true}));
-  mp.draft={order:shuffle(players.map(p=>p.pid)),pos:0,dir:1,passed:[],taken:{}};
+  mp.draft={order:players.map(p=>p.pid),pos:0,dir:1,passed:[],taken:{}};
   const host=players.find(p=>p.pid===NET.pid);
   netSend({t:'init',settings:{budget:S.settings.budget,days:S.settings.days,len:S.settings.len},stages:S.stages,restDay:S.restDay,lastDay:S.lastDay,pool:S.pool,
     teams:S.bots.map(b=>b.isRemote?b:stubOf(b)).concat([playerStub(host)]),players,draft:mp.draft});
@@ -2933,7 +2934,7 @@ function mpBuildClient(m){
 }
 /* --- draft --- */
 const mpTurn=()=>S.mp&&S.mp.draft?S.mp.draft.order[S.mp.draft.pos]:null;
-const mpMyTurn=()=>!S.mp||mpTurn()===NET.pid;
+const mpMyTurn=()=>true;
 function mpPlayerName(pid){const p=S.mp&&S.mp.players.find(x=>x.pid===pid);return p?p.team:'?'}
 function mpPlayerCol(pid){const p=S.mp&&S.mp.players.find(x=>x.pid===pid);return p?p.col:'#ccc'}
 function draftAdvance(){const d=S.mp.draft;const n=d.order.length;if(d.passed.length>=n)return mpBegin();
@@ -2944,7 +2945,7 @@ function mpPick(m){const d=S.mp.draft;if(!d||mpTurn()!==m.pid)return;const item=
   draftAdvance();if(S.phase!=='shop')return;const msg={t:'picked',pid:m.pid,id:m.id,draft:d};netSend(msg);mpApplyPicked(msg)}
 function mpApplyPicked(m){S.mp.draft=m.draft;mpApplyTaken();if(m.pid===NET.pid){S._applyPick=true;buy(m.id);S._applyPick=false}else if(S.phase==='shop')renderShop();SND.click&&SND.click()}
 function mpApplyTaken(){const tk=S.mp.draft.taken;for(const it of S.pool)it.takenBy=tk[it.id]&&tk[it.id]!==NET.pid?tk[it.id]:null}
-function mpPass(pid){const d=S.mp.draft;if(!d.passed.includes(pid))d.passed.push(pid);if(d.passed.length>=d.order.length){mpBegin();return}if(mpTurn()===pid)draftAdvance();const msg={t:'draft',draft:d};netSend(msg);mpHandle(msg)}
+function mpPass(pid){const d=S.mp.draft;if(!d.passed.includes(pid))d.passed.push(pid);if(d.passed.length>=S.mp.players.filter(p=>!(S.bots.find(b=>b.id===p.pid)||{}).out).length){mpBegin();return}const msg={t:'draft',draft:d};netSend(msg);mpHandle(msg)}
 function mpBegin(){netSend({t:'begin'});goBivak()}
 /* --- in game --- */
 function mpStatus(){return{t:'st',pid:NET.pid,team:S.team.name,phase:S.phase,stageIdx:S.stageIdx,clock:S.t,speed:modalOpen?0:S.speed,ready:!!S.waitHumans,dist:S.race?Math.round(S.race.dist*10)/10:0,v:S.race?Math.round(S.race.v):0,out:!!S.team.out,passed:!!S.mp.passed}}
@@ -2987,6 +2988,7 @@ function mpHandle(m){
     case 'picked':if(!isHost())mpApplyPicked(m);break;
     case 'pickfail':toastMsg('Kartu už někdo vzal.');break;
     case 'pass':if(isHost())mpPass(m.pid);break;
+    case 'unpass':if(isHost()){const d=S.mp.draft;d.passed=d.passed.filter(x=>x!==m.pid);const msg={t:'draft',draft:d};netSend(msg);mpHandle(msg)}break;
     case 'draft':S.mp.draft=m.draft;mpApplyTaken();if(S.phase==='shop')renderShop();break;
     case 'begin':if(!isHost()&&S.phase==='shop')goBivak();break;
     case 'st':mpOnStatus(m);break;
