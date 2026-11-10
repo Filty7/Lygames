@@ -370,6 +370,7 @@ table{border-collapse:collapse;width:100%;font-size:13px}
 th,td{padding:4px 8px;border-bottom:1px solid #3a3040;text-align:left;white-space:nowrap}
 th{font-family:var(--f-pix);font-weight:400;color:var(--mute)}
 td.r,th.r{text-align:right}
+#aiOv p{margin:8px 0}.slotbtn{display:flex;align-items:center;gap:8px;width:100%;text-align:left}.slotbtn i{width:10px;height:10px;display:inline-block}.slotbtn .go{margin-left:auto}
 #aiOv{position:fixed;inset:0;z-index:90;display:flex;align-items:center;justify-content:center;background:rgba(10,6,2,.72)}#aiOv .panel{max-width:440px;padding:22px}
 tr.me td{color:var(--mecol,var(--dakar));font-weight:700}
 tr.past td{opacity:.55}
@@ -1730,7 +1731,7 @@ function renderPlayers(){
   if(!S.humans){el.hidden=true;return}el.hidden=false;const nx=nextStageObj();
   const row=(dot,name,st,cls)=>`<div class="pl ${cls||''}"><i style="background:${dot}"></i><span class="pn">${name}</span><span class="ps">${st}</span></div>`;
   let me;if(S.phase==='race')me=`${ICON.flag} na trati`;else if(S.waitHumans)me=`${ICON.check} připraven`;else me=`${S.speed?ICON.play+' '+S.speed+'×':ICON.pause+' pauza'}${nx?` · ${durHM(Math.max(0,nx.dep-S.t))}`:''}`;
-  el.innerHTML=`<div class="plh">${ICON.users}<b>Hráči</b>${S.mp?`<span class="mute" style="font-family:var(--f-mono);font-size:11px">${S.mp.code}${NET.send?'':' · offline'}</span>`:''}${S.waitHumans?'<span class="warn">čekáme na start</span>':''}</div>`+row(S.mp?mpPlayerCol(NET.pid):teamLiv()[0],`<b style="color:var(--mecol,var(--dakar))">Ty</b> <span class="mute">${esc(S.team.name)}</span>`,me,'me')+
+  el.innerHTML=`<div class="plh">${ICON.users}<b>Hráči</b>${S.mp?`<button class="small" data-act="mpCode" style="font-family:var(--f-mono);font-size:11px;padding:1px 6px">${S.mp.code}${NET.send?'':' · offline'}</button>`:''}${S.waitHumans?'<span class="warn">čekáme na start</span>':''}</div>`+row(S.mp?mpPlayerCol(NET.pid):teamLiv()[0],`<b style="color:var(--mecol,var(--dakar))">Ty</b> <span class="mute">${esc(S.team.name)}</span>`,me,'me')+
   S.humans.map(h=>{const s=humanState(h);const T=S.bots.find(b=>b.id===h.id);let st;
     if(s==='out')st='mimo závod';
     else if(T&&(T.aiFor||T.ai)&&s==='bivak')st=`<span class="mute">${ICON.gear||''} řídí AI</span>`;
@@ -2074,8 +2075,9 @@ function render(){
   else if(S.phase==='race')renderRace();
   else if(S.phase==='end')renderEnd();
 }
-const VERSION='0.26';
+const VERSION='0.27';
 const CHANGELOG=[
+ ['0.27','Multiplayer: návrat do rozehrané hry stejným kódem – vybereš si svůj tým (řídí ho bot) a převezmeš ho v nejbližším bivaku. Kód hry je v bivaku v horní liště.'],
  ['0.26','Dodávky: tým má na začátku jednu dodávku se 6 místy. Další dodávka (18 000 €) přidá 6 míst, ale při přesunu bivaku potřebuje vlastního řidiče a bivak je kompletní až s tou nejpomalejší. Multiplayer: všichni hráči mají stejné barvy u všech. Odpojeného hráče dočasně nahradí AI (bot) a po návratu mu tým vrátí. Když odejde hostitel, hostování převezme jiný hráč a hra běží dál.'],
  ['0.25','Multiplayer: tlačítko Start hry, kontrola stejné verze hry u všech hráčů.'],
  ['0.24','Multiplayer: všichni nakupují najednou, každý ze své kopie stejné nabídky. Hra začne, až mají nakoupeno všichni.'],
@@ -2275,7 +2277,7 @@ function renderBivakParts(){
     <div class="row"><span class="money" title="Rezerva peněz">${money(S.money)}</span>
       <button data-act="calendar">${ic('cal')} Kalendář</button><button data-act="results" ${anyResults()?'':'disabled'}>${ic('trophy')} Výsledky</button>
       ${day===S.restDay?'<button class="primary" data-act="market">Trh</button>':''}
-<button data-act="logModal">${ic('book')} Deník</button><button class="small" data-act="saveFile" title="Uložit hru do souboru">${ic('book')} Uložit</button><button class="small" data-act="help">?</button><button class="small" data-act="sound" title="Hudba a zvuky">${soundOn()?'♪ zvuk':'♪ vyp'}</button></div>
+<button data-act="logModal">${ic('book')} Deník</button>${S.mp?`<button class="small" data-act="mpCode" title="Kód online hry">${ic('users')} ${esc(S.mp.code)}</button>`:''}<button class="small" data-act="saveFile" title="Uložit hru do souboru">${ic('book')} Uložit</button><button class="small" data-act="help">?</button><button class="small" data-act="sound" title="Hudba a zvuky">${soundOn()?'♪ zvuk':'♪ vyp'}</button></div>
     ${S.waitHumans?`<div class="status"><span class="warn">${ic('clock')} Jsi připravený. Čekáme, až ostatní hráči dokončí bivak.</span></div>`:''}${!bivakHere()||(S.speed===0&&S.pauseMsg)?`<div class="status">${!bivakHere()?`<span style="color:var(--bad)">Bivak dorazí v ${clock(S.convoyUntil)}.</span> `:''}${S.speed===0&&S.pauseMsg?`<span class="warn">❚❚ Automatická pauza: ${esc(S.pauseMsg)}</span>`:''}</div>`:''}`;
   document.getElementById('sceneLabel').textContent=S.marathonNight?'Maratonský bivak · jen posádka':!bivakHere()?'Bivak ještě není na místě':day===S.restDay?'Den volna':'Bivak';
   renderCarCard();renderNext();renderStations();renderRoster();
@@ -2817,6 +2819,8 @@ function handleAct(b){
     case 'mpJoin':mpJoin();break;
     case 'mpStart':mpStartDraft();break;
     case 'mpLeave':mpLeave();break;
+    case 'mpClaimSlot':{S.mp.claiming=true;netSend({t:'claim',pid:b.dataset.pid,from:NET.pid});render();setTimeout(()=>{if(S.phase==='lobby'&&S.mp&&S.mp.claiming){S.mp.claiming=false;S.mp.err='Hostitel neodpověděl. Zkus to znovu.';render()}},9000);break}
+    case 'mpCode':openModal(`<div class="modal narrow" style="width:min(420px,100%)"><header><h2>${ic('users')} Online hra</h2><button data-act="close">Zavřít</button></header><div class="codebox"><span>KÓD HRY</span><b class="num">${esc(S.mp.code)}</b><button class="small" data-act="copyCode">Kopírovat</button></div><p class="hint">Kdo vypadl, se vrátí přes Multiplayer → Připojit se a zadá tento kód. Pak si vybere svůj tým.</p></div>`,'info');break;
     case 'copyCode':try{navigator.clipboard.writeText(S.mp.code).then(()=>toastMsg('Kód zkopírován.'),()=>toastMsg('Kód: '+S.mp.code))}catch(e){toastMsg('Kód: '+S.mp.code)}break;
     case 'mpUnpass':S.mp.passed=false;mpToHost({t:'unpass',pid:NET.pid});renderShop();break;
     case 'mpPass':{const tm=S.team;if(!(tm.car&&tm.people.some(p=>p.role==='jezdec')&&tm.people.some(p=>p.role==='navigator')))break;S.mp.passed=true;mpToHost({t:'pass',pid:NET.pid});renderShop();break}
@@ -2970,6 +2974,13 @@ function mpBuildClient(m){
   UID=Math.max(UID,1000+Math.max(0,...S.pool.map(p=>p.id)));
   log('Přílet do bivaku. Nákup před odletem.');render();
 }
+function mpBuildLate(m){
+  NET.pid=m.pid;S.mp.pid=m.pid;S.mp.slots=null;S.mp.claiming=false;
+  Object.assign(S.settings,{teamName:m.me.baseName,number:m.number,colors:m.colors});
+  mpBuildClient(m);S.overall=m.overall||S.overall;S.mp.hostPid=(m.players.find(p=>p.host)||{}).pid;NET.lastHostAt=performance.now();
+  mpAdopt(m.me);S.phase=m.phase==='shop'?'shop':'bivak';S.mp.passed=true;S.mp.aiCtl=true;
+  S.mp.aiWhy='Připojuji tě zpátky. Tým zatím řídí bot – převezmeš ho v nejbližším bivaku.';
+  S.log=[];log(`Znovu ve hře jako ${S.team.name}.`,'ok');render();aiOverlay();netSend(mpStatus())}
 /* --- draft --- */
 const mpTurn=()=>S.mp&&S.mp.draft?S.mp.draft.order[S.mp.draft.pos]:null;
 const mpMyTurn=()=>true;
@@ -3012,7 +3023,7 @@ function mpBeginStage(){const nx=nextStageObj();if(isHost()&&nx)netSend({t:'go',
 function mpTick(dt){
   if(!S.mp||!NET.send)return;const now=performance.now();const live=S.phase==='bivak'||S.phase==='race'||S.phase==='shop';
   NET.stAcc+=dt;if(NET.stAcc>1){NET.stAcc=0;if(live)netSend(mpStatus())}
-  NET.tbAcc=(NET.tbAcc||0)+dt;if(NET.tbAcc>8&&(S.phase==='bivak'||S.phase==='race')&&!S.mp.aiCtl){NET.tbAcc=0;const tb=mpTeamBackup();if(tb){NET.tb[NET.pid]=tb;netSend(tb)}}
+  NET.tbAcc=(NET.tbAcc==null?99:NET.tbAcc)+dt;if(NET.tbAcc>8&&(S.phase==='bivak'||S.phase==='race')&&!S.mp.aiCtl){NET.tbAcc=0;const tb=mpTeamBackup();if(tb){NET.tb[NET.pid]=tb;netSend(tb)}}
   if(isHost()){NET.snapAcc+=dt;if(NET.snapAcc>1.5&&(S.phase==='bivak'||S.phase==='race')){NET.snapAcc=0;mpSnap()}
     NET.bbAcc=(NET.bbAcc||0)+dt;if(NET.bbAcc>20&&live){NET.bbAcc=0;netSend({t:'bb',pid:NET.pid,bots:S.bots.filter(b=>!b.isRemote).map(bbSer)})}
     NET.aiAcc=(NET.aiAcc||0)+dt;if(NET.aiAcc>1&&live){NET.aiAcc=0;
@@ -3026,12 +3037,12 @@ function bbLink(b){b=JSON.parse(JSON.stringify(b));if(b.race){const st=S.stages[
 function mpTeamBackup(){const r=S.race;if(S.phase==='race'&&(!r||r.over))return null;
   const tm=S.team;return{t:'tb',pid:NET.pid,team:{car:tm.car,people:tm.people,driverId:tm.driverId,navId:tm.navId,spares:tm.spares,joker:tm.joker,out:tm.out,prep:tm.prep,vans:tm.vans},
     jobs:S.jobs,setupProg:S.setupProg,convoyUntil:S.convoyUntil,convoyDriver:S.convoyDriver,moverId:S.moverId,marathonNight:S.marathonNight,money:S.money,
-    t:S.phase==='race'&&r?r.t:S.t,stageIdx:S.stageIdx,race:S.phase==='race'&&r?{...r,stage:null,si:r.stage.n,countdown:0,incident:null,finAnim:0}:null}}
+    clk:S.phase==='race'&&r?r.t:S.t,stageIdx:S.stageIdx,race:S.phase==='race'&&r?{...r,stage:null,si:r.stage.n,countdown:0,incident:null,finAnim:0}:null}}
 function teamToBot(pid,tb){
   const i=S.bots.findIndex(b=>b.id===pid);if(i<0)return null;const old=S.bots[i];const base=old.baseName||String(old.name).replace(/ \(bot\)$/,'');let T;
   if(tb&&tb.team&&tb.team.car){const tm=JSON.parse(JSON.stringify(tb.team));
     T={...tm,id:pid,name:base+' (bot)',baseName:base,number:old.number,livery:old.livery,budget:tb.money,money:tb.money,jobs:JSON.parse(JSON.stringify(tb.jobs||[])),setupProg:tb.setupProg||0,
-      convoyUntil:tb.convoyUntil,convoyDriver:tb.convoyDriver,moverId:tb.moverId,marathonNight:!!tb.marathonNight,log:[],t:tb.t,stageIdx:tb.stageIdx,race:null,state:'bivak',
+      convoyUntil:tb.convoyUntil,convoyDriver:tb.convoyDriver,moverId:tb.moverId,marathonNight:!!tb.marathonNight,log:[],t:tb.clk,stageIdx:tb.stageIdx,race:null,state:'bivak',
       isBot:true,aggr:1.02,smart:.62,planAt:0,prep:tm.prep||{},aiFor:pid,human:true,out:!!tm.out};
     if(tb.race){const st=S.stages[tb.race.si-1];if(st&&!(st.res&&st.res[pid])){T.race={...JSON.parse(JSON.stringify(tb.race)),stage:st,countdown:0};delete T.race.si;T.state='race';T.t=T.race.t}else if(st)T.stageIdx=Math.max(T.stageIdx,st.n)}
   }else{const g=genBotTeam(0,base+' (bot)',old.number);T={...g,id:pid,baseName:base,livery:old.livery,aiFor:pid,human:true,out:!!old.out};
@@ -3040,13 +3051,39 @@ function teamToBot(pid,tb){
 function mpAiTake(pid){const nm=mpPlayerName(pid);const T=teamToBot(pid,S.phase==='shop'?null:NET.tb[pid]);if(!T)return;
   log(`${nm} se odpojil – jeho tým dočasně řídí AI.`,'warn');toastMsg(`${nm} se odpojil – tým převzala AI.`);
   if(S.phase==='shop'&&S.mp.draft)mpPass(pid);else checkResults();mpSnap()}
-function mpAiReturn(T,m){const now=performance.now();if(S.phase==='bivak'&&T.state==='bivak'&&m.phase!=='shop'&&!T.out){
-    const team={id:'me',car:T.car,people:T.people,driverId:T.driverId,navId:T.navId,spares:T.spares,joker:T.joker,out:T.out,prep:T.prep,vans:T.vans};
-    netSend({t:'takeover',to:T.id,team,jobs:T.jobs,setupProg:T.setupProg,convoyUntil:T.convoyUntil,convoyDriver:T.convoyDriver,moverId:T.moverId,marathonNight:T.marathonNight,money:T.money,t:T.t,stageIdx:T.stageIdx});
+function mpAiReturn(T,m){const now=performance.now();
+  if(S.phase!=='shop'&&S.phase!=='lobby'&&S.phase!=='end'&&T.state==='bivak'&&!T.out){
+    const st=S.stages[T.stageIdx];const goNow=st&&st.started&&!(st.res&&st.res[T.id])?st.n:null;
+    netSend({t:'takeover',to:T.id,...mpTeamPayload(T),goNow});
     const i=S.bots.indexOf(T);S.bots[i]={...playerStub({pid:T.id,team:T.baseName,number:T.number,colors:T.livery}),out:!!T.out};
     const h=humanOf(T.id);if(h){h.nick=T.baseName;h.ready=false}NET.status[T.id]={...m,at:now,ready:false};
     log(`${T.baseName} je zpět a převzal svůj tým.`,'ok');mpSnap();return}
-  if(!m.aictl&&now-(T._ctlAt||0)>4000){T._ctlAt=now;netSend({t:'aictl',to:T.id})}}
+  if(now-(T._ctlAt||0)>3000){T._ctlAt=now;let why;
+    if(S.phase==='shop')why='Ostatní hráči ještě nakupují. Tým za tebe zatím drží bot, převezmeš ho v prvním bivaku.';
+    else if(T.out)why='Tvůj tým už ze závodu vypadl. Můžeš sledovat výsledky.';
+    else if(T.state==='race'&&T.race)why=`Tvůj tým (řídí ho bot) teď jede ${T.race.stage.n}. etapu – ujeto ${Math.round(T.race.dist/T.race.stage.km*100)} %. Jakmile dorazí do bivaku, převezmeš ho a hraješ dál.`;
+    else why='Předávám ti tým…';
+    netSend({t:'aictl',to:T.id,why})}}
+function mpTeamPayload(T){return{team:{id:'me',car:T.car,people:T.people,driverId:T.driverId,navId:T.navId,spares:T.spares,joker:T.joker,out:T.out,prep:T.prep,vans:T.vans},
+  jobs:T.jobs,setupProg:T.setupProg,convoyUntil:T.convoyUntil,convoyDriver:T.convoyDriver,moverId:T.moverId,marathonNight:T.marathonNight,money:T.money,clk:T.t,stageIdx:T.stageIdx,baseName:T.baseName}}
+function mpFreeSlots(){const now=performance.now();return S.mp.players.filter(p=>p.pid!==NET.pid).map(p=>{const b=S.bots.find(x=>x.id===p.pid);if(!b||b.out)return null;
+  const s=NET.status[p.pid];const free=b.aiFor||(b.isRemote&&(!s||now-s.at>6000));if(!free)return null;
+  return{pid:p.pid,team:b.baseName||p.team,col:p.col,number:p.number,where:b.state==='race'&&b.race?`jede ${b.race.stage.n}. etapu`:S.phase==='shop'?'nákup':'v bivaku',ai:!!b.aiFor}}).filter(Boolean)}
+function mpMapStages(pid){const mo=x=>x==='me'?NET.pid:x===pid?'me':x;return JSON.parse(JSON.stringify(S.stages)).map(st=>{
+  if(st.res){const r={};for(const k in st.res)r[mo(k)]=st.res[k];st.res=r;st.player=r.me||null}
+  if(st.table)st.table=st.table.map(e=>({...e,id:mo(e.id)}));delete st.convoy;return st})}
+function mpClaim(m){const ok=mpFreeSlots().some(x=>x.pid===m.pid);if(!ok){netSend({t:'full',to:m.from,why:'Tenhle tým už mezitím převzal někdo jiný.'});return}
+  let T=S.bots.find(b=>b.id===m.pid);if(!T.aiFor)T=teamToBot(m.pid,S.phase==='shop'?null:NET.tb[m.pid]);if(!T)return;
+  if(S.phase==='shop'&&S.mp.draft&&!S.mp.draft.passed.includes(m.pid))mpPass(m.pid);
+  const pl=S.mp.players.find(p=>p.pid===m.pid);const mo=x=>x==='me'?NET.pid:x===m.pid?'me':x;const ov={};for(const k in S.overall)ov[mo(k)]=S.overall[k];
+  const host=S.mp.players.find(p=>p.pid===NET.pid);
+  netSend({t:'init',to:m.from,late:true,pid:m.pid,phase:S.phase,settings:{budget:S.settings.budget,days:S.settings.days,len:S.settings.len},stages:mpMapStages(m.pid),restDay:S.restDay,lastDay:S.lastDay,pool:S.pool,
+    teams:S.bots.filter(b=>b.id!==m.pid).map(b=>b.isRemote?b:{...stubOf(b),name:b.name,ai:b.aiFor?1:0}).concat([playerStub(host)]),players:S.mp.players,draft:S.mp.draft,overall:ov,me:mpTeamPayload(T),number:pl.number,colors:pl.colors});
+  NET.status[m.pid]={at:performance.now(),aictl:true,phase:'bivak'};T._ctlAt=0;log(`${T.baseName}: hráč se znovu připojil, tým mu předám v nejbližším bivaku.`,'ok')}
+function mpAdopt(m){const tm=m.team;tm.id='me';tm.name=m.baseName||S.team.name;S.team=tm;
+  S.jobs=m.jobs||[];S.setupProg=m.setupProg||0;S.convoyUntil=m.convoyUntil;S.convoyDriver=m.convoyDriver;S.moverId=m.moverId;S.marathonNight=!!m.marathonNight;S.money=m.money;
+  S.t=m.clk!=null?m.clk:m.t;S.stageIdx=m.stageIdx;S.race=null;S.speed=0;S.waitHumans=false;S.awaitMover=false;
+  if(S.pool)for(const it of S.pool)it.owned=tm.people.some(p=>p.poolId===it.id)||!!(tm.car&&tm.car.poolId===it.id)}
 function mpElect(){const now=performance.now();const old=mpHostPid();NET.dead=NET.dead||[];if(old&&!NET.dead.includes(old))NET.dead.push(old);NET.lastHostAt=now;
   const cand=S.mp.players.find(p=>!NET.dead.includes(p.pid)&&(p.pid===NET.pid||(NET.status[p.pid]&&now-NET.status[p.pid].at<8000)));if(!cand)return;
   S.mp.hostPid=cand.pid;if(cand.pid===NET.pid)mpPromote(old);else log(`Hostitel se odpojil. Hostování přebírá ${cand.team}…`,'warn')}
@@ -3064,19 +3101,22 @@ function mpDemote(pid,ep){S.mp.host=false;S.mp.hostPid=pid;S.mp.ep=ep;S.mp.playe
   S.bots=S.bots.map(b=>b.isRemote?b:{...stubOf(b),name:b.name,ai:b.aiFor?1:0});NET.lastHostAt=performance.now();
   log('Hostování mezitím převzal jiný hráč. Pokračuješ jako běžný hráč.','warn');netSend({t:'hello',...myPlayer(),resume:true})}
 function aiOverlay(){let el=document.getElementById('aiOv');const on=!!(S.mp&&S.mp.aiCtl);
-  if(!el){if(!on)return;el=document.createElement('div');el.id='aiOv';el.className='aiov';el.innerHTML=`<div class="panel"><h2>Tvůj tým teď řídí AI</h2><p>Byl jsi chvíli odpojený, tak tvůj tým dočasně převzal bot. Jakmile bude tým v bivaku, vrátí se ti zpátky – i s tím, co mezitím zažil.</p><p class="mute">Čekám na předání…</p></div>`;document.body.appendChild(el)}
+  if(!el){if(!on)return;el=document.createElement('div');el.id='aiOv';document.body.appendChild(el)}
+  const why=(S.mp&&S.mp.aiWhy)||'Byl jsi chvíli odpojený, tak tvůj tým dočasně převzal bot. Jakmile bude v bivaku, vrátí se ti zpátky – i s tím, co mezitím zažil.';
+  if(on&&el._why!==why){el._why=why;el.innerHTML=`<div class="panel"><h2>${ic('users')} Tvůj tým teď řídí bot</h2><p>${esc(why)}</p><p class="hint">Hra ti tým předá automaticky, nic nemusíš dělat. Kód hry: <b class="num">${esc(S.mp.code)}</b></p></div>`}
   el.hidden=!on}
 function mpHandle(m){
   switch(m.t){
     case 'hello':{if(!isHost())return;if(m.ver!==VERSION){netSend({t:'full',to:m.pid,why:`Máš jinou verzi hry (${m.ver||'?'}) než hostitel (${VERSION}). Obnov stránku pomocí Ctrl+F5 a připoj se znovu.`});return}let pl=S.mp.players.find(p=>p.pid===m.pid);
-      if(!pl){if(S.phase!=='lobby'||S.mp.players.length>=10){netSend({t:'full',to:m.pid,why:S.phase!=='lobby'?'Hra už běží.':'Hra je plná (10 hráčů).'});return}
+      if(!pl){if(S.phase!=='lobby'){if(S.phase==='end'){netSend({t:'full',to:m.pid,why:'Tahle hra už skončila.'});return}const sl=mpFreeSlots();if(!sl.length)netSend({t:'full',to:m.pid,why:'Hra už běží a žádný tým teď není volný (všichni hráči jsou připojení).'});else netSend({t:'slots',to:m.pid,slots:sl});return}
+        if(S.mp.players.length>=10){netSend({t:'full',to:m.pid,why:'Hra je plná (10 hráčů).'});return}
         pl={pid:m.pid,team:m.team,number:m.number,colors:m.colors,col:PCOLS[S.mp.players.length%PCOLS.length]};S.mp.players.push(pl)}
       else if(S.phase==='lobby')Object.assign(pl,{team:m.team,number:m.number,colors:m.colors});
       if(S.phase==='lobby'){mpLobbyBroadcast();render()}else{mpResync(m.pid);const b=S.bots.find(x=>x.id===m.pid);if(b&&b.isRemote)b.out=false;NET.status[m.pid]={...(NET.status[m.pid]||{}),at:performance.now()};log(`${pl.team} se znovu připojil.`,'ok')}
       break}
     case 'lobby':if(isHost())return;S.mp.players=m.players;S.mp.settings=m.settings;if(S.phase==='lobby')render();break;
     case 'full':S.mp.err=m.why;netClose();render();break;
-    case 'init':if(isHost()||S.phase!=='lobby')return;mpBuildClient(m);break;
+    case 'init':if(isHost()||S.phase!=='lobby')return;if(m.late)mpBuildLate(m);else mpBuildClient(m);break;
     case 'pass':if(isHost())mpPass(m.pid);break;
     case 'unpass':if(isHost()){const d=S.mp.draft;d.passed=d.passed.filter(x=>x!==m.pid);const msg={t:'draft',draft:d};netSend(msg);mpHandle(msg)}break;
     case 'draft':S.mp.draft=m.draft;mpApplyTaken();if(S.phase==='shop')renderShop();break;
@@ -3090,10 +3130,10 @@ function mpHandle(m){
     case 'bb':if(!isHost())NET.bb=m.bots;break;
     case 'newhost':if(m.pid===NET.pid)return;if(isHost()){const me=S.mp.ep||0;if((m.ep||0)>me||((m.ep||0)===me&&m.pid<NET.pid))mpDemote(m.pid,m.ep||0);return}
       S.mp.hostPid=m.pid;S.mp.ep=m.ep||0;S.mp.players.forEach(p=>p.host=p.pid===m.pid);NET.lastHostAt=performance.now();log(`Hostování hry převzal ${mpPlayerName(m.pid)}.`,'warn');break;
-    case 'aictl':if(m.to!==NET.pid||isHost())return;S.mp.aiCtl=true;S.speed=0;aiOverlay();break;
-    case 'takeover':{if(m.to!==NET.pid||isHost())return;const tm=m.team;tm.id='me';tm.name=S.team.name;S.team=tm;
-      S.jobs=m.jobs||[];S.setupProg=m.setupProg||0;S.convoyUntil=m.convoyUntil;S.convoyDriver=m.convoyDriver;S.moverId=m.moverId;S.marathonNight=!!m.marathonNight;S.money=m.money;
-      S.t=m.t;S.stageIdx=m.stageIdx;S.race=null;S.phase=S.phase==='end'?'end':'bivak';S.speed=0;S.waitHumans=false;S.awaitMover=false;S.mp.aiCtl=false;S.mp.goPending=null;S.mp.passed=true;
+    case 'aictl':if(m.to!==NET.pid||isHost())return;S.mp.aiCtl=true;S.mp.aiWhy=m.why||S.mp.aiWhy;S.speed=0;aiOverlay();break;
+    case 'slots':if(isHost()||S.phase!=='lobby')return;S.mp.slots=m.slots;render();break;
+    case 'claim':if(isHost()&&m.from!==NET.pid)mpClaim(m);break;
+    case 'takeover':{if(m.to!==NET.pid||isHost())return;mpAdopt(m);S.phase=S.phase==='end'?'end':'bivak';S.mp.aiCtl=false;S.mp.aiWhy=null;S.mp.goPending=m.goNow||null;S.mp.passed=true;
       aiOverlay();log('Jsi zpět! Tým ti AI vrátila – zkontroluj auto a lidi.','ok');save();render();toastMsg('Převzal jsi zpět svůj tým.')}break;
     case 'kick':if(m.pid===NET.pid){S.team.out=true;log('Hostitel tě odpojil ze hry.','bad')}else{const b=S.bots.find(x=>x.id===m.pid);if(b)b.out=true}break;
   }
@@ -3111,6 +3151,11 @@ function renderLobby(){
     <div class="row" style="gap:8px"><span class="pill">${money(set.budget||0)}</span><span class="pill">${dl}</span><span class="pill">etapy: ${ll}</span><span class="pill">${30-(mp.players||[]).length} botů</span></div>
     ${host?`<button class="primary" style="font-size:18px;padding:9px" data-act="mpStart" ${mp.ok?'':'disabled'}>Start hry →</button>`:''}
   </div></div>`;
+  if(!host&&mp.slots){app.querySelector('.lobby').innerHTML=`<div class="row" style="justify-content:space-between"><h2>${ic('users')} Hra už běží</h2><button class="small" data-act="mpLeave">Odejít</button></div>
+    <div class="codebox"><span>KÓD HRY</span><b class="num">${esc(mp.code)}</b></div>
+    <p>Můžeš se vrátit a převzít tým, který po odpojeném hráči řídí bot. ${mp.claiming?'<b>Připojuji…</b>':'Vyber svůj tým:'}</p>
+    <div class="plist">${mp.slots.map(s=>`<button class="slotbtn" data-act="mpClaimSlot" data-pid="${s.pid}" ${mp.claiming?'disabled':''}><i style="background:${s.col}"></i><b style="color:${s.col}">${esc(s.team)}</b> <span class="mute">#${s.number} · ${s.where}${s.ai?' · řídí bot':' · odpojen'}</span><span class="go">Převzít →</span></button>`).join('')}</div>
+    <p class="hint">Když tým zrovna jede etapu, počkáš, až dorazí do bivaku. Pokud je v bivaku, dostaneš ho hned.</p>`}
 }
 /* --- ukládání do souboru --- */
 function saveToFile(){
