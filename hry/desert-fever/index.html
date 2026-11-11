@@ -342,7 +342,7 @@ details summary{cursor:pointer;font-family:var(--f-pix);font-size:13px;color:var
 .speedread .st{font-family:var(--f-pix);font-size:16px;letter-spacing:.08em}
 .slider{position:relative;height:74px;margin-top:6px;cursor:ew-resize;touch-action:none}
 .slider .bandrow{position:absolute;left:0;right:0;top:0;height:14px}
-.slider .band{position:absolute;top:0;height:14px;background:repeating-linear-gradient(90deg,var(--dakar) 0 6px,#e0731a 6px 12px);border:2px solid #ffd09b;transition:left .4s,width .4s}
+.slider .band{position:absolute;top:0;height:14px;background:repeating-linear-gradient(90deg,var(--dakar) 0 6px,#e0731a 6px 12px);border:2px solid #ffd09b;}
 .slider .track{position:absolute;left:0;right:0;top:24px;height:22px;background:#151018;border:2px solid var(--line)}
 .slider .tgt{position:absolute;top:0;bottom:0;left:0;background:rgba(233,196,139,.18)}
 .slider .needle{position:absolute;top:18px;width:4px;height:34px;margin-left:-2px;background:var(--ok)}
@@ -693,7 +693,7 @@ const QK=CK.filter(k=>k!=='pneu');
 const COMP_DESC={motor:'Top speed celého auta, nejvíc se projeví na pláni.',prevodovka:'Zrychlení a tah v dunách a fesh-fesh.',podvozek:'Odolnost rámu, duny, kameny a fesh-fesh.',tlumice:'V kamenech a vádí chrání ostatní díly před ničením.',pneu:'Grip a defekty. Nemají kvalitu, jen se opotřebují a mění.',chlazeni:'V dunách a fesh-fesh chrání motor před přehřátím.'};
 const REPAIR_H={motor:.17,prevodovka:.145,podvozek:.145,tlumice:.1,pneu:.12,chlazeni:.1};
 const TYRE_Q=5;
-const upgNeed=q=>Math.round(4.8*Math.pow(q,1.5));
+const upgNeed=q=>Math.round(3.84*Math.pow(q,1.5));
 const SETUP={
   vyska:{name:'Světlá výška',lo:'nízko',hi:'vysoko',loTxt:'pláň, vádí<br>rychlejší auto',hiTxt:'duny, fesh-fesh<br>pomalejší auto'},
   tlak:{name:'Odklon kol',lo:'bez odklonu',hi:'velký odklon',loTxt:'pláň, duny, fesh<br>stabilní na rovině',hiTxt:'vádí, kameny<br>zatáčky, ale ničí pneu'},
@@ -770,7 +770,7 @@ function makePerson(role,quality,opt={}){
   for(const k of ks){let v=quality+(strong.includes(k)?R(1.5,3.6):weak.includes(k)?-R(2.4,4.8):R(-1,1));sk[k]=v}
   // trade-off: a driver who is great at most things pays for it with stamina (and vice versa)
   const wAvg=avg(work.map(k=>sk[k]));if(wAvg>quality+.6)sk.vydrz=Math.min(sk.vydrz,quality-R(1.5,4));else if(wAvg<quality-.6)sk.vydrz=Math.max(sk.vydrz,quality+R(1,3));
-  for(const k of ks)sk[k]=clamp(Math.round(sk[k]),0,10);
+  for(const k of ks)sk[k]=clamp(Math.round(sk[k]),k==='vydrz'?0:1,10);
   if(opt.flat!=null)for(const k of ks)sk[k]=opt.flat;
   const p={id:uid(),name:opt.name||personName(),role,sk,xp:{},mistakes:0,energy:100,inj:null,task:'rest',face:makeFace()};
   p.price=opt.free?0:personPrice(role,sk);
@@ -836,7 +836,7 @@ function genRace(set){
     if(last)sm=pick([480,540]);
     let mar=0;for(const[a,b]of cfg.mar){if(i===a)mar=1;if(i===b)mar=2}
     const rainP=clamp(Math.pow(rand(),1.6)*.55+.03,.03,.6);
-    const move=(mar===1||last)?0:(rand()<.08?0:Math.round(R(3,10)*60));
+    const move=(mar===2||last)?0:mar===1?Math.round(R(8,12)*60):(rand()<.08?0:Math.round(R(3,10)*60));
     stages.push({n:i,day,start:day*1440+sm,dep:day*1440+sm,liaIn:0,liaOut:0,preKm:0,postKm:0,move,moveKm:Math.round(move/60*70),convoy:null,fc:0,km,segs,type,mar,rainP,rainRoll:rand()<rainP,fNoise:rand()*2-1,nightStart,rain:null,runs:null,player:null,final:false,table:null,resultsAt:null,
       warned:false});
     day++;
@@ -868,7 +868,7 @@ function voptGeneric(car,skillFn,b,rain,night,setupS,tyre){
 function physMax(car,b,rain,tyre){return carTop(car)*BIOMES[b].phys*(rain&&b==='vadi'&&tyre!=='wet'?.88:1)*(!rain&&tyre==='wet'?.92:1)}
 function needXP(L){return 100+100*L}
 function addXP(p,k){
-  const gain=Math.round(100*Math.pow(0.9,p.mistakes));p.mistakes++;
+  const gain=Math.round(130*Math.pow(0.9,p.mistakes));p.mistakes++;
   p.xp[k]=(p.xp[k]||0)+gain;
   let up=false;
   while((p.sk[k]||0)<10&&p.xp[k]>=needXP(p.sk[k]||0)){p.xp[k]-=needXP(p.sk[k]||0);p.sk[k]=(p.sk[k]||0)+1;up=true}
@@ -885,7 +885,7 @@ const MOVER_ORDER=['mechanik','doktor','kuchar','meteorolog','jezdec','navigator
 function moverCands(){return S.team.people.filter(p=>!isCrew(p)).sort((a,b)=>MOVER_ORDER.indexOf(a.role)-MOVER_ORDER.indexOf(b.role)||b.energy-a.energy)}
 function moversNeeded(){return Math.min(vansOf(S.team),S.team.people.filter(p=>!isCrew(p)).length)}
 function autoMovers(n){const sc=p=>p.energy+lvl(p,'vydrz')*4+(p.role==='jezdec'?12:0);return S.team.people.filter(p=>!isCrew(p)&&p.task!=='sleep').sort((a,b)=>sc(b)-sc(a)).slice(0,n)}
-function addSuccXP(p,k,ch){if(!p||!k||rand()>ch)return;p.succ=p.succ||0;const gain=Math.round(45*Math.pow(.9,p.succ));p.succ++;p.xp[k]=(p.xp[k]||0)+gain;let up=false;
+function addSuccXP(p,k,ch){if(!p||!k||rand()>ch)return;p.succ=p.succ||0;const gain=Math.round(58.5*Math.pow(.9,p.succ));p.succ++;p.xp[k]=(p.xp[k]||0)+gain;let up=false;
   while((p.sk[k]||0)<10&&p.xp[k]>=needXP(p.sk[k]||0)){p.xp[k]-=needXP(p.sk[k]||0);p.sk[k]=(p.sk[k]||0)+1;up=true}
   if(up)logAny(`${p.name} se zlepšil praxí: ${SKILLS[k]} → ${p.sk[k]}`,'xp')}
 const MINOR=['bolest zad','natažený krk','otlaky a modřiny','rozlámaný','bolavá zápěstí'];
@@ -908,14 +908,14 @@ function navig(){return person(S.team.navId)}
 function isCrew(p){return p.id===S.team.driverId||p.id===S.team.navId}
 function meteoSkill(){return Math.max(0,...S.team.people.map(p=>lvl(p,'predpoved')))}
 function prepOf(st){const tm=S.team;tm.prep=tm.prep||{};return tm.prep[st.n]||(tm.prep[st.n]={forecast:0,terrain:0,roadbook:0,fc:0})}
-function prepDone(st,k){return k==='forecast'?(prepOf(st).fc||0)>=3:prepOf(st)[k]>=PREP[k].need}
+function prepDone(st,k){return k==='forecast'?(prepOf(st).fc||0)>=2:prepOf(st)[k]>=PREP[k].need}
 function forecast(st){
   const fc=prepOf(st).fc||0;
-  if(fc>=3)return{p:st.rainRoll?1:0,lo:st.rainRoll?1:0,hi:st.rainRoll?1:0,acc:'jistá',exact:true,fc};
+  if(fc>=2)return{p:st.rainRoll?1:0,lo:st.rainRoll?1:0,hi:st.rainRoll?1:0,acc:'jistá',exact:true,fc};
   const m=meteoSkill();const truth=st.rainRoll?1:0;
-  const c0=clamp(st.rainP+st.fNoise*.25*(1-m/10),0,1);const c=c0+(truth-c0)*(fc/3)*.8;
-  const w=(.55-.035*m)*(1-fc*.3);
-  return{p:c,lo:clamp(c-w/2,0,1),hi:clamp(c+w/2,0,1),acc:fc?`${fc}/3 předpovědí`:m>=7?'zkušený meteorolog':m>=4?'meteorolog':m>0?'slabý odhad':'hrubý odhad',exact:false,fc};
+  const c0=clamp(st.rainP+st.fNoise*.25*(1-m/10),0,1);const c=c0+(truth-c0)*(fc/2)*.8;
+  const w=(.55-.035*m)*(1-fc*.45);
+  return{p:c,lo:clamp(c-w/2,0,1),hi:clamp(c+w/2,0,1),acc:fc?`${fc}/2 předpovědí`:m>=7?'zkušený meteorolog':m>=4?'meteorolog':m>0?'slabý odhad':'hrubý odhad',exact:false,fc};
 }
 function forecastOld(st){
   const m=meteoSkill();const err=.4*(1-m/10);return{p:clamp(st.rainP+st.fNoise*err,.01,.95),acc:m>=7?'vysoká':m>=4?'střední':m>0?'nízká':'bez meteorologa'}}
@@ -1661,7 +1661,7 @@ function botDrive(T){
   const mood=r.mood==null?.5:r.mood;
   const pos=mood*1.05-.32;let tgt=band.lo+pos*(band.hi-band.lo);
   if(r.temp>101){tgt*=.9;r.aggr=Math.min(r.aggr==null?.5:r.aggr,.3)}if(r.temp>108)tgt*=.88;
-  const nxt=r.stage.segs[seg.i+1];if(nxt&&rand()<T.smart){const toNext=seg.from+seg.km-r.dist;if(toNext<1.4){const nb=bandFor({b:nxt.b});tgt=Math.min(tgt,nb.lo+pos*(nb.hi-nb.lo))}}
+  const nxt=r.stage.segs[seg.i+1];if(nxt&&rand()<T.smart){const toNext=seg.from+seg.km-r.dist;if(toNext<1.4){const nb=bandFor({b:nxt.b},true);tgt=Math.min(tgt,nb.lo+pos*(nb.hi-nb.lo))}}
   r.target=Math.max(10,tgt*R(.97,1.03));
 }
 function botStart(T,st){
@@ -1810,11 +1810,12 @@ function finishRace(status,reason){
 }
 const WORK_DRAIN=100/12,REGEN=100/16,NIGHT_MUL=1,ROAD_REGEN=2.2;
 function vyLvl(p){if(!p)return 0;let v=lvl(p,'vydrz');const ij=p.inj;if(ij){if(ij.serious)v-=ij.pen;else if(ij.lvl>=3)v-=1}return Math.max(0,v)}
-const vyDrain=p=>clamp(1-.05*vyLvl(p),.4,1);
-const vyRegen=p=>clamp(1+.05*vyLvl(p),1,1.6);
+const vyDrain=p=>1/(1+.05*Math.min(10,vyLvl(p)));
+const vyRegen=p=>16/(16-.8*Math.min(10,vyLvl(p)));
 function restRegen(p,hrs,night,boost){p.energy=Math.min(100,p.energy+REGEN*vyRegen(p)*(1+(boost||0))*(1-.15*minorLvl(p))*hrs)}
 function teamReturn(r){
-  const st=r.stage;const cv=r.convoy||{arrive:st.start};
+  const st=r.stage;let cv=r.convoy||{arrive:st.start};
+  if(st.mar===2&&S.team.marCv){cv=S.team.marCv;S.team.marCv=null}r._cv=cv;
   for(let t=st.start;t<r.arrive;t+=30){const night=isNight(t);for(const p of S.team.people){if(isCrew(p)||((cv.drivers||[cv.driver]).includes(p.id)&&t<cv.arrive))continue;if(t<cv.arrive)p.energy=Math.min(100,p.energy+ROAD_REGEN*vyRegen(p)*.5);else restRegen(p,.5,night,0)}}
   const el=(r.arrive-st.start)/60;
   for(const p of S.team.people){if(p.inj&&!isCrew(p)){p.inj.h-=el*(p.inj.serious?.35:.6);if(p.inj.h<=0)p.inj=null}}
@@ -1822,18 +1823,18 @@ function teamReturn(r){
   for(const p of [driver(),navig()]){if(!p)continue;addInjury(p,{minor:true,name:pick(MINOR),lvl:1,h:R(5,10)*(.6+rough)+r.incCount*2})}
   for(const p of S.team.people){if(p.task==='sleep'&&p.energy<75)continue;p.task='rest'}
   S.convoyUntil=null;S.convoyDriver=cv.drivers||(cv.driver?[cv.driver]:null);
-  if(st.mar===1){S.marathonNight=true;S.team.people.forEach(p=>{if(!isCrew(p))p.task='away'});return'mar'}
+  if(st.mar===1){S.team.marCv=cv;S.marathonNight=true;S.team.people.forEach(p=>{if(!isCrew(p))p.task='away'});return'mar'}
   if(cv.arrive>r.arrive){S.convoyUntil=cv.arrive;S.team.people.forEach(p=>{if(!isCrew(p))p.task='road'});return'late'}
   return'ok';
 }
 function backToBivak(){
-  const r=S.race;const st=r.stage;const cv=r.convoy||{arrive:st.start};
-  const res=teamReturn(r);
-  S.t=r.arrive;S.race=null;S.phase='bivak';S.speed=0;S.pauseMsg=null;
+  const r=S.race;const st=r.stage;
+  const res=teamReturn(r);const cv=r._cv||r.convoy||{arrive:st.start};
+  S.t=r.arrive;S.resClock=Math.max(S.resClock||0,r.watchT||0);S.race=null;S.phase='bivak';S.speed=0;S.pauseMsg=null;
   if(res==='mar')log('Maratonský bivak: zbytek týmu je v hlavním bivaku. Opravovat smí jen posádka.','warn');
   else if(res==='late'){log(`Bivak měl zpoždění ${durHM(cv.arrive-r.arrive)}${cv.slept?' (řidič usnul za volantem)':''}. Čekali jste na něj do ${clock(cv.arrive)}.`,'bad');
     let g=0;while(S.convoyUntil&&g++<3000){bivakCore(1);if(g%15===0){botsAdvance(S.t);checkResults()}}S._stop=false;S.pauseMsg=null}
-  else if(st.move>0)log(`Bivak dorazil včas v ${clock(cv.arrive)}${cv.delay>30?` i se zpožděním ${durHM(cv.delay)}`:''}.`,'ok');
+  else if(st.move>0||st.mar===2)log(`Bivak dorazil včas v ${clock(cv.arrive)}${cv.delay>30?` i se zpožděním ${durHM(cv.delay)}`:''}.`,'ok');
   S.stageIdx++;
   if(st.n===S.stages.length&&!S.team.out)log('Poslední etapa za námi! Čekáme, až dojedou všichni.','ok');
   else if(S.stages[S.stageIdx])log(`Další start: ${dateOf(S.stages[S.stageIdx].day)} ${clock(S.stages[S.stageIdx].start)}.`);
@@ -1870,7 +1871,7 @@ function overallTable(){
 }
 
 /* ================= BIVAK SIM ================= */
-const TASK_SKILL={tires:'opravy',swap:'opravy',setup:'setup',medic:'medicina',cook:'vareni','prep:forecast':'predpoved','prep:terrain':'predpoved','prep:roadbook':'navigace'};
+const TASK_SKILL={tires:'setup',swap:'setup',setup:'setup',medic:'medicina',cook:'vareni','prep:forecast':'predpoved','prep:terrain':'predpoved','prep:roadbook':'navigace'};
 function workSkill(task){if(task.startsWith('rep:'))return'opravy';if(task.startsWith('upg:'))return'upgrade';return TASK_SKILL[task]||null}
 const RESTING=['rest','sleep','away','patient','road'];
 function bivakHere(){return !(S.convoyUntil&&S.t<S.convoyUntil)}
@@ -1921,11 +1922,12 @@ function bivakCore(dm){
     if(!SK_KEYS.some(k=>c.target[k]!==c.setup[k])){S.setupProg=0;freeWorkers('setup','Nastavení auta dokončeno.')}}}
   const nx=nextStageObj();
   if(nx)for(const k in PREP){const task='prep:'+k;if(prepDone(nx,k))continue;const r=jobRate(task);if(r>0){prepOf(nx)[k]+=r*hrs;if(prepOf(nx)[k]>=PREP[k].need){
-    if(k==='forecast'){prepOf(nx).fc=(prepOf(nx).fc||0)+1;prepOf(nx).forecast=0;if(prepOf(nx).fc>=3)freeWorkers(task,`Předpověď 3/3: na etapě ${nx.n} ${nx.rainRoll?'BUDE pršet':'nebude pršet'}. Jistě.`);else log(`Předpověď ${prepOf(nx).fc}/3 hotová: déšť na etapě ${nx.n} ${rainText(nx)}. Meteorolog pokračuje.`,'ok')}
+    if(k==='forecast'){prepOf(nx).fc=(prepOf(nx).fc||0)+1;prepOf(nx).forecast=0;if(prepOf(nx).fc>=2)freeWorkers(task,`Předpověď 2/2: na etapě ${nx.n} ${nx.rainRoll?'BUDE pršet':'nebude pršet'}. Jistě.`);else log(`Předpověď ${prepOf(nx).fc}/2 hotová: déšť na etapě ${nx.n} ${rainText(nx)}. Meteorolog pokračuje.`,'ok')}
     else{prepOf(nx)[k]=PREP[k].need;freeWorkers(task,`${PREP[k].name} hotové. ${PREP[k].eff}`)}}}}
   const ck=cookInfo();const md=medicInfo();
   for(const p of S.team.people){
     if(!available(p))p.task=S.marathonNight?'away':'road';
+    if(p.task==='away'&&S.team.marCv&&S.t<S.team.marCv.arrive){if(!(S.team.marCv.drivers||[]).includes(p.id))p.energy=Math.min(100,p.energy+ROAD_REGEN*vyRegen(p)*hrs);continue}
     const vy=lvl(p,'vydrz');
     if(p.task==='road'){if(S.convoyAhead&&S.t>=S.convoyAhead.arrive)restRegen(p,hrs,night,0);else if(!isConvDriver(p.id))p.energy=Math.min(100,p.energy+ROAD_REGEN*vyRegen(p)*hrs)}
     else if(RESTING.includes(p.task)){restRegen(p,hrs,night,p.task==='away'?0:ck.boost);
@@ -1941,7 +1943,7 @@ function bivakStep(dm){
   if(S.awaitMover||S.waitHumans)return;
   bivakCore(dm);const nx=nextStageObj();
   const day=Math.floor(S.t/1440);
-  if(day===S.restDay&&!S.restPoolDone){S.restPoolDone=true;refreshPoolRestDay();log('DEN VOLNA! Celý den na opravy, regeneraci a nákupy na trhu.','ok')}
+  if(day===S.restDay&&!S.restPoolDone){S.restPoolDone=true;log('DEN VOLNA! Celý den na opravy a odpočinek.','ok')}
   checkResults();
   if(S.phase!=='bivak')return;
   if(nx&&!nx.warned&&nx.dep-S.t<=60){nx.warned=true;log(`Za hodinu start etapy ${nx.n}!${nx.move?' Nezapomeň vybrat řidiče přesunu bivaku.':''}`,'warn');autoPause()}
@@ -1959,8 +1961,8 @@ function assign(id,task){
 function accelRate(car,d){const wrong=(S.race&&S.race.rain&&car.tyre==='dry')||(S.race&&!S.race.rain&&car.tyre==='wet');return(6+1.1*compEff(car.comps.prevodovka)+.5*eff(d,'rychlost'))*(.7+.3*car.comps.pneu.cond/100)*(wrong?.85:1)}
 function crewSkillFn(){const d=driver();return k=>eff(d,k)}
 function curVopt(seg){const r=S.race;return voptGeneric(S.team.car,crewSkillFn(),seg.b,r.rain,isNight(r.t),null,S.team.car.tyre)}
-function bandFor(seg){
-  const r=S.race;const d=driver(),n=navig();const B=BIOMES[seg.b];
+function bandFor(seg,raw){
+  const r=S.race;if(!raw&&r.bs)return r.bs;const d=driver(),n=navig();const B=BIOMES[seg.b];
   const V=curVopt(seg)*(1+.28*((r.aggr==null?.5:r.aggr)-.5));
   const sk=(avg(B.skill.map(k=>eff(d,k)))+eff(d,'postreh')+eff(n,'cteni'))/3;
   const w=clamp(.5-.03*sk,.14,.5)*(r.intel?.8:1);
@@ -1980,6 +1982,7 @@ function raceStep(dtReal){
   const dtG=dtReal*RACE_GMIN_PER_S;r.t+=dtG;const hrs=dtG/60;
   const st=r.stage;const car=S.team.car;const d=driver(),n=navig();const ag=r.aggr==null?.5:r.aggr;
   const seg=segAt(r.dist);
+  {const tb=bandFor(seg,true);if(!r.bs)r.bs={...tb};else{const k=1-Math.exp(-dtReal/1.1);for(const q of ['lo','hi','V'])r.bs[q]+=(tb[q]-r.bs[q])*k}}
   if(seg.i!==r.segIdx){if(r.segIdx>=0&&!r.segInc){const pb=BIOMES[st.segs[r.segIdx].b];addSuccXP(d,pb.skill[0],.3);addSuccXP(d,'technika',.15)}r.segInc=0;r.segIdx=seg.i;r.bandR=rand();rlog(`Biom: ${BIOMES[seg.b].name} (${seg.km} km).`)}
   const ssNow=setupScore(car.setup,seg.b);
   for(const[p,base]of[[d,WORK_DRAIN*(.85+.3*ag)+(r.heater?6:0)],[n,WORK_DRAIN+(r.heater?6:0)]]){if(!p)continue;p.energy=Math.max(0,p.energy-base*vyDrain(p)*(1+.1*minorLvl(p))*hrs)}
@@ -2020,7 +2023,7 @@ function raceStep(dtReal){
       if((k==='pneu'||k==='podvozek')&&car.setup.tlak>0&&seg.b!=='vadi')w*=1+.12*car.setup.tlak;
       w*=k==='pneu'?.55+.9*ag:.85+.3*ag;
       r.wr[k]=(r.wr[k]||0)*.9+(hrs>0?w/hrs:0)*.1;
-      c.cond=Math.max(0,c.cond-w);if(k!=='pneu')c.max=Math.max(20,c.max-w*(.05+.12*Math.max(0,(r.v-band.V)/band.V)))}
+      w*=.85;c.cond=Math.max(0,c.cond-w);if(k!=='pneu')c.max=Math.max(20,c.max-w*(.05+.12*Math.max(0,(r.v-band.V)/band.V)))}
     const dead=CK.find(k=>car.comps[k].cond<=0);
     if(dead){rlog(`${COMPS[dead]} to vzdal úplně! Auto stojí.`,'bad');return finishRace('dnf',`${COMPS[dead]} se úplně zničil (stav 0 %).`)}
   }
@@ -2048,7 +2051,7 @@ function riskCheck(seg,band){
 function triggerIncident(seg,o){
   const r=S.race;const car=S.team.car;const B=BIOMES[seg.b];
   const w={...B.inc};if(o<.1){w.smyk*=2;w.strecha*=.15}if(o>.3){w.strecha*=2.5;w.smyk*=.6}
-  const ty=wpick(w);const sev=(1+o*6)*1.1;const dmg=(k,a,b)=>{const x=car.comps[k];const amt=R(a,b)*sev;x.cond=Math.max(0,x.cond-amt);if(k!=='pneu')x.max=Math.max(20,x.max-amt*.25)};
+  const ty=wpick(w);const sev=(1+o*6)*1.1;const dmg=(k,a,b)=>{const x=car.comps[k];const amt=R(a,b)*sev*.85;x.cond=Math.max(0,x.cond-amt);if(k!=='pneu')x.max=Math.max(20,x.max-amt*.25)};
   r.incCount++;r.segInc=1;SND.crash(ty);if(S._bot)r.spook=Math.min(.45,(r.spook||0)+R(.12,.3));if(!S._bot){r.shake=9;lensSplat(seg.b==='duny'||seg.b==='fesh'?'sand':'mud',RI(2,4))}
   const d=driver(),n=navig();
   for(const p of [d,n])if(p)p.energy=Math.max(0,p.energy-5);
@@ -2080,8 +2083,9 @@ function render(){
   else if(S.phase==='race')renderRace();
   else if(S.phase==='end')renderEnd();
 }
-const VERSION='0.30';
+const VERSION='0.31';
 const CHANGELOG=[
+ ['0.31','Upgrady o 20 % rychlejší, auto se ničí o 15 % méně, XP o 30 % rychleji. Výměna pneu je skill Nastavení. Předpověď počasí na 2 kroky. Výdrž 10 = 18 h práce / 8 h spánku. Optimální rychlost se při změně biomu posouvá plynule. Specialisté mají ve svém oboru aspoň 1. Maraton: bivak jede dlouhou objížďkou už od M1. Po dojetí závod běží dál. Výsledky v bivaku už samy nevyskakují. Trh zrušen.'],
  ['0.30','Výdrž se počítá od nuly (12 h práce / 16 h odpočinku je Výdrž 0, každý bod −5 % únavy a +5 % regenerace). Nehoda bere posádce vždy 5 energie. Zapadnutí a převrácení se řeší samo – posádka to zkouší znovu a znovu, každý pokus má větší šanci. Kuchaři: 5 % + 5 % za level vaření, děleno počtem lidí, kteří nevaří.'],
  ['0.29','Únava sjednocená: jakákoli práce (dílna, stan, závod, řízení dodávky) vybije člověka ze 100 na 0 za 12 h, odpočinek ho z 0 dobije za 16 h. Výdrž: každý bod nad 5 = −5 % únavy a +5 % regenerace (pod 5 naopak). Bez skillu se už rychleji neunavíš, jen práce trvá déle. Kuchaři: každý další přidá méně (např. 5 % + 4 % + 3 %).'],
  ['0.28','Riskování: přestřelení rychlosti vede k nehodě o 10 % méně často a Postřeh zachraňuje o něco častěji, ale nehoda bolí víc (+10 % poškození auta a únavy posádky).'],
@@ -2218,7 +2222,7 @@ function renderShop(){
   <aside class="panel"><h3>${esc(tm.name)}</h3>
     ${inBivak?'':`<div class="check"><span style="color:${tm.car?'var(--ok)':'var(--bad)'}">${tm.car?'✓':'✗'} Auto</span><span style="color:${has('jezdec')?'var(--ok)':'var(--bad)'}">${has('jezdec')?'✓':'✗'} Jezdec</span><span style="color:${has('navigator')?'var(--ok)':'var(--bad)'}">${has('navigator')?'✓':'✗'} Navigátor</span></div>
     <div style="margin:10px 0"><div class="row" style="justify-content:space-between;font-size:13px"><span>Rezerva na závod</span><span class="num">${money(S.money)} / doporučeno ${money(reserve)}</span></div><div class="bar"><i style="width:${clamp(S.money/reserve*100,0,100)}%;background:${S.money>=reserve?'var(--ok)':S.money>=reserve/2?'var(--warn)':'var(--bad)'}"></i></div>
-    <p class="hint">Z rezervy platíš nové pneumatiky (3 000 €), rezervní kola a nákupy na trhu o dni volna. Upgrady dílů stojí jen čas. Během závodu žádné příjmy nejsou.</p></div>`}
+    <p class="hint">Z rezervy platíš nové pneumatiky (3 000 €) a rezervní kola. Upgrady dílů stojí jen čas. Během závodu žádné příjmy nejsou.</p></div>`}
     <div class="team-list">
       ${tm.car?`<div class="team-item"><span><b>${esc(tm.car.name)}</b></span>${inBivak||(S.mp&&S.mp.passed)?'':`<button class="small" data-act="sellCar">Prodat</button>`}</div>`:''}
       ${vanSlots(tm,inBivak||(S.mp&&S.mp.passed))}
@@ -2284,7 +2288,7 @@ function renderBivakParts(){
 </div>
     <div class="row"><span class="money" title="Rezerva peněz">${money(S.money)}</span>
       <button data-act="calendar">${ic('cal')} Kalendář</button><button data-act="results" ${anyResults()?'':'disabled'}>${ic('trophy')} Výsledky</button>
-      ${day===S.restDay?'<button class="primary" data-act="market">Trh</button>':''}
+
 <button data-act="logModal">${ic('book')} Deník</button>${S.mp?`<button class="small" data-act="mpCode" title="Kód online hry">${ic('users')} ${esc(S.mp.code)}</button>`:''}<button class="small" data-act="saveFile" title="Uložit hru do souboru">${ic('book')} Uložit</button><button class="small" data-act="help">?</button><button class="small" data-act="sound" title="Hudba a zvuky">${soundOn()?'♪ zvuk':'♪ vyp'}</button></div>
     ${S.waitHumans?`<div class="status"><span class="warn">${ic('clock')} Jsi připravený. Čekáme, až ostatní hráči dokončí bivak.</span></div>`:''}${!bivakHere()||(S.speed===0&&S.pauseMsg)?`<div class="status">${!bivakHere()?`<span style="color:var(--bad)">Bivak dorazí v ${clock(S.convoyUntil)}.</span> `:''}${S.speed===0&&S.pauseMsg?`<span class="warn">❚❚ Automatická pauza: ${esc(S.pauseMsg)}</span>`:''}</div>`:''}`;
   document.getElementById('sceneLabel').textContent=S.marathonNight?'Maratonský bivak · jen posádka':!bivakHere()?'Bivak ještě není na místě':day===S.restDay?'Den volna':'Bivak';
@@ -2382,7 +2386,7 @@ function renderStations(){
     <div class="jobs">${jobs.join('')||(bivakHere()?'<p class="hint">Auto je v pořádku. Upgrade dílu nebo změnu nastavení zadáš v okně <b>Auto a nastavení</b>, pak se tu objeví jako práce.</p>':'')}</div></section>
   <section class="station staff" style="--sc:#5aa7e6"><header><h3>${ic('map')}Štábní stan</h3><span class="hint">etapa ${st?st.n:'—'}</span></header>
     <div class="prepz">${st?Object.keys(PREP).map(k=>{const P=PREP[k];const done=prepDone(st,k);return done?`<div class="drop done"><div class="dh"><b>${P.name}</b><span class="pill ok">${ic('check')}</span></div><span class="hint eff">${P.eff}</span></div>`
-      :dropZone('prep:'+k,`<b>${P.name}${k==='forecast'?` ${prepOf(st).fc||0}/3`:''}</b><span class="hint">${SKILLS[P.skill]}</span>`,`<div class="prog">${progBar(prepOf(st)[k]/P.need,'#5aa7e6')}${etaText('prep:'+k,P.need-prepOf(st)[k])}</div>`)}).join(''):'<p class="hint">Žádná další etapa.</p>'}</div></section>
+      :dropZone('prep:'+k,`<b>${P.name}${k==='forecast'?` ${prepOf(st).fc||0}/2`:''}</b><span class="hint">${SKILLS[P.skill]}</span>`,`<div class="prog">${progBar(prepOf(st)[k]/P.need,'#5aa7e6')}${etaText('prep:'+k,P.need-prepOf(st)[k])}</div>`)}).join(''):'<p class="hint">Žádná další etapa.</p>'}</div></section>
   <div class="lowrow">
   <section class="station" style="--sc:#7cc56b"><header><h3>${ic('pot')}Kuchyně</h3><span class="hint" data-tip="Kuchař uvaří 5 % + 5 % za každý level vaření a to se rozdělí mezi všechny, kdo nevaří. O tolik se jim zrychlí odpočinek a zpomalí únava při práci. Druhý kuchař přidá 80 % svého výkonu, třetí 60 %… Maximum je +30 %.">${off?'zavřeno':ck.cooks?`+${Math.round(ck.boost*100)} % regenerace · −${Math.round(ck.boost*100)} % únavy`:'bez kuchaře'}</span></header>
     ${dropZone('cook','','')}</section>
@@ -2414,7 +2418,7 @@ function rosterCard(p,first){
   return `<div class="pc ${locked?'locked':''}" ${locked?'':'draggable="true"'} data-act="sel" data-pid="${p.id}" style="--rc:${ROLES[p.role].col};--rot:${rot}deg;${first?'grid-column-start:1':''}">
     <div class="pc-h"><b>${esc(nm[0])} <span>${esc(nm.slice(1).join(' '))}</span></b><em>${p.id===tm.driverId?'PILOT':p.id===tm.navId?'NAVIGÁTOR':ROLES[p.role].name}</em></div>
     <div class="pc-bw"><canvas class="pix pc-ban" data-face="${p.id}" data-ban="1" width="48" height="34"></canvas>${p.task==='sleep'?`<span class="zz">${ic('zz')}</span>`:''}${p.inj?`<span class="pinj ${p.inj.serious?'ser':''}">${ic('inj')}${p.inj.serious?'!':(p.inj.lvl||1)}</span>`:''}</div>
-    <div class="pc-en"><span class="eb"><i style="width:${e}%;background:${eCol(e)}"></i></span><span class="num">${e}%</span><span class="vy" title="Výdrž: každý bod = o 5 % pomalejší únava a o 5 % rychlejší odpočinek">${ic('heart')}${vyLvl(p)}</span></div>
+    <div class="pc-en"><span class="eb"><i style="width:${e}%;background:${eCol(e)}"></i></span><span class="num">${e}%</span><span class="vy" title="Výdrž: 0 = práce 12 h / odpočinek 16 h, 10 = práce 18 h / odpočinek 8 h">${ic('heart')}${vyLvl(p)}</span></div>
     <div class="pc-sl">${skillRows(p)}</div>
   </div>`;
 }
@@ -2628,13 +2632,13 @@ function showResults(n,view='stage'){
 function showHelp(){
   openModal(`<div class="modal"><header><h2>Příručka</h2><button data-act="close">Zavřít</button></header><div class="prose">
   <h3>Cíl</h3><p>Vyhraje tým s nejnižším součtem časů ze všech etap. Nedojedeš-li etapu, dostaneš čas nejpomalejšího jezdce + 2 hodiny.</p>
-  <h3>Bivak</h3><p>Čas běží jen když ho pustíš (1× = 15 s na hodinu, 2×, 3× nebo Dál). Lidi přetahuješ myší mezi stanovišti. Kdo nemá práci, je ve stanu (pravý sloupec) a odpočívá. Vytažením z úkolu kamkoli mimo stanoviště ho pošleš do stanu. Kdo pracuje, unavuje se, a na 0 % může usnout a spí až do 75 %. Jakákoli práce vybije člověka ze 100 na 0 za 12 hodin, odpočinek ho z 0 dobije za 16 hodin. <b>Výdrž</b> to zlepšuje: každý bod znamená o 5 % pomalejší únavu a o 5 % rychlejší odpočinek (Výdrž 10 = únava za 24 h, odpočinek za ~11 h). Rozhoduj, co stihneš opravit a kdo se musí vyspat.</p>
+  <h3>Bivak</h3><p>Čas běží jen když ho pustíš (1× = 15 s na hodinu, 2×, 3× nebo Dál). Lidi přetahuješ myší mezi stanovišti. Kdo nemá práci, je ve stanu (pravý sloupec) a odpočívá. Vytažením z úkolu kamkoli mimo stanoviště ho pošleš do stanu. Kdo pracuje, unavuje se, a na 0 % může usnout a spí až do 75 %. Jakákoli práce vybije člověka ze 100 na 0 za 12 hodin, odpočinek ho z 0 dobije za 16 hodin. <b>Výdrž</b> to zlepšuje: s Výdrží 10 člověk vydrží pracovat 18 hodin a vyspí se za 8. Rozhoduj, co stihneš opravit a kdo se musí vyspat.</p>
   <p><b>Skilly v bivaku:</b> každá práce má svůj skill. Se skillem 0 pracuješ zhruba 9× pomaleji než specialista se skillem 10. <b>Dílna:</b> opravy, upgrady (jen čas, ale hodně: vyšší level = mnohem delší práce, typicky na několik bivaků) a nastavení auta. Víc lidí na jedné práci = rychleji, ale s klesajícím přínosem. <b>Kuchyně:</b> kuchař uvaří 5 % + 5 % za každý level vaření a rozdělí to mezi všechny, kdo nevaří (kuchař s vařením 5 v týmu 6 lidí = +6 % pro každého). O tolik se zrychlí odpočinek a zpomalí únava při práci. Každý další kuchař přidá méně (80 %, 60 %…), maximum je +30 %. <b>Ošetřovna:</b> lékař a pacienti. <b>Štábní stan:</b> předpověď počasí a analýza terénu (meteorolog) a studium roadbooku (navigátor).</p>
   <h3>Přesun bivaku</h3><p>Na většině etap se bivak po startu stěhuje k cíli. Při startu vybereš řidiče dodávek (kohokoliv kromě posádky). Řízení je práce jako každá jiná, a když je vyčerpaný, zastavuje nebo usne a bivak přijede pozdě. Dokud bivak nedorazí, na autě se nedá pracovat. Ostatní během přesunu skoro neregenerují. Okruhové etapy se nestěhují.</p><h3>Zranění</h3><p>Posádka je po každé etapě rozlámaná (drobné zranění, hlavně po kamenech a dunách). Drobné zranění nesnižuje skilly, ale zpomaluje regeneraci, práci a v závodě víc unavuje. Hojí se jen při odpočinku. Když se neléčí, další etapa ho zhorší (až 3/3 = chronické, pak i výdrž −1). Nehody můžou způsobit vážné zranění, které bez doktora léčí jen pomalu. Pošli zraněné do ošetřovny jako pacienty.</p><h3>Trvalé opotřebení</h3><p>Každé ničení dílu trochu sníží jeho maximum, na které ho jde opravit (šrafovaná část). Nejvíc ho ničí rychlá jízda nad bezpečnou hranicí a nehody. Upgrade zvedne maximum o 10 % aktuální hodnoty (z 80 % na 88 %), takže díl úplně neomladí.</p><h3>Pneumatiky a počasí</h3><p>Máš sadu suchých a sadu mokrých pneumatik. Suché v dešti znamenají horší grip, nižší bezpečnou rychlost a vyšší riziko. Mokré na suchu se rychle ničí a auto je pomalejší. Přezutí trvá hodinu práce. Bez předpovědi vidíš jen široký odhad deště. Každá předpověď meteorologa ho zúží a třetí dá jistotu.</p><h3>Etapa</h3><p>45 sekund = 1 herní hodina. Kromě rychlosti hlídej teplotu motoru (nad 105 °C se ničí). Režim motoru Útok dá o 7 % rychlejší tempo bez změny rychlostního pásu, ale hřeje a ničí motor. Topení naplno motor rychle chladí, ale vyčerpává posádku. Na etapu máš 3 lahve vody: zastávka na 3 minuty dá oběma jezdcům +14 % energie (unaveným +18 %). Vyplatí se, když zbývá ještě hodně etapy nebo je posádka vyčerpaná. Auto nezrychluje ani nebrzdí okamžitě: záleží na převodovce, jezdci a stavu pneumatik. Sleduj, kdy přijde další biom, a zpomal včas. Riziko se počítá z aktuální rychlosti, ne z posuvníku. Špatné nastavení pro daný biom zvyšuje riziko nehody a víc unavuje jezdce. Rychlost nastavuješ posuvníkem. Oranžový pás ukazuje, kde zhruba leží hranice bezpečné rychlosti. Ta zahrnuje auto, opotřebení dílů, nastavení, skilly a únavu posádky, počasí i noc. Pod pásem jsi v bezpečí, v pásu možná riskuješ, nad ním určitě. Postřeh jezdce může chybu na poslední chvíli zachránit. Lepší posádka = užší pás.</p>
   <h3>Biomy</h3>${BK.map(b=>`<p><b style="color:${BIOMES[b].ui}">${BIOMES[b].name}</b>: ${BIOMES[b].info} Vyniká: ${BIOMES[b].good} Riziko: ${BIOMES[b].risk}</p>`).join('')}
   <h3>Díly</h3><p>Díly mají kvalitu Q1–10 a stav 0–100 %. Pneumatiky kvalitu nemají, jen se opotřebují a vyměňují. Pod 25 % hrozí, že díl praskne a etapu nedojedeš.</p>
   <h3>Waypointy a zkušenosti</h3><p>Na trati je 15 waypointů, nenalezený stojí 15 minut. Lidé se učí z chyb: první chyba dá 100 XP, každá další o 10 % méně. Na další level je potřeba 100 + 100 × level XP.</p>
-  <h3>Maraton a den volna</h3><p>Po první části maratonu spíte bez týmu, opravovat můžou jen jezdec a navigátor. Den volna je celý den na opravy a regeneraci a otevře se trh. Když etapu nedojedeš, odtáhnou tě do bivaku a pokračuješ dál s časem nejpomalejšího + 2 h.</p><h3>V závodě</h3><p>Rychlost řídíš sliderem (šipky). Agresivita (Q/E) posune oranžový pás doprava: jedeš rychleji, ale víc ničíš pneumatiky a motor se víc hřeje. Topení chladí motor, ale vyčerpává posádku.</p><h3>Hráči</h3><p>Etapa startuje, až jsou připravení všichni hráči. Panel Hráči vlevo dole ukazuje, kdo je ještě na trati a kolik mu zbývá do startu.</p></div></div>`);
+  <h3>Maraton a den volna</h3><p>Na začátku maratonu odjíždí bivak dlouhou objížďkou rovnou do cíle druhé etapy – řidiče vybíráš už před první etapou a zbytek týmu je celou dobu na cestě. Po první části spí posádka bez týmu, opravovat můžou jen jezdec a navigátor. Den volna je celý den na opravy a regeneraci. Když etapu nedojedeš, odtáhnou tě do bivaku a pokračuješ dál s časem nejpomalejšího + 2 h.</p><h3>V závodě</h3><p>Rychlost řídíš sliderem (šipky). Agresivita (Q/E) posune oranžový pás doprava: jedeš rychleji, ale víc ničíš pneumatiky a motor se víc hřeje. Topení chladí motor, ale vyčerpává posádku.</p><h3>Hráči</h3><p>Etapa startuje, až jsou připravení všichni hráči. Panel Hráči vlevo dole ukazuje, kdo je ještě na trati a kolik mu zbývá do startu.</p></div></div>`);
 }
 function renderEnd(){
   const ov=overallTable();const i=ov.findIndex(e=>e.id==='me');
@@ -3196,12 +3200,12 @@ function loop(now){
       saveAcc+=dt;if(saveAcc>5){saveAcc=0;save()}
       if(S.waitHumans&&(!S.mp||isHost())){const nx=nextStageObj();if(!nx||humansReady(nx)){log('Všichni hráči jsou připraveni. Start!','ok');mpBeginStage()}}
       if(S.mp&&S.mp.goPending&&!S.awaitMover&&modalKind!=='mover'&&S.phase==='bivak'){const n=S.mp.goPending;S.mp.goPending=null;const nx=nextStageObj();if(nx&&nx.n===n){S.waitHumans=false;startStage()}}
-    if(S.phase==='bivak'&&S.pendingRes&&!modalOpen&&!dragging&&!S.awaitMover&&!S.waitHumans){const n=S.pendingRes;S.pendingRes=null;S.speed=0;showResults(n,'stage')}
+    if(S.phase==='bivak'&&S.pendingRes){const n=S.pendingRes;S.pendingRes=null;toastMsg(`Etapa ${n} je dojetá – výsledky najdeš pod blikajícím tlačítkem.`);renderBivakParts()}
     }
   }else if(S.phase==='menu'){const cv=document.getElementById('menuScene');if(cv)renderMenuScene(cv,dt);
   }else if(S.phase==='race'&&S.race){
     if(!S.race.over)raceStep(dt);
-    if(S.race)botsAdvance(S.race.t);
+    if(S.race){const r=S.race;if(r.over){r.watchT=Math.max(r.watchT||r.t,r.t)+dt*RACE_GMIN_PER_S;botsAdvance(r.watchT);checkResults()}else botsAdvance(r.t)}
     if(S.race&&S.race.over&&S.race.finAnim>0){const r=S.race;r.finAnim-=dt;r.v=Math.max(0,r.v-r.v*dt*1.2-8*dt);r.dist+=r.v*dt*RACE_GMIN_PER_S/60;if(r.finAnim<=0)showFinishModal()}
     const cv=document.getElementById('scene');if(cv&&S.race)renderRaceScene(cv,dt);
     if(S.race){updateRaceUI(false);const inc=S.race.incident;
