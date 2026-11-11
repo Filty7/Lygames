@@ -1591,8 +1591,8 @@ function withTeam(T,fn){const sv={};for(const k of CTXK)sv[k]=S[k];
   S.team=T;S.race=T.race;S.jobs=T.jobs;S.setupProg=T.setupProg;S.convoyUntil=T.convoyUntil;S.convoyDriver=T.convoyDriver;S.moverId=T.moverId;S.marathonNight=T.marathonNight;S.money=T.money;S.log=T.log;S.t=T.t;S.stageIdx=T.stageIdx;S._bot=true;
   try{fn()}finally{T.race=S.race;T.jobs=S.jobs;T.setupProg=S.setupProg;T.convoyUntil=S.convoyUntil;T.convoyDriver=S.convoyDriver;T.moverId=S.moverId;T.marathonNight=S.marathonNight;T.money=S.money;T.log=S.log.slice(0,30);T.t=S.t;T.stageIdx=S.stageIdx;
     for(const k of CTXK)S[k]=sv[k];S._bot=false}}
-function genBotTeam(i,name,num){
-  const budget=Math.round((150+Math.pow(rand(),1.4)*850)*1000);let money=budget*.9;
+function genBotTeam(i,name,num,bud){
+  const budget=bud||Math.round((150+Math.pow(rand(),1.4)*850)*1000);let money=budget*.9;
   const models=CAR_MODELS.filter(m=>!m.free).map(m=>({m,p:carPrice(m.q)})).filter(x=>x.p<=budget*.45).sort((a,b)=>b.p-a.p);
   const ch=models.length?models[Math.min(models.length-1,RI(0,1))]:{m:CAR_MODELS[1],p:carPrice(CAR_MODELS[1].q)};
   const car=makeCar(ch.m);money-=ch.p;
@@ -1609,7 +1609,7 @@ function genBotTeam(i,name,num){
 function genBots(n){
   const names=shuffle(BOT_NAMES.slice()).slice(0,n);
   const nums=shuffle(Array.from({length:90},(_,i)=>200+i)).filter(x=>x!==S.settings.number);
-  return names.map((name,i)=>genBotTeam(i,name,nums[i]));
+  return names.map((name,i)=>genBotTeam(i,name,nums[i],S.settings.sameBudget?S.settings.budget:0));
 }
 function botPlan(T){
   const tm=S.team,c=tm.car;const st=nextStageObj();const left=st?st.start-S.t:9999;
@@ -2083,8 +2083,9 @@ function render(){
   else if(S.phase==='race')renderRace();
   else if(S.phase==='end')renderEnd();
 }
-const VERSION='0.32';
+const VERSION='0.33';
 const CHANGELOG=[
+ ['0.33','Nová hra: volba „Stejný rozpočet pro všechny týmy“ – boti dostanou stejnou částku jako ty (i v multiplayeru).'],
  ['0.32','Pilot a navigátor se v závodě unavují rychleji (to, co by v bivaku vydrželi 8 h, v závodě vydrží 6 h, pak teprve působí Výdrž). Po M1 už hra nepíše, že budete čekat na bivak – ten jede rovnou do cíle M2.'],
  ['0.31','Upgrady o 20 % rychlejší, auto se ničí o 15 % méně, XP o 30 % rychleji. Výměna pneu je skill Nastavení. Předpověď počasí na 2 kroky. Výdrž 10 = 18 h práce / 8 h spánku. Optimální rychlost se při změně biomu posouvá plynule. Specialisté mají ve svém oboru aspoň 1. Maraton: bivak jede dlouhou objížďkou už od M1. Po dojetí závod běží dál. Výsledky v bivaku už samy nevyskakují. Trh zrušen.'],
  ['0.30','Výdrž se počítá od nuly (12 h práce / 16 h odpočinku je Výdrž 0, každý bod −5 % únavy a +5 % regenerace). Nehoda bere posádce vždy 5 energie. Zapadnutí a převrácení se řeší samo – posádka to zkouší znovu a znovu, každý pokus má větší šanci. Kuchaři: 5 % + 5 % za level vaření, děleno počtem lidí, kteří nevaří.'],
@@ -2150,7 +2151,8 @@ function renderSetup(){
       <div class="bigmoney num" id="budV">${money(s.budget)}</div>
       <div class="seg" style="margin:10px 0">${STARTUP_BUDGETS.map(([v,l])=>`<button class="${s.budget===v?'on':''}" data-act="budget" data-v="${v}">${l}<br><span class="num" style="font-size:11px">${money(v)}</span></button>`).join('')}</div>
       <div class="field"><label for="bud">Vlastní částka</label><input type="range" id="bud" min="100000" max="1200000" step="25000" value="${s.budget}"></div>
-      <p class="hint">Za rozpočet nakoupíš auto a lidi. Co neutratíš, zůstane jako rezerva na pneumatiky, rezervní kola a trh o dni volna. Boti mají 150 000 – 1 000 000 €.</p>
+      <p class="hint">Za rozpočet nakoupíš auto a lidi. Co neutratíš, zůstane jako rezerva na pneumatiky a rezervní kola.${s.setupMode==='mp'?' Všichni hráči v online hře dostanou tenhle rozpočet.':''}</p>
+      <label class="chk" style="display:flex;gap:8px;align-items:flex-start;margin-top:8px;cursor:pointer"><input type="checkbox" id="sameBud" ${s.sameBudget?'checked':''}><span><b>Stejný rozpočet pro všechny týmy</b><br><span class="hint">${s.sameBudget?'Boti dostanou stejnou částku jako ty.':'Boti mají náhodně 150 000 – 1 000 000 €.'}</span></span></label>
     </section>
     <section class="panel"><h3>2 · Tým</h3>
       <div class="field"><label for="tName">Název týmu</label><input type="text" id="tName" maxlength="28" value="${esc(s.teamName)}"></div>
@@ -2898,6 +2900,7 @@ document.addEventListener('change',e=>{if(e.target.id==='ap')S.settings.autopaus
 document.addEventListener('input',e=>{
   const id=e.target.id;
   if(id==='aggr'&&S.race){S.race.aggr=+e.target.value/100;updAggr();return}
+  if(id==='sameBud'){S.settings.sameBudget=e.target.checked;readSetupInputs();renderSetup();return}
   if(id==='bud'){S.settings.budget=+e.target.value;document.getElementById('budV').textContent=money(S.settings.budget);document.querySelector('[data-act="toShop"]').textContent=`Do nákupu s ${money(S.settings.budget)} →`;document.querySelectorAll('[data-act="budget"]').forEach(b=>b.classList.toggle('on',+b.dataset.v===S.settings.budget))}
   if(id==='tNum'||id==='tName'||id==='c1'||id==='c2'){readSetupInputs();const cv=document.getElementById('setupCar');if(cv){cv.dataset.car=`suv|${S.settings.colors.join(',')}|${S.settings.number}`;paintSprites()}drawHeroCars()}
 });
@@ -2963,7 +2966,7 @@ async function mpReconnect(){
   if(!S.mp)return;NET.pid=S.mp.pid;try{await netConnect(S.mp.code);S.mp.ok=true;S.mp.err=null;if(!S.mp.host)netSend({t:'hello',...myPlayer(),resume:true});log(`Znovu připojeno k online hře ${S.mp.code}.`,'ok')}catch(e){S.mp.err=e.message;log('Online připojení selhalo: '+e.message,'bad')}
 }
 function mpLeave(){netClose();S={...defaults(),settings:S.settings};S.phase='menu';render()}
-function mpLobbyBroadcast(){netSend({t:'lobby',players:S.mp.players,settings:{budget:S.settings.budget,days:S.settings.days,len:S.settings.len}})}
+function mpLobbyBroadcast(){netSend({t:'lobby',players:S.mp.players,settings:{sameBudget:!!S.settings.sameBudget,budget:S.settings.budget,days:S.settings.days,len:S.settings.len}})}
 function stubOf(b){return{id:b.id,name:b.name,number:b.number,livery:b.livery,car:{shape:(b.car&&b.car.shape)||'suv'},isRemote:true,human:!!b.human,state:'bivak',out:!!b.out,race:null}}
 function playerStub(pl){return{id:pl.pid,name:pl.team,number:pl.number,livery:pl.colors,car:{shape:'suv'},isRemote:true,human:true,state:'bivak',out:false,race:null}}
 function mpStartDraft(){
@@ -3163,7 +3166,7 @@ function renderLobby(){
     <div class="codebox"><span>KÓD HRY</span><b class="num">${esc(mp.code)}</b>${host?'<button class="small" data-act="copyCode">Kopírovat</button>':''}</div>
     <p class="hint">${host?'Pošli kód kamarádům. Připojí se přes Multiplayer → Připojit. Maximálně 10 hráčů, zbytek pole doplní boti do 30 týmů.':'Jsi připojený. Čekáme, až hostitel spustí hru.'}</p>
     <div class="plist">${(mp.players||[]).map(p=>`<div class="pl"><i style="background:${p.col}"></i><span class="pn"><b style="color:${p.col}">${esc(p.team)}</b> <span class="mute">#${p.number}</span></span><span class="ps">${p.host?'hostitel':''}${p.pid===NET.pid?' · ty':''}</span></div>`).join('')||'<span class="hint">Zatím nikdo.</span>'}</div>
-    <div class="row" style="gap:8px"><span class="pill">${money(set.budget||0)}</span><span class="pill">${dl}</span><span class="pill">etapy: ${ll}</span><span class="pill">${30-(mp.players||[]).length} botů</span></div>
+    <div class="row" style="gap:8px"><span class="pill">${money(set.budget||0)}${set.sameBudget?' · všichni':''}</span><span class="pill">${dl}</span><span class="pill">etapy: ${ll}</span><span class="pill">${30-(mp.players||[]).length} botů</span></div>
     ${host?`<button class="primary" style="font-size:18px;padding:9px" data-act="mpStart" ${mp.ok?'':'disabled'}>Start hry →</button>`:''}
   </div></div>`;
   if(!host&&mp.slots){app.querySelector('.lobby').innerHTML=`<div class="row" style="justify-content:space-between"><h2>${ic('users')} Hra už běží</h2><button class="small" data-act="mpLeave">Odejít</button></div>
