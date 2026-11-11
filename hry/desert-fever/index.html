@@ -261,13 +261,13 @@ details summary{cursor:pointer;font-family:var(--f-pix);font-size:13px;color:var
 #lvlfx .lvl b{color:#fff}#lvlfx .lvl .num{color:#5ad1ff;font-weight:700}#lvlfx .lvl.out{opacity:0;transform:translateX(20px)}
 @keyframes lvlin{from{opacity:0;transform:translateX(20px)}}
 .flash{animation:cflash .5s steps(2) infinite}@keyframes cflash{50%{box-shadow:0 0 0 3px #5ad1ff,0 0 14px #5ad1ff;filter:brightness(1.25)}}
-.stats{display:grid;grid-template-columns:260px 1fr;gap:14px;min-height:0}.stl{min-width:0}.str{min-width:0}
+.stats{display:grid;grid-template-columns:230px 1fr;gap:14px;min-height:0}.stl{min-width:0}.str{min-width:0}
 .stteams{display:grid;gap:2px;max-height:62vh;overflow:auto;padding-right:4px}.stteams label{display:flex;gap:6px;align-items:center;font-size:13px;cursor:pointer;padding:2px 4px}
 .stteams label.me{color:var(--mecol,var(--dakar));font-weight:700}.stteams label i{width:10px;height:10px;border:1px solid var(--line);flex:none}.stteams .num{width:26px;text-align:right;color:var(--mute)}
 .stm{display:flex;flex-wrap:wrap;gap:4px}.stm .on{background:var(--dakar);color:#1a1008}
 .chart{width:100%;height:auto;background:rgba(0,0,0,.18);border:1px solid var(--line)}.chart text{font-size:11px;fill:var(--mute);font-family:var(--f-mono)}.chart .gl{stroke:rgba(255,255,255,.08)}
 .stleg{display:flex;flex-wrap:wrap;gap:12px;margin:6px 0;font-size:13px}.stleg i{display:inline-block;width:12px;height:4px;margin-right:5px;vertical-align:middle}
-.stcards{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,300px));gap:8px}.stcard{border:1px solid var(--line);border-top:4px solid var(--c);padding:8px;background:rgba(0,0,0,.15)}
+.stcards{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}@media(max-width:1100px){.stcards{grid-template-columns:repeat(2,minmax(0,1fr))}}.stcard{border:1px solid var(--line);border-top:4px solid var(--c);padding:8px;background:rgba(0,0,0,.15)}
 .stcard h4{margin:0}.stgrid{display:grid;grid-template-columns:1fr auto;gap:1px 10px;font-size:13px;margin:6px 0}.stsk{font-size:12px;display:flex;flex-wrap:wrap;gap:4px 8px}.stsk em{width:100%;color:var(--mute);font-style:normal}
 @media(max-width:800px){.stats{grid-template-columns:1fr}}
 .wk.stack{gap:0}
@@ -2704,7 +2704,7 @@ function statData(){const sts=S.stages.filter(s=>s.final&&s.table);const teams={
       bv:h.bv==null?null:h.bv/60,cl:h.cl!=null?h.cl/60:null,dsk:h.dsk?Object.values(h.dsk).reduce((a,b)=>a+b,0):null,nsk:h.nsk?Object.values(h.nsk).reduce((a,b)=>a+b,0):null,xp:h.xp,money:h.money,h,note:e.note}});
     const ord=Object.keys(cum).filter(id=>teams[id]&&teams[id].pts[si]).sort((a,b)=>cum[a]-cum[b]);ord.forEach((id,i)=>teams[id].pts[si].ovr=i+1)});
   return{sts,teams}}
-function svgChart(series,n,m){const W=660,H=240,L=46,R=12,T=14,B=30;const vals=series.flatMap(s=>s.pts.map(p=>p&&p[m.k]).filter(v=>v!=null));if(!vals.length)return'<p class="hint">Žádná data.</p>';
+function svgChart(series,n,m){const W=1100,H=290,L=46,R=12,T=14,B=30;const vals=series.flatMap(s=>s.pts.map(p=>p&&p[m.k]).filter(v=>v!=null));if(!vals.length)return'<p class="hint">Žádná data.</p>';
   let lo=Math.min(...vals),hi=Math.max(...vals);if(m.inv){lo=1;hi=Math.max(hi,5)}if(lo===hi){lo-=1;hi+=1}if(!m.inv&&lo>0&&lo<hi*.5)lo=0;
   const x=i=>L+(n>1?i*(W-L-R)/(n-1):(W-L-R)/2),y=v=>m.inv?T+(v-lo)/(hi-lo)*(H-T-B):H-B-(v-lo)/(hi-lo)*(H-T-B);
   const fmt=v=>m.u==='.'?Math.round(v):m.u==='€'?Math.round(v/1000)+'k':m.u==='h'?v.toFixed(1):Math.abs(v)>=100?Math.round(v):(+v.toFixed(1));
@@ -2724,7 +2724,7 @@ function showStats(){const D=statData();if(!D.sts.length){toastMsg('Zatím nejso
     return`<div class="stcard" style="--c:${col}"><h4>${esc(T.name)}</h4><div class="mute">${esc(h.car||'')} · ${h.ppl||'?'} lidí</div>
     <div class="stgrid"><span>Celkově</span><b>${p.length&&p[p.length-1].ovr?p[p.length-1].ovr+'.':'–'}</b><span>Nehody</span><b>${sum(T,'inc')}</b><span>Minuté WP</span><b>${sum(T,'wp')}</b><span>Poškození</span><b>${Math.round(sum(T,'dmg'))}</b><span>Energie</span><b>${Math.round(sum(T,'dr'))} %</b><span>Čekání na bivak</span><b>${durHM(Math.round(sum(T,'cl')*60))}</b><span>XP</span><b>${h.xp||0}</b></div>
     <div class="stsk"><em>Pilot ${esc(h.dn||'')}</em>${sk(h.dsk)}</div><div class="stsk"><em>Navigátor ${esc(h.nn||'')}</em>${sk(h.nsk)}</div></div>`};
-  openModal(`<div class="modal" style="width:min(1180px,100%)"><header><h2>Statistiky rallye</h2><button data-act="close">Zavřít ✕</button></header>
+  openModal(`<div class="modal" style="width:min(1560px,100%)"><header><h2>Statistiky rallye</h2><button data-act="close">Zavřít ✕</button></header>
   <div class="stats"><div class="stl"><p class="hint">Zaškrtni až 4 týmy ke srovnání.</p><div class="stteams">${rows.map(T=>{const i=S.statSel.indexOf(T.id);const p=T.pts[last];
     return`<label class="${T.id==='me'?'me':''}"><input type="checkbox" data-statteam="${T.id}" ${i>=0?'checked':''}><i style="background:${i>=0?STAT_COL[i]:'transparent'}"></i><span class="num">${p&&p.ovr?p.ovr+'.':'–'}</span> ${esc(T.name)}</label>`}).join('')}</div></div>
   <div class="str"><div class="stm">${STAT_M.map(x=>`<button class="small ${x===m?'on':''}" data-act="statM" data-k="${x.k}">${x.l}</button>`).join('')}</div>
