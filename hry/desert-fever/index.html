@@ -2700,9 +2700,9 @@ function statSnap(r){const tm=S.team,c=tm.car,st=r.stage,d=driver(),n=navig();co
 /* ---- skill-up notices ---- */
 const FLASH={};
 function skillUp(p,k){if(S._bot||!S.team.people.includes(p))return;FLASH[p.id]=performance.now()+4500;
-  let box=document.getElementById('lvlfx');if(!box){box=document.createElement('div');box.id='lvlfx';document.body.appendChild(box)}
+  try{let box=document.getElementById('lvlfx');if(!box){box=document.createElement('div');box.id='lvlfx';document.body.appendChild(box)}
   const el=document.createElement('div');el.className='lvl';el.innerHTML=`<b>${esc(p.name)}</b> · ${SKILLS[k]} <span class="num">→ ${p.sk[k]}</span>`;box.appendChild(el);
-  setTimeout(()=>el.classList.add('out'),3800);setTimeout(()=>el.remove(),4400);try{SND.ok()}catch(e){}uiTick()}
+  setTimeout(()=>el.classList.add('out'),3800);setTimeout(()=>el.remove(),4400);SND.ok();uiTick()}catch(e){}}
 function uiTick(){const now=performance.now();
   document.querySelectorAll('[data-pid],[data-face]').forEach(el=>{const id=+(el.dataset.pid||0);const host=el.dataset.pid?el:el.closest('.rcard');if(!host)return;const pid=id||+el.dataset.face;host.classList.toggle('flash',!!(FLASH[pid]&&FLASH[pid]>now))});
   if(typeof dragging!=='undefined'&&dragging)return;
