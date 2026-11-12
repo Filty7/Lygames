@@ -266,6 +266,12 @@ details summary{cursor:pointer;font-family:var(--f-pix);font-size:13px;color:var
 .mini .eb{width:34px}
 .mini.locked{cursor:default;opacity:.7}
 .wk.tight{flex-wrap:nowrap;gap:5px}.wk.tight .mini{flex:none;transition:transform .12s}.wk.tight .mini .me{order:-1}.wk.tight .mini canvas{width:24px;height:30px}.wk.tight .mini:hover{z-index:5;transform:translateY(-4px)}
+#tutBox{position:fixed;left:50%;bottom:20px;transform:translateX(-50%);z-index:95;width:min(560px,calc(100% - 32px));background:#1d2f45;color:#e8f2ff;border:3px solid #5ad1ff;box-shadow:5px 5px 0 rgba(0,0,0,.5);padding:12px 16px}
+#tutBox .tt{font-family:var(--f-st);font-size:19px;color:#fff;margin-bottom:4px}#tutBox .tt .num{font-size:12px;color:#5ad1ff;margin-right:6px}#tutBox p{margin:4px 0 10px;line-height:1.4;font-size:14px}#tutBox b{color:#ffd28a}
+#tutBox .row{justify-content:space-between;align-items:center}#tutBox.top{bottom:auto;top:84px}
+.tut-hl{outline:3px solid #5ad1ff!important;outline-offset:3px;animation:tutpulse 1s ease-in-out infinite;position:relative;z-index:6}
+@keyframes tutpulse{50%{outline-color:rgba(90,209,255,.35)}}
+.sti{display:inline-flex;vertical-align:-2px;margin-right:4px}.sti svg{width:13px;height:13px}
 #lvlfx{position:fixed;top:112px;right:20px;align-items:flex-end;z-index:80;display:flex;flex-direction:column;gap:6px;pointer-events:none}
 #lvlfx .lvl{background:#163a5c;color:#d8eeff;border:2px solid #5ad1ff;padding:6px 12px;font-size:14px;box-shadow:3px 3px 0 rgba(0,0,0,.45);animation:lvlin .25s ease-out;transition:opacity .5s,transform .5s}
 #lvlfx .lvl b{color:#fff}#lvlfx .lvl .num{color:#5ad1ff;font-weight:700}#lvlfx .lvl.out{opacity:0;transform:translateX(20px)}
@@ -596,7 +602,7 @@ button.on{background:linear-gradient(180deg,#f0d29a,#d9b06a);color:#2a1a08;borde
 .pc-desc{font-size:11.5px;color:#4a3420;padding:5px 8px 0;line-height:1.3;position:relative;z-index:1}
 .scard.car canvas.carc{width:100%;height:auto;background:#d9b07a;display:block}
 .scard .pc-en{padding-top:5px}
-.dice{width:100%;margin-top:12px;font-family:var(--f-st);font-size:17px;padding:9px;background:var(--grain,none),linear-gradient(180deg,#5aa7e6,#2f6fae);color:#08182a;border-color:#a8d4f8}
+.dice{width:100%;margin-top:8px;font-size:12px;padding:3px 6px;background:transparent;color:var(--mute);border:1px dashed var(--line);opacity:.8}.dice:hover{opacity:1;color:var(--ink)}
 .dice .ic{width:18px;height:18px}
 .shop-fit .topbar h2{font-size:24px}
 /* setup header */
@@ -1755,7 +1761,9 @@ function newGame(){
 const HUMAN_NICKS=[['Kuba_Duna','#5ad1ff'],['Martina R.','#ff7ac8'],['petr4x4','#b8f05a'],['Zuzka Píst','#c9a2ff']];
 function ensureHumans(){if(S.mp||S.humans||S.settings.noHumans||!S.bots||S.bots.length<4)return;const ids=shuffle(S.bots.map(b=>b.id)).slice(0,4);S.humans=ids.map((id,i)=>({id,nick:HUMAN_NICKS[i][0],col:HUMAN_NICKS[i][1],clock:null,speed:1,timer:R(2,10),ready:false}))}
 function humanOf(id){return S.humans&&S.humans.find(h=>h.id===id)}
-function nameHtml(id,name){const h=humanOf(id);if(h&&h.real)return`<b style="color:${h.col}">${esc(name)}</b>`;return h?`<b style="color:${h.col}">${esc(h.nick)}</b> <span class="mute">${esc(name)}</span>`:esc(name)}
+const STYLE_IC={star:['trophy','#f2d14a'],factory:['car','#93a4b8'],workshop:['wrench','#cf7a68'],endurance:['heart','#e05d7a'],navig:['map','#77b9c8'],balanced:['users','#b8f05a']};
+function styleIc(id){if(!S.simOnly)return'';const b=S.bots&&S.bots.find(x=>x.id===id);if(!b||!b.style||!STYLE_IC[b.style])return'';const[i,c]=STYLE_IC[b.style];return`<span class="sti" style="color:${c}" data-tip="${BOT_STYLES[b.style].name}">${ic(i)}</span>`}
+function nameHtml(id,name){if(S.simOnly)return styleIc(id)+esc(name);const h=humanOf(id);if(h&&h.real)return`<b style="color:${h.col}">${esc(name)}</b>`;return h?`<b style="color:${h.col}">${esc(h.nick)}</b> <span class="mute">${esc(name)}</span>`:esc(name)}
 function humanState(h){const T=S.bots.find(b=>b.id===h.id);if(!T||T.out)return'out';if(T.state==='race')return'track';return'bivak'}
 function humansReady(nx){if(S.mp){if(!isHost())return false;return S.mp.players.filter(p=>p.pid!==NET.pid).every(p=>{const b=S.bots.find(x=>x.id===p.pid);const s=NET.status[p.pid];return(b&&b.out)||(b&&b.aiFor)||(s&&s.out)||(s&&s.ready&&s.stageIdx===S.stageIdx&&s.phase==='bivak')})}if(!S.humans||!nx)return true;return S.humans.every(h=>{const s=humanState(h);return s==='out'||(s==='bivak'&&(h.ready||(h.clock!=null&&h.clock>=nx.dep)))})}
 function humansTick(dt){
@@ -1876,7 +1884,7 @@ function teamReturn(r){(S.team.stt||(S.team.stt={})).arr=r.arrive;
   if(cv.arrive>r.arrive){S.convoyUntil=cv.arrive;S.team.people.forEach(p=>{if(!isCrew(p))p.task='road'});return'late'}
   return'ok';
 }
-function backToBivak(){
+function backToBivak(){setTimeout(()=>tutEvent('bivak'),50);
   const r=S.race;const st=r.stage;
   const res=teamReturn(r);const cv=r._cv||r.convoy||{arrive:st.start};
   S.t=r.arrive;S.resClock=Math.max(S.resClock||0,r.watchT||0);S.race=null;S.phase='bivak';S.speed=0;S.pauseMsg=null;
@@ -2032,7 +2040,7 @@ function raceStep(dtReal){
   const st=r.stage;const car=S.team.car;const d=driver(),n=navig();const ag=r.aggr==null?.5:r.aggr;
   const seg=segAt(r.dist);
   {const tb=bandFor(seg,true);if(!r.bs)r.bs={...tb};else{const k=1-Math.exp(-dtReal/1.1);for(const q of ['lo','hi','V'])r.bs[q]+=(tb[q]-r.bs[q])*k}}
-  if(seg.i!==r.segIdx){if(r.segIdx>=0&&!r.segInc){const pb=BIOMES[st.segs[r.segIdx].b];addSuccXP(d,pb.skill[0],.3);addSuccXP(d,'technika',.15)}r.segInc=0;r.segIdx=seg.i;r.bandR=rand();rlog(`Biom: ${BIOMES[seg.b].name} (${seg.km} km).`)}
+  if(seg.i!==r.segIdx){if(r.segIdx>=0&&!r.segInc){const pb=BIOMES[st.segs[r.segIdx].b];addSuccXP(d,pb.skill[0],.3);addSuccXP(d,'technika',.15)}r.segInc=0;if(r.segIdx>=0&&!S._bot)tutEvent('biome');r.segIdx=seg.i;r.bandR=rand();rlog(`Biom: ${BIOMES[seg.b].name} (${seg.km} km).`)}
   const ssNow=setupScore(car.setup,seg.b);
   for(const[p,base]of[[d,RACE_DRAIN*(.85+.3*ag)+(r.heater?6:0)],[n,RACE_DRAIN+(r.heater?6:0)]]){if(!p)continue;drainE(p,base*vyDrain(p)*(1+.1*minorLvl(p))*hrs)}
   const night=isNight(r.t);
@@ -2078,7 +2086,7 @@ function raceStep(dtReal){
   }
   r.wps.forEach((wp,i)=>{if(wp.res===null&&prev<wp.km&&r.dist>=wp.km){
     const ch=clamp(.8+.018*eff(n,'navigace')+(r.roadbook?.06:0)-BIOMES[segAt(wp.km).b].nav-(night?.05:0)-(r.rain?.03:0),.4,.99);
-    if(rand()<ch){wp.res=true;wpFx(true,i+1);addSuccXP(n,'navigace',.1)}else{wp.res=false;r.pen+=15;wpFx(false,i+1);rlog(`Waypoint ${i+1} nenalezen! +15 min penalizace.`,'bad');if(n)addXP(n,'navigace')}}});
+    if(!S._bot)tutEvent('wp');if(rand()<ch){wp.res=true;wpFx(true,i+1);addSuccXP(n,'navigace',.1)}else{wp.res=false;r.pen+=15;wpFx(false,i+1);rlog(`Waypoint ${i+1} nenalezen! +15 min penalizace.`,'bad');if(n)addXP(n,'navigace')}}});
   r.acc+=dtG;
   while(r.acc>=2){r.acc-=2;if(r.v>5&&!r.incident&&!r.over)riskCheck(seg,band)}
   if(r.dist>=st.km&&!r.over){r.dist=st.km;rlog('CÍL!','ok');finishRace('fin')}
@@ -2104,7 +2112,7 @@ function triggerIncident(seg,o){
   const r=S.race;const car=S.team.car;const B=BIOMES[seg.b];
   const w={...B.inc};if(o<.1){w.smyk*=2;w.strecha*=.15}if(o>.3){w.strecha*=2.5;w.smyk*=.6}
   const ty=wpick(w);const kk=crashK(o);const sev=kk*1.2;const dmg=(k,a,b)=>{const x=car.comps[k];const amt=R(a,b)*sev*.85;r.dmg=(r.dmg||0)+Math.min(x.cond,amt);x.cond=Math.max(0,x.cond-amt);if(k!=='pneu')x.max=Math.max(20,x.max-amt*.25)};
-  r.incCount++;r.segInc=1;SND.crash(ty);if(S._bot)r.spook=Math.min(.45,(r.spook||0)+R(.12,.3));if(!S._bot){r.shake=9;lensSplat(seg.b==='duny'||seg.b==='fesh'?'sand':'mud',RI(2,4))}
+  r.incCount++;r.segInc=1;SND.crash(ty);if(!S._bot)tutEvent('crash');if(S._bot)r.spook=Math.min(.45,(r.spook||0)+R(.12,.3));if(!S._bot){r.shake=9;lensSplat(seg.b==='duny'||seg.b==='fesh'?'sand':'mud',RI(2,4))}
   const d=driver(),n=navig();
   drainE(d,8*kk);drainE(n,4*kk);crashDmg(seg,kk,2.5);
   const injure=ch=>{if(rand()<ch){const p=rand()<.6?d:n;if(!p)return;const sk=pick(ROLES[p.role].skills);const pen=RI(2,3);const name=pick(SERIOUS);addInjury(p,{serious:true,name,skill:sk,pen,h:R(20,50)});rlog(`${p.name}: ${name} (${SKILLS[sk]} −${pen}, výdrž −${pen}). Bez doktora se to bude hojit dlouho.`,'bad')}};
@@ -2135,8 +2143,9 @@ function render(){
   else if(S.phase==='race')renderRace();
   else if(S.phase==='end')renderEnd();
 }
-const VERSION='0.39';
+const VERSION='0.40';
 const CHANGELOG=[
+ ['0.40','Tutorial: cvičná etapa s vysvětlením pásma, waypointů, biomů, agresivity a topení, pak bivak (opravy, nastavení, doktor, roadbook, počasí, energie, kuchyně, pneu, přesun, upgrady) a druhá etapa už sám. Simulace rallye: volba rozpočtu a ikonky herních stylů. Menší tlačítko náhodného nákupu.'],
  ['0.39','Nový panel etapy: biomy pod sebou, vpravo 3 nejdůležitější díly (ikonky). Ikonky dílů i v přehledu auta. Velké tlačítko Poslat bivak napřed s délkou přesunu. Jednodušší tooltip biomů. U maratonu vidíš v nastavení auta obě etapy. Přehlednější kalendář. V noci je závodní pásmo až o 70 % širší a tmavší. Nové odpolední etapy, které končí za tmy.'],
  ['0.38','Chyby při přepalu rostou lineárně s přepalem (za 1 s jízdy o 10 % rychleji = 0,5 % šance na chybu). Postřeh zachraňuje 8,3 % za bod (Postřeh 10 ≈ 85 %). Únava zvyšuje chybovost méně. Mírný přepal se mírně vyplatí, ale stojí auto a energii; trvalý velký přepal ne.'],
  ['0.37','Nehody: chyba při přestřelení je vzácnější a Postřeh zachraňuje častěji, takže se dá na pár vteřin riskovat. Zachráněná chyba: jezdec −4 energie, auto lehce poškozené. Nehoda: jezdec −8, auto 2,5× víc. Čím víc přepálíš, tím víc to bolí. Drahá auta se opotřebovávají stejně jako levná. Upgrady jsou rychlejší (hlavně slabé díly), opravy delší, pilot má větší vliv a je levnější, dodávka stojí 24 000 €.'],
@@ -2173,7 +2182,7 @@ function renderMenu(){
       ${has?`<button class="mb go" data-act="continue"><span>▶</span> Pokračovat <em>${esc(sv.team.name)}</em></button>`:''}
       <button class="mb ${has?'':'go'}" data-act="toSetup"><span>▶</span> Single player</button>
       <button class="mb" data-act="toMp"><span>▶</span> Multiplayer <em>online · beta</em></button>
-      <button class="mb" disabled><span>▶</span> Tutorial <em>coming soon</em></button>
+      <button class="mb" data-act="tutorial"><span>▶</span> Tutorial</button>
       <button class="mb" data-act="loadFile"><span>▶</span> Načíst ze souboru</button>
       <button class="mb" data-act="changelog"><span>▶</span> Change log</button>
     </div>
@@ -2627,7 +2636,7 @@ function renderOthers(){
   const rows=liveStageRows(st);
   el.innerHTML=rows.map((x,i)=>`<div class="o ${x.id==='me'?'me':''}"><span class="num">${i+1}</span><span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${nameHtml(x.id,x.name)}${x.stopped&&x.km>0?' <span style="color:var(--warn)">●</span>':''}</span>${x.state==='dnf'?'<span class="pill bad">DNF</span>':x.state==='fin'?`<span class="pill ok">${dur(x.time)}</span>`:`<div class="bar"><i style="width:${x.km/st.km*100}%"></i></div>`}</div>`).join('');
 }
-function showFinishModal(){
+function showFinishModal(){tutEvent('finish');
   const r=S.race;const st=r.stage;const c=S.team.car;
   const dmg=CK.map(k=>`<tr><td>${COMPS[k]}</td><td class="r num">${Math.floor(r.startCond[k])} %</td><td class="r num" style="color:${condCol(c.comps[k].cond)}">${Math.floor(c.comps[k].cond)} %</td></tr>`).join('');
   let head,body;
@@ -2690,7 +2699,7 @@ function showResults(n,view='stage'){
   openModal(`<div class="modal"><header><h2>${title}</h2><button data-act="close">Zavřít</button></header>
   <div class="row"><button class="${view==='overall'?'on':''}" data-act="resView" data-v="overall" data-n="${n}">Celkově</button>${started.map(s=>`<button class="small ${view==='stage'&&s.n===n?'on':''}" data-act="resView" data-v="stage" data-n="${s.n}">E${s.n}${s.final?'':' ●'}</button>`).join('')}</div>
   <p class="hint" style="margin:0">● = etapa ještě běží, výsledky jsou průběžné.</p>
-  <div class="tbl-wrap"><table>${table}</table></div>${S.phase==='end'?'<div class="row" style="justify-content:flex-end"><button data-act="stats">Statistiky a grafy</button>'+(S.simOnly?'':'<button class="primary" data-act="newRun">Nová rallye</button>')+'</div>':''}</div>`,'results');
+  ${S.simOnly?`<div class="legend" style="margin:4px 0">${Object.entries(STYLE_IC).map(([k,[i,c]])=>`<span style="--c:transparent"><span class="sti" style="color:${c}">${ic(i)}</span>${BOT_STYLES[k].name}</span>`).join('')}</div>`:''}<div class="tbl-wrap"><table>${table}</table></div>${S.phase==='end'?'<div class="row" style="justify-content:flex-end"><button data-act="stats">Statistiky a grafy</button>'+(S.simOnly?'':'<button class="primary" data-act="newRun">Nová rallye</button>')+'</div>':''}</div>`,'results');
   if(S.phase==='bivak')renderBivakParts();
 }
 function showHelp(){
@@ -2771,20 +2780,91 @@ function showStats(){const D=statData();if(!D.sts.length){toastMsg('Zatím nejso
     <div class="stsk"><em>Pilot ${esc(h.dn||'')}</em>${sk(h.dsk)}</div><div class="stsk"><em>Navigátor ${esc(h.nn||'')}</em>${sk(h.nsk)}</div></div>`};
   openModal(`<div class="modal" style="width:min(1560px,100%)"><header><h2>Statistiky rallye</h2><button data-act="close">Zavřít ✕</button></header>
   <div class="stats"><div class="stl"><p class="hint">Zaškrtni až 4 týmy ke srovnání.</p><div class="stteams">${rows.map(T=>{const i=S.statSel.indexOf(T.id);const p=T.pts[last];
-    return`<label class="${T.id==='me'?'me':''}"><input type="checkbox" data-statteam="${T.id}" ${i>=0?'checked':''}><i style="background:${i>=0?STAT_COL[i]:'transparent'}"></i><span class="num">${p&&p.ovr?p.ovr+'.':'–'}</span> ${esc(T.name)}</label>`}).join('')}</div></div>
+    return`<label class="${T.id==='me'?'me':''}"><input type="checkbox" data-statteam="${T.id}" ${i>=0?'checked':''}><i style="background:${i>=0?STAT_COL[i]:'transparent'}"></i><span class="num">${p&&p.ovr?p.ovr+'.':'–'}</span> ${styleIc(T.id)}${esc(T.name)}</label>`}).join('')}</div></div>
   <div class="str"><div class="stm">${STAT_M.map(x=>`<button class="small ${x===m?'on':''}" data-act="statM" data-k="${x.k}">${x.l}</button>`).join('')}</div>
   <h3 style="margin:8px 0 2px">${m.l}${m.u&&m.u!=='.'?` <span class="mute">(${m.u})</span>`:''}</h3>${svgChart(series,n,m,Object.values(D.teams))}
   <div class="stleg">${series.map(s=>`<span><i style="background:${s.col}"></i>${esc(s.name)}</span>`).join('')}</div>
   <div class="stcards">${series.map(s=>card(s,s.col)).join('')}</div></div></div></div>`,'stats')}
 document.addEventListener('change',e=>{const id=e.target.dataset&&e.target.dataset.statteam;if(!id)return;let a=S.statSel||[];if(e.target.checked){a.push(id);if(a.length>4)a.shift()}else a=a.filter(x=>x!==id);S.statSel=a;showStats()});
 /* ---- quick simulation from menu ---- */
-function simRally(){S=defaults();S.settings.noHumans=true;newGame();S.simOnly=true;S.team.out=true;S.team.name='(simulace)';S.phase='bivak';S.statSel=null;
+function simRally(bud,same){S=defaults();S.settings.noHumans=true;S.settings.budget=bud||400000;S.settings.sameBudget=same!==false;newGame();S.simOnly=true;S.team.out=true;S.team.name='(simulace)';S.phase='bivak';S.statSel=null;
   const last=S.stages[S.stages.length-1];let W=900,it=0;
   openModal(`<div class="modal narrow" style="width:min(380px,100%)"><header><h2>Simulace rallye</h2></header><p>Jede ${S.bots.length} týmů… <b id="simP">0 %</b></p><div class="bar" style="height:8px"><i id="simB" style="width:0%;background:var(--dakar)"></i></div></div>`,'sim');
   const step=()=>{for(let k=0;k<40&&!last.final;k++){W+=60;S.t=W;botsAdvance(W);checkResults();it++}
     const done=S.stages.filter(s=>s.final).length;const pc=Math.round(done/S.stages.length*100);const a=document.getElementById('simP'),b=document.getElementById('simB');if(a)a.textContent=pc+' %';if(b)b.style.width=pc+'%';
     if(last.final||it>6000){S.phase='end';S.pendingRes=null;closeModal();render()}else setTimeout(step,0)};
   setTimeout(step,30)}
+/* ================= TUTORIAL ================= */
+const TUT=[
+ {ph:'race',t:'Vítej v Desert Fever',sel:'.scene-wrap',x:'Jsi šéf rallye týmu. Tohle je krátká cvičná etapa – závod teď stojí, dokud nebudeš připravený. Nahoře vidíš svoje auto, biom, ve kterém jedeš, a ujeté kilometry.'},
+ {ph:'race',t:'Rychlost a oranžové pásmo',sel:'#slider',x:'Dole je posuvník rychlosti. <b>Oranžové pásmo</b> je odhad ideální rychlosti pro tenhle terén. Skutečná ideální rychlost leží <b>někde uvnitř</b> pásma, přesně ji nevidíš. Pod pásmem ztrácíš čas, nad ním riskuješ chybu a nehodu.'},
+ {ph:'race',t:'Nastav rychlost',sel:'#slider',x:'Táhni posuvník (nebo použij šipky ↑ ↓) tak, aby cílová rychlost byla <b>uprostřed oranžového pásma</b>.',wait:()=>{const r=S.race;if(!r)return false;const b=bandFor(segAt(r.dist));return r.target>=b.lo&&r.target<=b.hi}},
+ {ph:'race',t:'Jedeme!',sel:'#slider',x:'Výborně. Závod se teď rozjede. Bílá ručička ukazuje skutečnou rychlost auta, které chvíli trvá, než zrychlí.',btn:'Start!',run:true},
+ {ph:'race',ev:'wp',t:'Waypoint',sel:'#strip',x:'Projel jsi <b>waypoint</b> – kontrolní bod trasy. Na etapě jich je několik a každý nenalezený stojí 15 minut penalizace. Šanci najít ho zvyšuje navigátorova <b>Navigace</b> a studium roadbooku v bivaku. Zelená čárka na pásu = našli jsme, červená = minuli.'},
+ {ph:'race',ev:'biome',t:'Změna biomu',sel:'#slider',x:'Auto vjelo do jiného <b>biomu</b> a pásmo se posunulo. Každý biom má jinou ideální rychlost – na pláni se letí, v dunách se jede pomalu. Při změně se pásmo chvíli plynule přesouvá, tak ho sleduj posuvníkem.'},
+ {ph:'race',t:'Proč je pásmo široké nebo úzké',sel:'#crew',x:'Šířka pásma = jak přesně posádka ví, kam jet. Zužuje ho pilotův skill pro daný biom (Rychlost, Duny, Technika), jeho <b>Postřeh</b> a navigátorovo <b>Čtení terénu</b>. Všechny skilly se násobí <b>energií</b> – unavená posádka jezdí naslepo. V noci je pásmo širší.'},
+ {ph:'race',t:'Agresivita',sel:'.aggrbox',x:'<b>Agresivita</b> (klávesy Q / E) posouvá celé pásmo doprava nebo doleva. Ostřejší jízda je rychlejší, ale víc ničí pneumatiky a hřeje motor, a jezdec se víc unaví.'},
+ {ph:'race',t:'Motor a topení',sel:'.tempbox',x:'Teplota motoru roste se zátěží, vedrem a agresivitou. Nad 105 °C se motor ničí, nad 115 °C se přehřeje a musíte zastavit. <b>Topení</b> odvádí teplo z motoru do kabiny – chladí motor, ale posádka se rychleji unavuje.'},
+ {ph:'race',t:'Ostatní týmy',sel:'.tower',x:'Tady vidíš, jak jedou ostatní týmy – kolik mají ujeto a kdo je před tebou. Výsledky etapy se ukážou, až dojedou všichni.'},
+ {ph:'race',t:'Dojeď do cíle',x:'Teď už jeď sám. Drž rychlost v pásmu a sleduj teplotu. Krátké přepálení se může vyplatit, ale riskuješ nehodu.',btn:'Jedu',run:true},
+ {ph:'race',ev:'finish',t:'Cíl!',x:'Jsi v cíli etapy. V okně vidíš čas, penalizace a poškození auta. Klikni na pokračování do bivaku.',btn:'OK',run:true},
+ {ph:'bivak',ev:'bivak',t:'Bivak',sel:'#stations',x:'Tohle je <b>bivak</b> – tady se mezi etapami opravuje, plánuje a odpočívá. Lidi přiřazuješ na úkoly <b>přetažením karty</b> myší. Čas teď během tutorialu stojí.'},
+ {ph:'bivak',t:'Opravy',sel:'#stations',x:'Auto je po etapě poškozené. V <b>Dílně</b> se u každého poškozeného dílu objeví oprava. Přetáhni mechanika ze stanu vpravo na nějakou opravu.',wait:()=>S.team.people.some(p=>p.task.startsWith('rep:'))},
+ {ph:'bivak',t:'Kalendář',sel:'[data-act="calendar"]',x:'V <b>Kalendáři</b> nahoře je celý program rallye: dny, starty, délky etap, přesuny bivaku, šance na déšť, biomy a klíčové díly.'},
+ {ph:'bivak',t:'Příští etapa',sel:'#nextStage',x:'Tady je přehled příští etapy: start, délka, šance na déšť, složení biomů a vpravo <b>dva nejzásadnější díly</b> auta pro tuhle etapu. Na ty se vyplatí soustředit opravy a upgrady.'},
+ {ph:'bivak',t:'Nastavení auta',sel:'.carbtn',x:'Otevři <b>Auto a nastavení</b>. Vpravo vidíš ideální nastavení pro biomy příští etapy. Klikni u některého parametru na <b>cílovou hodnotu</b>.',wait:()=>SK_KEYS.some(k=>S.team.car.target[k]!==S.team.car.setup[k])},
+ {ph:'bivak',t:'Práce na nastavení',sel:'[data-drop="setup"]',x:'Zavři okno auta. V Dílně se objevila práce <b>Nastavení auta</b> – přetáhni na ni dalšího mechanika.',wait:()=>S.team.people.some(p=>p.task==='setup')},
+ {ph:'bivak',t:'Ošetřovna',sel:'.medz',x:'Pilot si v etapě narazil rameno. Přetáhni <b>doktora</b> na Lékaře a <b>pilota</b> na Pacienty. Bez doktora se zranění hojí dlouho a snižuje skilly.',wait:()=>S.team.people.some(p=>p.task==='medic')&&(person(S.team.driverId)||{}).task==='patient'},
+ {ph:'bivak',t:'Roadbook',sel:'[data-drop="prep:roadbook"]',x:'Ve <b>Štábním stanu</b> se připravuje příští etapa. Přetáhni <b>navigátora</b> na Studium roadbooku – v příští etapě najde waypointy snáz.',wait:()=>(person(S.team.navId)||{}).task==='prep:roadbook'},
+ {ph:'bivak',t:'Meteorolog',sel:'[data-drop="prep:forecast"]',x:'<b>Meteorolog</b> umí udělat předpověď počasí. Bez ní znáš jen šanci na déšť, s ní víš jistě, jestli bude pršet. Přetáhni ho na Předpověď počasí.',wait:()=>S.team.people.some(p=>p.role==='meteorolog'&&p.task==='prep:forecast')},
+ {ph:'bivak',t:'Energie a odpočinek',sel:'#roster',x:'Každý má <b>energii</b> (zelená lišta). Prací ze 100 % na 0 klesne zhruba za 12 hodin, spánkem se z 0 dobije za 16 hodin. <b>Výdrž</b> (srdíčko) to zlepšuje. Vyčerpaný člověk pracuje pomalu a nakonec usne. Lidé ve <b>Stanu</b> odpočívají.'},
+ {ph:'bivak',t:'Kuchyně',sel:'[data-drop="cook"]',x:'<b>Kuchař</b> v kuchyni zrychlí odpočinek a zpomalí únavu všem ostatním. Čím lepší vaření a menší tým, tím větší bonus. Přetáhni kuchaře do kuchyně.',wait:()=>S.team.people.some(p=>p.task==='cook')},
+ {ph:'bivak',t:'Pneumatiky',sel:'.carbtn',x:'V okně auta najdeš i <b>pneumatiky</b>: suché a mokré sady. Když má pršet, přezuj na mokré (trvá 1,2 h práce). Opotřebenou sadu můžeš koupit novou a druhou sadu dokoupit do zásoby.'},
+ {ph:'bivak',t:'Přesun bivaku',sel:'.sg-movebox',x:'Po startu etapy se bivak stěhuje do cíle. Řídí <b>dodávky</b> lidé z týmu – na každou dodávku jeden řidič. Unavený řidič zastavuje a bivak dorazí pozdě. Proto nech řidiče před startem <b>odpočinout</b>. Bivak můžeš poslat i napřed.'},
+ {ph:'bivak',t:'Klíčové díly a upgrady',sel:'.sg-imp',x:'Vylepšení dílů (upgrade) stojí jen čas mechaniků. Nejvíc se vyplatí upgradovat <b>klíčové díly</b> pro další etapy. Otevři Auto a nastavení a u některého dílu klikni na <b>↑ Q</b>.',wait:()=>S.jobs.some(j=>j.id.startsWith('upg:'))},
+ {ph:'bivak',t:'A teď už sám',sel:'#topbar',x:'To je vše! Nahoře spustíš čas (1×, 2×, 3×). Až přijde čas startu, vybereš řidiče dodávek a vyrazíš na druhou etapu – už bez nápovědy. Hodně štěstí!',btn:'Hrát',end:true}
+];
+function startTutorial(){
+  S=defaults();Object.assign(S.settings,{noHumans:true,budget:400000,sameBudget:true,teamName:'Tvůj tým',number:7});
+  newGame();
+  const [st1,st2]=S.stages;
+  Object.assign(st1,{segs:[{b:'plan',km:30},{b:'duny',km:25},{b:'vadi',km:25},{b:'plan',km:30}],km:110,rainP:.05,rainRoll:false,move:0,moveKm:0,nightStart:false,eveStart:false,mar:0,start:st1.day*1440+480,dep:st1.day*1440+480});
+  Object.assign(st2,{segs:[{b:'vadi',km:50},{b:'kameny',km:40},{b:'plan',km:60},{b:'duny',km:40}],km:190,rainP:.3,rainRoll:false,move:240,moveKm:280,nightStart:false,eveStart:false,mar:0,start:st2.day*1440+480,dep:st2.day*1440+480});
+  S.stages=[st1,st2];st2.n=2;S.restDay=-1;S.lastDay=st2.day+1;
+  S.bots=S.bots.slice(0,9);S.overall={me:0};S.bots.forEach(b=>S.overall[b.id]=0);
+  const tm=S.team;tm.car=makeCar(CAR_MODELS.find(m=>m.id==='pajaro'));
+  const mk=(r,q)=>{const p=makePerson(r,q);p.task='rest';for(const k of ROLES[r].skills)if(k!=='vydrz')p.sk[k]=Math.max(p.sk[k],4);p.sk.vydrz=Math.max(p.sk.vydrz,4);return p};
+  tm.people=[mk('jezdec',6),mk('navigator',6),mk('mechanik',6),mk('mechanik',6),mk('doktor',5),mk('kuchar',5),mk('meteorolog',5)];
+  tm.driverId=tm.people[0].id;tm.navId=tm.people[1].id;S.money=60000;
+  S.tut={i:0,shown:false,crash:false};
+  goBivak();S.t=st1.start;startStage();
+}
+function tutStep(){return S.tut&&TUT[S.tut.i]}
+function tutHold(){return!!(S.tut&&(S.tut.note||tutActive()))}
+function tutActive(){const s=tutStep();return s&&s.ph===S.phase&&(!s.ev||S.tut.fired)}
+function tutEvent(ev){if(!S.tut)return;const s=tutStep();
+  if(ev==='bivak'&&!S.tut.dmg){S.tut.dmg=true;const c=S.team.car;for(const k of ['motor','tlumice','podvozek'])c.comps[k].cond=Math.min(c.comps[k].cond,R(68,80));renderBivakParts()}
+  if(ev==='crash'&&!S.tut.crash&&S.phase==='race'){S.tut.crash=true;S.tut.note={t:'Nehoda!',x:'Přepálil jsi rychlost nad pásmo a jezdec udělal chybu, kterou nezachránil. Nehoda stojí čas, poškodí auto a unaví posádku. Čím víc přepálíš, tím víc to bolí. Pilotův <b>Postřeh</b> chyby často zachrání – ale ne vždycky.'};tutRender();return}
+  for(let j=S.tut.i;j<TUT.length;j++){if(TUT[j].ev===ev){S.tut.i=j;S.tut.fired=true;tutRender();return}if(j>S.tut.i&&!TUT[j].ev)break}}
+function tutNext(){const s=tutStep();if(!s)return;if(s.end){S.tut=null;tutRender();log('Tutorial dokončen. Hodně štěstí na trati!','ok');render();return}
+  S.tut.i++;S.tut.fired=false;const n=tutStep();
+  if(n&&n.ph==='bivak'&&S.phase==='bivak'&&n.t==='Ošetřovna'){const d=person(S.team.driverId);if(d&&!d.inj)addInjury(d,{serious:false,name:'Naražené rameno',lvl:2,h:6})}
+  tutRender()}
+function tutTick(){if(!S.tut)return;const s=tutStep();
+  if(S.phase==='bivak'&&S.tut&&tutStep()&&tutStep().ph==='bivak'){S.speed=0}
+  if(s&&tutActive()&&s.wait&&s.wait()){tutNext()}
+  const el=document.getElementById('tutBox');const want=!!(S.tut&&(S.tut.note||tutActive()));if(!el||el.hidden===want)tutRender();
+  document.querySelectorAll('.tut-hl').forEach(e=>{if(!S.tut||!tutActive()||!s.sel||!e.matches(s.sel))e.classList.remove('tut-hl')});
+  const box=document.getElementById('tutBox');let top=false;
+  if(tutActive()&&s.sel&&!S.tut.note){const t=document.querySelector(s.sel);if(t){if(!t.classList.contains('tut-hl'))t.classList.add('tut-hl');const rc=t.getBoundingClientRect();if(box&&rc.bottom>innerHeight-box.offsetHeight-40&&rc.top>box.offsetHeight+120)top=true}}
+  if(box)box.classList.toggle('top',top)}
+function tutRender(){let el=document.getElementById('tutBox');if(!el){el=document.createElement('div');el.id='tutBox';document.body.appendChild(el)}
+  if(!S.tut){el.hidden=true;document.querySelectorAll('.tut-hl').forEach(e=>e.classList.remove('tut-hl'));return}
+  const n=S.tut.note;if(n){el.hidden=false;el.innerHTML=`<div class="tt">${n.t}</div><p>${n.x}</p><div class="row"><button class="primary" data-act="tutNote">Rozumím</button></div>`;return}
+  const s=tutStep();if(!s||!tutActive()){el.hidden=true;return}
+  el.hidden=false;const k=TUT.indexOf(s)+1;
+  el.innerHTML=`<div class="tt"><span class="num">${k}/${TUT.length}</span> ${s.t}</div><p>${s.x}</p><div class="row"><button class="small" data-act="tutQuit">Ukončit tutorial</button>${s.wait?'<span class="hint">Udělej to a pokračuje se samo…</span>':`<button class="primary" data-act="tutNext">${s.btn||'Dál →'}</button>`}</div>`}
+
 /* ================= AUDIO ================= */
 const AU={ctx:null,master:null,music:null,sfx:null,noise:null,mode:null,step:0,next:0,bpm:72,melody:9,rainG:null,eng:null,revIn:null,dlyIn:null,duck:null,oud:null,motif:null,motifBar:-1};
 const SCALE=[0,1,4,5,7,8,10];
@@ -2995,7 +3075,15 @@ function handleAct(b){
     case 'results':showResults(b.dataset.n?+b.dataset.n:null,'stage');break;
     case 'stats':showStats();break;
     case 'statM':S.statM=b.dataset.k;showStats();break;
-    case 'simRally':simRally();break;
+    case 'tutorial':startTutorial();break;
+    case 'tutNext':tutNext();break;
+    case 'tutQuit':S.tut=null;tutRender();break;
+    case 'tutNote':if(S.tut){S.tut.note=null;tutRender()}break;
+    case 'simRally':openModal(`<div class="modal narrow" style="width:min(420px,100%)"><header><h2>Simulace rallye</h2><button data-act="close">Zavřít</button></header>
+      <label style="display:grid;gap:4px">Rozpočet týmů <b class="num" id="simBudV">400 000 €</b><input type="range" id="simBud" min="150000" max="1000000" step="50000" value="400000" oninput="document.getElementById('simBudV').textContent=money(+this.value)"></label>
+      <label class="chk" style="display:flex;gap:8px;margin:10px 0;cursor:pointer"><input type="checkbox" id="simSame" checked><span>Stejný rozpočet pro všechny týmy<br><span class="hint">Jinak náhodně 150 000 – 1 000 000 €.</span></span></label>
+      <div class="row" style="justify-content:flex-end"><button class="primary" data-act="simGo">Spustit simulaci</button></div></div>`,'simset');break;
+    case 'simGo':{const bud=+document.getElementById('simBud').value,same=document.getElementById('simSame').checked;closeModal();simRally(bud,same);break}
     case 'simExit':S=defaults();render();break;
     case 'resultsEnd':showResults(null,'overall');break;
     case 'resView':showResults(+b.dataset.n,b.dataset.v);break;
@@ -3329,6 +3417,7 @@ function loop(now){
   const dt=Math.min(.1,(now-last)/1000);last=now;
   humansTick(dt);mpTick(dt);plAcc+=dt;if(plAcc>.4){plAcc=0;renderPlayers();uiTick()}
   if(S.mp&&S.mp.aiCtl){aiOverlay();requestAnimationFrame(loop);return}
+  if(S.tut)tutTick();
   if(S.phase==='bivak'){
     S.resClock=Math.max(S.resClock||0,S.t)+((S.speed===0||modalOpen)?dt*4:0);
     if(S.speed>0&&!modalOpen){bivAcc+=dt*4*S.speed;while(bivAcc>=1&&S.phase==='bivak'){bivAcc-=1;bivakStep(1)}}
@@ -3346,7 +3435,7 @@ function loop(now){
     }
   }else if(S.phase==='menu'){const cv=document.getElementById('menuScene');if(cv)renderMenuScene(cv,dt);
   }else if(S.phase==='race'&&S.race){
-    if(!S.race.over)raceStep(dt);
+    if(!S.race.over&&!tutHold())raceStep(dt);
     if(S.race){const r=S.race;if(r.over){r.watchT=Math.max(r.watchT||r.t,r.t)+dt*RACE_GMIN_PER_S;botsAdvance(r.watchT);checkResults()}else botsAdvance(r.t)}
     if(S.race&&S.race.over&&S.race.finAnim>0){const r=S.race;r.finAnim-=dt;r.v=Math.max(0,r.v-r.v*dt*1.2-8*dt);r.dist+=r.v*dt*RACE_GMIN_PER_S/60;if(r.finAnim<=0)showFinishModal()}
     const cv=document.getElementById('scene');if(cv&&S.race)renderRaceScene(cv,dt);
