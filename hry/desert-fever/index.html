@@ -1604,18 +1604,34 @@ function withTeam(T,fn){const sv={};for(const k of CTXK)sv[k]=S[k];
   S.team=T;S.race=T.race;S.jobs=T.jobs;S.setupProg=T.setupProg;S.convoyUntil=T.convoyUntil;S.convoyDriver=T.convoyDriver;S.moverId=T.moverId;S.marathonNight=T.marathonNight;S.money=T.money;S.log=T.log;S.t=T.t;S.stageIdx=T.stageIdx;S._bot=true;
   try{fn()}finally{T.race=S.race;T.jobs=S.jobs;T.setupProg=S.setupProg;T.convoyUntil=S.convoyUntil;T.convoyDriver=S.convoyDriver;T.moverId=S.moverId;T.marathonNight=S.marathonNight;T.money=S.money;T.log=S.log.slice(0,30);T.t=S.t;T.stageIdx=S.stageIdx;
     for(const k of CTXK)S[k]=sv[k];S._bot=false}}
-function genBotTeam(i,name,num,bud){
+const BOT_STYLES={
+  star:     {name:'Hvězdný pilot',    car:.30,drv:.55,nav:.35,mech:[1,2],doc:0,cook:0,meteo:0,upg:.03,rest:0},
+  factory:  {name:'Tovární auto',     car:.62,drv:.35,nav:.30,mech:[2,2],doc:1,cook:0,meteo:0,upg:.06,rest:0},
+  workshop: {name:'Dílna a upgrady',  car:.16,drv:.25,nav:.22,mech:[4,6],doc:1,cook:1,meteo:0,upg:.6,rest:5,pref:{mechanik:'upgrady'}},
+  endurance:{name:'Výdrž a pohoda',   car:.26,drv:.30,nav:.26,mech:[3,3],doc:1,cook:2,meteo:1,upg:.25,rest:12,pref:{all:'vydrz'}},
+  navig:    {name:'Navigace a počasí',car:.34,drv:.30,nav:.50,mech:[2,3],doc:1,cook:0,meteo:1,upg:.12,rest:4,pref:{navigator:'navigace',meteorolog:'predpoved'}},
+  balanced: {name:'Vyvážený',         car:.45,drv:.40,nav:.32,mech:null,upg:.08,rest:0}
+};
+function genBotTeam(i,name,num,bud,style){
   const budget=bud||Math.round((150+Math.pow(rand(),1.4)*850)*1000);let money=budget*.9;
-  const models=CAR_MODELS.filter(m=>!m.free).map(m=>({m,p:carPrice(m.q)})).filter(x=>x.p<=budget*.45).sort((a,b)=>b.p-a.p);
+  const sk=style||(typeof window!=='undefined'&&window.SIM_STYLE)||pick(Object.keys(BOT_STYLES));const Y=BOT_STYLES[sk];
+  const models=CAR_MODELS.filter(m=>!m.free).map(m=>({m,p:carPrice(m.q)})).filter(x=>x.p<=budget*Y.car).sort((a,b)=>b.p-a.p);
   const ch=models.length?models[Math.min(models.length-1,RI(0,1))]:{m:CAR_MODELS[1],p:carPrice(CAR_MODELS[1].q)};
   const car=makeCar(ch.m);money-=ch.p;
-  const hire=(role,share)=>{let q=9.5,p;do{p=makePerson(role,q);q-=.5}while(p.price>money*share&&q>.6);money-=p.price;p.task='rest';return p};
-  const people=[hire('jezdec',.4),hire('navigator',.32)];
-  const nm=2+Math.floor(budget/320000);const reserve=Math.max(budget*.08,24000);
-  if(budget>330000)people.push(hire('doktor',.12));if(budget>620000)people.push(hire('kuchar',.12));if(budget>700000)people.push(hire('meteorolog',.12));
-  for(let k=0;k<nm&&money>reserve+8000;k++)people.push(hire('mechanik',Math.max(.2,(money-reserve)/money/(nm-k))));
+  const pref=Y.pref||{};
+  const hire=(role,share)=>{const want=pref[role]||pref.all;let q=9.5,best=null;
+    while(q>.6&&!best){const cands=Array.from({length:want?5:1},()=>makePerson(role,q)).filter(p=>p.price<=money*share);
+      if(cands.length)best=want?cands.sort((a,b)=>(b.sk[want]||0)-(a.sk[want]||0))[0]:cands[0];q-=.5}
+    if(!best)best=makePerson(role,.6);money-=best.price;best.task='rest';return best};
+  const people=[hire('jezdec',Y.drv),hire('navigator',Y.nav)];const reserve=Math.max(budget*.08,24000);
+  let nm,doc,cook,met;
+  if(Y.mech){nm=RI(Y.mech[0],Y.mech[1]);doc=Y.doc;cook=Y.cook;met=Y.meteo}
+  else{nm=2+Math.floor(budget/320000);doc=budget>330000?1:0;cook=budget>620000?1:0;met=budget>700000?1:0}
+  const staff=[];for(let k=0;k<doc;k++)staff.push('doktor');for(let k=0;k<cook;k++)staff.push('kuchar');for(let k=0;k<met;k++)staff.push('meteorolog');
+  for(const r of staff)if(money>reserve+6000)people.push(hire(r,.12));
+  for(let k=0;k<nm&&money>reserve+8000;k++)people.push(hire('mechanik',Math.max(.15,(money-reserve)/money/(nm-k))));
   const tier=clamp((budget-150000)/850000,0,1);const vans=Math.ceil(people.length/VAN_SEATS);money-=VAN_PRICE*(vans-1);
-  return{vans,id:'b'+i,name,number:num,livery:LIVERIES[RI(0,LIVERIES.length-1)],budget,car,people,driverId:people[0].id,navId:people[1].id,spares:2,joker:1,out:false,money:Math.max(0,money),
+  return{vans,style:sk,id:'b'+i,name,number:num,livery:LIVERIES[RI(0,LIVERIES.length-1)],budget,car,people,driverId:people[0].id,navId:people[1].id,spares:2,joker:1,out:false,money:Math.max(0,money),
     jobs:[],setupProg:0,convoyUntil:null,convoyDriver:null,moverId:null,marathonNight:false,log:[],t:900,state:'bivak',stageIdx:0,race:null,isBot:true,
     aggr:R(.97,1.07),smart:clamp(.35+tier*.55+R(-.1,.1),.25,.95),planAt:0,prep:{}};
 }
@@ -1642,7 +1658,7 @@ function botPlan(T){
   for(const p of tm.people){
     if(p.task==='sleep'||!available(p))continue;
     if(isCrew(p)){if(S.marathonNight&&p.energy>65&&left>360&&jl.length){const j=jl.find(x=>(cnt[x]||0)<1);if(j){p.task=j;cnt[j]=1;continue}}p.task=p.inj&&hasDoc?'patient':'rest';continue}
-    const minE=left<240?50:18+15*(1-T.smart);
+    const minE=(left<240?50:18+15*(1-T.smart))+((BOT_STYLES[T.style]||{}).rest||0);
     if(p.energy<minE||(p.task!=='rest'&&p.energy<minE+10&&rand()<.5)){p.task=p.inj&&hasDoc?'patient':'rest';continue}
     if(p.role==='doktor'){p.task=injured?'medic':'rest';continue}
     if(p.role==='kuchar'){p.task='cook';continue}
@@ -1650,7 +1666,7 @@ function botPlan(T){
     const j=jl.find(x=>(cnt[x]||0)<2&&taskValid(x));
     if(j&&(p.role==='mechanik'||p.energy>70)){p.task=j;cnt[j]=(cnt[j]||0)+1}else p.task=p.inj&&hasDoc?'patient':'rest';
   }
-  if(bivakHere()&&!jl.length&&left>600&&rand()<.12*T.smart){const k=pick(QK);if(c.comps[k].q<10&&!S.jobs.some(j=>j.id==='upg:'+k))S.jobs.push({id:'upg:'+k,comp:k,need:upgNeed(c.comps[k].q),done:0})}
+  const upP=(BOT_STYLES[T.style]||BOT_STYLES.balanced).upg;if(bivakHere()&&jl.length<=(upP>.3?2:0)&&left>(upP>.3?300:600)&&rand()<upP*(.5+T.smart)){const k=pick(QK);if(c.comps[k].q<10&&!S.jobs.some(j=>j.id==='upg:'+k))S.jobs.push({id:'upg:'+k,comp:k,need:upgNeed(c.comps[k].q),done:0})}
 }
 function botDrive(T){
   const r=S.race;if(r.over)return;
@@ -2097,8 +2113,9 @@ function render(){
   else if(S.phase==='race')renderRace();
   else if(S.phase==='end')renderEnd();
 }
-const VERSION='0.34';
+const VERSION='0.35';
 const CHANGELOG=[
+ ['0.35','Boti mají herní styly (Hvězdný pilot, Tovární auto, Dílna a upgrady, Výdrž a pohoda, Navigace a počasí, Vyvážený). Styl je vidět ve statistikách.'],
  ['0.34','Nová sada druhých pneu do zásoby bez přezouvání. Předpověď počasí je jednorázová (trvá déle, ale řekne jistě). Hodně lidí na jednom úkolu se vejde do řádku. Statistiky a grafy na konci rallye se srovnáním týmů. Oznámení o novém levelu skillu. Tlačítko Simulovat rallye v menu.'],
  ['0.33','Nová hra: volba „Stejný rozpočet pro všechny týmy“ – boti dostanou stejnou částku jako ty (i v multiplayeru).'],
  ['0.32','Pilot a navigátor se v závodě unavují rychleji (to, co by v bivaku vydrželi 8 h, v závodě vydrží 6 h, pak teprve působí Výdrž). Po M1 už hra nepíše, že budete čekat na bivak – ten jede rovnou do cíle M2.'],
@@ -2723,7 +2740,7 @@ function showStats(){const D=statData();if(!D.sts.length){toastMsg('Zatím nejso
   const rows=ids.map(id=>D.teams[id]).sort((a,b)=>(a.pts[last]?a.pts[last].ovr:999)-(b.pts[last]?b.pts[last].ovr:999));
   const sum=(T,k)=>T.pts.reduce((s,p)=>s+(p&&p[k]||0),0);
   const card=(T,col)=>{const p=T.pts.filter(Boolean);const h=(p[p.length-1]||{}).h||{};const sk=(o)=>o?Object.entries(o).map(([k,v])=>`<span>${SK_ABBR[k]||k} <b>${v}</b></span>`).join(''):'–';
-    return`<div class="stcard" style="--c:${col}"><h4>${esc(T.name)}</h4><div class="mute">${esc(h.car||'')} · ${h.ppl||'?'} lidí</div>
+    return`<div class="stcard" style="--c:${col}"><h4>${esc(T.name)}</h4><div class="mute">${(()=>{const b=S.bots.find(x=>x.id===T.id);return b&&b.style&&BOT_STYLES[b.style]?`<b style="color:${col}">${BOT_STYLES[b.style].name}</b> · `:''})()}${esc(h.car||'')} · ${h.ppl||'?'} lidí</div>
     <div class="stgrid"><span>Celkově</span><b>${p.length&&p[p.length-1].ovr?p[p.length-1].ovr+'.':'–'}</b><span>Nehody</span><b>${sum(T,'inc')}</b><span>Minuté WP</span><b>${sum(T,'wp')}</b><span>Poškození</span><b>${Math.round(sum(T,'dmg'))}</b><span>Energie</span><b>${Math.round(sum(T,'dr'))} %</b><span>Čekání na bivak</span><b>${durHM(Math.round(sum(T,'cl')*60))}</b><span>XP</span><b>${h.xp||0}</b></div>
     <div class="stsk"><em>Pilot ${esc(h.dn||'')}</em>${sk(h.dsk)}</div><div class="stsk"><em>Navigátor ${esc(h.nn||'')}</em>${sk(h.nsk)}</div></div>`};
   openModal(`<div class="modal" style="width:min(1560px,100%)"><header><h2>Statistiky rallye</h2><button data-act="close">Zavřít ✕</button></header>
