@@ -115,14 +115,14 @@ input[type=range]{width:100%;accent-color:var(--dakar)}
 .startin b{font-size:20px;color:var(--dakar);font-weight:700;font-family:var(--f-pix);display:inline-block;min-width:8.5ch}
 .startin.soon{border-color:var(--dakar);animation:pulse 1s steps(2) infinite}
 .speedbtns button{min-width:44px}
-.bivak-grid{display:grid;grid-template-columns:minmax(0,.9fr) minmax(0,1.5fr) minmax(0,.85fr);gap:14px;margin-top:14px;align-items:start}
+.bivak-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.45fr) minmax(0,.85fr);gap:14px;margin-top:14px;align-items:start}
 @media (max-width:1240px){.bivak-grid{grid-template-columns:minmax(0,1fr) minmax(0,1.3fr)}.bivak-grid>.col:last-child{grid-column:1/-1;grid-template-columns:repeat(auto-fit,minmax(300px,1fr))}}
 @media (max-width:760px){.bivak-grid{grid-template-columns:1fr}}
 .col{display:grid;gap:14px;min-width:0;align-content:start}
 .scene-panel{padding:0;position:relative}
 .scene-panel canvas{width:100%;height:auto}
 .scene-label{position:absolute;left:8px;top:6px;font-family:var(--f-pix);font-size:13px;background:rgba(20,15,25,.7);padding:1px 6px}
-.comp{display:grid;grid-template-columns:96px 30px 1fr 40px 76px;gap:6px;align-items:center;font-size:13px;padding:3px 0}
+.comp{display:grid;grid-template-columns:112px 30px 1fr 40px 76px;gap:6px;align-items:center;font-size:13px;padding:3px 0}
 .comp .q{font-family:var(--f-pix);color:var(--sand)}
 .tyres{margin-top:8px;padding-top:8px;border-top:2px dashed var(--line);display:grid;gap:6px}
 .setup-row{display:grid;gap:4px;margin:8px 0;padding-bottom:8px;border-bottom:1px dashed #3a3040}
@@ -218,7 +218,7 @@ details summary{cursor:pointer;font-family:var(--f-pix);font-size:13px;color:var
 .carhead h3{font-size:17px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .fitline{font-size:13px}
 .cqs{display:grid;grid-template-columns:1fr 1fr;gap:4px 12px}
-.cq{display:grid;grid-template-columns:52px 34px 1fr 22px;gap:5px;align-items:center;font-size:12px}
+.cq{display:grid;grid-template-columns:66px 34px 1fr 22px;gap:5px;align-items:center;font-size:12px}
 .cq b{font-family:var(--f-pix);color:var(--sand);font-weight:600}
 .cq b sup{color:var(--sky)}
 .cq .bar{height:7px}
@@ -229,6 +229,16 @@ details summary{cursor:pointer;font-family:var(--f-pix);font-size:13px;color:var
 .stagecard .biobar{margin:0;flex:none}
 .stagecard .banner{margin:0}
 .sg-move{font-size:12.5px;color:var(--mute)}
+.sg-split{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}
+.legend.col{flex-direction:column;align-items:flex-start;gap:2px}.legend.col b{color:var(--ink);font-weight:400;margin-left:4px}
+.sg-imp{display:flex;flex-direction:column;align-items:flex-end;gap:3px;cursor:help}
+.imp{display:flex;align-items:center;gap:6px;font-size:12.5px;color:#fff}
+.cic{width:13px;height:13px;flex:none;vertical-align:-2px}
+.sg-movebox{margin-top:8px;display:grid;gap:4px}.early.big{width:100%;padding:7px;font-size:15px}
+.sg-mv{justify-content:space-between;font-size:12.5px;color:var(--mute)}.sg-mv b{color:var(--ink)}
+.cq>span:first-child,.comp>span:first-child{display:flex;align-items:center;gap:4px;white-space:nowrap;overflow:hidden}
+.cal-mv{padding-left:22px!important}
+.cal-imp{display:flex;gap:7px}.cal-imp span{cursor:help}
 .sg-prep{display:flex;flex-wrap:wrap;gap:3px 10px;font-size:12px;color:var(--mute)}
 .sg-prep .ok{color:var(--ok)}
 .sg-prep em{font-style:normal;color:var(--sky)}
@@ -357,7 +367,7 @@ details summary{cursor:pointer;font-family:var(--f-pix);font-size:13px;color:var
 .speedread .st{font-family:var(--f-pix);font-size:16px;letter-spacing:.08em}
 .slider{position:relative;height:74px;margin-top:6px;cursor:ew-resize;touch-action:none}
 .slider .bandrow{position:absolute;left:0;right:0;top:0;height:14px}
-.slider .band{position:absolute;top:0;height:14px;background:repeating-linear-gradient(90deg,var(--dakar) 0 6px,#e0731a 6px 12px);border:2px solid #ffd09b;}
+.slider .band{position:absolute;top:0;height:14px;background:linear-gradient(rgba(60,18,0,var(--nb,0)),rgba(60,18,0,var(--nb,0))),repeating-linear-gradient(90deg,var(--dakar) 0 6px,#e0731a 6px 12px);border:2px solid #ffd09b;}
 .slider .track{position:absolute;left:0;right:0;top:24px;height:22px;background:#151018;border:2px solid var(--line)}
 .slider .tgt{position:absolute;top:0;bottom:0;left:0;background:rgba(233,196,139,.18)}
 .slider .needle{position:absolute;top:18px;width:4px;height:34px;margin-left:-2px;background:var(--ok)}
@@ -547,8 +557,8 @@ button.on{background:linear-gradient(180deg,#f0d29a,#d9b06a);color:#2a1a08;borde
 }
 
 .cm-grid{grid-template-columns:minmax(0,1.25fr) minmax(0,1fr) minmax(0,1.2fr)}
-.cm-grid .comp{grid-template-columns:84px 26px minmax(40px,1fr) 38px auto}
-@media (max-width:1600px){.cq{grid-template-columns:44px 24px 1fr}.cq>.num{display:none}}
+.cm-grid .comp{grid-template-columns:104px 26px minmax(40px,1fr) 38px auto}
+@media (max-width:1600px){.cq{grid-template-columns:62px 24px 1fr}.cq>.num{display:none}}
 .drop.job{height:132px}
 .hud{align-items:flex-start}.hud>div{align-content:start}
 /* ===== cards v2: banner on top ===== */
@@ -702,6 +712,13 @@ const ROLES={
   kuchar:{name:'Kuchař',skills:['vareni','vydrz'],k:.9,col:'#7cc56b'},
   meteorolog:{name:'Meteorolog',skills:['predpoved','vydrz'],k:1.0,col:'#5aa7e6'},
 };
+const CICO={motor:["..XXX..","..X.X..","XXXXXXX","X.XXX.X","XXXXXXX","XX...XX"],prevodovka:[".X.X.X.","XXXXXXX",".XX.XX.","XX...XX",".XX.XX.","XXXXXXX",".X.X.X."],
+  podvozek:["XX...XX","XX...XX","XXXXXXX","..X.X..","XXXXXXX","XX...XX","XX...XX"],tlumice:["..XXX..","...X...","XXXXX..","..XXXXX","XXXXX..","..XXXXX","..XXX.."],
+  pneu:["..XXX..",".XXXXX.","XX...XX","XX.X.XX","XX...XX",".XXXXX.","..XXX.."],chlazeni:["X..X..X",".X.X.X.","..XXX..","XXXXXXX","..XXX..",".X.X.X.","X..X..X"]};
+const IMP_COL=['#e8432c','#ff8c2a','#f2d14a'];
+function cic(k,col){const g=CICO[k];let r='';g.forEach((row,y)=>{for(let x=0;x<row.length;x++)if(row[x]==='X')r+=`<rect x="${x}" y="${y}" width="1" height="1"/>`});return`<svg class="cic" viewBox="0 0 7 7" shape-rendering="crispEdges" fill="${col||'currentColor'}">${r}</svg>`}
+function compImp(st){const imp={};for(const k of CK)imp[k]=0;for(const s of st.segs){const B=BIOMES[s.b];B.comps.forEach((k,i)=>imp[k]+=s.km*(B.comps.length-i))}return CK.slice().sort((a,b)=>imp[b]-imp[a]).slice(0,3)}
+function impHtml(st,iconsOnly){return compImp(st).map((k,i)=>iconsOnly?`<span data-tip="${i+1}. nejdůležitější díl: <b>${COMPS[k]}</b>">${cic(k,IMP_COL[i])}</span>`:`<div class="imp">${cic(k,IMP_COL[i])}<span>${COMPS[k]}</span></div>`).join('')}
 const COMPS={motor:'Motor',prevodovka:'Převodovka',podvozek:'Podvozek',tlumice:'Tlumiče',pneu:'Pneumatiky',chlazeni:'Chlazení'};
 const CK=Object.keys(COMPS);
 const QK=CK.filter(k=>k!=='pneu');
@@ -734,7 +751,7 @@ const BIOMES={
     info:'Prach jemný jako mouka, pod kterým se skrývají díry.',good:'Podvozek, převodovka, skilly Duny a Technika.',risk:'Zapadnutí, špatná viditelnost.'},
 };
 const BK=Object.keys(BIOMES);
-function biomeTip(b){const B=BIOMES[b];return `<b>${B.name}</b><br>${B.info}<br><span style="color:var(--ok)">Vyniká:</span> ${B.good}<br><span style="color:var(--sky)">Nastavení:</span> ${SK_KEYS.map(k=>SETUP[k].name.toLowerCase()+' '+(B.setup[k]>0?'+':'')+B.setup[k]).join(', ')}<br><span style="color:var(--bad)">Riziko:</span> ${B.risk}`}
+function biomeTip(b){const B=BIOMES[b];return `<b>${B.name}</b><br>Vyniká: ${B.comps.slice(0,2).map((k,i)=>`${cic(k,IMP_COL[i])} <span style='color:${IMP_COL[i]}'>${COMPS[k]}</span>`).join(' ')} · skill ${B.skill.map(k=>SKILLS[k]).join(', ')}<br><span style='color:var(--bad)'>Riziko:</span> ${B.risk}`}
 const CAR_MODELS=[
   {id:'srotik',name:'Šrotík 4×4',shape:'suv',q:[1,1,1,1,0,1],free:true,desc:'Ze dvora u strejdy. Jede. Většinou.'},
   {id:'niva',name:'Volha Niva 1600',shape:'hatch',q:[3,3,4,3,0,3],desc:'Levná, poctivá, pomalá.'},
@@ -848,11 +865,12 @@ function genRace(set){
     let sm=pick([360,390,420,420,450,450,480,480,510,540]);
     if(km>430)sm-=60;
     const nightStart=!last&&rand()<.16;if(nightStart)sm=pick([240,270,300]);
+    const eveStart=!last&&!nightStart&&i>1&&rand()<.14;if(eveStart)sm=pick([780,810,840,870]);
     if(last)sm=pick([480,540]);
     let mar=0;for(const[a,b]of cfg.mar){if(i===a)mar=1;if(i===b)mar=2}
     const rainP=clamp(Math.pow(rand(),1.6)*.55+.03,.03,.6);
     const move=(mar===2||last)?0:mar===1?Math.round(R(8,12)*60):(rand()<.08?0:Math.round(R(3,10)*60));
-    stages.push({n:i,day,start:day*1440+sm,dep:day*1440+sm,liaIn:0,liaOut:0,preKm:0,postKm:0,move,moveKm:Math.round(move/60*70),convoy:null,fc:0,km,segs,type,mar,rainP,rainRoll:rand()<rainP,fNoise:rand()*2-1,nightStart,rain:null,runs:null,player:null,final:false,table:null,resultsAt:null,
+    stages.push({n:i,day,start:day*1440+sm,dep:day*1440+sm,liaIn:0,liaOut:0,preKm:0,postKm:0,move,moveKm:Math.round(move/60*70),convoy:null,fc:0,km,segs,type,mar,rainP,rainRoll:rand()<rainP,fNoise:rand()*2-1,nightStart,eveStart,rain:null,runs:null,player:null,final:false,table:null,resultsAt:null,
       warned:false});
     day++;
     if(i===cfg.rest){restDay=day;day++}
@@ -1996,7 +2014,7 @@ function bandFor(seg,raw){
   const r=S.race;if(!raw&&r.bs)return r.bs;const d=driver(),n=navig();const B=BIOMES[seg.b];
   const V=curVopt(seg)*(1+.28*((r.aggr==null?.5:r.aggr)-.5));
   const sk=(avg(B.skill.map(k=>eff(d,k)))+eff(d,'postreh')+eff(n,'cteni'))/3;
-  const w=clamp(.5-.03*sk,.14,.5)*(r.intel?.8:1);
+  const dk=1-lightAt((r.t%1440)/60);const w=clamp(.5-.03*sk,.14,.5)*(r.intel?.8:1)*(1+.7*dk);
   const lo=V-w*V*r.bandR;return{lo,hi:lo+w*V,V};
 }
 function fx(kind,text){if(S._bot)return;const el=document.getElementById('wpfx');if(!el)return;el.className='wpfx';void el.offsetWidth;el.textContent=text;el.className='wpfx show '+kind}
@@ -2117,8 +2135,9 @@ function render(){
   else if(S.phase==='race')renderRace();
   else if(S.phase==='end')renderEnd();
 }
-const VERSION='0.38';
+const VERSION='0.39';
 const CHANGELOG=[
+ ['0.39','Nový panel etapy: biomy pod sebou, vpravo 3 nejdůležitější díly (ikonky). Ikonky dílů i v přehledu auta. Velké tlačítko Poslat bivak napřed s délkou přesunu. Jednodušší tooltip biomů. U maratonu vidíš v nastavení auta obě etapy. Přehlednější kalendář. V noci je závodní pásmo až o 70 % širší a tmavší. Nové odpolední etapy, které končí za tmy.'],
  ['0.38','Chyby při přepalu rostou lineárně s přepalem (za 1 s jízdy o 10 % rychleji = 0,5 % šance na chybu). Postřeh zachraňuje 8,3 % za bod (Postřeh 10 ≈ 85 %). Únava zvyšuje chybovost méně. Mírný přepal se mírně vyplatí, ale stojí auto a energii; trvalý velký přepal ne.'],
  ['0.37','Nehody: chyba při přestřelení je vzácnější a Postřeh zachraňuje častěji, takže se dá na pár vteřin riskovat. Zachráněná chyba: jezdec −4 energie, auto lehce poškozené. Nehoda: jezdec −8, auto 2,5× víc. Čím víc přepálíš, tím víc to bolí. Drahá auta se opotřebovávají stejně jako levná. Upgrady jsou rychlejší (hlavně slabé díly), opravy delší, pilot má větší vliv a je levnější, dodávka stojí 24 000 €.'],
  ['0.35','Boti mají herní styly (Hvězdný pilot, Tovární auto, Dílna a upgrady, Výdrž a pohoda, Navigace a počasí, Vyvážený). Styl je vidět ve statistikách.'],
@@ -2267,7 +2286,6 @@ function renderShop(){
     <div class="team-list">
       ${tm.car?`<div class="team-item"><span><b>${esc(tm.car.name)}</b></span>${inBivak||(S.mp&&S.mp.passed)?'':`<button class="small" data-act="sellCar">Prodat</button>`}</div>`:''}
       ${vanSlots(tm,inBivak||(S.mp&&S.mp.passed))}
-      <div class="team-item"><span>Rezervní kola</span><span class="num">${tm.spares}</span></div>
     </div>
     ${inBivak||(S.mp&&S.mp.passed)?'':`<button class="dice" data-act="randomTeam">${ic('dice')} ${S.mp?'Koupit náhodně':'Koupit náhodně a jet'}</button>`}
     ${inBivak?'':S.mp?`<button class="primary" style="width:100%;margin-top:12px" data-act="mpPass" ${S.mp.passed||!(tm.car&&has('jezdec')&&has('navigator'))?'disabled':''}>${S.mp.passed?'Čekáš na ostatní…':'Hotovo s nákupem →'}</button>${S.mp.passed?`<button class="small" style="width:100%;margin-top:6px" data-act="mpUnpass">Ještě něco dokoupit</button>`:''}`:`<div class="row" style="margin-top:12px;justify-content:space-between"><button class="small" data-act="back">← Rozpočet a nastavení</button><button class="primary" data-act="toBivak" ${tm.car&&has('jezdec')&&has('navigator')?'':'disabled'}>Odletět do bivaku →</button></div>`}
@@ -2350,7 +2368,7 @@ function renderCarCard(){
   const busy=k=>S.jobs.some(j=>j.id==='upg:'+k);
   el.innerHTML=`<div class="carhead"><canvas class="pix bigcar" data-car="${c.shape}|${teamLiv().join(',')}|${S.settings.number}" width="96" height="52"></canvas>
     <div class="ch-t"><h3>${esc(c.name)}</h3><span class="hint num">${ic('up')} ~${Math.round(carTop(c))} km/h · ${ic('tyre')} rezervy ${S.team.spares}</span></div></div>
-  <div class="cqs">${QK.map(k=>{const x=c.comps[k];return `<div class="cq"><span>${COMP_AB[k]}</span><b>Q${x.q}${busy(k)?'<sup>↑</sup>':''}</b>${condBar(x)}<span class="num">${Math.floor(x.cond)}</span></div>`}).join('')}
+  <div class="cqs">${QK.map(k=>{const x=c.comps[k];return `<div class="cq"><span>${cic(k,'#fff')}${COMP_AB[k]}</span><b>Q${x.q}${busy(k)?'<sup>↑</sup>':''}</b>${condBar(x)}<span class="num">${Math.floor(x.cond)}</span></div>`}).join('')}
     <div class="cq"><span>Pneu</span><b style="color:${c.tyre==='wet'?'#4f9fe0':'var(--mute)'}">${c.tyre==='wet'?'MOK':'SUCH'}</b><div class="bar"><i style="width:${ty.cond}%;background:${tyreCol(c.tyre,ty.cond)}"></i></div><span class="num">${Math.floor(ty.cond)}</span></div></div>
   <button class="primary carbtn" data-act="carModal">${ic('wrench')} Auto a nastavení</button>`;
 }
@@ -2358,18 +2376,18 @@ function showCarModal(){
   if(modalKind!=='car')openModal(`<div class="modal carmodal" id="carModal"></div>`,'car');
   const el=document.getElementById('carModal');if(!el)return;
   const c=S.team.car;const st=nextStageObj();const tiresJob=S.jobs.find(j=>j.id==='tires');const ty=c.comps.pneu;
-  let stageHtml='<p class="hint">Žádná další etapa.</p>';
-  if(st){const sh=biomeShare(st);const bs=Object.keys(sh).sort((a,b)=>sh[b]-sh[a]);
-    stageHtml=`<div class="row" style="gap:6px"><span class="pill">${st.km} km</span><span class="pill sky">déšť ${rainText(st)}</span>${st.nightStart?'<span class="pill warn">start za tmy</span>':''}${st.mar?`<span class="pill warn">Maraton ${st.mar}/2</span>`:''}</div>
+  const stHtml=st=>{const sh=biomeShare(st);const bs=Object.keys(sh).sort((a,b)=>sh[b]-sh[a]);return `<div class="row" style="gap:6px"><span class="pill">${st.km} km</span><span class="pill sky">déšť ${rainText(st)}</span>${st.nightStart?'<span class="pill warn">start za tmy</span>':''}${st.mar?`<span class="pill warn">Maraton ${st.mar}/2</span>`:''}</div>
     <div class="biobar">${st.segs.map(s=>`<i style="width:${s.km/st.km*100}%;background:${BIOMES[s.b].ui}" data-tip="${esc(biomeTip(s.b))}<br>${s.km} km"></i>`).join('')}</div>
     <div class="tbl-wrap"><table class="ideal"><tr><th></th>${bs.map(b=>`<th style="color:${BIOMES[b].ui}" data-tip="${esc(biomeTip(b))}">${BIOMES[b].name}<br><span class="num">${Math.round(sh[b]/st.km*100)} %</span></th>`).join('')}</tr>
     ${SK_KEYS.map(k=>`<tr><td>${SETUP[k].name}</td>${bs.map(b=>{const v=BIOMES[b].setup[k];return `<td class="num">${v>0?'+':''}${v}</td>`}).join('')}</tr>`).join('')}</table></div>
-    <p class="hint">Ideální nastavení pro každý biom etapy. Jak to skloubit, je na tobě.</p>`}
+    <p class="hint">Ideální nastavení pro každý biom etapy. Jak to skloubit, je na tobě.</p>`};
+  let stageHtml=st?stHtml(st):'<p class="hint">Žádná další etapa.</p>';
+  if(st&&st.mar===1&&S.stages[st.n]){const s2=S.stages[st.n];stageHtml+=`<h3 style="margin-top:12px">Etapa ${s2.n} (Maraton 2/2)</h3><p class="hint">Mezi M1 a M2 nastavení může měnit jen posádka. Můžeš nastavit kompromis pro obě.</p>`+stHtml(s2)}
   el.innerHTML=`<header><h2>${esc(c.name)} <span class="hint num" style="font-size:14px">top ~${Math.round(carTop(c))} km/h</span></h2><button data-act="close">Zavřít ✕</button></header>
   <div class="cm-grid">
    <section><h3>Díly</h3>
     ${QK.map(k=>{const x=c.comps[k];const upJob=S.jobs.find(j=>j.id==='upg:'+k);
-    return `<div class="comp" data-tip="<b>${COMPS[k]}</b><br>${COMP_DESC[k]}<br>Stav ${Math.floor(x.cond)} %, max opravitelný ${Math.round(x.max)} %.<br>Šrafovaná část je trvalé opotřebení. Upgrade zvedne maximum o 10 % (třeba z 80 na 88)."><span>${COMPS[k]}</span><span class="q">Q${x.q}</span>${condBar(x)}<span class="num" style="text-align:right">${Math.floor(x.cond)}%</span>
+    return `<div class="comp" data-tip="<b>${COMPS[k]}</b><br>${COMP_DESC[k]}<br>Stav ${Math.floor(x.cond)} %, max opravitelný ${Math.round(x.max)} %.<br>Šrafovaná část je trvalé opotřebení. Upgrade zvedne maximum o 10 % (třeba z 80 na 88)."><span>${cic(k,'#fff')}${COMPS[k]}</span><span class="q">Q${x.q}</span>${condBar(x)}<span class="num" style="text-align:right">${Math.floor(x.cond)}%</span>
     ${upJob?`<span class="pill sky">${Math.round(upJob.done/upJob.need*100)} %</span>`:x.q<10?`<button class="small" data-act="upgrade" data-k="${k}" title="Upgrade na Q${x.q+1}: jen čas, ~${upgNeed(x.q)} pracovních hodin v Dílně. Rozpracovaný upgrade zůstává mezi bivaky.">↑ Q${x.q+1}</button>`:'<span class="pill ok">MAX</span>'}</div>`}).join('')}
     <p class="hint">Upgrade stojí jen čas (~${upgNeed(5)} prac. h z Q5), zadá se jako práce do Dílny.</p>
     <div class="tyres"><div class="row" style="justify-content:space-between"><b style="font-family:var(--f-pix);font-size:15px">Pneumatiky</b><span>nasazené: <b class="pill ${c.tyre==='wet'?'sky':'warn'}">${c.tyre==='wet'?'MOKRÉ':'SUCHÉ'}</b></span></div>
@@ -2385,7 +2403,7 @@ function showCarModal(){
     <div class="ends"><span><b style="color:var(--ink)">−2 ${SETUP[k].lo}</b><br>${SETUP[k].loTxt}</span><span><b style="color:var(--ink)">+2 ${SETUP[k].hi}</b><br>${SETUP[k].hiTxt}</span></div></div>`).join('')}
     <p class="hint">Klikni na cílovou hodnotu. Změnu pak udělá člověk v Dílně (0,9 prac. h za krok).</p>
    </section>
-   <section><h3>${st?`Příští etapa ${st.n} · ${esc(st.type)}`:'Příští etapa'}</h3>${stageHtml}</section>
+   <section><h3>${st?`Příští etapa ${st.n}${st.mar?` (Maraton ${st.mar}/2)`:''}`:'Příští etapa'}</h3>${stageHtml}</section>
   </div>`;
   paintSprites(el);
 }
@@ -2396,12 +2414,14 @@ function renderNext(){
   const sh=biomeShare(st);const fc=forecast(st);const pr=prepOf(st);
   el.innerHTML=`${S.marathonNight?'<div class="banner">Maratonský bivak: pracovat můžou jen pilot a navigátor.</div>':''}
   ${S.skipNext?'<div class="banner">Žolík aktivní: tuto etapu tým vynechá.</div>':''}
-  <h3>Etapa ${st.n}/${S.stages.length} · ${esc(st.type)}</h3>
-  <div class="row" style="gap:5px"><span class="pill warn">start ${dateOf(st.day)} ${clock(st.start)}</span><span class="pill">${st.km} km</span><span class="pill sky" data-tip="Přesnost předpovědi: ${fc.acc}">déšť ${rainText(st)}</span>${st.mar?`<span class="pill warn">Maraton ${st.mar}/2</span>`:''}${st.nightStart?'<span class="pill warn">start za tmy</span>':''}${S.marathonNight?'':`<span class="pill" data-tip="${st.move?`Po startu se bivak stěhuje ${st.moveKm} km (~${durHM(st.move)} jízdy). Řidiče konvoje vybereš při startu, nech někoho odpočatého.`:'Okruh, bivak zůstává na místě.'}">${st.move?`přesun ${st.moveKm} km`:'bivak zůstává'}</span>`}</div>
+  <h3>Etapa ${st.n}/${S.stages.length}</h3>
+  <div class="row" style="gap:5px"><span class="pill warn">start ${dateOf(st.day)} ${clock(st.start)}</span><span class="pill">${st.km} km</span><span class="pill sky">déšť ${rainText(st)}</span>${st.mar?`<span class="pill warn">Maraton ${st.mar}/2</span>`:''}${st.nightStart?'<span class="pill warn">start za tmy</span>':''}${st.eveStart?'<span class="pill warn">dojezd za tmy</span>':''}</div>
   <div class="biobar">${st.segs.map(s=>`<i style="width:${s.km/st.km*100}%;background:${BIOMES[s.b].ui}" data-tip="${esc(biomeTip(s.b))}<br>${s.km} km"></i>`).join('')}</div>
-  <div class="legend">${Object.entries(sh).sort((a,b)=>b[1]-a[1]).map(([b,k])=>`<span style="--c:${BIOMES[b].ui}" data-tip="${esc(biomeTip(b))}">${BIOMES[b].name} ${Math.round(k/st.km*100)} %</span>`).join('')}</div>
-  ${st.move>0&&!S.marathonNight?(S.convoyAhead?`<div class="sg-move">${ic('car')} Bivak jede napřed, v cíli v <b>${clock(S.convoyAhead.arrive)}</b>${S.convoyAhead.delay>15?' (se zpožděním)':''}.</div>`:(bivakHere()&&S.t<st.dep?`<button class="small early" data-act="earlyConvoy" data-tip="Odveze všechny kromě pilota a navigátora hned teď. Bivak pak v cíli nebude mít zpoždění, ale do startu na autě pracuje jen posádka.">${ic('car')} Poslat bivak napřed</button>`:'')):''}
-  <div class="sg-prep"><span>Příprava:</span>${Object.keys(PREP).map(k=>{const done=prepDone(st,k);const f=k==='forecast'?(pr.fc||0)/3:pr[k]/PREP[k].need;return `<span class="${done?'ok':''}" data-tip="<b>${PREP[k].name}</b><br>${PREP[k].eff}">${done?'✓':'○'} ${PREP_SHORT[k]}${done?'':` <em class="num">${Math.round(clamp(f,0,1)*100)} %</em>`}</span>`}).join('')}</div>`;
+  <div class="sg-split"><div class="legend col">${Object.entries(sh).sort((a,b)=>b[1]-a[1]).map(([b,k])=>`<span style="--c:${BIOMES[b].ui}" data-tip="${esc(biomeTip(b))}">${BIOMES[b].name} <b class="num">${Math.round(k/st.km*100)} %</b></span>`).join('')}</div>
+    <div class="sg-imp" data-tip="Díly, které na téhle etapě nejvíc rozhodují (podle biomů). Nezávisí na tvém autě.">${impHtml(st)}</div></div>
+  ${S.marathonNight?'':st.move>0?`<div class="sg-movebox">${S.convoyAhead?`<div class="sg-move">${ic('car')} Bivak jede napřed, v cíli v <b>${clock(S.convoyAhead.arrive)}</b>${S.convoyAhead.delay>15?' (se zpožděním)':''}.</div>`:(bivakHere()&&S.t<st.dep?`<button class="early big" data-act="earlyConvoy" data-tip="Odveze všechny kromě pilota a navigátora hned teď. Bivak pak v cíli nebude mít zpoždění, ale do startu na autě pracuje jen posádka.">${ic('car')} Poslat bivak napřed</button>`:'')}
+    <div class="row sg-mv"><span>Přesun bivaku <b class="num">${st.moveKm} km</b>${st.mar===1?' (objížďka do cíle M2)':''}</span><span class="num">~${durHM(st.move)} jízdy</span></div></div>`:`<div class="sg-movebox"><div class="row sg-mv"><span>Bivak zůstává na místě</span></div></div>`}
+  <div class="sg-prep"><span>Příprava:</span>${Object.keys(PREP).map(k=>{const done=prepDone(st,k);const f=k==='forecast'?(pr.fc?1:(pr.forecast||0)/PREP.forecast.need):pr[k]/PREP[k].need;return `<span class="${done?'ok':''}" data-tip="<b>${PREP[k].name}</b><br>${PREP[k].eff}">${done?'✓':'○'} ${PREP_SHORT[k]}${done?'':` <em class="num">${Math.round(clamp(f,0,1)*100)} %</em>`}</span>`}).join('')}</div>`;
 }
 function chip(p,ghost){
   const locked=ghost||p.task==='sleep'||!available(p);const e=Math.round(p.energy);
@@ -2570,7 +2590,7 @@ function updateRaceUI(force){
   const s2=document.getElementById('spdSt');if(s2){s2.textContent=r.mode==='liaison'?'PŘEJEZD NA START':r.countdown>0?'PŘIPRAV SE':r.v<1&&!r.incident?'STOJÍME':st[0];s2.style.color=st[1]}
   set('tgtV',String(r.target));
   const M=r.maxSlider;const pc=v=>clamp(v/M*100,0,100)+'%';
-  const bd=document.getElementById('band');if(bd){bd.style.left=pc(band.lo);bd.style.width=(clamp(band.hi,0,M)-clamp(band.lo,0,M))/M*100+'%'}
+  const bd=document.getElementById('band');if(bd){bd.style.setProperty('--nb',((1-lightAt((r.t%1440)/60))*.62).toFixed(2));bd.style.left=pc(band.lo);bd.style.width=(clamp(band.hi,0,M)-clamp(band.lo,0,M))/M*100+'%'}
   const nd=document.getElementById('needle');if(nd){nd.style.left=pc(r.v);nd.style.background=st[1]}
   const th=document.getElementById('thumb');if(th)th.style.left=pc(r.target);
   const tf=document.getElementById('tgtFill');if(tf)tf.style.width=pc(r.target);
@@ -2633,15 +2653,15 @@ function showCalendar(){
   for(let d=0;d<S.lastDay;d++){
     const st=S.stages.find(s=>s.day===d);
     if(d===0){rows.push(`<tr class="past"><td>${dateOf(d)}</td><td>Přílet</td><td colspan="7">Bivak</td></tr>`);continue}
-    if(d===S.restDay){rows.push(`<tr class="${Math.floor(now/1440)>d?'past':''}"><td>${dateOf(d)}</td><td><b>Den volna</b></td><td colspan="7" class="mute">Opravy, regenerace, trh</td></tr>`);continue}
+    if(d===S.restDay){rows.push(`<tr class="${Math.floor(now/1440)>d?'past':''}"><td>${dateOf(d)}</td><td><b>Den volna</b></td><td colspan="7" class="mute">Opravy a odpočinek</td></tr>`);continue}
     if(!st)continue;const past=st.final||st.player;const isNext=st===nextStageObj();
-    rows.push(`<tr class="${past?'past':''} ${isNext?'next':''}"><td>${dateOf(d)}</td><td>Etapa ${st.n}${st.mar?` <span class="pill warn">M${st.mar}</span>`:''}</td><td class="num">${clock(st.start)}${st.nightStart?' 🌙':''}</td><td class="r num">${st.km} km</td><td class="num">${st.move?st.moveKm+' km':'—'}</td><td>${esc(st.type)}</td>
+    rows.push(`<tr class="${past?'past':''} ${isNext?'next':''}"><td>${dateOf(d)}</td><td>Etapa ${st.n}${st.mar?` <span class="pill warn">M${st.mar}</span>`:''}</td><td class="num">${clock(st.start)}${st.nightStart?' 🌙':''}${st.eveStart?' 🌆':''}</td><td class="r num">${st.km} km</td><td class="num cal-mv">${st.move?st.moveKm+' km':'—'}</td><td class="num" style="color:var(--sky)">${st.rain!==null?(st.rain?'pršelo':'sucho'):rainText(st)}</td>
       <td><div class="biobar" style="width:140px;margin:0">${st.segs.map(s=>`<i style="width:${s.km/st.km*100}%;background:${BIOMES[s.b].ui}" data-tip="${esc(biomeTip(s.b))}"></i>`).join('')}</div></td>
-      <td class="r num">${st.rain!==null?(st.rain?'pršelo':'sucho'):rainText(st)}</td><td>${st.final&&st.table?(()=>{const i=st.table.findIndex(e=>e.id==='me');return i>=0?(i+1)+'. místo':'—'})():''}</td></tr>`);
+      <td><div class="cal-imp">${impHtml(st,true)}</div></td><td>${st.final&&st.table?(()=>{const i=st.table.findIndex(e=>e.id==='me');return i>=0?(i+1)+'. místo':'—'})():''}</td></tr>`);
   }
   openModal(`<div class="modal"><header><h2>Kalendář rallye 2027</h2><button data-act="close">Zavřít</button></header>
-  <div class="legend">${BK.map(b=>`<span style="--c:${BIOMES[b].ui}" data-tip="${esc(biomeTip(b))}">${BIOMES[b].name}</span>`).join('')}<span class="mute">M = maratonská etapa · 🌙 start za tmy</span></div>
-  <div class="tbl-wrap"><table><tr><th>Den</th><th>Program</th><th>Start</th><th class="r">Speciálka</th><th>Přesun bivaku</th><th>Typ</th><th>Biomy</th><th class="r">Déšť</th><th>Výsledek</th></tr>${rows.join('')}</table></div></div>`);
+  <div class="legend">${BK.map(b=>`<span style="--c:${BIOMES[b].ui}" data-tip="${esc(biomeTip(b))}">${BIOMES[b].name}</span>`).join('')}<span class="mute">M = maratonská etapa · 🌙 start za tmy · 🌆 dojezd za tmy</span></div>
+  <div class="tbl-wrap"><table><tr><th>Den</th><th>Program</th><th>Start</th><th class="r">Speciálka</th><th class="cal-mv">Přesun bivaku</th><th>Déšť</th><th>Biomy</th><th>Klíčové díly</th><th>Výsledek</th></tr>${rows.join('')}</table></div></div>`);
 }
 function teamRow(T,st){const res=st.res&&st.res[T.id||'me'];
   if(res){if(res.skip)return{state:'skip',km:0};return res.fin?{state:'fin',time:res.time+res.pen,pen:res.pen,km:st.km}:{state:'dnf',km:0}}
