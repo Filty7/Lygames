@@ -2691,7 +2691,41 @@ const SCENARIOS = [
     goalShort: 'Vydržet do konce 9. kola a mít aspoň jednu z pěti svící hořící. Monstra svíce zhášejí, lovci je znovu zapalují.' },
 ];
 
-return { MDEF, grpHpPer, CATS, CAT_MECH, SLOTS, PRICE, EQUIP, SHOP_POOL, ABIL, UPCOST, levelOf, HEROES, ROLE, abilityCard, buildDeck, PANIC, WATER, FONT_WATER, LANTERN, HAMMER, LOOT, LOOT_IDS,
+
+// ===== bot Domu: síla skupin a kombinace (simulace v60: poměr způsobeného zranění k referenci) =====
+const GRP_STR = { sluha: 1.0, krysy: 0.82, zbroj: 0.74, polt: 1.13, slimak: 0.94, zalarnik: 0.75, kostlivci: 0.85, ghulove: 1.01, hrobnik: 0.9,
+  kvety: 0.85, mury: 1.12, strasaci: 0.78, oci: 1.1, grimoar: 1.17, panenky: 0.92, kapela: 0.95, havrani: 1.11, vlci: 1.17, carodejnice: 1.01 };
+function grpRoles(t) {
+  const b = (MDEF[t] || {}).base || {}, r = new Set();
+  if (b.hp >= 6 || b.armor > 0) r.add('front');
+  if (b.range >= 3) r.add('ranged');
+  if (b.move >= 5) r.add('fast');
+  if (b.fear > 0 || b.poison) r.add('fear');
+  if (!r.size) r.add('melee');
+  return r;
+}
+const grpUpVal = (ups, t) => { const u = (ups || {})[t] || {}; return (u.hp || 0) + 2 * (u.plus || 0) + 3 * (u.elite || 0); };
+// hodnota sestavy: síla skupin (vylepšené víc) + souhra rolí (tank chrání střelce, rychlí + strach rozbíjejí formaci)
+function comboScore(types, ups) {
+  let v = 0; const roles = new Set();
+  for (const t of types) { v += (GRP_STR[t] || 1) * (1 + 0.15 * grpUpVal(ups, t)); grpRoles(t).forEach(x => roles.add(x)); }
+  v += 0.2 * roles.size;
+  if (roles.has('front') && roles.has('ranged')) v += 0.3;
+  if (roles.has('fast') && roles.has('fear')) v += 0.15;
+  return v;
+}
+// nejlepší sestavy pro daný počet slotů (cost: kolik slotů skupina stojí)
+function bestCombos(cands, slots, ups, cost) {
+  cost = cost || (() => 1); const out = [];
+  const rec = (i, pick, used) => {
+    if (pick.length && (used === slots || i >= cands.length)) { if (used === slots || i >= cands.length) out.push({ types: pick.slice(), v: comboScore(pick, ups) }); if (used === slots) return; }
+    for (let j = i; j < cands.length; j++) { const c = cost(cands[j]); if (used + c > slots) continue; pick.push(cands[j]); rec(j + 1, pick, used + c); pick.pop(); }
+  };
+  rec(0, [], 0);
+  return out.sort((a, b) => b.v - a.v);
+}
+
+return { GRP_STR, grpRoles, comboScore, bestCombos, MDEF, grpHpPer, CATS, CAT_MECH, SLOTS, PRICE, EQUIP, SHOP_POOL, ABIL, UPCOST, levelOf, HEROES, ROLE, abilityCard, buildDeck, PANIC, WATER, FONT_WATER, LANTERN, HAMMER, LOOT, LOOT_IDS,
   OL_CARDS, OL_DECK, OL_VAR, olName, olText, SCENARIOS };
 })();
 if (typeof module !== 'undefined') module.exports = CoreData;
@@ -6480,11 +6514,12 @@ function botSetupPart(G, part, pool) {
     let g = 0; while (C.obelPoolLeft(G) > 0 && g++ < 60) C.setObeliskHp(G, C.pickR(types), 1);
   } else if (part === 'traps') { for (let i = 0, g = 0; i < (G.scen.setupTraps || 0) && g < 40; g++) { const c = C.trapCands(G).filter(x => roomOf(x) !== C.MAP.startRoom); if (!C.toggleSetupTrap(G, C.pickR(c))) i++; } }
   else if (part === 'buy') {
-    // kampaň: skupiny vylepšené za temnou esenci mají přednost
-    const ups = allowed.filter(t => G.grpUp && G.grpUp[t] && !MDEF[t].object).sort((a, b) => upVal(G, b) - upVal(G, a));
-    for (const t of ups) if (!G.groups[t] && C.goldUsed(G) + C.slotCost(t) <= G.budget) C.toggleGroup(G, t);
-    const pre = PRESETS.map(p => p.filter(t => allowed.includes(t))).filter(p => p.length);
-    if (pre.length) C.pickR(pre).forEach(t => { if (!G.groups[t] && C.goldUsed(G) + C.slotCost(t) <= G.budget) C.toggleGroup(G, t); });
+    // nejsilnější sestava, která spolu ladí (role) – vylepšené skupiny z kampaně mají vyšší hodnotu; mírná náhoda mezi top 3
+    const D = C.D || (typeof CoreData !== 'undefined' ? CoreData : require('./data.js'));
+    const cands = allowed.filter(t => !MDEF[t].object && !MDEF[t].obelisk);
+    const free = G.budget - C.goldUsed(G);
+    const combos = D.bestCombos ? D.bestCombos(cands, free, G.grpUp || {}, t => C.slotCost(t)) : [];
+    if (combos.length) { const top = combos.slice(0, 3); const w = C.random(); const ch = w < 0.6 ? top[0] : w < 0.85 ? (top[1] || top[0]) : (top[2] || top[0]); ch.types.forEach(t => { if (!G.groups[t] && C.goldUsed(G) + C.slotCost(t) <= G.budget) C.toggleGroup(G, t); }); }
     for (const t of C.shuffle(allowed.slice())) if (!G.groups[t] && C.goldUsed(G) + C.slotCost(t) <= G.budget) C.toggleGroup(G, t);
   } else if (part === 'place') {
     const ks = G.spots.find(s => s.token === 'key');
@@ -6954,9 +6989,18 @@ function botCore(st) {
   return st.ol.core;
 }
 function botGold(st) {
-  const core = botCore(st); if (!core.length) return;
   const sc = scenById(st.next);
-  const order = core.slice().sort((a, b) => ((sc && (sc.cats || []).includes(D.MDEF[b].cat)) ? 1 : 0) - ((sc && (sc.cats || []).includes(D.MDEF[a].cat)) ? 1 : 0));
+  let order;
+  if (sc) {
+    // vylepšuj tu sestavu, kterou bot v dalším scénáři opravdu nasadí (nejsilnější kombinace jeho prostředí, s ohledem na dosavadní vylepšení)
+    const cands = groupsFor(st).filter(t => (sc.cats || []).includes(D.MDEF[t].cat));
+    const slots = (sc.slots || 3) + (sc.budgetBonus || 0);
+    const best = D.bestCombos(cands, slots, st.ol.grp || {})[0];
+    order = best ? best.types.slice() : [];
+    // přednost skupinám, které se hodí i do dalších zbývajících scénářů
+    const core = botCore(st); order.sort((a, b) => (core.includes(b) ? 1 : 0) - (core.includes(a) ? 1 : 0));
+  } else order = botCore(st);
+  if (!order.length) return;
   let guard = 0;
   while (guard++ < 12 && (st.ol.gold || 0) > 0) {
     let done = false;
