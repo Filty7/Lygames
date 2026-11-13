@@ -2493,7 +2493,7 @@ const SCENARIOS = [
     short: 'Najděte pravý klíč a utečte. Stačí dva.',
     blurb: 'Seance se zvrtla a panství za vámi zabouchlo dveře. Pokoji bloudí služebné přízraky a někde v nábytku leží klíč.',
     goalShort: 'Najít pravý klíč (jeden je falešný) a utéct hlavními dveřmi. Stačí dva lovci.' },
-  { id: 'hlasy', n: 2, map: 'hrbitov', name: 'Hlasy z druhé strany', goal: 'circles', cats: ['hrbitov', 'zahrada'], need: 6, budgetBonus: -1, // v60: monstra vzhůru od 1. kola → o slot méně
+  { id: 'hlasy', n: 2, map: 'hrbitov', name: 'Hlasy z druhé strany', goal: 'circles', cats: ['hrbitov', 'zahrada'], need: 6,
     tokens: ['candle', 'candle', 'trap', 'loot', 'loot'], setup: ['tokens', 'buy', 'place', 'curse'], locks: 0,
     short: 'Honěte zářící kruh a nasbírejte 6 vyvolání.',
     blurb: 'Na hřbitově u svatého Jiljí bloudí duše, které nemohou odejít. Pod náhrobky se táhnou staré krypty.',
@@ -3679,11 +3679,10 @@ async function resolveHeroAttack(G, h, m, spec, C, ui, noLine) {
   h.invis = false; if (!mdef(m).object) m.awake = true;
   const retal = mdef(m).retaliate && dist(h.pos, m.pos) === 1 && !m.dormant ? { elite: !!m.elite } : null;
   const info = attackInfo(G, h, m, spec, extra);
-  // v60: výhoda „na příští útok“ (Svíce naděje / Vedení…) se spotřebuje jen tehdy, když opravdu platila;
-  // zruší-li ji nevýhoda (na dálku zblízka, přízračný cíl, Zlé oko), zůstává na další útok
+  // výhoda „na příští útok“ (Svíce naděje / Vedení…) se spotřebuje prvním útokem, i když ji zruší nevýhoda
   if ((h.advNext || 0) >= G.round) {
-    if (info.adv > 0) h.advSpent = true;
-    else if (!h.advSpent) { log(G, h.name + ': výhodu ruší nevýhoda (' + info.why.join(', ') + '), zůstává na příští útok.'); await ui.anim({ type: 'float', at: h.pos, text: 'Výhoda × nevýhoda', cls: 'info' }); }
+    if (info.adv <= 0 && !h.advSpent) log(G, h.name + ': výhoda a nevýhoda se vyrušily, výhoda je spotřebovaná.');
+    h.advSpent = true;
   }
   let r = rollCheck(info.mods, info.critOn, info.adv);
   if (!r.hit && hasPassive(G, h, 'zajic') && h.zajicRound !== G.round) { h.zajicRound = G.round; log(G, h.name + ': Zaječí tlapka, hází znovu.'); await ui.anim({ type: 'float', at: h.pos, text: 'Zaječí tlapka', cls: 'good' }); r = rollCheck(info.mods, info.critOn, info.adv); }
