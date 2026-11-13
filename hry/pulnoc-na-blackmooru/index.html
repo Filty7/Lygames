@@ -133,7 +133,7 @@ kbd { font: 600 10px var(--f-body); border: 1px solid var(--line-2); border-radi
 @keyframes grab { 0% { transform: scaleY(0); } 35% { transform: scaleY(1.1); } 55% { transform: scaleY(.9); } 80% { transform: scaleY(1); opacity: 1; } 100% { transform: scaleY(0); opacity: 0; } }
 .exit-lbl { font: 700 5px var(--f-body); fill: #e9d9bd; letter-spacing: .2em; }
 .lit, .moon { transition: opacity .6s; }
-.lit.off, .moon.off { opacity: 0; }
+.lit.off, .moon.off { opacity: 0; animation: none; } /* v60: blikání (.flick) dřív přebilo opacity a světla svítila i v mlze */
 .l-light { mix-blend-mode: screen; }
 .heroglow { transition: transform .26s ease-in-out, opacity .4s; opacity: .85; }
 .heroglow.gone { opacity: 0; }
@@ -989,7 +989,7 @@ button.pd-cell { cursor: default; } .pd-cell.full { cursor: pointer; border-styl
 .pd-slot { font-size: 9px; text-transform: uppercase; letter-spacing: .12em; color: var(--muted); }
 .pd-name { font-size: 11px; line-height: 1.15; } .pd-name.empty { color: #5a5460; font-style: italic; }
 .cp-hero .pd-cell.full:hover { background: #2a1a18; }
-.cp-hero .pd-cell.full:hover .pd-name::after { content: " → truhla"; color: #ffb19f; }
+.cp-hero .pd-cell.full:hover .pd-name::after { content: " · karty"; color: #f3cf8e; } /* v60: klik ukáže karty předmětu */
 .cp-abil { display: grid; gap: 8px; }
 .ab-name { font-size: 13px; color: var(--muted); margin: 0 0 4px; } .ab-name b { color: var(--paper); }
 .tree { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 4px; align-items: center; }
@@ -1139,6 +1139,36 @@ button.pd-cell { cursor: default; } .pd-cell.full { cursor: pointer; border-styl
 @media (min-width: 1450px) and (min-height: 760px) { html { zoom: 1.1; } }
 @media (min-width: 1650px) and (min-height: 860px) { html { zoom: 1.18; } }
 @media (min-width: 1950px) and (min-height: 1000px) { html { zoom: 1.3; } }
+
+/* v60: čekání lovců na přípravu Domu (online) */
+.setupwait { position: fixed; inset: 0; z-index: 60; background: radial-gradient(ellipse at 50% 40%, #1b1410 0%, #070505 70%); display: grid; place-items: center; overflow: auto; padding: 24px; }
+.setupwait .sw-box { max-width: 640px; }
+.sw-wait { display: flex; align-items: center; gap: 10px; margin-top: 18px; font: 400 20px var(--f-disp); color: var(--paper); }
+.sw-spin { width: 16px; height: 16px; border-radius: 50%; border: 2px solid #f3cf8e44; border-top-color: #f3cf8e; animation: swspin 1s linear infinite; }
+@keyframes swspin { to { transform: rotate(360deg); } }
+/* v60: kdo je na tahu */
+.turnbanner { position: fixed; left: 50%; top: 22%; transform: translate(-50%, -50%) scale(.96); z-index: 55; pointer-events: none; opacity: 0; transition: opacity .35s, transform .35s; padding: 14px 34px; border-radius: 10px; font: 400 34px var(--f-disp); letter-spacing: .02em; text-align: center; box-shadow: 0 10px 40px #000a; }
+.turnbanner.on { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+.turnbanner.h { background: linear-gradient(#1d2a22ee, #101a14ee); color: #d8f0d0; border: 1px solid #7fbf8a; }
+.turnbanner.o { background: linear-gradient(#2a1414ee, #180a0aee); color: #f3c8c0; border: 1px solid #cf5b45; }
+.turnbanner small { display: block; font: 500 14px var(--f-ui, sans-serif); opacity: .85; margin-top: 4px; letter-spacing: 0; }
+/* v60: Alt = průchodnost polí */
+.passov path.imp { fill: #e0302a; fill-opacity: .42; stroke: #ff6a5a; stroke-width: 1; }
+.passov path.rough { fill: #f0c020; fill-opacity: .36; stroke: #ffe060; stroke-width: 1; }
+.passov-leg { position: fixed; left: 12px; bottom: 12px; z-index: 50; background: #0d0a08e8; color: var(--paper); border: 1px solid #5a4a3a; border-radius: 6px; padding: 6px 10px; font-size: 13px; pointer-events: none; }
+.passov-leg i { display: inline-block; width: 11px; height: 11px; border-radius: 2px; margin: 0 4px -1px 8px; }
+.grp-cat { display: inline-block; width: fit-content; font-size: 11px; padding: 0 6px; border-radius: 8px; background: #2a2018; border: 1px solid #5a4a3a; margin: 1px 6px 1px 0; color: #e8d8b8; }
+.grp-cat.next { background: #3a2a10; border-color: #d79e48; color: #ffe0a0; }
+.cp-nextbar { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin: 6px 0 10px; padding: 8px 12px; border: 1px solid #5a4a3a; border-radius: 8px; background: #16110d; }
+.cp-nextbar b { color: var(--paper); }
+.olpiles { display: flex; flex-wrap: wrap; gap: 4px 10px; align-items: center; margin: 2px 0 6px; }
+.olpiles span { display: inline-flex; gap: 3px; align-items: center; white-space: nowrap; }
+.olpiles svg { width: 14px; height: 14px; }
+.shopit.buycard .bc-olcard { display: grid; place-items: center; width: 40px; height: 40px; border-radius: 6px; background: #2a1414; border: 1px solid #cf5b45; }
+.shopit.buycard .bc-olcard svg { width: 24px; height: 24px; }
+.cp-insp { margin: 8px 0; padding: 8px; border: 1px solid #d79e48; border-radius: 8px; background: #1a130d; }
+.cp-insp .si-cards { display: flex; flex-wrap: wrap; gap: 6px; margin: 6px 0; }
+.cp-insp .cp-h { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
 </style>
 
 <div id="menu">
@@ -1187,7 +1217,10 @@ button.pd-cell { cursor: default; } .pd-cell.full { cursor: pointer; border-styl
       <label class="chk"><input type="checkbox" id="follow" checked> Kamera sleduje</label>
       <div class="pop-row"><button class="btn icon" id="sndbtn" aria-label="Zvuky"></button><span>Zvuky</span><button class="btn icon" id="musbtn" aria-label="Hudba"></button><span>Hudba</span></div>
       <button class="btn sm" id="legbtn">Legenda</button>
+      <button class="btn sm" id="briefbtn">Zadání scénáře</button>
       <button class="btn sm" id="savebtn">Uložit hru</button>
+      <button class="btn sm" id="dlbtn">Stáhnout uložení</button>
+      <button class="btn sm" id="ulbtn">Nahrát uložení ze souboru</button>
       <button class="btn sm" id="newgame">Odejít do menu</button>
     </div></div>
   </header>
@@ -1276,7 +1309,7 @@ MAPS.blackmoor = {
 };
 
 MAPS.hrbitov = {
-  id: 'hrbitov', name: 'Hřbitov u svatého Jiljí', cols: 20, rows: 15, theme: 'yard', revealAll: true, wakeRound: 2,
+  id: 'hrbitov', name: 'Hřbitov u svatého Jiljí', cols: 20, rows: 15, theme: 'yard', revealAll: true, wakeRound: 1, // v60: celá mapa je vidět → monstra jsou vzhůru od začátku
   rooms: [
     { id: 'T', name: 'Starý hřbitov', k0: 0, k1: 7, y0: 0, y1: 4, floor: 'grass', wall: 'fence', outdoor: true },
     { id: 'K', name: 'Zřícená kaple', k0: 7, k1: 13, y0: 0, y1: 4, floor: 'flag', wall: 'fence', outdoor: true },
@@ -2033,7 +2066,7 @@ const EQUIP = {
     ['Čichací sůl', { t: 'heal', range: 2, n: 2 }, mv(3)],
     ['Kapky na nervy', { t: 'cleanse', range: 1, n: 3, heal: 0 }, SE]] },
   svice: { name: 'Černá svíce', slot: 'telo', tier: 0, cards: [
-    ['Bludička', { t: 'fire', range: 3, area: true, dmg: 2, light: true }, mv(3)],
+    ['Bludička', { t: 'fire', range: 3, area: true, dmg: 1, light: true }, mv(3)],
     ['Poutací kruh', { t: 'rootarea', range: 4 }, mv(3)],
     ['Svíce naděje', { t: 'guide', range: 3, armor: 0 }, mv(3)]] },
   brokovnice: { name: 'Dvouhlavňová brokovnice', slot: 'obourucni', tier: 0, cards: [
@@ -2079,7 +2112,7 @@ const EQUIP = {
     ['Švih řetězem', { t: 'attack', range: 1, dmg: 3, mod: 1, pushAdj: 1 }, mv(3)],
     ['Zakotvit', { t: 'rootone', range: 3 }, mv(2)]] },
   lucerna2: { name: 'Lucerna s modrým plamenem', slot: 'ruka', tier: 2, cards: [
-    ['Modrý plamen', { t: 'fire', range: 3, len: 2, dmg: 2, light: true }, mv(3)],
+    ['Modrý plamen', { t: 'fire', range: 3, len: 2, dmg: 1, light: true }, mv(3)],
     ['Spálit', { t: 'attack', range: 2, dmg: 3, mod: 1, burn: true, holy: true }, mv(3)],
     ['Světlo naděje', { t: 'cleanse', range: 3, n: 1 }, { t: 'lightmove', n: 3 }]] },
   krucifix: { name: 'Krucifix', slot: 'ruka', tier: 1, cards: [
@@ -2189,7 +2222,7 @@ const EQUIP = {
   medaile: { name: 'Plukovní medaile', slot: 'trinket', tier: 2, build: 'Bašta', passive: 'Na začátku svého tahu získáš 1 armor.', cards: [] },
   prezka: { name: 'Olověná přezka', slot: 'trinket', tier: 2, build: 'Nehybný', passive: 'Útoky zblízka +1 dmg, pokud ses v tomto tahu nepohnul.', cards: [] },
   jizva: { name: 'Jizva po drápu', slot: 'trinket', tier: 2, build: 'Zuřivost', passive: 'Na konci svého tahu se vyléčíš o 1.', cards: [] },
-  zub: { name: 'Zub mrtvého', slot: 'trinket', tier: 2, build: 'Panika', passive: 'Zbavit se Paniky tě nestojí žádnou akci (jinou kartu odhodit musíš).', cards: [] },
+  zub: { name: 'Zub mrtvého', slot: 'trinket', tier: 2, build: 'Panika', passive: 'Zbavit se Paniky stojí jen 1 akci, žádnou další kartu odhazovat nemusíš.', cards: [] },
   ruzenec: { name: 'Růženec', slot: 'trinket', tier: 2, build: 'Požehnání', passive: 'Na konci tvého tahu mají lovci do 4 polí (i ty) −1 Strach.', cards: [] },
   pouto: { name: 'Pouto duší', slot: 'trinket', tier: 3, rare: true, build: 'Požehnání', passive: 'Každé léčení, které dáváš, léčí o 1 víc.', cards: [] },
   nabijecka: { name: 'Nabíječka', slot: 'trinket', tier: 2, build: 'Pozice', passive: 'Útoky na cíl ve vzdálenosti 4 a víc mají +1 dmg.', cards: [] },
@@ -2460,7 +2493,7 @@ const SCENARIOS = [
     short: 'Najděte pravý klíč a utečte. Stačí dva.',
     blurb: 'Seance se zvrtla a panství za vámi zabouchlo dveře. Pokoji bloudí služebné přízraky a někde v nábytku leží klíč.',
     goalShort: 'Najít pravý klíč (jeden je falešný) a utéct hlavními dveřmi. Stačí dva lovci.' },
-  { id: 'hlasy', n: 2, map: 'hrbitov', name: 'Hlasy z druhé strany', goal: 'circles', cats: ['hrbitov', 'zahrada'], need: 6,
+  { id: 'hlasy', n: 2, map: 'hrbitov', name: 'Hlasy z druhé strany', goal: 'circles', cats: ['hrbitov', 'zahrada'], need: 6, budgetBonus: -1, // v60: monstra vzhůru od 1. kola → o slot méně
     tokens: ['candle', 'candle', 'trap', 'loot', 'loot'], setup: ['tokens', 'buy', 'place', 'curse'], locks: 0,
     short: 'Honěte zářící kruh a nasbírejte 6 vyvolání.',
     blurb: 'Na hřbitově u svatého Jiljí bloudí duše, které nemohou odejít. Pod náhrobky se táhnou staré krypty.',
@@ -2707,7 +2740,7 @@ function describeBoost(s) {
 }
 function describe0(s) {
   if (!s) return '';
-  if ((s.t === 'salt' || s.t === 'fire') && s.area) return (s.light ? 'Zruš Tmu; ' : '') + (s.t === 'salt' ? 'Sůl' : 'Oheň (monstrům ' + FIRE_DMG + ' dmg, lovcům ' + FIRE_DMG_H + ')') + ' na pole do ' + s.range + ' ve výhledu a všechna sousední' + (s.t === 'salt' ? '. Monstra do soli nevstoupí a v soli nemohou útočit; lovce stojícího v soli napadají s nevýhodou' : '. Kdo na něm stojí nebo do něj vstoupí, utrží zranění') + '. Do konce příštího kola';
+  if ((s.t === 'salt' || s.t === 'fire') && s.area) return (s.light ? 'Zruš Tmu; ' : '') + (s.t === 'salt' ? 'Sůl' : 'Oheň (' + FIRE_DMG + ' dmg všem)') + ' na pole do ' + s.range + ' ve výhledu a všechna sousední' + (s.t === 'salt' ? '. Monstra do soli nevstoupí a v soli nemohou útočit; lovce stojícího v soli napadají s nevýhodou. Do konce kola' : '. Kdo na něm stojí (i lovci), hned utrží ' + FIRE_DMG + '; znovu při vstupu a na konci tahu v ohni. Do konce příštího kola');
   if (s.t === 'blast') return (s.one === false ? 'Všechna monstra' : 'Monstrum') + ' do ' + s.range + ' odstrč o ' + s.n + (s.dmg ? ', ' + s.dmg + ' dmg (bez hodu)' : '') + (s.root ? ', přišpendlí' : '') + (s.disNext ? ', příští útok s nevýhodou' : '') + (s.mark ? ', Označí' : '') + '. Narazí-li, je omráčené';
   if (s.t === 'yank') return (s.all ? 'Monstra' : s.n > 1 ? s.n + ' monstra' : 'Monstrum') + ' do ' + s.range + ' ve výhledu přitáhni o ' + s.pull + (s.disarm ? (s.disarmN ? ', až ' + s.disarmN + ' náhodná z nich odzbroj' : ', odzbroj') : '') + (s.perHex ? '; za každé pole přitažení utrží ' + s.perHex : '') + (s.dmgEach ? '; každé přitažené utrží ' + s.dmgEach : '');
   if (s.t === 'recall') return 'Další karta, kterou v tomto tahu zahraješ, se ti po zahrání vrátí do ruky (ne Panika ani jednorázové)';
@@ -2805,7 +2838,7 @@ function describe0(s) {
     case 'dash': return s.n + ' pohyb skrz nepřátele, pak lízni ' + s.draw + ' kartu';
     case 'blind': return 'Monstra do ' + s.range + ' ve výhledu v příští aktivaci nemohou útočit';
     case 'rally': return 'Lovci do ' + s.range + ' (i ty): Strach −' + s.fear + ' a +' + s.mod + ' k útokům' + (s.dmg ? ' a +' + s.dmg + ' dmg' : '') + ' do konce kola' + (s.seeAll ? '; všichni vidí neviditelné' : '') + (s.noEv ? '; monstra v dosahu ztrácí únik' : '') + (s.ghostDmg ? ', +' + s.ghostDmg + ' dmg proti duchům' : '') + (s.draw ? '; každý lízne ' + s.draw : '') + (s.peekAny ? '; zjisti obsah jednoho místa kdekoli' : '') + (s.extraPlay ? '; jeden lovec má příště 4 zahrání' : '') + (s.selfFear ? '; ty +' + s.selfFear + ' Strach' : '');
-    case 'fire': return (s.light ? 'Zruš Tmu; ' : '') + 'Oheň na ' + s.len + ' sousedící pole do dosahu ' + s.range + ' (výhled). Kdo na něm stojí nebo do něj vstoupí, utrží zranění (monstrum ' + FIRE_DMG + ', lovec ' + FIRE_DMG_H + '). Do konce příštího kola';
+    case 'fire': return (s.light ? 'Zruš Tmu; ' : '') + 'Oheň na ' + s.len + ' sousedící pole do dosahu ' + s.range + ' (výhled). Kdo na něm stojí (i lovci), hned utrží ' + FIRE_DMG + '; znovu při vstupu a na konci tahu v ohni. Do konce příštího kola';
     case 'shove': return (s.all ? 'Odstrč všechna sousední monstra' : 'Odstrč sousední monstrum') + ' o ' + s.n + ' pole. Narazí-li, je omráčené a utrží ' + (s.collide || 1) + ' dmg';
     case 'light': return 'Zruš Tmu v místnosti a lízni 1 kartu';
     case 'grenade': return 'Hoď do dosahu ' + s.range + ' (potřebuješ výhled, monstra ho neblokují): cíl ' + s.dmg + ' dmg, sousední pole ' + s.splash + ' dmg, i lovci. ' + sgn(s.mod) + ', hod pro každého';
@@ -2814,7 +2847,7 @@ function describe0(s) {
     case 'discipline': return 'Vyhoď Paniku z ruky mimo hru a lízni 1';
     case 'sense': return s.range ? 'Prohlédni žeton místa do vzdálenosti ' + s.range : 'Odhal nejbližší žeton hledání, u kterého ještě nevíš, co skrývá (kdekoli, vzdušnou čarou)';
     case 'reveal': return 'Monstra do ' + s.range + ' ztrácí do konce kola únik, neviditelná se odhalí' + (s.ally ? '; lovci do ' + s.ally + ' +1 k útokům do konce kola' : '');
-    case 'salt': if (s.around) return 'Sůl na všechna pole kolem tebe (i pod monstra). Monstra do soli nevstoupí a v soli nemohou útočit. Do konce příštího kola' + (s.calm ? '. Lovci stojící na té soli −' + s.calm + ' Strach' : ''); return 'Sůl na ' + s.len + ' sousedící pole do dosahu ' + s.range + ' (i pod monstra). Monstra do soli nevstoupí a v soli nemohou útočit. Do konce příštího kola';
+    case 'salt': if (s.around) return 'Sůl na všechna průchozí pole kolem tebe (i pod monstra). Monstra do soli nevstoupí a v soli nemohou útočit. Do konce kola' + (s.calm ? '. Lovci stojící na té soli −' + s.calm + ' Strach' : ''); return 'Sůl na ' + s.len + ' sousedící průchozí pole do dosahu ' + s.range + ' (i pod monstra). Monstra do soli nevstoupí a v soli nemohou útočit. Do konce kola';
     case 'flee': return 'Odhoď 1 kartu z ruky a lízni 1';
     case 'voice': return 'Spoluhráč do vzdálenosti ' + s.range + ' vyhodí Paniku z ruky';
     case 'calm': return 'Sniž Strach libovolného lovce o 1';
@@ -2866,6 +2899,74 @@ function newGame(opts) {
   for (let i = 0; i < 4; i++) olDraw(G);
   return G;
 }
+// v60: načtená (uložená) hra převezme aktuální data: karty lovců se znovu sestaví ze šablon (podle id předmětu / schopnosti
+// a jména karty), zůstane jim uid a to, v jakém balíčku/ruce/discardu jsou; lovci dostanou aktuální zdraví/odvahu ze své definice;
+// monstrům se zdraví ořízne na aktuální maximum (staty se počítají vždy živě z MDEF); karty Domu jsou jen id + varianta.
+// Vrací souhrn { cards, unknown, heroes, monsters, ol } (počty) pro log/testy.
+const CARD_STATIC = new Set(['item', 'itemName', 'name', 'pri', 'sec', 'hero', 'ability', 'abKey', 'abCat', 'abLevel', 'panic', 'single', 'loot', 'scenWater', 'cursed']);
+for (const id of Object.keys(EQUIP)) for (const c of EQUIP[id].cards) if (c[3]) Object.keys(c[3]).forEach(k => CARD_STATIC.add(k));
+function cardTemplate(G, h, c, idxInItem) {
+  if (!c) return null;
+  if (c.panic) return PANIC;
+  if (c.loot && D.LOOT[c.loot]) return D.LOOT[c.loot];
+  if (c.ability && c.hero && ABIL[c.hero]) {
+    const ab = ABIL[c.hero].find(a => a.key === c.abKey); if (!ab) return null;
+    const lo = G.loadouts && G.loadouts[c.hero], v = (lo && lo.abil && lo.abil[c.abKey]) || '';
+    return D.abilityCard(c.hero, ab, ab.tree[v] ? v : '');
+  }
+  if (c.item === 'voda') return WATER;
+  if (c.item === 'kasna') return D.FONT_WATER;
+  if (c.item === 'kladivo') return HAMMER;
+  if (c.item === 'lucernaN') return LANTERN;
+  const e = EQUIP[c.item]; if (!e || !e.cards.length) return null;
+  let row = e.cards.find(r => r[0] === c.name);
+  if (!row && idxInItem != null && e.cards[idxInItem]) row = e.cards[idxInItem];
+  if (!row) return null;
+  const [name, pri, sec, extra] = row;
+  return Object.assign({ item: c.item, itemName: e.name + ' · ' + SLOTS[e.slot], name, pri, sec }, extra || {});
+}
+function rehydrate(G) {
+  const rep = { cards: 0, unknown: 0, heroes: 0, monsters: 0, ol: 0 };
+  if (!G || !G.heroes) return rep;
+  for (const h of G.heroes) {
+    const def = HEROES.find(d => d.id === h.id);
+    if (def) {
+      h.def = def; h.name = def.name;
+      const lo = G.loadouts && G.loadouts[h.id], eqs = (lo && lo.equip) || [];
+      const mx = def.hp, dHp = mx - (h.maxHp || mx);
+      if (dHp) { h.maxHp = mx; if (!h.downed) h.hp = Math.max(1, Math.min(mx, h.hp + dHp)); }
+      h.hp = Math.min(h.hp, h.maxHp);
+      h.courage = def.courage + (eqs.includes('medailon') ? 1 : 0);
+      rep.heroes++;
+    }
+    // pořadí karet stejného předmětu podle uid = pořadí v buildDeck (náhradní párování, když se karta přejmenovala)
+    const piles = ['deck', 'hand', 'discard', 'removed'].filter(p => Array.isArray(h[p]));
+    const all = piles.flatMap(p => h[p]);
+    const idxOf = new Map();
+    const byItem = {};
+    all.filter(c => c && !c.ability && !c.panic && !c.loot).forEach(c => { (byItem[c.item] = byItem[c.item] || []).push(c); });
+    Object.values(byItem).forEach(arr => arr.sort((a, b) => (a.uid || 0) - (b.uid || 0)).forEach((c, i) => idxOf.set(c, i)));
+    for (const p of piles) h[p] = h[p].map(c => {
+      const t = cardTemplate(G, h, c, idxOf.get(c));
+      if (!t) { rep.unknown++; return c; }
+      const keep = {}; for (const k of Object.keys(c)) if (!CARD_STATIC.has(k)) keep[k] = c[k];
+      rep.cards++;
+      return Object.assign({}, t, keep);
+    });
+  }
+  // monstra: staty jsou živé (stats() z MDEF + vylepšení skupin), uložené je jen aktuální zdraví → ořízni na nové maximum
+  for (const m of G.monsters || []) {
+    if (!MDEF[m.type]) continue;
+    if (MDEF[m.type].object || m.maxHp) continue; // obelisky, zrcadla: zdraví z přípravy
+    const mx = stats(m).hp; if (mx && m.hp > mx) m.hp = mx;
+    rep.monsters++;
+  }
+  // karty Domu: jen id + varianta; neznámá id (vyřazené karty) zahoď
+  if (G.ol) for (const p of ['deck', 'hand', 'discard']) { const before = (G.ol[p] || []).length; G.ol[p] = (G.ol[p] || []).filter(c => c && OL_CARDS[c.id]); rep.ol += G.ol[p].length; rep.unknown += before - G.ol[p].length; }
+  // parametry scénáře
+  if (G.scen) { G.maxRound = G.scen.maxRound || G.maxRound || 12; if (G.scen.goal === 'cleanse' && !G.scen.need) G.scen = Object.assign({}, G.scen, { need: G.spots.length }); }
+  return rep;
+}
 // Deník: záznam = { r: kolo, t: text, a?: aktér ('h:<lovec>' | 'g:<skupina>' | 'ol'), c?: odkaz na kartu }
 // c = { k: 'h', o: <lovec>, u: <uid>, n: <jméno> } | { k: 'ol', id, v, n } – čisté JSON (online sync, uložené hry)
 const LOG_MAX = 1500;
@@ -2898,6 +2999,7 @@ const hasPassive = (G, h, id) => { const lo = G.loadouts && G.loadouts[h.id]; re
 const vargaAura = (G, vg) => 3;
 // Pouto duší: léčení, které nositel dává, je o 1 vyšší
 const healBy = (G, h, n) => n > 0 && h && hasPassive(G, h, 'pouto') ? n + 1 : n;
+const ADV_KEEP = 9999; // advNext = ADV_KEEP: výhoda na příští útok bez časového omezení
 const ATK_TYPES = new Set(['attack', 'lunge', 'charge', 'sweep', 'swapatk', 'crossfire', 'grenade']);
 // stavy: negativní u monster (pro ×2), pozitivní u lovců
 const isMarked = (G, m) => (m.markedUntil || -1) >= G.round;
@@ -3045,8 +3147,9 @@ function healMonster(G, m, n) {
   if (m.bleed) m.bleed = 0;
   const k = Math.max(0, Math.min(n || 0, stats(m).hp - m.hp)); m.hp += k; return k;
 }
-const FIRE_DMG = 2; // oheň dává monstrům 2
-const FIRE_DMG_H = 1; // v59: lovcům dává oheň všude jen 1 (vstup, konec tahu, nově hořící pole)
+// v60: oheň dává 1 zranění VŠEM (lovcům i monstrům): při vstupu, konci tahu/aktivace v ohni a když pole pod nimi chytne
+const FIRE_DMG = 1;
+const FIRE_DMG_H = 1;
 // pasti (lovecké i Domu) nefungují na létající figurky
 const trapImmune = f => !!(f && !f.def && (mdef(f).flying || mdef(f).object));
 // karta „vrátí se do ruky“: další (způsobilá) karta zahraná v tomto tahu se po zahrání vrátí do ruky
@@ -3075,8 +3178,8 @@ function addFear(G, h, n) {
   h.fear += n; let np = 0;
   while (h.fear >= h.courage) {
     h.fear -= h.courage; np++;
-    h.discard.push(Object.assign({}, PANIC, { uid: uid() }));
-    log(G, h.name + ' propadá panice. Do discardu jde Panika.');
+    h.hand.push(Object.assign({}, PANIC, { uid: uid() })); // v60: nová Panika jde rovnou do ruky
+    log(G, h.name + ' propadá panice. Do ruky dostává Paniku.');
     if (G.fx) G.fx.push({ t: 'panic', hero: h.id });
   }
   return np;
@@ -3092,6 +3195,8 @@ function damageHero(G, h, n, cause) {
   h.hp = Math.max(0, h.hp - n);
   if (h.hp === 0) {
     h.downed = true; log(G, h.name + ' padá k zemi.');
+    // v60: sražený lovec = odměna pro Dům: líže 1 kartu (ne když se lovec zranil sám vlastní kartou)
+    if (cause !== 'self' && G.phase !== 'setup' && G.ol && G.ol.hand.length < OL_HAND_MAX && (G.ol.deck.length || G.ol.discard.length)) { olDraw(G); log(G, 'Dům za sraženého lovce líže kartu.', { a: 'ol' }); }
     const w = h.hand.filter(c => c.scenWater); if (w.length) { h.hand = h.hand.filter(c => !c.scenWater); h.removed.push(...w); log(G, h.name + ': svěcená voda z kašny se rozlila.'); }
     clearHeroStatus(G, h);
     if (cause === 'dot' && h.acted && !isActiveFig(G, h)) {
@@ -3109,7 +3214,7 @@ function revive(G, t) {
 // lovec vstane sám: polovina zdraví, v tomto tahu už jen 1 akce, dostane Paniku
 function standUp(G, h) {
   h.downed = false; h.hp = Math.ceil(h.maxHp / 2); h.plays = 2;
-  h.discard.push(Object.assign({}, PANIC, { uid: uid() }));
+  h.hand.push(Object.assign({}, PANIC, { uid: uid() }));
   if (G.fx) G.fx.push({ t: 'panic', hero: h.id });
   log(G, h.name + ' se sám zvedá (' + h.hp + ' zdraví), zbývá mu 1 akce a dostává Paniku.');
 }
@@ -3297,19 +3402,27 @@ async function enterHeroTrap(G, m, hex, ui) {
   return true;
 }
 // oheň zraňuje při vstupu (lovce i monstra); vrací true, když lovec padl
-async function enterFire(G, who, hex, ui, isMon) {
+async function enterFire(G, who, hex, ui, isMon, why, cause) {
   const f = fireAt(G, hex); if (!f) return false;
   if (isMon) {
-    if (mdef(who).fireImmune || mdef(who).flying) return false;
-    who.hp -= FIRE_DMG; who.noRegenRound = G.round; log(G, mname(who) + ' vstoupil do ohně: −' + FIRE_DMG + '.');
+    if (mdef(who).fireImmune || mdef(who).flying || mdef(who).object) return false;
+    who.hp -= FIRE_DMG; who.noRegenRound = G.round; log(G, mname(who) + ' ' + (why || 'vstoupil do ohně') + ': −' + FIRE_DMG + '.');
     if (G.fx) G.fx.push({ t: 'burn', at: hex });
     await ui.anim({ type: 'float', at: hex, text: 'Oheň −' + FIRE_DMG, cls: 'dmg' });
     if (who.hp <= 0) { killMonster(G, who); await ui.anim({ type: 'kill', who: 'm:' + who.uid }); return true; }
     return false;
   }
-  damageHero(G, who, FIRE_DMG_H); log(G, who.name + ' vstoupil do ohně: −' + FIRE_DMG_H + '.');
+  if (who.downed || who.escaped) return false;
+  damageHero(G, who, FIRE_DMG_H, cause); log(G, who.name + ' ' + (why || 'vstoupil do ohně') + ': −' + FIRE_DMG_H + '.');
   await ui.anim({ type: 'float', at: hex, text: 'Oheň −' + FIRE_DMG_H, cls: 'dmg' });
+  burnCheck(G);
   return who.downed;
+}
+// v60: pole právě chytlo (karta, výbuch dýně…) → kdo na něm stojí, lovec i monstrum, utrží 1
+async function igniteHit(G, hex, ui, hit) {
+  const mm = monsterAt(G, hex), hh = heroAt(G, hex);
+  if (mm && !(hit && hit.has(mm))) { if (hit) hit.add(mm); await enterFire(G, mm, hex, ui, true, 'hoří'); }
+  if (hh && !(hit && hit.has(hh))) { if (hit) hit.add(hh); await enterFire(G, hh, hex, ui, false, 'stojí v plamenech', 'self'); }
 }
 async function doSearch(G, h, s, C, ui) {
   const t = s.resolved ? null : s.token;
@@ -3566,6 +3679,12 @@ async function resolveHeroAttack(G, h, m, spec, C, ui, noLine) {
   h.invis = false; if (!mdef(m).object) m.awake = true;
   const retal = mdef(m).retaliate && dist(h.pos, m.pos) === 1 && !m.dormant ? { elite: !!m.elite } : null;
   const info = attackInfo(G, h, m, spec, extra);
+  // v60: výhoda „na příští útok“ (Svíce naděje / Vedení…) se spotřebuje jen tehdy, když opravdu platila;
+  // zruší-li ji nevýhoda (na dálku zblízka, přízračný cíl, Zlé oko), zůstává na další útok
+  if ((h.advNext || 0) >= G.round) {
+    if (info.adv > 0) h.advSpent = true;
+    else if (!h.advSpent) { log(G, h.name + ': výhodu ruší nevýhoda (' + info.why.join(', ') + '), zůstává na příští útok.'); await ui.anim({ type: 'float', at: h.pos, text: 'Výhoda × nevýhoda', cls: 'info' }); }
+  }
   let r = rollCheck(info.mods, info.critOn, info.adv);
   if (!r.hit && hasPassive(G, h, 'zajic') && h.zajicRound !== G.round) { h.zajicRound = G.round; log(G, h.name + ': Zaječí tlapka, hází znovu.'); await ui.anim({ type: 'float', at: h.pos, text: 'Zaječí tlapka', cls: 'good' }); r = rollCheck(info.mods, info.critOn, info.adv); }
   let base = info.dmg;
@@ -3639,7 +3758,9 @@ async function heroAttack(G, h, card, spec, C, ui) {
 }
 
 // ---------- validace a efekty karet ----------
-function saltHexes(G, h, range) { return ROOM_HEXES.filter(x => G.revealed.has(roomOf(x)) && dist(x, h.pos) <= range && !isBlock(x) && !saltAt(G, x)); }
+// v60: sůl jen na průchozí pole (ne nábytek, zdi, ploty, vchody krypt, obelisky a jiné objekty)
+const saltable = (G, x) => !!roomOf(x) && isPlayable(x) && !isBlock(x) && !isWallHex(x) && !isFence(x) && !G.monsters.some(m => mdef(m).object && eq(m.pos, x));
+function saltHexes(G, h, range) { return ROOM_HEXES.filter(x => G.revealed.has(roomOf(x)) && dist(x, h.pos) <= range && saltable(G, x) && !saltAt(G, x)); }
 // Nálezy: obsah žetonu „loot“ se losuje až při nalezení / nahlédnutí (bez opakování v rámci scénáře, pokud to jde)
 function drawLoot(G, sp) {
   const all = D.LOOT_IDS || []; if (!all.length) return null;
@@ -3737,8 +3858,8 @@ function lightRooms(G, rooms, who) {
 }
 function cannotPlay(G, h, card, half) {
   if (h.downed) return 'Ležíš na zemi. Nejdřív vstaň.';
-  // v59: zbavit se Paniky stojí 1 akci + odhození jiné karty; se Zubem mrtvého žádnou akci (odhodit kartu musíš)
-  if (card.panic) return !hasPassive(G, h, 'zub') && h.plays >= 3 + (h.bonusThis || 0) ? 'Zbavit se Paniky stojí 1 akci a už žádnou nemáš.' : !h.hand.some(c => c !== card && !c.panic) ? 'Potřebuješ v ruce ještě jednu kartu (ne Paniku), kterou odhodíš.' : null;
+  // v59: zbavit se Paniky stojí 1 akci + odhození jiné karty; v60: se Zubem mrtvého jen tu akci (bez odhození)
+  if (card.panic) return h.plays >= 3 + (h.bonusThis || 0) ? 'Zbavit se Paniky stojí 1 akci a už žádnou nemáš.' : !hasPassive(G, h, 'zub') && !h.hand.some(c => c !== card && !c.panic) ? 'Potřebuješ v ruce ještě jednu kartu (ne Paniku), kterou odhodíš.' : null;
   if (h.plays >= 3 + (h.bonusThis || 0)) return 'Už jsi zahrál všechny karty.';
   let s = card[half];
   if (h.shotgunLocked && card.item === 'brokovnice') return 'Po Obou hlavních už brokovnici tento tah nezahraješ.';
@@ -3811,6 +3932,12 @@ function cannotPlay(G, h, card, half) {
 }
 async function resolveCard(G, h, card, half, C, ui) {
   if (card.panic) {
+    // v60: se Zubem mrtvého stojí Panika akci, ale žádnou další kartu odhazovat nemusíš
+    if (hasPassive(G, h, 'zub')) {
+      G.threat += PANIC_BURN_THREAT; G.fx.push({ t: 'threat', n: PANIC_BURN_THREAT, hero: h.id });
+      log(G, h.name + ' ničí Paniku (Zub mrtvého: bez odhození karty). Dům +' + PANIC_BURN_THREAT + ' Hrozba.');
+      return true;
+    }
     const d = await C.H.chooseTarget(G, h, { kind: 'hand', cands: h.hand.filter(c => c !== card && !c.panic), card, spec: card.pri, panicBurn: true });
     if (!d) return false;
     h.hand = h.hand.filter(c => c !== d); h.discard.push(d);
@@ -3844,7 +3971,7 @@ async function resolveCard(G, h, card, half, C, ui) {
   if (!s._post && (s.selfDmg || (s.selfFear && s.t !== 'rally') || s.spendArmor || s.advNext || s.lifesteal)) {
     const ok = await resolveCard(G, h, Object.assign({}, card, { [half]: Object.assign({}, s, { _post: 1 }) }), half, C, ui);
     if (ok) {
-      if (s.selfDmg) { damageHero(G, h, s.selfDmg); log(G, h.name + ' platí krví: −' + s.selfDmg + ' zdraví.'); await ui.anim({ type: 'float', at: h.pos, text: '−' + s.selfDmg + ' ♥', cls: 'dmg' }); }
+      if (s.selfDmg) { damageHero(G, h, s.selfDmg, 'self'); log(G, h.name + ' platí krví: −' + s.selfDmg + ' zdraví.'); await ui.anim({ type: 'float', at: h.pos, text: '−' + s.selfDmg + ' ♥', cls: 'dmg' }); }
       if (s.selfFear && s.t !== 'rally') { addFear(G, h, s.selfFear); await ui.anim({ type: 'float', at: h.pos, text: '+' + s.selfFear + ' strach', cls: 'dmg' }); }
       if (s.spendArmor) h.armorUp = null;
     }
@@ -3967,8 +4094,8 @@ async function resolveCard(G, h, card, half, C, ui) {
       if (s.all) os = cand; else { const o = await pick('hero', cand); if (!o) return false; os = [o]; }
       if (!os.length) return false;
       for (const o of os) {
-        // výhoda na příští útok: kdo už v tomto kole hrál, má ji i v příštím kole
-        if (s.round) o.advRound = G.round; else o.advNext = o !== h && o.acted ? G.round + 1 : G.round;
+        // v60: výhoda na příští útok platí, dokud ji lovec opravdu nevyužije (i přes konec kola); padnutím se ztratí
+        if (s.round) o.advRound = G.round; else o.advNext = ADV_KEEP;
         if (s.armor) addArmor(G, o, s.armor);
         if (s.extra) o.bonusPlays = 1;
         await ui.anim({ type: 'float', at: o.pos, text: s.extra ? '+1 akce' : 'Výhoda' + (s.armor ? ', armor +' + s.armor : ''), cls: 'good' });
@@ -4012,7 +4139,7 @@ async function resolveCard(G, h, card, half, C, ui) {
       const extra = hasPassive(G, h, 'pouto') ? 1 : 0;
       G.summons = G.summons || [];
       G.summons.push({ uid: uid(), owner: h.id, kind: 'monster', type: m.type, name: mdef(m).unit || mdef(m).name, pos: m.pos.slice(), dmg: st.dmg + extra, mod: st.mod || 0, move: Math.max(3, st.move), until: G.round + s.rounds - 1 + extra });
-      damageHero(G, h, hp);
+      damageHero(G, h, hp, 'self');
       log(G, h.name + ' ovládá ' + mname(m) + ' a platí ' + hp + ' zdraví.');
       await ui.anim({ type: 'kill', who: 'm:' + m.uid }); await ui.anim({ type: 'float', at: h.pos, text: '−' + hp + ' ♥', cls: 'dmg' });
       return true;
@@ -4020,7 +4147,7 @@ async function resolveCard(G, h, card, half, C, ui) {
     case 'move': { if (s.quiet) h.quietRound = G.round; if (s.noDarkFear) h.noDarkRound = G.round; const r = await heroMove(G, h, s.n, C, ui, s.phase); return r || !!(s.quiet || s.noDarkFear); }
     case 'attack': return heroAttack(G, h, card, s, C, ui);
     case 'search': { const sp = await pick('spot', spotsWithin(G, h, s.range || 1)); if (!sp) return false; await doSearch(G, h, sp, C, ui); return true; }
-    case 'cursed': { damageHero(G, h, 1); log(G, h.name + ' se zmítá v posedlosti: 1 zranění.'); await ui.anim({ type: 'float', at: h.pos, text: 'Posedlost −1', cls: 'dmg' }); return true; }
+    case 'cursed': { damageHero(G, h, 1, 'self'); log(G, h.name + ' se zmítá v posedlosti: 1 zranění.'); await ui.anim({ type: 'float', at: h.pos, text: 'Posedlost −1', cls: 'dmg' }); return true; }
     case 'beam': {
       lightRooms(G, zonesOf(h.pos));
       const ms = monstersInSight(G, h, s.range); ms.forEach(m => { m.noEvRound = G.round; m.visibleRound = G.round; });
@@ -4280,7 +4407,7 @@ async function resolveCard(G, h, card, half, C, ui) {
       for (const o of G.heroes.filter(o => !o.escaped && !o.downed && dist(o.pos, center) === 1)) {
         const mods = s.mod ? [{ label: 'výbuch', v: s.mod }] : [], r = rollCheck(mods), dmg = r.hit ? Math.max(0, s.splash * (r.crit ? 2 : 1) - heroArmor(G, o)) : 0;
         await ui.anim({ type: 'roll', at: o.pos, roll: r.roll, mods, total: r.total, hit: r.hit, crit: r.crit, base: s.splash, armor: heroArmor(G, o), dmg, label: r.hit ? 'Zasažen' : 'Uskočil', enemy: true, friendly: true });
-        if (dmg) { damageHero(G, o, dmg); log(G, 'Výbuch zasáhl i lovce: ' + o.name + ' −' + dmg + '.'); await ui.anim({ type: 'float', at: o.pos, text: '−' + dmg + ' ♥', cls: 'dmg' }); }
+        if (dmg) { damageHero(G, o, dmg, 'self'); log(G, 'Výbuch zasáhl i lovce: ' + o.name + ' −' + dmg + '.'); await ui.anim({ type: 'float', at: o.pos, text: '−' + dmg + ' ♥', cls: 'dmg' }); }
         else log(G, o.name + ' výbuchu uskočil.');
       }
       return true;
@@ -4298,30 +4425,32 @@ async function resolveCard(G, h, card, half, C, ui) {
     }
     case 'salt': case 'fire': {
       if (s.around) {
-        const hexes = neighbors(h.pos).filter(y => !!roomOf(y) && !isBlock(y) && !isWallHex(y) && linkOK(h.pos, y));
-        for (const y of hexes) if (!saltAt(G, y)) G.salt.push({ hex: y.slice(), until: G.round + 1 });
+        const hexes = neighbors(h.pos).filter(y => saltable(G, y) && linkOK(h.pos, y));
+        for (const y of hexes) if (!saltAt(G, y)) G.salt.push({ hex: y.slice(), until: G.round }); // v60: sůl jen do konce tohoto kola
         await ui.anim({ type: 'wave', at: h.pos, kind: 'wail', range: 1 }); await ui.refresh();
         log(G, h.name + ' kreslí kolem sebe svatou pečeť ze soli.');
         if (s.calm) for (const o of G.heroes.filter(o => !o.escaped && !o.downed && o.fear > 0 && hexes.some(y => eq(y, o.pos)) && !griefed(G, o))) { o.fear = Math.max(0, o.fear - s.calm); log(G, 'Svatá pečeť: ' + o.name + ' −' + s.calm + ' Strach.'); await ui.anim({ type: 'calm', at: o.pos, range: 0, heroes: [o.id], text: '−' + s.calm + ' strach' }); }
         return true;
       }
       if (s.area) {
-        const x = await pick('hex', s.t === 'salt' ? ROOM_HEXES.filter(x => G.revealed.has(roomOf(x)) && dist(x, h.pos) <= s.range && !isBlock(x) && (eq(x, h.pos) || los(G, h.pos, x))) : fireStart(G, h, s.range), { area: s.t === 'salt' ? 'salt' : 'root' }); if (!x) return false;
-        const hexes = [x].concat(neighbors(x).filter(y => !!roomOf(y) && !isBlock(y) && !isWallHex(y) && linkOK(x, y)));
+        const x = await pick('hex', s.t === 'salt' ? ROOM_HEXES.filter(x => G.revealed.has(roomOf(x)) && dist(x, h.pos) <= s.range && saltable(G, x) && (eq(x, h.pos) || los(G, h.pos, x))) : fireStart(G, h, s.range), { area: s.t === 'salt' ? 'salt' : 'root' }); if (!x) return false;
+        const hexes = [x].concat(neighbors(x).filter(y => (s.t === 'salt' ? saltable(G, y) : !!roomOf(y) && !isBlock(y) && !isWallHex(y)) && linkOK(x, y)));
         await ui.anim({ type: 'throw', from: h.pos, at: x, item: s.t });
-        for (const y of hexes) { if (s.t === 'salt') { if (!saltAt(G, y)) G.salt.push({ hex: y.slice(), until: G.round + 1 }); } else { G.fire.push({ hex: y.slice(), until: G.round + 1, dmg: FIRE_DMG }); const mm = monsterAt(G, y); if (mm) await enterFire(G, mm, y, ui, true); } }
+        const hit = new Set();
+        for (const y of hexes) { if (s.t === 'salt') { if (!saltAt(G, y)) G.salt.push({ hex: y.slice(), until: G.round }); } else if (!G.fire.some(f => eq(f.hex, y))) G.fire.push({ hex: y.slice(), until: G.round + 1, dmg: FIRE_DMG }); }
+        if (s.t === 'fire') for (const y of hexes) await igniteHit(G, y, ui, hit);
         if (s.light) lightRooms(G, zonesOf(x));
         await ui.refresh();
         log(G, h.name + (s.t === 'salt' ? ' sype solný kruh.' : ' zapaluje oheň kolem cíle.')); return true;
       }
       const chosen = [];
       while (chosen.length < s.len) {
-        const cands = chosen.length ? chainNext(chosen).filter(x => s.t === 'salt' ? !saltAt(G, x) && G.revealed.has(roomOf(x)) : hexRevealed(G, x)) : (s.t === 'salt' ? saltHexes(G, h, s.range) : fireStart(G, h, s.range));
+        const cands = chosen.length ? chainNext(chosen).filter(x => s.t === 'salt' ? !saltAt(G, x) && saltable(G, x) && G.revealed.has(roomOf(x)) : hexRevealed(G, x)) : (s.t === 'salt' ? saltHexes(G, h, s.range) : fireStart(G, h, s.range));
         if (!cands.length) break;
         const x = await pick('hex', cands, { chain: true, optional: chosen.length > 0, n: chosen.length + 1, of: s.len, area: s.t });
         if (!x) break; chosen.push(x.slice());
         if (chosen.length === 1) await ui.anim({ type: 'throw', from: h.pos, at: x, item: s.t });
-        if (s.t === 'salt') G.salt.push({ hex: x.slice(), until: G.round + 1 }); else { G.fire.push({ hex: x.slice(), until: G.round + 1, dmg: FIRE_DMG }); const mm = monsterAt(G, x); if (mm) await enterFire(G, mm, x, ui, true); }
+        if (s.t === 'salt') G.salt.push({ hex: x.slice(), until: G.round }); else { G.fire.push({ hex: x.slice(), until: G.round + 1, dmg: FIRE_DMG }); await igniteHit(G, x, ui); }
         await ui.refresh();
       }
       if (!chosen.length) return false;
@@ -4464,7 +4593,7 @@ async function heroTurn(G, h, C, ui) {
       const hs = c[a.half] || {};
       const freeAdj = hs.freeIfAdj && adjMonsters(G, h).length > 0;
       const clock = a.half === 'sec' && (hs.t === 'move' || hs.t === 'lightmove') && !h.clockUsed && hasPassive(G, h, 'hodinky');
-      const hadAdv = (h.advNext || 0) >= G.round;
+      const hadAdv = (h.advNext || 0) >= G.round; h.advSpent = false;
       const recallOn = h.recallArmed && hs.t !== 'recall';
       const playE = log(G, h.name + ' hraje ' + c.name + (c.panic ? '' : a.half === 'sec' ? ' (▼)' : ' (▲)') + '.', { a: 'h:' + h.id, c: heroCardRef(c, h.id) });
       const ok = await resolveCard(G, h, c, a.half, C, ui);
@@ -4476,8 +4605,9 @@ async function heroTurn(G, h, C, ui) {
         if (c.olCursed) { c.olCursed = 0; damageHero(G, h, 1); log(G, 'Prokletá karta ' + c.name + ': ' + h.name + ' utrží 1 zranění.'); await ui.anim({ type: 'float', at: h.pos, text: 'Prokletí −1 ♥', cls: 'dmg' }); }
         const free = !c.panic && !hs.cost2 && (hs.free || freeAdj || clock);
         if (clock) h.clockUsed = true;
-        h.plays += c.panic ? (hasPassive(G, h, 'zub') ? 0 : 1) : hs.cost2 ? 2 : free ? 0 : 1;
-        if (ATK_TYPES.has(hs.t)) { h.atkCards = (h.atkCards || 0) + 1; if (hadAdv) h.advNext = 0; }
+        h.plays += c.panic ? 1 : hs.cost2 ? 2 : free ? 0 : 1;
+        if (ATK_TYPES.has(hs.t)) { h.atkCards = (h.atkCards || 0) + 1; if (hadAdv && h.advSpent) h.advNext = 0; }
+        h.advSpent = false;
         if (hs.advNext) h.advNext = G.round;
         if (hs.noDarkAtk) h.noDarkAtkRound = G.round;
         if (recallOn && recallable(c, a.half) && h.hand.includes(c)) { h.recallArmed = false; log(G, c.name + ' se vrací do ruky.'); await ui.anim({ type: 'float', at: h.pos, text: c.name + ' zpět do ruky', cls: 'good' }); }
@@ -4573,10 +4703,12 @@ async function walkMonster(G, m, path, ui) {
     m.pos = hex.slice(); m.dived = (m.dived || 0) + 1;
     if (hexRevealed(G, hex)) m.awake = true;
     await ui.anim({ type: 'step', who: 'm:' + m.uid, hex });
-    if (await enterFire(G, m, hex, ui, true)) return;
-    if (await enterHeroTrap(G, m, hex, ui)) return;
+    if (await enterFire(G, m, hex, ui, true)) return true;
+    if (await enterHeroTrap(G, m, hex, ui)) return true;
     if (typeof onMonsterStep === 'function') await onMonsterStep(G, m, hex, ui);
+    if (!G.monsters.includes(m)) return true;
   }
+  return false;
 }
 // reakce lovců na zásah: každá karta s horní akcí 'react' nabídne možnost
 function reactOptions(G, who, h, m, dmg, fear) {
@@ -4719,33 +4851,64 @@ async function activateGroup(G, type, C, ui, single, mode) {
   const md = mode || {};
   const done = new Set();
   G.active = { side: 'overlord', type };
+  let prefer = null; // v60: Dům přepnul na jiné monstrum (před první akcí)
   while (!G.over) {
     const left = G.monsters.filter(m => m.type === type && isAwake(G, m) && !done.has(m.uid) && !md.only || (md.only && md.only.includes(m) && !done.has(m.uid)));
     if (!left.length) break;
-    const m = await C.O.chooseMonster(G, left);
+    const m = (prefer != null && left.find(x => x.uid === prefer)) || await C.O.chooseMonster(G, left);
+    prefer = null;
     if (!m) break;
+    const prevActed = m.actedRound, wasStunned = !!m.stunned;
+    // už začal (jed, Hostina…) a Dům ho před první akcí vyměnil: start aktivace se neopakuje
+    const resumed = m._preAct === G.round + ':' + type;
     done.add(m.uid); G.active.monster = m.uid; m.actedRound = G.round;
     // jed a krvácení tikají na začátku aktivace
-    if (((m.poison || 0) > 0 || (m.bleed || 0) > 0) && await tickDots(G, m, ui)) { G.active.monster = null; continue; }
+    if (!resumed && ((m.poison || 0) > 0 || (m.bleed || 0) > 0) && await tickDots(G, m, ui)) { G.active.monster = null; continue; }
     let actions = md.actions || (single ? 1 : 2); if (m.stunned) { actions = 1; m.stunned = false; log(G, mname(m) + ' je omráčený, má jen 1 akci.'); }
-    let attacks = 0; const used = new Set(); m.dived = 0; m._atkIds = []; m._atkN = 0;
-    if (typeof onActivate === 'function') await onActivate(G, m, C, ui);
+    const actions0 = actions;
+    let attacks = 0; const used = new Set(); if (!resumed) m.dived = 0; m._atkIds = []; m._atkN = 0;
+    if (!resumed && typeof onActivate === 'function') await onActivate(G, m, C, ui);
+    m._preAct = G.round + ':' + type;
+    let switched = false;
     while (actions > 0 && !G.over && G.monsters.includes(m)) {
       const st = mstats(G, m);
       const maxAtk = st.attacks || 1;
       const canAtk = !md.moveOnly && attacks < maxAtk && !m.disarmed && !saltAt(G, m.pos);
       const mv = st.move + (md.moveBonus || 0);
       const opts = { reach: m.rooted || mv <= 0 ? new Map() : monsterReach(G, m, mv, md.passHeroes), targets: canAtk ? monsterTargets(G, m) : [], specials: md.moveOnly ? [] : monsterSpecials(G, m, used) };
+      // v60: dokud monstrum nic neudělalo, smí Dům vybrat jiné ze skupiny
+      if (actions === actions0 && !attacks && !used.size) { const others = G.monsters.filter(o => o !== m && o.type === type && isAwake(G, o) && !done.has(o.uid) && (!md.only || md.only.includes(o))); if (others.length) opts.switchTo = others.map(o => o.uid); }
       await ui.refresh();
       const a = await C.O.chooseMonsterAction(G, m, opts, actions);
+      if (a && a.type === 'switch' && opts.switchTo) {
+        done.delete(m.uid); m.actedRound = prevActed; m.stunned = wasStunned; switched = true;
+        prefer = opts.switchTo.includes(a.uid) ? a.uid : null;
+        log(G, 'Dům místo ' + mname(m) + ' vybírá jiné monstrum.');
+        break;
+      }
       if (!a || a.type === 'end') break;
-      if (a.type === 'move') { const e = opts.reach.get(K(a.hex)); if (!e) continue; await walkMonster(G, m, e.path, ui); if (md.moveOnly && md.attackAfter) md.moveOnly = false; }
+      if (a.type === 'move') {
+        const e = opts.reach.get(K(a.hex)); if (!e) continue;
+        let stop = await walkMonster(G, m, e.path, ui);
+        // v60: pohyb krok po kroku jako u lovců: po kroku může Dům pokračovat se zbylým pohybem (stále tatáž akce)
+        let rest = mv - e.cost;
+        while (!stop && rest > 0 && C.O.chooseMonsterStep && G.monsters.includes(m) && !G.over && !m.rooted) {
+          const reach = monsterReach(G, m, rest, md.passHeroes); if (!reach.size) break;
+          await ui.refresh();
+          const hx = await C.O.chooseMonsterStep(G, m, { reach, left: rest, actions });
+          const e2 = hx && reach.get(K(hx)); if (!e2) break;
+          stop = await walkMonster(G, m, e2.path, ui); rest -= e2.cost;
+        }
+        if (md.moveOnly && md.attackAfter) md.moveOnly = false;
+      }
       else if (a.type === 'attack') { const h = opts.targets.find(x => x.id === a.hero); if (!h) continue; await monsterAttack(G, m, h, C, ui); attacks++; m._atkN = attacks; }
       else if (opts.specials.some(x => x.id === a.type)) { used.add(a.type); await doSpecial(G, m, a.type, C, ui); }
       else continue;
       actions--;
       checkWin(G);
     }
+    if (switched) { G.active.monster = null; continue; }
+    m._preAct = null;
     // stavy (přišpendlení, odzbrojení, omráčení získané během aktivace, nevýhoda) končí s aktivací
     m.rooted = false; m.disarmed = false; m.stunned = false; m.disNext = false; m.taunt = null; m.dived = 0;
     m._atkN = attacks;
@@ -4758,9 +4921,27 @@ async function activateGroup(G, type, C, ui, single, mode) {
 
 // ---------- karty a respawn Domu ----------
 function olDraw(G) {
-  if (G.ol.hand.length >= 6) return;
+  if (G.ol.hand.length >= OL_HAND_MAX) return;
   if (!G.ol.deck.length) { if (!G.ol.discard.length) return; G.ol.deck = shuffle(G.ol.discard); G.ol.discard = []; }
   G.ol.hand.push(G.ol.deck.pop());
+}
+// v60: v návratové fázi (konec kola) si Dům může za Hrozbu dokoupit karty: první 1, další 2, 3… (každé kolo znovu od 1)
+const OL_HAND_MAX = 6;
+const olBuyCost = G => 1 + (G.cardBuyRound === G.round ? (G.cardBuyN || 0) : 0);
+function olBuyWhy(G) {
+  if (G.ol.hand.length >= OL_HAND_MAX) return 'Ruka Domu je plná (' + OL_HAND_MAX + ').';
+  if (!G.ol.deck.length && !G.ol.discard.length) return 'Došly karty.';
+  if (G.threat < olBuyCost(G)) return 'Málo Hrozby.';
+  return null;
+}
+function olBuyCard(G) {
+  const why = olBuyWhy(G); if (why) return why;
+  const cost = olBuyCost(G);
+  G.threat -= cost; if (G.cardBuyRound !== G.round) { G.cardBuyRound = G.round; G.cardBuyN = 0; } G.cardBuyN++;
+  olDraw(G);
+  log(G, 'Dům kupuje kartu za ' + cost + ' Hrozby.', { a: 'ol' });
+  if (G.fx) G.fx.push({ t: 'sfx', name: 'card', side: 'ol' });
+  return null;
 }
 const aliveOf = (G, t) => G.monsters.filter(m => m.type === t).length;
 function trapCands(G) { return ROOM_HEXES.filter(x => standable(G, x) && !G.traps.has(K(x)) && !SPAWN_DEFS.some(s => eq(s.hex, x))); }
@@ -4857,7 +5038,8 @@ async function playOlCard(G, uidC, C, ui, phase) {
         const toks = [];
         if (v[0] === 'B') {
           const els = deadElites(G); let t = els[0];
-          if (els.length > 1) t = await C.O.olPick(G, { kind: 'type', prompt: 'Vyber padlou elitu', cands: els.map(tokType) }) || tokType(t);
+          // v60: Zrušit = karta se nezahraje (zůstane v ruce), dřív se vrátil první padlý
+          if (els.length > 1) { t = await C.O.olPick(G, { kind: 'type', prompt: 'Vyber padlou elitu', cands: els.map(tokType) }); if (!t) return false; }
           else t = tokType(t);
           toks.push(t + '*');
           if (v === 'BB' && G.dead.includes(t)) toks.push(t);
@@ -4865,7 +5047,7 @@ async function playOlCard(G, uidC, C, ui, phase) {
           const n = ({ '': 1, A: 2, AA: 3, AB: 2 })[v] || 1, pool = G.dead.filter(x => !x.endsWith('*') && MDEF[x] && !MDEF[x].lieutenant);
           for (let i = 0; i < n && pool.length; i++) {
             const types = [...new Set(pool)]; let t = types[0];
-            if (types.length > 1) t = await C.O.olPick(G, { kind: 'type', prompt: 'Vyber padlého přisluhovače (' + (i + 1) + ' z ' + n + ')', cands: types }) || t;
+            if (types.length > 1) { t = await C.O.olPick(G, { kind: 'type', prompt: 'Vyber padlého přisluhovače (' + (i + 1) + ' z ' + n + ')', cands: types, optional: i > 0 }); if (!t) { if (i === 0) return false; break; } }
             toks.push(t); pool.splice(pool.indexOf(t), 1);
           }
         }
@@ -5088,6 +5270,7 @@ async function overlordStep(G, C, ui, phase, groups) {
       // karta (např. Probuzení) vzbudila skupinu a Dům v tomto tahu ještě neaktivoval: může ji hned aktivovat
       if (phase === 'turn' && !G.over) { const gs = awakeTypes(G).filter(t => !G.activated.has(t)); if (gs.length) { phase = 'activation'; groups = gs; } }
     }
+    else if (s.type === 'buycard' && phase === 'house') { const w = olBuyCard(G); if (w && C.O.notify) C.O.notify(w); }
     else if (s.type === 'respawn' && phase === 'house') { const prevLA = G._logA; G._logA = 'ol'; await doRespawn(G, s.mtype, s.point, ui); if (prevLA) G._logA = prevLA; else delete G._logA; }
     else if (s.type === 'group' && phase === 'activation' && groups.includes(s.mtype)) {
       G.activated.add(s.mtype);
@@ -5427,7 +5610,7 @@ async function onHeroTurnEnd(G, h, C, ui) {
   }
   const hurt = (n, why) => { if (h.downed) return; damageHero(G, h, n); log(G, h.name + ': ' + why + ' −' + n + '.'); };
   if (slimeAt(G, h.pos)) { hurt(1, 'sliz pod nohama'); await ui.anim({ type: 'float', at: h.pos, text: 'Sliz −1', cls: 'dmg' }); }
-  if (frontBurning(G, h.pos) && !h.downed) { hurt(FIRE_DMG_H, 'končí tah v plamenech'); await ui.anim({ type: 'float', at: h.pos, text: 'Oheň −' + FIRE_DMG_H, cls: 'dmg' }); burnCheck(G); }
+  if (fireAt(G, h.pos) && !h.downed) { hurt(FIRE_DMG_H, 'končí tah v plamenech'); await ui.anim({ type: 'float', at: h.pos, text: 'Oheň −' + FIRE_DMG_H, cls: 'dmg' }); burnCheck(G); }
   // jed a krvácení tikají na začátku tahu (tickDots v heroTurn)
   h.pecked = false;
   checkWin(G);
@@ -5484,7 +5667,7 @@ async function onActivate(G, m, C, ui) {
 async function onActivationEnd(G, m, C, ui) {
   const s = stats(m);
   if (G.candles) await snuffCandle(G, m, ui);
-  if (frontBurning(G, m.pos) && !mdef(m).fireImmune && !mdef(m).flying && !mdef(m).object) {
+  if (G.monsters.includes(m) && fireAt(G, m.pos) && !mdef(m).fireImmune && !mdef(m).flying && !mdef(m).object) {
     m.hp -= FIRE_DMG; log(G, mname(m) + ' končí v plamenech: −' + FIRE_DMG + '.'); await ui.anim({ type: 'float', at: m.pos, text: 'Oheň −' + FIRE_DMG, cls: 'dmg' });
     if (m.hp <= 0) { killMonster(G, m); await ui.anim({ type: 'kill', who: 'm:' + m.uid }); return; }
   }
@@ -5614,7 +5797,7 @@ API = {
   D, CATS, PRICE, SHOP_POOL, ABIL, UPCOST, levelOf, OL_VAR, olName, olText, SCENARIOS, OL_DECK, evadeOf,
   hasPassive, describeBoost, SUMMON_NAMES, summonsAct, summonsOf, negStatus, posStatus, isMarked, setSeed, random, d10, shuffle, pickR, COLS, ROWS, NH, ROOM_DEFS, ROOMS, DOOR_DEFS, EXIT, SPOT_DEFS, FURN_DEFS, SPAWN_DEFS, MIRRORS, HERO_START,
   TOKENS, TOKEN_ORDER, respawnLabel, respawnBase, tokType, chainNext, EQUIP, SLOTS, buildDeck, respawnCost, heroArmor, isWallHex, WALL_HEXES, WATER, LANTERN, grenadeTargets, RESPAWN_SAFE, THREAT_PER_ROUND, THREAT_LATE_ROUND, THREAT_LATE, threatFor, MONSTER_ROOMS, CURSE_ROOMS, LOCKABLE, SETUP_BANNED, GOLD, MDEF, HEROES, OL_CARDS, PANIC,
-  K, unK, eq, xcOf, roomOf, zonesOf, isPlayable, inHouse, furnAt, isBlock, isRough, dist, neighbors, ALL_HEXES, ROOM_HEXES, linkOK,
+  saltable, K, unK, eq, xcOf, roomOf, zonesOf, isPlayable, inHouse, furnAt, isBlock, isRough, dist, neighbors, ALL_HEXES, ROOM_HEXES, linkOK,
   sightEdge, los, canStrike, chanceFor, stats, mname, groupSize, aliveOf, setGrpUp, grpUp, maxElites, drawLoot,
   mstats, newGame, log, heroAt, monsterAt, saltAt, doorAt, hexRevealed, visibleToHeroes, isAwake, isDark, isInvisible, standable, describe, attackInfo, attackTargets, monsterAttackInfo,
   spawnBlocked, moveOptions, heroReach, monsterReach, monsterTargets, cannotPlay, awakeTypes, olCannot, olPickSpec, respawnOptions, adjSpots,
@@ -5622,7 +5805,7 @@ API = {
   CRYPTS, CRYPT_COST, cryptNear, cryptLinks, executeWalk, resolveCard, playOlCard, addFear, setToken, clearToken, missingTokens, tokenNeed, CIRCLES, circleAt, circleDesecrated, circleActive, scenAllowed, objectTargets, mirrorHexes, toggleLock, goldUsed, slotCost, toggleGroup, placeRooms, placeHexes, placeMonster, removeMonster, setCurse, setupStatus, setupErrors, finishSetup,
   chargeLanes, crossPairs, pulseMonsters, hookTargets,
   newUid: () => uid(), setUid: n => { UID = Math.max(UID, n); },
-  runGame, sgn, isGrabbed, griefed, slimeAt, graveAt, graveNeed,
+  runGame, rehydrate, olBuyCost, olBuyWhy, olBuyCard, OL_HAND_MAX, sgn, isGrabbed, griefed, slimeAt, graveAt, graveNeed,
   capRange, capSpec, veilOf, darkVarOf, PROH_RANGE,
   markMonster, markHero, heroMarked, heroInvisible, pierceArmor, isPierced, applyStatus, addPoison, addBleed, tickDots, healHero, healMonster, FIRE_DMG, FIRE_DMG_H, trapImmune, recallable, peekSpot, doSearch, nearestUnknownSpots, senseSpots, pushStep, STATUS_TXT,
   useMap, MAPS, isFence, blocksSight, OBELISK_SITES, MAP, OUTDOOR,
@@ -5855,12 +6038,13 @@ const heroBot = {
       const helper = G.heroes.some(o => o !== h && !o.downed && !o.escaped && !o.acted && dist(o.pos, h.pos) <= 4);
       return helper && G.round < G.maxRound ? { type: 'end' } : { type: 'standup' };
     }
-    // v59: zbavit se Paniky stojí 1 akci + odhození jiné karty (se Zubem mrtvého bez akce)
+    // v59: zbavit se Paniky stojí 1 akci + odhození jiné karty (v60: se Zubem mrtvého bez odhození)
     const pnc = h.hand.find(c => c.panic), zub = C.hasPassive(G, h, 'zub');
-    if (pnc && h.hand.some(c => !c.panic) && !C.cannotPlay(G, h, pnc, 'pri')) {
+    if (pnc && (zub || h.hand.some(c => !c.panic)) && !C.cannotPlay(G, h, pnc, 'pri')) {
       const bestAtk = Math.max(0, ...h.hand.map(c => cardAttackValue(G, h, c)));
       const lowCard = h.hand.filter(c => !c.panic).some(c => cardAttackValue(G, h, c) < 0.5 && !isReaction(c));
-      if (zub && (lowCard || h.plays >= 2 || h.hand.length >= 4)) return { type: 'play', uid: pnc.uid, half: 'pri' };
+      // v60: se Zubem mrtvého stojí Panika akci, ale bez odhození karty
+      if (zub && (h.plays === 2 || lowCard || h.hand.filter(c => c.panic).length >= 2) && !((h.keys.length || G.exitUnlocked) && h.plays < 2)) return { type: 'play', uid: pnc.uid, half: 'pri' };
       if (!zub && !((h.keys.length || G.exitUnlocked) && h.plays < 2) && (h.plays === 2 || (lowCard && bestAtk < 1.5) || h.hand.filter(c => c.panic).length >= 2)) return { type: 'play', uid: pnc.uid, half: 'pri' };
     }
     if (h.plays >= 3) return { type: 'end' };
@@ -6196,6 +6380,9 @@ const overlordBot = {
         const p = o.points.slice().sort((a, b) => psc(a) - psc(b)).find(p => nearestHeroDist(G, p.hex) >= 2);
         if (t && p) return { type: 'respawn', mtype: t, point: p.id };
       }
+      // v60: zbylou Hrozbu občas promění v kartu (1, pak 2, 3…); rezerva na návrat padlých
+      const cost = C.olBuyCost(G), reserve = G.dead.length ? 2 : 0;
+      if (!C.olBuyWhy(G) && cost <= 2 && G.ol.hand.length < 4 && G.threat - cost >= reserve) return { type: 'buycard' };
       return { type: 'pass' };
     }
     // skupina, která teď nejvíc ublíží (dosah na lovce), jinak nejbližší
@@ -6258,6 +6445,8 @@ const overlordBot = {
     }
     return c[0];
   },
+  // v60: pohyb krok po kroku je jen pro lidského hráče; bot jde rovnou na cílové pole
+  async chooseMonsterStep() { return null; },
   async chooseMonster(G, list) {
     // nejdřív ten, kdo může hned útočit (a zabít), pak nejbližší
     const sc = m => { const s = C.mstats(G, m), d = nearestHeroDist(G, m.pos); return (d <= s.range ? -20 : d <= s.move + s.range ? -10 : 0) + d; };
@@ -6449,7 +6638,21 @@ function migrate(st) {
   if (st.next && (!scenById(st.next) || st.played.includes(st.next))) st.next = null;
   if (!st.played.length && !st.next) st.next = FIRST;
   st.ol.gold = st.ol.gold || 0; st.ol.grp = st.ol.grp || {}; st.ol.up = st.ol.up || {}; st.streak = st.streak || { heroes: 0, ol: 0 };
-  for (const id of Object.keys(st.heroes)) { const hs = st.heroes[id]; hs.bag = hs.bag || []; hs.loot = (hs.loot || []).filter(x => D.LOOT && D.LOOT[x]); }
+  // v60: všechno jsou id → po načtení platí aktuální data; neznámá (vyřazená) id zahodíme, chybějící lovce doplníme
+  const okItem = x => !!(x && D.EQUIP[x]);
+  st.chest = (st.chest || []).filter(okItem);
+  if (Array.isArray(st.shop)) st.shop = st.shop.filter(okItem);
+  for (const h of D.HEROES) if (!st.heroes[h.id]) st.heroes[h.id] = { xp: 0, abil: {}, equip: startEquip(h.id), bag: [], loot: [] };
+  for (const id of Object.keys(st.heroes)) {
+    if (!D.HEROES.some(h => h.id === id)) { delete st.heroes[id]; continue; }
+    const hs = st.heroes[id]; hs.bag = (hs.bag || []).filter(okItem); hs.loot = (hs.loot || []).filter(x => D.LOOT && D.LOOT[x]);
+    hs.equip = Object.assign({ hlava: null, ruka1: null, ruka2: null, telo: null, nohy: null, trinket: null }, hs.equip || {});
+    for (const sl of HSLOTS) if (hs.equip[sl] && !okItem(hs.equip[sl])) hs.equip[sl] = null;
+    const ab = D.ABIL[id] || []; hs.abil = hs.abil || {};
+    for (const k of Object.keys(hs.abil)) { const a = ab.find(x => x.key === k); if (!a || !a.tree[hs.abil[k]]) delete hs.abil[k]; }
+  }
+  for (const k of Object.keys(st.ol.up)) if (!D.OL_CARDS[k] || (st.ol.up[k] && !(D.OL_VAR[k] && D.OL_VAR[k][st.ol.up[k]]))) delete st.ol.up[k];
+  for (const t of Object.keys(st.ol.grp)) if (!D.MDEF[t]) delete st.ol.grp[t];
   return st;
 }
 function load() { try { const s = localStorage.getItem(KEY); if (!s) return null; return migrate(JSON.parse(s)); } catch (e) { return null; } }
@@ -6490,11 +6693,12 @@ function applyResult(st, G) {
   return r;
 }
 function owned(st) { const s = new Set(st.chest); for (const id of Object.keys(st.heroes)) { equipList(st.heroes[id].equip).forEach(x => s.add(x)); (st.heroes[id].bag || []).forEach(x => s.add(x)); } return s; }
+const SHOP_N = 4; // v60: obchod nabízí 4 předměty
 function rollShop(st, force) {
   if (st.shop && !force) return st.shop;
   const own = owned(st), pool = D.SHOP_POOL.filter(k => !own.has(k));
   const pick = []; const p = pool.slice();
-  while (pick.length < 3 && p.length) pick.push(p.splice(Math.floor(rnd() * p.length), 1)[0]);
+  while (pick.length < SHOP_N && p.length) pick.push(p.splice(Math.floor(rnd() * p.length), 1)[0]);
   st.shop = pick; save(st); return pick;
 }
 const price = id => D.PRICE[D.EQUIP[id].tier] || 2;
@@ -7863,7 +8067,8 @@ const sv = (tag, attrs = {}, html) => { const e = document.createElementNS(NS, t
 const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 const reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 const SND = typeof Sfx !== 'undefined' ? Sfx : null;
-const sfx = (n, o) => { try { if (SND) SND.play(n, o); } catch (e) { /* zvuk je nepovinný */ } };
+// v60: online lovci během přípravy Domu neslyší nic (zvuky by prozradily, co Dům rozmisťuje)
+const sfx = (n, o) => { try { if (setupWaitActive()) return; if (SND) SND.play(n, o); } catch (e) { /* zvuk je nepovinný */ } };
 
 const HERO_COLORS = { ashford: '#d79e48', varga: '#b993dc', wren: '#72c49d' };
 const S = { padX: 0, padY: 0,
@@ -8681,7 +8886,7 @@ function renderMap() {
     const g = gDepth.querySelector(`[data-door="${d.id}"]`); if (!g) continue;
     g.classList.remove('closed', 'open', 'locked'); g.classList.add(d.state === 'arch' ? 'open' : d.state === 'bars' || d.state === 'shut' ? 'closed' : d.state === 'fake' ? 'locked' : d.state);
     g.classList.toggle('fogged', !d.rooms.some(roomVisible));
-    const prev = S.doorState[d.id]; if (prev && prev !== d.state && d.state === 'open') sfx(d.portcullis ? 'clank' : 'door'); if (prev && prev !== d.state && d.state === 'locked') sfx('lock');
+    const prev = S.doorState[d.id], quietDoors = G.phase === 'setup' || S._lastPhase === 'setup'; if (!quietDoors && prev && prev !== d.state && d.state === 'open') sfx(d.portcullis ? 'clank' : 'door'); if (!quietDoors && prev && prev !== d.state && d.state === 'locked') sfx('lock');
     S.doorState[d.id] = d.state;
   }
   { let db = ''; for (const d of G.doors) { if (d.state !== 'locked' || !d.rooms.some(roomVisible)) continue; const [x, y] = px(d.hex), yy = y - (isVertDoor(d) ? 30 : 32); db += `<g class="door-badge" transform="translate(${x},${yy})"><circle r="6.5" class="bd-bg"/>${A.iconG('lock', 0, 0, 8.5, '#f3cf8e')}</g>`; }
@@ -8698,9 +8903,12 @@ function renderMap() {
     if (!roomVisible(r)) { const top = R.y0 === 0 ? y0 - HN - 12 : y0 - 2; ov += `<rect x="${x0 - 4}" y="${top}" width="${w + 8}" height="${hh + y0 - top + 5}" fill="#030204"/>`; continue; }
     if (roomDark(G, r)) ov += darkRoomFX(G, r, x0, y0, w, hh);
   }
+  // v60: podlaha východu a dveří mimo obdélník místnosti (spodní zeď) se v mlze nesmí prozradit
+  if (C.MAP.exit && !roomVisible(C.EXIT_ROOM)) { const [x, y] = px(C.EXIT); ov += `<path d="${hexPts(x, y, SIZE + 3)}" fill="#030204"/><rect x="${x - WPX}" y="${y - 6}" width="${WPX * 2}" height="${TW + 14}" fill="#030204"/>`; }
+  for (const d of G.doors) if (!d.rooms.some(roomVisible)) ov += `<path d="${pts(d.hex, SIZE + 2)}" fill="#030204"/>`;
   for (const sp of G.spots) if (sp.sensed && !roomVisible(C.roomOf(sp.hex))) ov += `<path d="${pts(sp.hex, SIZE - 1)}" fill="#241e1a" stroke="#f3cf8e" stroke-opacity=".6" stroke-width="1" stroke-dasharray="2 2"/>`;
   for (const d of G.doors) if (d.rooms.some(r => roomVisible(r) && roomDark(G, r)) && d.rooms.some(roomVisible)) ov += `<path d="${pts(d.hex, SIZE - .5)}" fill="#03040a" opacity=".62"/>`;
-  for (const s of G.salt) { if (!roomVisible(C.roomOf(s.hex))) continue; const [x, y] = px(s.hex); ov += `<g class="salt"><path d="${hexPts(x, y, SIZE - 4)}" fill="#f1ece0" fill-opacity=".12" stroke="#f8f4ea" stroke-width="2.2" stroke-dasharray="1.2 2.2" stroke-linecap="round"/><circle cx="${x - 6}" cy="${y - 2}" r="1" fill="#fff" class="twinkle"/><circle cx="${x + 7}" cy="${y + 3}" r=".9" fill="#fff" class="twinkle t2"/></g>`; }
+  for (const s of G.salt) { if (!roomVisible(C.roomOf(s.hex)) || !C.saltable(G, s.hex)) continue; const [x, y] = px(s.hex); ov += `<g class="salt"><path d="${hexPts(x, y, SIZE - 4)}" fill="#f1ece0" fill-opacity=".12" stroke="#f8f4ea" stroke-width="2.2" stroke-dasharray="1.2 2.2" stroke-linecap="round"/><circle cx="${x - 6}" cy="${y - 2}" r="1" fill="#fff" class="twinkle"/><circle cx="${x + 7}" cy="${y + 3}" r=".9" fill="#fff" class="twinkle t2"/></g>`; }
   for (const f of G.fire) { if (!roomVisible(C.roomOf(f.hex))) continue; const [x, y] = px(f.hex); ov += `<path d="${hexPts(x, y, SIZE - 2)}" fill="#3a1206" opacity=".7"/><ellipse cx="${x}" cy="${y}" rx="40" ry="${40 * KY}" fill="url(#ag-warm)" class="fireglow"/>`; }
   for (const c of G.circles || []) { if (!roomVisible(c.room)) continue; const bad = !C.circleActive(G, c), on = c.hexes.some(x => G.heroes.some(h => !h.downed && C.eq(h.pos, x)));
     const cx = c.hexes.reduce((a, x) => a + px(x)[0], 0) / 3, cy = c.hexes.reduce((a, x) => a + px(x)[1], 0) / 3;
@@ -8894,6 +9102,23 @@ function renderLos() {
   const [x, y] = px(src);
   gHl.insertAdjacentHTML('beforeend', `<path d="${vis.map(v => pts(v, SIZE - 1.5)).join('')}" class="los"/><ellipse cx="${x}" cy="${y}" rx="20" ry="${20 * KY}" class="los-src"/>`);
 }
+// v60: podržený Alt = průchodnost: neprůchozí pole červeně, náročný terén (pohyb za 2) žlutě
+function passOverlay(on) {
+  if (!svg || !gTop) return;
+  let g = gTop.querySelector('.passov'); if (g) g.remove();
+  let lg = $('#passleg'); if (lg) lg.remove();
+  if (!on || !S.G || $('#game').hidden) return;
+  const G = S.G, vis = h => C.zonesOf(h).some(roomVisible);
+  let imp = '', rough = '';
+  for (const h of C.ALL_HEXES) {
+    if (!vis(h)) continue;
+    const d = C.doorAt(G, h);
+    if (C.isBlock(h) || (C.isWallHex(h) && !d) || C.isFence(h) || (d && (d.state === 'locked' || C.isBars(d) || d.state === 'shut' || (d.exit && d.state !== 'open'))) || G.monsters.some(m => C.MDEF[m.type].object && C.eq(m.pos, h))) imp += pts(h, SIZE - 1.5);
+    else if (C.isRough(h) || (d && d.state === 'closed') || (C.slimeAt && C.slimeAt(G, h))) rough += pts(h, SIZE - 1.5);
+  }
+  g = sv('g', { class: 'passov' }); g.innerHTML = `<path class="imp" d="${imp}"/><path class="rough" d="${rough}"/>`; gTop.appendChild(g);
+  document.body.appendChild(el('div', { id: 'passleg', class: 'passov-leg' }, `Průchodnost:<i style="background:#e0302a"></i>nejde projít<i style="background:#f0c020"></i>pohyb za 2 (náročný terén, zavřené dveře, sliz)`));
+}
 function renderHighlights() {
   gHl.innerHTML = '';
   gDepth.querySelectorAll('.furn.cand').forEach(f => f.classList.remove('cand'));
@@ -8903,6 +9128,7 @@ function renderHighlights() {
   if (m.type === 'setup') return setupHighlights();
   if (m.type === 'move' || m.type === 'monsterAction') {
     hlArea([...m.opts.reach.keys()].map(C.unK), m.type === 'move' ? 'a-move' : 'a-mmove');
+    if (m.type === 'monsterAction' && m.opts.switchTo) G.monsters.filter(o => m.opts.switchTo.includes(o.uid)).forEach(o => hlRing(o.pos, 'ring-act'));
     if (m.opts.inter) m.opts.inter.forEach((it, i) => { hlRing(it.hex, 'ring-act'); hlPill(it.hex, INTER_LBL[it.kind], 'pill-act', { 'data-inter': i }, -2); });
     if (m.opts.targets) m.opts.targets.forEach(h => { const i = C.monsterAttackInfo(G, m.monster, h); hlRing(h.pos, 'ring-atk'); hlPill(h.pos, Math.round(i.chance * 100) + ' %', 'pill-atk' + (i.adv > 0 ? ' adv' : i.adv < 0 ? ' dis' : ''), { 'data-k': C.K(h.pos) }, liftOf(h.pos) + 12); });
   } else if (m.type === 'target') {
@@ -9070,7 +9296,7 @@ function legendHTML() {
     <li>${lgIc('eyeoff', '#d6b8f4')}<span><b>Neviditelný</b> (vidí ho Dům a Varga do 3 polí).</span></li>
     <li>${lgIc('zzz', '#a8b4d0')}<span><b>Spí</b>, dokud lovci neotevřou jeho místnost.</span></li>
     <li>${lgIc('hourglass', '#a59b8f')}<span><b>Odehráno</b> v tomto kole.</span></li>
-    <li><span class="lg lg-fire"></span><span><b>Oheň</b>: kdo na něm skončí, utrží zranění. <b>Sůl</b>: monstra do ní nevstoupí a nezaútočí z ní.</span></li>
+    <li><span class="lg lg-fire"></span><span><b>Oheň</b>: 1 zranění všem (lovcům i monstrům) při vstupu, na konci tahu v něm a když pole chytne. <b>Sůl</b>: monstra do ní nevstoupí a nezaútočí z ní, vydrží do konce kola. Podrž <kbd>Alt</kbd>: průchodnost polí.</span></li>
     <li><span class="lg lg-door"></span><span><b>Dveře</b> jsou celé pole. Vstup na zavřené stojí 2 pohyby. Zamčené se páčí.</span></li>
   </ul>` : ''}</section>`;
 }
@@ -9111,6 +9337,8 @@ function onMapClick(ev) {
     const th = pickBy(hit, x => m.opts.targets.some(h => C.eq(h.pos, x)));
     if (th) { const h = m.opts.targets.find(x => C.eq(x.pos, th)); return m.resolve({ type: 'attack', hero: h.id }); }
     const mh = [hit.hex, hit.tokHex, hit.doorHex].find(x => x && m.opts.reach.has(C.K(x))); if (mh) return m.resolve({ type: 'move', hex: mh });
+    // v60: klik na jiné monstrum skupiny = vyměnit (jen před první akcí)
+    if (m.opts.switchTo) { const oh = pickBy(hit, x => G.monsters.some(o => m.opts.switchTo.includes(o.uid) && C.eq(o.pos, x))); if (oh) { const o = G.monsters.find(x => m.opts.switchTo.includes(x.uid) && C.eq(x.pos, oh)); sfx('click'); return m.resolve({ type: 'switch', uid: o.uid }); } }
   } else if (m.type === 'target' || m.type === 'olPick') {
     const r = m.type === 'target' ? m.req : m.spec; let f = null;
     const find = (arr, posOf) => { const h = pickBy(hit, x => arr.some(a => C.eq(posOf(a), x))); return h ? arr.find(a => C.eq(posOf(a), h)) : null; };
@@ -9766,6 +9994,8 @@ const human = {
     olPick: (G, spec) => ask('olPick', { spec }),
     chooseMonster: (G, list) => list.length === 1 ? Promise.resolve(list[0]) : ask('chooseMonster', { list }),
     chooseMonsterAction: (G, m, opts, actions) => ask('monsterAction', { monster: m, opts, actions }),
+    // v60: pokračování pohybu monstra po kroku (null = Dokončit pohyb)
+    chooseMonsterStep: (G, m, o) => ask('monsterAction', { monster: m, opts: { reach: o.reach, targets: [], specials: [] }, actions: o.actions, step: true, left: o.left }).then(a => a && a.type === 'move' ? a.hex : null),
     react: async (G, kind, info) => {
       await camTo(info.monster.pos, 120);
       const [ax, ay] = px(info.hero.pos), [bx, by] = px(info.monster.pos);
@@ -9784,7 +10014,7 @@ function botWrap(bot) {
   const w = {};
   for (const k of Object.keys(bot)) {
     if (typeof bot[k] !== 'function' || k.startsWith('_')) continue;
-    w[k] = async (...a) => { render(); await drainFx(); if (k !== 'setup' && k !== 'notify') await sleep(dur(k === 'chooseMove' || k === 'chooseMonsterAction' ? 300 : 450)); return bot[k](...a); };
+    w[k] = async (...a) => { if (k === 'chooseMonsterStep') return bot[k](...a); render(); await drainFx(); if (k !== 'setup' && k !== 'notify') await sleep(dur(k === 'chooseMove' || k === 'chooseMonsterAction' ? 300 : 450)); return bot[k](...a); };
   }
   return w;
 }
@@ -9793,7 +10023,42 @@ function botWrap(bot) {
 function render() {
   if (!S.G) return;
   renderMap(); renderTop(); renderSide(); renderBottom(); renderModal();
+  renderSetupWait(); renderTurnBanner();
+  S._lastPhase = S.G.phase;
   followActive();
+}
+// v60: kdo je na tahu: banner + zvuk při každé změně strany (lovci ↔ Dům); online i jméno lovce a hráče
+function renderTurnBanner() {
+  const G = S.G; if (!G || G.phase === 'setup' || G.phase === 'over' || G.over || setupWaitActive()) return;
+  if (S.ctl.heroes !== 'human' && S.ctl.overlord !== 'human' && !NETS.role) return;
+  const side = G.phase === 'overlord' || G.phase === 'house' ? 'o' : G.phase === 'heroes' ? 'h' : null; if (!side) return;
+  const hid = side === 'h' && G.active && G.active.hero ? G.active.hero : '';
+  const flip = S.tbSide !== side, heroNew = !!hid && S.tbHero !== hid;
+  if (!flip && !heroNew) return;
+  const first = S.tbSide == null; S.tbSide = side; if (side === 'o') S.tbHero = ''; else if (hid) S.tbHero = hid;
+  if (first && side === 'h' && !hid) return; // úplný začátek hry řeší briefing a animace kola
+  const h = hid && G.heroes.find(x => x.id === hid);
+  const owner = h && NETS.role ? (NETS.roles[h.id] === 'bot' ? 'bot' : NETS.roles[h.id] === Net.myId ? 'ty' : pName(NETS.roles[h.id])) : '';
+  const title = side === 'o' ? 'Na tahu je Dům' : 'Na tahu jsou lovci';
+  const sub = side === 'o' ? (G.phase === 'house' ? 'Konec kola: návrat monster a karty' : '') : h ? (NETS.role ? 'Hraje ' + h.name + (owner ? ' · ' + owner : '') : h.name) : (S.ctl.heroes === 'human' ? 'Vyberte, který lovec hraje' : '');
+  let b = $('#turnbanner'); if (!b) { b = el('div', { id: 'turnbanner', class: 'turnbanner', role: 'status', 'aria-live': 'polite' }); document.body.appendChild(b); }
+  const fresh = flip || !b.classList.contains('on');
+  b.className = 'turnbanner ' + side + ' on'; b.innerHTML = esc(title) + (sub ? `<small>${esc(sub)}</small>` : '');
+  if (flip) sfx(side === 'o' ? 'ghost' : 'bell');
+  clearTimeout(S.tbT); S.tbT = setTimeout(() => { const x = $('#turnbanner'); if (x) x.classList.remove('on'); }, fresh ? 1600 : 1300);
+}
+// v60: online lovci během přípravy Domu nevidí mapu (ani zvuky), jen zadání scénáře a čekání
+const setupWaitActive = () => !!(S.G && S.G.phase === 'setup' && NETS.role && S.ctl.heroes === 'human' && S.ctl.overlord !== 'human');
+function renderSetupWait() {
+  let ov = $('#setupwait');
+  if (!setupWaitActive()) { if (ov) { ov.remove(); } return; }
+  const G = S.G, key = G.mapId + '|' + G.scen.id;
+  S.briefSeen = key; // briefing po přípravě už znovu neukazujeme
+  if (ov && ov.dataset.k === key) return;
+  if (!ov) { ov = el('div', { id: 'setupwait', class: 'setupwait' }); document.body.appendChild(ov); }
+  ov.dataset.k = key;
+  ov.innerHTML = `<div class="dialog brief sw-box"><p class="eyebrow">Lovci duchů · scénář ${G.scen.n}</p><h2>${esc(G.scen.name)}</h2>${BRIEF_H()}<p class="sw-wait"><span class="sw-spin"></span>Dům připravuje mapu…</p><p class="muted sm">Jakmile Dům rozmístí monstra a žetony, hra začne.</p></div>`;
+  stripTitles(ov);
 }
 function applyZoom(keepCenter) {
   const wrap = $('#mapwrap'); if (!svg || !wrap.clientWidth) return;
@@ -10007,11 +10272,18 @@ function fitBuyDialog(box) {
   const avail = window.innerHeight * 0.95, h = d.getBoundingClientRect().height;
   if (h > avail) d.style.zoom = Math.max(0.6, avail / h).toFixed(3);
 }
+// v60: složení skupiny, jak opravdu vstoupí do hry (vč. vylepšení z kampaně): „1 elita + 4 běžní“
+function compText(t) {
+  const el_ = C.maxElites(t), n = Math.max(0, C.groupSize(t) - el_), d = C.MDEF[t];
+  if (d.lieutenant) return '1 poručík';
+  const a = el_ ? el_ + ' ' + (el_ === 1 ? 'elita' : 'elity') : '', b = n ? n + ' ' + (n === 1 ? 'běžný' : n <= 4 ? 'běžní' : 'běžných') : '';
+  return [a, b].filter(Boolean).join(' + ') || '—';
+}
 function buyDialogHTML() {
   const G = S.G;
   const cards = Object.keys(C.MDEF).filter(t => C.scenAllowed(G, t)).map(t => {
     const d = C.MDEF[t], b = d.base, owned = !!G.groups[t], afford = owned || C.goldUsed(G) + C.slotCost(t) <= G.budget;
-    return `<div class="buycard${owned ? ' owned' : ''}${afford ? '' : ' poor'}"><div class="bc-top"><div class="bc-port">${monPortrait(t)}${monPortrait(t, true)}</div><div><h3>${esc(d.name)}</h3><small>elita + ${d.minions[C.NH]} · ${esc(C.CATS[d.cat] || '')}</small></div><span class="bc-cost" title="sloty">${C.slotCost(t)}</span></div>
+    return `<div class="buycard${owned ? ' owned' : ''}${afford ? '' : ' poor'}"><div class="bc-top"><div class="bc-port">${monPortrait(t)}${monPortrait(t, true)}</div><div><h3>${esc(d.name)}</h3><small><b class="bc-comp">${esc(compText(t))}</b> · ${esc(C.CATS[d.cat] || '')}${(() => { const g = C.grpUp(t); const x = grpBadge(t, g); return x ? ' · ' + esc(x) : ''; })()}</small></div><span class="bc-cost" title="sloty">${C.slotCost(t)}</span></div>
       ${grpStats(b)}<div class="grp-txt">${abilHTML(d.abil, d.text)}</div>${d.eliteAbil && d.eliteAbil.length ? `<div class="grp-txt elite-t"><span class="mab-h">★ ${esc(d.eliteName)}</span>${abilHTML(d.eliteAbil)}</div>` : ''}
       <button class="btn ${owned ? '' : 'primary'}" data-buy="${t}" ${afford ? '' : 'disabled'}>${owned ? 'Vrátit' : (C.slotCost(t) > 1 ? 'Vzít (2 sloty)' : 'Vzít')}</button></div>`;
   }).join('');
@@ -10032,7 +10304,9 @@ function renderSide() {
   G.monsters.forEach(m => { if (C.visibleToHeroes(G, m)) G.seen.add(m.type); });
   const types = Object.keys(G.groups).filter(t => !hv || G.seen.has(t));
   html += `<section class="panel house"><h3>Monstra <span class="threat-pill">${A.icon('threat')} Hrozba ${G.threat}</span></h3>`;
-  if (hv) html += `<p class="muted sm">Karty Domu v ruce: ${G.ol.hand.length}.${types.length ? '' : ' Zatím jste žádná monstra nepotkali.'}</p>`;
+  // v60: karty Domu: ruka · balíček · discard (jako u lovců)
+  html += `<div class="olpiles muted sm"><span>Karty Domu:</span><span title="V ruce">${A.icon('hand')}${G.ol.hand.length} v ruce</span><span title="Balíček">${A.icon('deck')}${G.ol.deck.length} balíček</span><span title="Discard">${A.icon('cardloss')}${G.ol.discard.length} discard</span></div>`;
+  if (hv && !types.length) html += `<p class="muted sm">Zatím jste žádná monstra nepotkali.</p>`;
   html += `<div class="msums">${types.map(monSum).join('')}</div>`;
   if (!hv && G.dead.length) html += `<p class="muted sm">Mohou se vrátit: ${[...new Set(G.dead)].map(t => C.respawnLabel(t) + ' ×' + G.dead.filter(x => x === t).length + ' (' + C.respawnBase(t) + ' Hrozby)').join(', ')}</p>`;
   html += '</section>';
@@ -10267,8 +10541,8 @@ function topHTML(s, c) {
       else { L.push(LN_('panic', 'strach', s.fear >= 9 ? '0' : '−' + s.fear, 'c-fear')); if (s.dmg) L.push(LN_('shield', s.both ? 'a zranění' : 'nebo zranění', '−' + s.dmg, 'c-ar')); if (s.reflect) x('drop', 'odraz', s.reflect, 'c-dmg'); if (s.heal) x('heart', 'léčí', '+' + s.heal, 'c-heal'); if (s.pushBack) x('push', 'útočník odletí', s.pushBack); }
       break;
     case 'shove': R(s.all ? 'splash' : 'sword'); L.push(LN_('push', s.all ? 'všechny odstrčí' : 'odstrčí', s.n, 'c-mv')); x('stun', 'náraz omráčí' + (s.collide ? ' a zraní' : '')); break;
-    case 'salt': if (s.around) { R('splash', '', { label: 'všechna pole kolem tebe' }); L.push(LN_('salt', 'sůl', '', 'c-fx')); if (s.calm) L.push(LN_('panic', 'lovci na soli: strach', '−' + s.calm, 'c-fear')); N.push('I pod monstra. Monstra do soli nevstoupí a v soli nemohou útočit. Do konce příštího kola.'); break; } R('crosshair', s.range, { diag: s.area ? 'area' : null }); if (!s.area) L.push(LN_('hex', 'pole', s.len, 'c-rng')); L.push(LN_('salt', 'sůl', '', 'c-fx')); N.push('I pod postavy. Monstra do soli nevstoupí a v soli nemohou útočit; lovce v soli napadají s nevýhodou. Do konce příštího kola.'); break;
-    case 'fire': R('lob', s.range, { diag: s.area ? 'area' : null }); if (!s.area) L.push(LN_('hex', 'pole', s.len, 'c-rng')); L.push(LN_('fire', 'oheň', s.dmg, 'c-dmg')); if (s.light) N.push('Rozsvítí Tmu.'); break;
+    case 'salt': if (s.around) { R('splash', '', { label: 'všechna pole kolem tebe' }); L.push(LN_('salt', 'sůl', '', 'c-fx')); if (s.calm) L.push(LN_('panic', 'lovci na soli: strach', '−' + s.calm, 'c-fear')); N.push('I pod monstra, ne na nábytek a zdi. Monstra do soli nevstoupí a v soli nemohou útočit. Do konce kola.'); break; } R('crosshair', s.range, { diag: s.area ? 'area' : null }); if (!s.area) L.push(LN_('hex', 'pole', s.len, 'c-rng')); L.push(LN_('salt', 'sůl', '', 'c-fx')); N.push('I pod postavy, ne na nábytek a zdi. Monstra do soli nevstoupí a v soli nemohou útočit; lovce v soli napadají s nevýhodou. Do konce kola.'); break;
+    case 'fire': R('lob', s.range, { diag: s.area ? 'area' : null }); if (!s.area) L.push(LN_('hex', 'pole', s.len, 'c-rng')); L.push(LN_('fire', 'oheň · všem na poli', s.dmg, 'c-dmg')); N.push('Zasáhne i lovce. Znovu 1 při vstupu a na konci tahu v ohni.'); if (s.light) N.push('Rozsvítí Tmu.'); break;
     case 'rootarea': R('lob', s.range, { diag: 'area' }); L.push(LN_('chain', 'přišpendlí všechny', '', 'c-fx')); N.push('I lovce. Bez hodu.'); break;
     case 'flash': R('aura', s.range); L.push(LN_('stun', 'omráčí', '', 'c-fx')); if (s.light) N.push('Rozsvítí Tmu.'); break;
     case 'sense': if (s.range) { R('aura', s.range); L.push(LN_('search', 'prohlédni žeton', '', 'c-fx')); N.push('I přes zdi.'); } else { R('aura', '', { label: 'kdekoli' }); L.push(LN_('search', 'odhal nejbližší žeton', '', 'c-fx')); N.push('Neznámý žeton hledání, vzdušnou čarou, i přes zdi.'); } break;
@@ -10348,7 +10622,7 @@ function cardHTML(c, extraCls, owner) {
   const col = owner ? HERO_COLORS[owner] : '#888';
   return `<div class="card k-${k}${k === 'ability' && c.hero ? ' ab-' + c.hero : ''}${c.olCursed ? ' olcursed' : ''} ${extraCls || ''}" data-uid="${c.uid}" title="${esc((c.olCursed ? 'PROKLETÁ (Ztráta): zahrání stojí 1 zranění. Prokletí zmizí na konci tvého tahu.\n\n' : '') + tip)}" style="--hc:${col}">${c.olCursed ? '<div class="olcurse-tag">Prokletá · zahrání −1 ♥</div>' : ''}
     <div class="c-title">${k === 'ability' && c.abLevel > 1 ? `<b class="lvlr" title="Vylepšeno na úroveň ${c.abLevel}">${c.abLevel === 2 ? 'II' : 'III'}</b>` : ''}<span>${esc(c.name)}</span>${k === 'ability' && c.abLevel > 1 ? `<i class="lvl">${'◆'.repeat(c.abLevel)}</i>` : ''}</div>
-    ${c.panic ? `<div class="c-tag cost2">${A.icon('deck')}<span>${owner && S.G && S.G.loadouts && ((S.G.loadouts[owner] || {}).equip || []).includes('zub') ? 'bez akce' : '1 akce'} · odhoď kartu</span></div>` : c.pri && c.pri.cost2 ? `<div class="c-tag cost2">${A.icon('deck')}<span>2 akce · odhoď kartu</span></div>` : c.pri && c.pri.free ? `<div class="c-tag free">${A.icon('bolt')}<span>Nestojí akci</span></div>` : c.pri && c.pri.t === 'react' ? `<div class="c-tag react">${A.icon('react')}<span>Reakce · v tahu Domu</span></div>` : ''}
+    ${c.panic ? `<div class="c-tag cost2">${A.icon('deck')}<span>${owner && S.G && S.G.loadouts && ((S.G.loadouts[owner] || {}).equip || []).includes('zub') ? '1 akce · bez odhození' : '1 akce · odhoď kartu'}</span></div>` : c.pri && c.pri.cost2 ? `<div class="c-tag cost2">${A.icon('deck')}<span>2 akce · odhoď kartu</span></div>` : c.pri && c.pri.free ? `<div class="c-tag free">${A.icon('bolt')}<span>Nestojí akci</span></div>` : c.pri && c.pri.t === 'react' ? `<div class="c-tag react">${A.icon('react')}<span>Reakce · v tahu Domu</span></div>` : ''}
     ${(() => { const t = topHTML(c.pri, c); return `<div class="c-top ${dense}" data-half="pri">${t}</div>`; })()}
     ${k === 'panic' || k === 'cursed' ? '' : `<div class="c-div">${k === 'equip' && C.EQUIP[c.item] ? `<span class="c-emb art" title="${esc(C.EQUIP[c.item].name)}">${itemPic(c.item)}</span>` : `<span class="c-emb">${A.icon(emb)}</span>`}</div><div class="c-bot" data-half="sec">${botHTML(c.sec)}</div>`}
     ${k === 'cursed' && C.EQUIP[c.item] ? `<span class="c-emb art cur">${itemPic(c.item)}</span>` : ''}
@@ -10410,8 +10684,10 @@ function respawnShop(G) {
       items.push({ tok, cost, why, n: G.dead.filter(x => x === tok).length });
     }
   }
-  if (!items.length) return '';
-  if (items.length) return `<div class="shop center"><h2>Konec kola: návrat monster</h2><p class="muted">Hrozba <b>${threat}</b>. Kup monstrum a pak klikni na zrcadlo, kde se vrátí. Každý další návrat v kole stojí o 1 víc.</p><div class="shoprow">${items.map(it => `<button class="shopit big${it.tok.endsWith('*') ? ' el' : ''}" data-shop="${it.tok}" ${it.why ? 'disabled' : ''}>${monPortrait(it.tok.replace('*', ''), it.tok.endsWith('*'))}<span><b>${esc(C.respawnLabel(it.tok))}</b><small>${it.why ? esc(it.why) : 'můžeš vrátit'}${it.n > 1 ? ' · padlých ' + it.n : ''}</small></span><em class="sh-cost${!it.why || it.why === 'chybí Hrozba' ? '' : ' dim'}">${A.icon('threat')}${it.cost}</em></button>`).join('')}</div><div class="dlg-btns"><button class="btn primary" data-shoppass="1">Ukončit kolo</button></div></div>`;
+  // v60: dokoupení karty Domu za Hrozbu (1, 2, 3… v tomto kole)
+  const bc = C.olBuyCost(G), bw = C.olBuyWhy(G);
+  const buy = `<button class="shopit big buycard" data-buycard="1" ${bw ? 'disabled' : ''}><span class="bc-olcard">${A.icon('deck')}</span><span><b>Lízni kartu Domu</b><small>${bw ? esc(bw) : 'další v tomto kole stojí ' + (bc + 1)} · v ruce ${G.ol.hand.length}/${C.OL_HAND_MAX}</small></span><em class="sh-cost${!bw || bw === 'Málo Hrozby.' ? '' : ' dim'}">${A.icon('threat')}${bc}</em></button>`;
+  return `<div class="shop center"><h2>Konec kola: návrat monster a karty</h2><p class="muted">Hrozba <b>${threat}</b>. ${items.length ? 'Kup monstrum a pak klikni na zrcadlo, kde se vrátí. Každý další návrat v kole stojí o 1 víc. ' : ''}Kartu Domu si můžeš dokoupit: první za 1 Hrozbu, další za 2, 3…</p><div class="shoprow">${buy}${items.map(it => `<button class="shopit big${it.tok.endsWith('*') ? ' el' : ''}" data-shop="${it.tok}" ${it.why ? 'disabled' : ''}>${monPortrait(it.tok.replace('*', ''), it.tok.endsWith('*'))}<span><b>${esc(C.respawnLabel(it.tok))}</b><small>${it.why ? esc(it.why) : 'můžeš vrátit'}${it.n > 1 ? ' · padlých ' + it.n : ''}</small></span><em class="sh-cost${!it.why || it.why === 'chybí Hrozba' ? '' : ' dim'}">${A.icon('threat')}${it.cost}</em></button>`).join('')}</div><div class="dlg-btns"><button class="btn primary" data-shoppass="1">Ukončit kolo</button></div></div>`;
   return `<div class="shop"><span class="hand-title">Návrat zrcadlem · Hrozba ${threat} · každé další v kole +1</span><div class="shoprow">${items.map(it => `<button class="shopit${it.tok.endsWith('*') ? ' el' : ''}" data-shop="${it.tok}" ${it.why ? 'disabled' : ''} title="${esc(it.why || 'Klikni a pak na zrcadlo')}">${monPortrait(it.tok.replace('*', ''), it.tok.endsWith('*'))}<span><b>${esc(C.respawnLabel(it.tok))}</b><small>${it.cost} Hrozby${it.n ? ' · padlo ' + it.n : ''}${it.why ? ' · ' + esc(it.why) : ''}</small></span></button>`).join('')}</div></div>`;
 }
 function olPilesHTML(G) {
@@ -10497,7 +10773,9 @@ function renderBottom() {
       }
       case 'olPick': prompt = esc(m.spec.prompt) + '.'; if (m.spec.kind === 'type') m.spec.cands.forEach(t => buttons.push({ l: C.MDEF[t].name, v: '__type:' + t })); buttons.push({ l: m.spec.optional ? 'Hotovo' : 'Zrušit', v: null }); break;
       case 'chooseMonster': prompt = 'Vyber monstrum, které jedná (zvýrazněná).'; buttons.push({ l: 'Ukončit skupinu', v: null }); break;
-      case 'monsterAction': prompt = `<b>${m.monster.elite ? '★ ' : ''}${esc(C.mname(m.monster))}</b>: ${m.actions} akce. Klikni na pole (pohyb) nebo na lovce (útok). Dva útoky nejdou.${G.candles ? ' Skončí-li vedle hořící svíce (nekryté lovcem) a neútočí, zhasne ji.' : ''}`; (m.opts.specials || []).forEach(sp => buttons.push({ l: sp.label, v: { type: sp.id }, cls: 'primary' })); buttons.push({ l: 'Konec monstra', v: null }); break;
+      case 'monsterAction':
+        if (m.step) { prompt = `<b>${m.monster.elite ? '★ ' : ''}${esc(C.mname(m.monster))}</b>: pohyb, zbývá <b>${m.left}</b>. Klikni na další pole, nebo pohyb dokonči.`; buttons.push({ l: 'Dokončit pohyb', v: null, cls: 'primary' }); break; }
+        prompt = `<b>${m.monster.elite ? '★ ' : ''}${esc(C.mname(m.monster))}</b>: ${m.actions} akce. Klikni na pole (pohyb, jde i po krocích) nebo na lovce (útok). Dva útoky nejdou.${m.opts.switchTo ? ' Dokud nic neudělá, můžeš kliknout na jiné monstrum skupiny.' : ''}${G.candles ? ' Skončí-li vedle hořící svíce (nekryté lovcem) a neútočí, zhasne ji.' : ''}`; (m.opts.specials || []).forEach(sp => buttons.push({ l: sp.label, v: { type: sp.id }, cls: 'primary' })); if (m.opts.switchTo) buttons.push({ l: 'Jiné monstrum', v: { type: 'switch' } }); buttons.push({ l: 'Konec monstra', v: null }); break;
     }
   } else if (G.phase !== 'over') prompt = NETS.role === 'host' && NETS.waiting ? `<span class="muted">Na tahu: ${esc(NETS.waiting)}…</span>` : isClient() ? '<span class="muted">Hrají ostatní…</span>' : '<span class="muted">Hraje bot…</span>';
   // ruka a balíčky
@@ -10553,6 +10831,7 @@ function renderBottom() {
   $('#pickdock').querySelectorAll('.pickrow .card').forEach(cEl => cEl.addEventListener('click', () => { const mm = S.mode; const c = mm.req.cands.find(x => x.uid === +cEl.dataset.uid); if (c) mm.resolve(c); }));
   if (m && m.type === 'target' && m.req.kind === 'olcard') {} 
   $('#shopdock').querySelectorAll('[data-shoppass]').forEach(b => b.addEventListener('click', () => { const mm = S.mode; if (mm && mm.type === 'olStep') mm.resolve({ type: 'pass' }); }));
+  $('#shopdock').querySelectorAll('[data-buycard]').forEach(b => b.addEventListener('click', () => { const mm = S.mode; if (!mm || mm.type !== 'olStep' || b.disabled) return; sfx('coin'); mm.resolve({ type: 'buycard' }); }));
   $('#shopdock').querySelectorAll('[data-shop]').forEach(b => b.addEventListener('click', () => { const mm = S.mode; if (!mm || b.disabled) return; mm.respawnType = b.dataset.shop; sfx('click'); render(); }));
   $('#pilesdock').querySelectorAll('[data-olpile]').forEach(b => b.addEventListener('click', () => { S.pileView = { ol: true, pile: b.dataset.olpile }; sfx('card'); renderModal(); }));
   $('#pilesdock').querySelectorAll('[data-pile]').forEach(b => b.addEventListener('click', () => { S.pileView = { hero: b.dataset.hero, pile: b.dataset.pile }; sfx('card'); renderModal(); }));
@@ -10670,6 +10949,7 @@ function renderModal0() {
     if (S.detail.hero) box.innerHTML = heroDetailHTML(S.G.heroes.find(h => h.id === S.detail.hero));
     else if (S.detail.hands) box.innerHTML = handsDialogHTML();
     else if (S.detail.buy) { box.innerHTML = buyDialogHTML(); hideTokPreview(); fitBuyDialog(box); box.querySelectorAll('[data-buy]').forEach(b => b.addEventListener('click', () => { const w = C.toggleGroup(S.G, b.dataset.buy); if (w) S.msg = w; else sfx('coin'); render(); renderModal(); })); box.querySelectorAll('[data-bd]').forEach(b => b.addEventListener('click', () => { if (b.dataset.bd === 'rand') { Bots.botSetupPart(S.G, 'buy', Bots.overlordBot.pool); render(); renderModal(); return; } S.detail = null; const i = STEPS.findIndex(x => x.id === 'place'); goStep(i >= 0 ? i : S.setup.step + 1); })); return; }
+    else if (S.detail.brief) box.innerHTML = briefAgainHTML();
     else if (S.detail.legend) box.innerHTML = `<div class="dialog legdlg"><h2>Legenda</h2>${legendHTML()}<div class="dlg-btns"><button class="btn primary" id="detclose">Zavřít</button></div></div>`;
     else box.innerHTML = monDetailHTML(S.detail.mon);
     stripTitles(box);
@@ -10717,12 +10997,19 @@ function renderModal0() {
 }
 
 // ---------- start, briefing, konec ----------
+// v60: zadání scénáře znovu (Menu → Zadání scénáře); ukazuje stranu, za kterou hráč hraje
+function briefSides() { const o = S.ctl.overlord === 'human', h = S.ctl.heroes === 'human'; return o && !h ? ['o'] : h && !o ? ['h'] : ['h', 'o']; }
+function briefAgainHTML() {
+  const G = S.G, title = 'Scénář ' + G.scen.n + ': ' + G.scen.name, sides = briefSides();
+  return `<div class="dialog brief"><p class="eyebrow">Zadání scénáře</p><h2>${esc(title)}</h2>${sides.map((x, i) => (sides.length > 1 ? `<h3>${x === 'o' ? 'Dům' : 'Lovci duchů'}</h3>` : '') + (x === 'o' ? BRIEF_O() : BRIEF_H())).join('')}<div class="dlg-btns"><button class="btn primary" id="detclose">Zavřít</button></div></div>`;
+}
+function showBriefAgain() { if (!S.G) return; S.detail = { brief: true }; sfx('card'); renderModal(); }
 // zadání misí: příběh (1 věta), cíl (1 věta), 2–3 body jak na to
 const GOAL_H = {
   escape: { story: 'Seance se zvrtla a dům za vámi zabouchl dveře.', goal: 'Utečte hlavními dveřmi ve Vstupní hale. Stačí dva z vás.',
     how: ['Klíč je schovaný v nábytku s otazníkem. Jeden z klíčů je falešný.', 'Kdo nese klíč a stojí u hlavních dveří, odemkne je a uteče.'] },
   circles: { story: 'Na hřbitově u svatého Jiljí bloudí duše, které nemohou odejít. Otevřete jim bránu.', goal: 'Nasbírejte 6 vyvolání.',
-    how: ['Vždy svítí jen jeden ze tří kruhů. Lovec, který začne tah v zářícím kruhu, získá vyvolání (ne ležící). Kruh pak pohasne a rozzáří se jiný.', 'Je vidět celý hřbitov. Plot zastaví krok, ne pohled. Branky jsou otevřené, ale Dům je umí zamknout.', 'Svíce vyvolávače dá +1. Monstra se probudí ve 2. kole.', 'Staré krypty: lovec na poli vedle vchodu do krypty může za 2 pohyb přejít na volné pole vedle jiného vchodu. Monstra krypty nepoužívají.'] },
+    how: ['Vždy svítí jen jeden ze tří kruhů. Lovec, který začne tah v zářícím kruhu, získá vyvolání (ne ležící). Kruh pak pohasne a rozzáří se jiný.', 'Je vidět celý hřbitov. Plot zastaví krok, ne pohled. Branky jsou otevřené, ale Dům je umí zamknout.', 'Svíce vyvolávače dá +1. Monstra jsou vzhůru od začátku.', 'Staré krypty: lovec na poli vedle vchodu do krypty může za 2 pohyb přejít na volné pole vedle jiného vchodu. Monstra krypty nepoužívají.'] },
   obelisks: { story: 'V hájovně stojí čtyři pohanské obelisky. Dokud stojí, les patří Domu.', goal: 'Rozbijte všechny obelisky.',
     how: ['Obelisk má armor 1. Kolik má zdraví, rozhodl Dům.', 'Každý působí na svou místnost: Tma, paprsek bolesti na konci tahu, led (o akci méně) a hlad (léčí monstra, +1 Hrozba).', 'V nábytku je schované kladivo.'] },
   cleanse: { story: 'Pod klášterem leží katakomby a kletba z nich prosakuje nahoru.', goal: 'Očistěte 5 ze 6 relikviářů.',
@@ -10732,7 +11019,7 @@ const GOAL_H = {
   maze: { story: 'Živé bludiště v zahradách Blackmooru se za vámi zavřelo. Každou noc roste jinak.', goal: 'Najděte pravou branku a utečte. Stačí dva z vás.',
     how: ['Na okrajích bludiště jsou čtyři branky, pravá je jen jedna. Lovec vedle branky ji za 1 akci vyzkouší.', 'Falešná branka je zarostlá zeď: lovec dostane 1 Strach a Dům si lízne kartu. Pravá se otevře a vstupem na ni lovec uteče.', 'Živé ploty blokují výhled. Zahrady se odkrývají postupně, jak procházíte průchody.', 'Od 9. kola se bludiště probouzí: všechna monstra jsou vzhůru, i v zahradách, které jste ještě neviděli.'] },
   fire: { story: 'Mlýn na Černém potoce hoří a plameny se ženou přes statek k řece.', goal: 'Dostaňte aspoň dva lovce přes brod na pravém konci mapy.',
-    how: ['Na konci každého kola se ohnivá fronta posune doprava. Slabě zvýrazněná pole chytnou na konci kola.', 'Lovec, který stojí na hořícím poli nebo do něj vstoupí, utrží 1 zranění, a znovu 1, když na něm skončí tah. Oheň ruší Tmu a pálí i monstra (2 zranění).', 'Lovec, který leží v ohni, uhoří: ze scénáře je venku a nejde zvednout. Když už nemůžou utéct dva lovci, Dům vyhrál.', 'Brod jsou tři pole v plotě u řeky. Vstupem na ně lovec uteče.'] },
+    how: ['Na konci každého kola se ohnivá fronta posune doprava. Slabě zvýrazněná pole chytnou na konci kola.', 'Lovec, který stojí na hořícím poli nebo do něj vstoupí, utrží 1 zranění, a znovu 1, když na něm skončí tah. Oheň ruší Tmu a pálí stejně i monstra (1 zranění).', 'Lovec, který leží v ohni, uhoří: ze scénáře je venku a nejde zvednout. Když už nemůžou utéct dva lovci, Dům vyhrál.', 'Brod jsou tři pole v plotě u řeky. Vstupem na ně lovec uteče.'] },
   dawn: { story: 'Poslední noc v kostele svatého Rocha. Ze zvonice i z krypty lezou věci, které nesnáší světlo.', get goal() { return 'Vydržte do svítání (konec ' + ((S.G && S.G.maxRound) || 9) + '. kola) a mějte aspoň jednu svíci hořící.'; },
     how: ['Pět velkých svící stojí v lodi kostela, na kůru a v sakristii. Monstrum, které na konci své aktivace stojí vedle hořící svíce a neútočilo, ji zhasne.', 'Svíci, vedle které stojí lovec (ne ležící), monstrum nezhasne. Lovec vedle zhaslé svíce ji za 1 akci znovu zapálí.', 'Padlí přisluhovači se na začátku kola zdarma vracejí oknem zvonice, vikýřem nebo z hrobek. Na začátku stojí monstra jen ve vnějších místnostech.'] },
 };
@@ -10746,7 +11033,7 @@ const GOAL_O = {
   fire: 'Nepusť dva lovce přes brod. Zatarasi jim cestu, ať je oheň dožene. Monstra v ohni hoří taky (ohnivzdorná ne).',
   get dawn() { return 'Zhasni všechny svíce dřív, než přijde svítání (konec ' + ((S.G && S.G.maxRound) || 9) + '. kola).' + ' Monstrum zhasne svíci, když na konci aktivace stojí vedle ní a neútočilo. Padlí přisluhovači se vracejí zdarma.'; },
 };
-const RULES_H = () => `<details class="brules"><summary>Základní pravidla</summary><ul><li>${S.G && S.G.scen.goal === 'dawn' ? 'Svítá na konci ' + S.G.maxRound + '. kola. Do té doby musí hořet aspoň jedna svíce.' : 'Máte ' + (S.G ? S.G.maxRound : 12) + ' kol, pak Dům vyhrává.'}</li><li>Útok: k10 + bonus karty − únik monstra. 5+ zasáhne, přirozená 10 je dvojnásobek.</li><li>Tma: −2 k útokům do ní i z ní, kdo v ní skončí tah, dostane 1 Strach.</li><li>Výhoda: dvě kostky, platí vyšší. Výhoda a nevýhoda se ruší.</li>${C.MAP.revealAll ? '' : '<li>Dveře otevřeš vstupem na ně (2 pohyby). Za nimi je tma a spící monstra.</li>'}<li>Padlý lovec ztrácí všechny stavy. Může v dalším tahu vstát sám (půl zdraví, 1 akce, Panika), nebo ho zvedne spoluhráč (bez Paniky). Kdo padne ve svém tahu, tomu tah hned končí. Kdo už v kole hrál a srazí ho jed nebo krvácení, nevstane.</li><li>Strach na úrovni odvahy = Panika do discardu. Paniku nejde odhodit při dobírání; zbavit se jí stojí 1 akci a odhození jedné další karty.</li><li>Únava: kdykoli zamícháš discard zpět do balíčku, dostaneš 1 Strach. Větší balíček (víc výbavy) = méně únavy.</li></ul></details>`;
+const RULES_H = () => `<details class="brules"><summary>Základní pravidla</summary><ul><li>${S.G && S.G.scen.goal === 'dawn' ? 'Svítá na konci ' + S.G.maxRound + '. kola. Do té doby musí hořet aspoň jedna svíce.' : 'Máte ' + (S.G ? S.G.maxRound : 12) + ' kol, pak Dům vyhrává.'}</li><li>Útok: k10 + bonus karty − únik monstra. 5+ zasáhne, přirozená 10 je dvojnásobek.</li><li>Tma: −2 k útokům do ní i z ní, kdo v ní skončí tah, dostane 1 Strach.</li><li>Výhoda: dvě kostky, platí vyšší. Výhoda a nevýhoda se ruší.</li>${C.MAP.revealAll ? '' : '<li>Dveře otevřeš vstupem na ně (2 pohyby). Za nimi je tma a spící monstra.</li>'}<li>Padlý lovec ztrácí všechny stavy. Může v dalším tahu vstát sám (půl zdraví, 1 akce, Panika), nebo ho zvedne spoluhráč (bez Paniky). Kdo padne ve svém tahu, tomu tah hned končí. Kdo už v kole hrál a srazí ho jed nebo krvácení, nevstane.</li><li>Strach na úrovni odvahy = Panika rovnou do ruky. Paniku nejde odhodit při dobírání; zbavit se jí stojí 1 akci a odhození jedné další karty.</li><li>Únava: kdykoli zamícháš discard zpět do balíčku, dostaneš 1 Strach. Větší balíček (víc výbavy) = méně únavy.</li></ul></details>`;
 const BRIEF_H = () => { const g = GOAL_H[S.G.scen.goal]; return `<p>${g.story}</p><p class="bgoal"><b>Cíl:</b> ${g.goal}</p><ul>${g.how.map(x => `<li>${x}</li>`).join('')}</ul>${RULES_H()}`; };
 const BRIEF_O = () => `<p>${GOAL_H[S.G.scen.goal].story} Ty jsi Dům.</p><p class="bgoal"><b>Cíl:</b> ${GOAL_O[S.G.scen.goal]} Vyhráváš i tehdy, když všichni lovci leží.</p>
 <ul><li>Příprava: vyber ${S.G ? S.G.budget : C.GOLD} sloty skupin monster (poloboss zabere 2) (${S.G.scen.cats.filter(c => c !== 'boss').map(c => C.CATS[c]).join(', ')}), rozmísti je, schovej žetony${S.G.scen.goal === 'maze' ? ', tajně vyber pravou branku' : ''}${S.G.scen.locks ? ', zamkni až ' + S.G.scen.locks + ' dveře' : ''}${S.G.obel ? ', postav ' + S.G.scen.obelisks.length + ' obelisky a rozděl jim ' + S.G.obel.pool + ' zdraví' : ''}${S.G.scen.setupTraps ? ', nastraž až ' + S.G.scen.setupTraps + ' pasti' : ''} a prokleji místnost.</li>
@@ -10767,7 +11054,7 @@ async function startGame() {
   if (builtMap !== C.MAP.id) { $('#menu').hidden = true; $('#game').hidden = false; const ld = el('div', { class: 'maploading' }, 'Připravuji ' + esc(C.MAP.name) + '…'); $('#game').appendChild(ld); await ensureMap(); ld.remove(); }
   $('.top .title').textContent = G.scen.name;
   toks.forEach(t => { t.fig.remove(); t.lab.remove(); if (t.glow) t.glow.remove(); }); toks.clear(); S.decals = []; gDecal._n = -1; S.doorState = {};
-  S.viewHero = null; S.viewMode = 'auto';
+  S.viewHero = null; S.viewMode = 'auto'; S.tbSide = null; S.tbHero = '';
   $('#menu').hidden = true; $('#game').hidden = false; $('#modal').hidden = true;
   Bots.overlordBot.pool = S.pool && S.pool.size ? [...S.pool] : null;
   const host = NETS.role === 'host';
@@ -10782,7 +11069,7 @@ async function startGame() {
   S.mirrorGame = false; S.mirrorSnap = NETS.role ? null : { s: Net.encodeState(G, { fullLog: true }), uid: maxUidOf(G) + 1 };
   if (!S.camp) S.campHold = null;
   if (host) { sendSnap(G); NETS.conn.send({ t: 'brief', who: 'Lovci duchů', title: scTitle, forRoles: ['ashford', 'varga', 'wren'] }); }
-  if (S.ctl.heroes === 'human') { G.phase = 'heroes'; await ask('briefing', { who: 'Lovci duchů', title: scTitle, body: BRIEF_H() }); }
+  if (S.ctl.heroes === 'human') { const seen = S.briefSeen === G.mapId + '|' + G.scen.id; G.phase = 'heroes'; if (!seen) await ask('briefing', { who: 'Lovci duchů', title: scTitle, body: BRIEF_H() }); }
   render();
   await ui.anim({ type: 'round' });
   const res = await C.runGame(G, ctl, ui);
@@ -10847,7 +11134,10 @@ function initMenu() {
   $('#seg-o').querySelectorAll('button').forEach(b => b.addEventListener('click', updPool)); updPool();
   $('#startbtn').addEventListener('click', () => { Camp.setKey(); startGame(); });
   renderMM();
-  $('#savebtn').addEventListener('click', () => { $('#menupop').hidden = true; if (isClient()) { S.msg = 'Online hru ukládá hostitel.'; render(); return; } if (lastCheckpoint) { lsSet(NETS.role === 'host' ? SAVE_MP : SAVE_SP, JSON.stringify(lastCheckpoint)); S.msg = 'Uloženo: ' + lastCheckpoint.label + ' (od začátku kola).'; } else S.msg = 'Zatím není co uložit, hra se ukládá na začátku kola.'; render(); });
+  $('#savebtn').addEventListener('click', () => { $('#menupop').hidden = true; if (isClient()) { S.msg = 'Online hru ukládá hostitel (sama na začátku každého kola). Kopii si můžeš stáhnout: Menu → Stáhnout uložení.'; render(); return; } if (lastCheckpoint) { lsSet(NETS.role === 'host' ? SAVE_MP : SAVE_SP, JSON.stringify(lastCheckpoint)); S.msg = 'Uloženo: ' + lastCheckpoint.label + ' (od začátku kola).'; } else S.msg = 'Zatím není co uložit, hra se ukládá na začátku kola.'; render(); });
+  $('#dlbtn').addEventListener('click', () => { $('#menupop').hidden = true; gameDownload(); });
+  $('#ulbtn').addEventListener('click', () => { $('#menupop').hidden = true; gameUpload(); });
+  $('#briefbtn').addEventListener('click', () => { $('#menupop').hidden = true; showBriefAgain(); });
   $('#viewbtn').addEventListener('click', () => { S.viewMode = view() === 'all' ? 'heroes' : 'all'; render(); });
   $('#newgame').addEventListener('click', () => { const b = $('#newgame'); if (S.G && S.G.phase !== 'over' && !b.dataset.confirm) { b.dataset.confirm = '1'; b.textContent = 'Opravdu?'; setTimeout(() => { delete b.dataset.confirm; b.textContent = 'Odejít do menu'; }, 2500); return; } if (NETS.role === 'host') NETS.conn.send({ t: 'menu' }); else if (NETS.conn) NETS.conn.send({ t: 'bye', from: Net.myId }); setTimeout(() => location.reload(), 150); });
   $('#speedsel').addEventListener('change', e => S.speed = +e.target.value);
@@ -10862,6 +11152,11 @@ function initMenu() {
     const mc = e.target.closest('.msum'); if (mc && !e.target.closest('button')) { S.detail = { mon: mc.dataset.mon }; sfx('card'); renderModal(); return; }
     if (e.target.id === 'modal' && S.detail) { S.detail = null; renderModal(); }
   });
+  // v60: Alt podržený = přehled průchodnosti; puštění, ztráta fokusu nebo přepnutí okna ho skryje
+  const passOff = () => { if (S.passOv) { S.passOv = false; passOverlay(false); } };
+  document.addEventListener('keydown', e => { if (e.key === 'Alt' && S.G && !$('#game').hidden) { e.preventDefault(); if (!S.passOv) { S.passOv = true; passOverlay(true); } } });
+  document.addEventListener('keyup', e => { if (e.key === 'Alt') { e.preventDefault(); passOff(); } });
+  window.addEventListener('blur', passOff); document.addEventListener('visibilitychange', passOff);
   document.addEventListener('keydown', e => {
     if (e.key === 'Escape' && (S.pileView || S.detail)) { S.pileView = null; S.detail = null; renderModal(); }
     if (e.key === 'Tab' && S.G && !$('#game').hidden && !e.target.closest('input, select, textarea')) { e.preventDefault(); toggleHands(); }
@@ -10871,6 +11166,8 @@ function initMenu() {
   buildMap().then(() => {
     initPanZoom();
     sb.disabled = false; sb.textContent = sbt;
+    let al = null; try { al = sessionStorage.getItem(AUTOLOAD); sessionStorage.removeItem(AUTOLOAD); } catch (e) { /* nic */ }
+    if (al) setTimeout(() => { if (al === SAVE_SP || al === SAVE_MP) loadGame(al); else afterImport(null, al === 'camp:mp' ? 'mp' : 'sp'); }, 50);
     const mp = $('#menuart'); if (mp) mp.innerHTML = `<svg viewBox="-80 -62 160 68"><ellipse cx="0" cy="2" rx="70" ry="5" fill="url(#ag-shadow)"/>${['m:vdova:n', 'h:ashford', 'h:varga', 'h:wren', 'm:zbroj:e'].map((k, i) => { const s = SPR[k]; return `<image href="${s.url}" x="${s.vb[0] + (i - 2) * 32}" y="${s.vb[1]}" width="${s.vb[2]}" height="${s.vb[3]}" class="px" ${i === 0 ? '' : ''} transform="${i === 4 ? `translate(${2 * 2 * 32},0) scale(-1,1)` : ''}"/>`; }).join('')}</svg>`;
     document.querySelectorAll('.poolit svg.mport').forEach(sv0 => { const t = sv0.closest('[data-pool]').dataset.pool, s = SPR['m:' + t + ':n']; if (s) sv0.innerHTML = `<image href="${s.url}" x="${s.vb[0]}" y="${s.vb[1]}" width="${s.vb[2]}" height="${s.vb[3]}" class="px"/>`; });
   });
@@ -10939,11 +11236,19 @@ function campHeroesHTML(st) {
       <div class="si-cards">${itemCardsHTML(id)}</div>
       ${buyFor === id ? `<div class="si-who">Komu? ${C.HEROES.filter(h => !e.hero || e.hero === h.id).map(h => `<button class="btn sm" data-buy="${id}" data-for="${h.id}" style="--c:${HERO_COLORS[h.id]}">${esc(h.name.split(' ')[0])}</button>`).join('')}<button class="btn sm ghost" data-buy="${id}" data-for="">Do truhly</button></div>` : `<button class="btn primary sm" data-pick="${id}" ${p > st.esence ? 'disabled' : ''}>Koupit za ${p}</button>`}</div>`; }).join('') || '<p class="muted">Nabídka je vyprodaná.</p>'}</div></section>`;
   html += `<section class="cp-party">${C.HEROES.map(h => { const hs = st.heroes[h.id]; return `<div class="cp-hero" style="--c:${HERO_COLORS[h.id]}"><div class="cp-hh">${heroPortrait(h.id)}<div><b>${esc(h.name)}</b><small>${esc(h.archetype)} · <span class="xp">${hs.xp} xp</span></small></div></div>
-      ${paperDollHTML(hs.equip, { slotAttr: true, hero: h.id })}
+      ${paperDollHTML(hs.equip, { slotAttr: true, hero: h.id, sel: S.campInspect && S.campInspect.hero === h.id ? S.campInspect.id : null })}${campInspectHTML(st, h.id)}
       <div class="bag" data-drop='${JSON.stringify({ where: 'bag', hero: h.id })}'><span class="bag-h">${A.icon('satchel')} Batoh ${hs.bag.length}/${Camp.BAG}</span>${hs.bag.map((id, i) => `<span class="bagi" draggable="true" data-src='${JSON.stringify({ where: 'bag', hero: h.id, idx: i })}' title="${esc(C.EQUIP[id].name)}">${itemPic(id)}<small>${esc(C.EQUIP[id].name)}</small></span>`).join('')}${hs.bag.length < Camp.BAG ? '<span class="bag-empty">přetáhni sem</span>' : ''}</div>
       <div class="cp-abil">${C.ABIL[h.id].map(ab => { const cur = hs.abil[ab.key] || ''; return `<div class="ab-row"><p class="ab-name">${esc(ab.cat)} · <b>${esc(ab.tree[cur][0])}</b> <small>úroveň ${C.levelOf(cur)}</small></p>${treeHTML(ab.tree, cur, hs.xp, `data-up="${h.id}|${ab.key}" data-v`, true)}</div>`; }).join('')}</div></div>`; }).join('')}</section>`;
-  html += `<section class="cp-chest" data-drop='{"where":"chest"}'><div class="cp-h"><h3>Truhla družiny</h3><div class="sellzone" data-drop='{"where":"sell"}'>${A.icon('star')} Prodat sem · +1 esence</div></div>${st.chest.length ? `<div class="chest">${st.chest.map((id, i) => `<div class="ci" draggable="true" data-src='{"where":"chest","idx":${i}}'><span class="si-ic art">${itemPic(id)}</span><div><b>${esc(C.EQUIP[id].name)}</b><div class="si-b">${itemBadge(id)}</div></div><div class="ci-b">${C.HEROES.map(h => `<button class="btn sm" data-equip="${id}" data-for="${h.id}">${esc(h.name.split(' ')[0])}</button>`).join('')}<button class="btn sm ghost" data-sell="${id}">Prodat · +1</button></div></div>`).join('')}</div>` : '<p class="muted">Prázdná. Sem padá výbava, kterou nahradíte, nebo kterou koupíte do zásoby. Kliknutím na předmět u lovce ho sem odložíte.</p>'}</section>`;
+  html += `<section class="cp-chest" data-drop='{"where":"chest"}'><div class="cp-h"><h3>Truhla družiny</h3><div class="sellzone" data-drop='{"where":"sell"}'>${A.icon('star')} Prodat sem · +1 esence</div></div>${st.chest.length ? `<div class="chest">${st.chest.map((id, i) => `<div class="ci" draggable="true" data-src='{"where":"chest","idx":${i}}'><span class="si-ic art">${itemPic(id)}</span><div><b>${esc(C.EQUIP[id].name)}</b><div class="si-b">${itemBadge(id)}</div></div><div class="ci-b">${C.HEROES.map(h => `<button class="btn sm" data-equip="${id}" data-for="${h.id}">${esc(h.name.split(' ')[0])}</button>`).join('')}<button class="btn sm ghost" data-sell="${id}">Prodat · +1</button></div></div>`).join('')}</div>` : '<p class="muted">Prázdná. Sem padá výbava, kterou nahradíte, nebo kterou koupíte do zásoby. Kliknutím na předmět u lovce uvidíte jeho karty (a můžete ho sem odložit).</p>'}</section>`;
   return html;
+}
+// v60: náhled karet předmětu z vlastní výbavy (srovnání s nabídkou obchodu)
+function campInspectHTML(st, heroId) {
+  const ci = S.campInspect; if (!ci || ci.hero !== heroId) return '';
+  const id = ci.slot ? st.heroes[heroId].equip[ci.slot] : st.heroes[heroId].bag[ci.bag];
+  if (!id || !C.EQUIP[id]) { S.campInspect = null; return ''; }
+  const e = C.EQUIP[id];
+  return `<div class="cp-insp"><div class="cp-h"><b>${esc(e.name)}</b><span class="si-b">${itemBadge(id)}</span><span class="muted sm">${e.passive ? 'pasivní, bez karet' : 'přidává do balíčku ' + e.cards.length + ' ' + (e.cards.length === 1 ? 'kartu' : e.cards.length < 5 ? 'karty' : 'karet')}</span></div><div class="si-cards">${itemCardsHTML(id, heroId)}</div><div class="dlg-btns">${ci.slot && campMay('h') ? '<button class="btn sm ghost" data-insp-chest>Odložit do truhly</button>' : ''}<button class="btn sm" data-insp-close>Zavřít</button></div></div>`;
 }
 // vylepšení skupin monster za temnou esenci Domu
 function campGrpHTML(st) {
@@ -10951,8 +11256,8 @@ function campGrpHTML(st) {
   if (!types.length) return '';
   const nextCats = new Set((Camp.scenById(st.next) || {}).cats || []);
   return `<div class="grp-up"><div class="cp-h"><h3>Skupiny monster</h3><span class="ess gold">${A.icon('crown')} ${gold} temné esence</span></div>
-    <p class="muted sm">Vylepšení platí natrvalo, kdykoli skupinu nasadíš. Platí se temnou esencí (${A.icon('crown')}): ${Camp.GRP_UPS.map(u => esc(u.name) + ' ' + u.cost + ' (max ' + u.max + '×)').join(', ')}. ★ = skupina z dalšího scénáře.</p>
-    <div class="grp-list">${types.sort((a, b) => (nextCats.has(C.MDEF[b].cat) ? 1 : 0) - (nextCats.has(C.MDEF[a].cat) ? 1 : 0)).map(t => { const g = (st.ol.grp || {})[t] || {}; return `<div class="grp${Object.keys(g).length ? ' has' : ''}">${monPortrait(t)}<div class="grp-b"><b>${nextCats.has(C.MDEF[t].cat) ? '★ ' : ''}${esc(C.MDEF[t].name)}</b><small>${grpBadge(t, g) || 'bez vylepšení'} · Zocelení: +${C.D.grpHpPer(t)} zdraví všem figurkám</small></div><div class="grp-btns">${Camp.GRP_UPS.map(u => { const why = Camp.grpCan(st, t, u.k), n = g[u.k] || 0; return `<button class="btn sm${why ? '' : ' primary'}" data-grpup="${t}|${u.k}" ${why ? 'disabled' : ''} title="${esc(grpUpText(t, u) + (why ? ' ' + why : ''))}">${esc(u.name)} ${n}/${u.max} · ${u.cost} ${A.icon('crown')}</button>`; }).join('')}</div></div>`; }).join('')}</div></div>`;
+    <p class="muted sm">Vylepšení platí natrvalo, kdykoli skupinu nasadíš. Platí se temnou esencí (${A.icon('crown')}): ${Camp.GRP_UPS.map(u => esc(u.name) + ' ' + u.cost + ' (max ' + u.max + '×)').join(', ')}. ★ = skupina z dalšího scénáře. U každé skupiny je prostředí (kategorie), ve kterém se dá nasadit.</p>
+    <div class="grp-list">${types.sort((a, b) => (nextCats.has(C.MDEF[b].cat) ? 1 : 0) - (nextCats.has(C.MDEF[a].cat) ? 1 : 0)).map(t => { const g = (st.ol.grp || {})[t] || {}; return `<div class="grp${Object.keys(g).length ? ' has' : ''}">${monPortrait(t)}<div class="grp-b"><b>${nextCats.has(C.MDEF[t].cat) ? '★ ' : ''}${esc(C.MDEF[t].name)}</b><span class="grp-cat${nextCats.has(C.MDEF[t].cat) ? ' next' : ''}">${esc(C.CATS[C.MDEF[t].cat] || C.MDEF[t].cat)}</span><small>${grpBadge(t, g) || 'bez vylepšení'} · Zocelení: +${C.D.grpHpPer(t)} zdraví všem figurkám</small></div><div class="grp-btns">${Camp.GRP_UPS.map(u => { const why = Camp.grpCan(st, t, u.k), n = g[u.k] || 0; return `<button class="btn sm${why ? '' : ' primary'}" data-grpup="${t}|${u.k}" ${why ? 'disabled' : ''} title="${esc(grpUpText(t, u) + (why ? ' ' + why : ''))}">${esc(u.name)} ${n}/${u.max} · ${u.cost} ${A.icon('crown')}</button>`; }).join('')}</div></div>`; }).join('')}</div></div>`;
 }
 const grpUpText = (t, u) => u.k === 'hp' ? '+' + C.D.grpHpPer(t) + ' zdraví všem figurkám' : u.text;
 const grpBadge = (t, g) => [g.hp ? '+' + g.hp * C.D.grpHpPer(t) + ' zdraví' : '', g.plus ? '+' + g.plus + ' přisluhovač' + (g.plus > 1 ? 'i' : '') : '', g.elite ? '+' + g.elite + ' elita' : ''].filter(Boolean).join(' · ');
@@ -11032,7 +11337,13 @@ function campPick(id) {
 function campHeadHTML(st, title, sub) {
   return `<header class="cp-top"><div class="cp-tt"><p class="eyebrow">Kampaň Blackmoor · odehráno ${Camp.playedN(st)} z ${C.SCENARIOS.length}</p><h1>${title}</h1>${sub ? `<p class="cp-sub">${sub}</p>` : ''}</div>${campScoreHTML(st)}</header>${campProgHTML(st)}`;
 }
+function campDlButton(box) {
+  const f = box.querySelector('.cp-foot'); if (!f || f.querySelector('[data-campdl]')) return;
+  f.insertAdjacentHTML('beforeend', '<button class="btn ghost" data-campdl title="Stáhne stav kampaně do souboru .json (záloha, přenos na jiný počítač)">Stáhnout uložení</button>');
+  f.querySelector('[data-campdl]').addEventListener('click', () => { if (!S.camp) return; const n = downloadBundle(saveBundle(NETS.role ? 'mp' : 'sp', null, S.camp)); sfx(n ? 'click' : 'deny'); });
+}
 function campWireCommon(box) {
+  campDlButton(box);
   box.querySelectorAll('[data-menu]').forEach(b => b.addEventListener('click', () => { const pv = $('#treepv'); if (pv) pv.hidden = true; box.hidden = true; $('#menu').hidden = false; refreshMenu(); }));
   box.querySelectorAll('[data-campnew]').forEach(b => b.addEventListener('click', () => { Camp.clear(); S.camp = null; box.hidden = true; $('#menu').hidden = false; refreshMenu(); }));
   if (isClient()) box.querySelectorAll('[data-campnew],[data-menu]').forEach(b => { b.disabled = true; b.textContent = 'Čeká se na hostitele'; });
@@ -11095,14 +11406,20 @@ function showCampShop() {
   if (!S.campTab) S.campTab = NETS.role ? (myRoles().some(k => k !== 'overlord') ? 'h' : 'o') : S.ctl.heroes === 'human' ? 'h' : 'o';
   const next = Camp.scenById(st.next);
   $('#game').hidden = true; $('#modal').hidden = true; box.hidden = false;
+  // v60: online vidí každá strana jen svůj obchod (hot-seat beze změny)
+  const tabsOk = NETS.role ? ['h', 'o'].filter(campMay) : ['h', 'o'];
+  if (!tabsOk.length) tabsOk.push('h');
+  if (!tabsOk.includes(S.campTab)) S.campTab = tabsOk[0];
+  const nextBar = `<div class="cp-nextbar">${A.icon('door')}<span>Další scénář: <b>${esc(next.n + '. ' + next.name)}</b></span><span>Prostředí monster: ${(next.cats || []).filter(c => c !== 'boss').map(c => `<span class="grp-cat next">${esc(C.CATS[c])}</span>`).join(' ')}</span><span class="muted sm">${esc(next.goalShort || next.short || '')}</span></div>`;
   box.innerHTML = `<div class="camp-wrap">${campHeadHTML(st, 'Mezi scénáři')}
-    ${campRewardsHTML(S.campReward)}
-    <nav class="cp-tabs"><button data-tab="h" aria-pressed="${S.campTab === 'h'}">Lovci: obchod, výbava, schopnosti</button><button data-tab="o" aria-pressed="${S.campTab === 'o'}">Dům: monstra a karty</button></nav>
+    ${campRewardsHTML(S.campReward)}${nextBar}
+    <nav class="cp-tabs">${tabsOk.includes('h') ? `<button data-tab="h" aria-pressed="${S.campTab === 'h'}">Lovci: obchod, výbava, schopnosti</button>` : ''}${tabsOk.includes('o') ? `<button data-tab="o" aria-pressed="${S.campTab === 'o'}">Dům: monstra a karty</button>` : ''}</nav>
     <div class="cp-body">${S.campTab === 'h' ? campHeroesHTML(st) : campOlHTML(st)}</div>
     <footer class="cp-foot"><p>Další: <b>${esc(next.n + '. ' + next.name)}</b>. ${esc(next.goalShort || next.short)}</p><button class="btn primary" data-next>Hrát scénář ${Camp.playedN(st) + 1} z ${C.SCENARIOS.length}</button><button class="btn ghost" data-menu>Do menu</button></footer></div>`;
   stripTitles(box);
   const re = () => showCamp();
-  box.querySelectorAll('[data-tab]').forEach(b => b.addEventListener('click', () => { S.campTab = b.dataset.tab; re(); }));
+  campDlButton(box);
+  box.querySelectorAll('[data-tab]').forEach(b => b.addEventListener('click', () => { if (!tabsOk.includes(b.dataset.tab)) return; S.campTab = b.dataset.tab; re(); }));
   box.querySelectorAll('[data-reroll]').forEach(b => b.addEventListener('click', () => { campDo('reroll'); sfx('shuffle'); re(); }));
   box.querySelectorAll('[data-pick]').forEach(b => b.addEventListener('click', () => { S.campBuy = b.dataset.pick; sfx('click'); re(); }));
   box.querySelectorAll('[data-buy]').forEach(b => b.addEventListener('click', () => { const w = campDo('buy', b.dataset.buy, b.dataset.for || null); S.campBuy = null; sfx(w ? 'deny' : 'coin'); re(); }));
@@ -11119,7 +11436,11 @@ function showCampShop() {
       if (dst.where === 'sell') { campDo('sellFrom', src); sfx('coin'); re(); return; }
       const w = campDo('moveItem', src, dst); if (w) S.msg = w; sfx('card'); re(); });
   });
-  box.querySelectorAll('.cp-hero .pd-cell.full').forEach(b => b.addEventListener('click', () => { const hero = C.HEROES[[...box.querySelectorAll('.cp-hero')].indexOf(b.closest('.cp-hero'))].id; campDo('toChest', hero, b.dataset.slot); sfx('card'); re(); }));
+  // v60: klik na předmět ve výbavě / v batohu ukáže jeho karty (pro srovnání s obchodem); odložení je tlačítko v náhledu
+  box.querySelectorAll('.cp-hero .pd-cell.full').forEach(b => b.addEventListener('click', () => { const hero = C.HEROES[[...box.querySelectorAll('.cp-hero')].indexOf(b.closest('.cp-hero'))].id; const cur = S.campInspect; S.campInspect = cur && cur.hero === hero && cur.slot === b.dataset.slot ? null : { hero, slot: b.dataset.slot, id: b.dataset.eq }; sfx('card'); re(); }));
+  box.querySelectorAll('.cp-hero .bagi').forEach(b => b.addEventListener('click', () => { const src = JSON.parse(b.dataset.src), id = st.heroes[src.hero].bag[src.idx]; const cur = S.campInspect; S.campInspect = cur && cur.hero === src.hero && cur.bag === src.idx ? null : { hero: src.hero, bag: src.idx, id }; sfx('card'); re(); }));
+  box.querySelectorAll('[data-insp-close]').forEach(b => b.addEventListener('click', () => { S.campInspect = null; re(); }));
+  box.querySelectorAll('[data-insp-chest]').forEach(b => b.addEventListener('click', () => { const ci = S.campInspect; if (ci && ci.slot) campDo('toChest', ci.hero, ci.slot); S.campInspect = null; sfx('card'); re(); }));
   box.querySelectorAll('[data-up]').forEach(b => b.addEventListener('click', () => { const [hid, key] = b.dataset.up.split('|'); const w = campDo('upgradeHero', hid, key, b.dataset.v); sfx(w ? 'deny' : 'coin'); re(); }));
   box.querySelectorAll('[data-olup]').forEach(b => b.addEventListener('click', () => { const w = campDo('upgradeOl', b.dataset.olup, b.dataset.v); sfx(w ? 'deny' : 'coin'); re(); }));
   box.querySelectorAll('[data-grpup]').forEach(b => b.addEventListener('click', () => { const [t, k] = b.dataset.grpup.split('|'); const w = campDo('buyGroupUp', t, k); sfx(w ? 'deny' : 'coin'); re(); }));
@@ -11176,12 +11497,12 @@ function renderMM() {
   let h = '';
   if (MM === 'main') {
     h = mmBtn('single', 'hand', 'Hra pro jednoho', 'Ty proti botům: za lovce, nebo za Dům', 'primary') + mmBtn('multi', 'ally', 'Hra více hráčů', 'Online přes kód, každý na svém počítači')
-      + mmBtn('load', 'deck', 'Načíst hru', sp || mp ? 'Uložené hry: ' + [sp && 'pro jednoho', mp && 'online'].filter(Boolean).join(', ') : 'Zatím nic uloženého', sp || mp ? '' : '" disabled data-x="') + mmBtn('settings', 'clock', 'Nastavení', 'Rychlost animací, monstra pro bota');
+      + mmBtn('load', 'deck', 'Načíst hru', sp || mp ? 'Uložené hry: ' + [sp && 'pro jednoho', mp && 'online'].filter(Boolean).join(', ') : 'Nic uloženého · nahrát ze souboru') + mmBtn('settings', 'clock', 'Nastavení', 'Rychlost animací, monstra pro bota');
   } else if (MM === 'single') {
-    h = `<button class="mm-back" data-mm="main">← zpět</button><h2>Za koho hraješ?</h2><div class="mm-row"><button class="mm-btn mm-side" data-side="heroes">${A.icon('ally')}<span>Lovci<small>Tři lovci duchů, karty a výbava</small></span></button><button class="mm-btn mm-side" data-side="overlord">${A.icon('threat')}<span>Dům<small>Monstra, kletby a karty hrůzy</small></span></button></div>`;
+    h = `<button class="mm-back" data-mm="main">← zpět</button><h2>Za koho hraješ?</h2>${NETS.loadNote ? `<p class="mm-note">${esc(NETS.loadNote)}</p>` : ''}<div class="mm-row"><button class="mm-btn mm-side" data-side="heroes">${A.icon('ally')}<span>Lovci<small>Tři lovci duchů, karty a výbava</small></span></button><button class="mm-btn mm-side" data-side="overlord">${A.icon('threat')}<span>Dům<small>Monstra, kletby a karty hrůzy</small></span></button></div>`;
   } else if (MM === 'single2') {
     const cs = camp && !Camp.finished(camp) ? camp : null;
-    h = `<button class="mm-back" data-mm="single">← zpět</button><h2>Hraješ za ${S.ctl.heroes === 'human' ? 'lovce' : 'Dům'}</h2>`
+    h = `<button class="mm-back" data-mm="single">← zpět</button><h2>Hraješ za ${S.ctl.heroes === 'human' ? 'lovce' : 'Dům'}</h2>` + (NETS.loadNote ? `<p class="mm-note">${esc(NETS.loadNote)}</p>` : '')
       + (cs ? mmBtn('campcont', 'star', 'Pokračovat v kampani', campMenuLine(cs).replace(/^o/, 'O'), 'primary') : '')
       + mmBtn('campnew', 'crown', cs ? 'Nová kampaň' : 'Kampaň', cs ? 'Rozehraná kampaň se smaže' : nScen(C.SCENARIOS.length) + ', další vybírá vítěz mise; mezi nimi obchod a vylepšení', cs ? '' : 'primary')
       + mmBtn('missions', 'door', 'Jednotlivá mise', 'Vyber si scénář');
@@ -11192,17 +11513,20 @@ function renderMM() {
     h = `<button class="mm-back" data-mm="main">← zpět</button><h2>Hra více hráčů</h2><input class="mm-input" id="mm-name" maxlength="16" placeholder="Tvoje jméno" value="${esc(nm)}">
       ${mmBtn('host', 'crown', 'Založit hru', 'Dostaneš kód, který pošleš ostatním', 'primary')}
       <div class="mm-row"><input class="mm-input code" id="mm-code" maxlength="5" placeholder="KÓD"><button class="mm-btn" data-mm="join">${A.icon('key')}<span>Připojit se</span></button></div>
-      ${NETS.err ? `<p class="mm-err">${esc(NETS.err)}</p>` : ''}<p class="mm-note">Hra běží u hostitele. Ideálně 2–4 hráči: jeden za Dům, ostatní si rozdělí lovce. Volné role hraje bot.</p>`;
+      ${NETS.err ? `<p class="mm-err">${esc(NETS.err)}</p>` : ''}${NETS.loadNote ? `<p class="mm-note">${esc(NETS.loadNote)}</p>` : ''}<p class="mm-note">Hra běží u hostitele. Ideálně 2–4 hráči: jeden za Dům, ostatní si rozdělí lovce. Volné role hraje bot.</p>`;
   } else if (MM === 'lobby') {
     const host = NETS.role === 'host';
     h = `<h2>${host ? 'Tvoje hra' : 'Připojeno'}</h2><div class="mm-code">${esc(NETS.code || '')}</div><p class="mm-note">${host ? 'Pošli kód ostatním. Až budou všichni tady, rozděl role a začni.' : 'Čekáme, až hostitel rozdělí role a spustí hru.'}</p>
       <div class="mm-players">${NETS.players.map(p => `<span>${esc(p.name)}${p.id === Net.myId ? ' (ty)' : ''}${p.host ? ' · hostitel' : ''}</span>`).join('')}</div>
       <div class="mm-roles">${ROLE_KEYS.map(k => `<label class="mm-role"><span>${esc(roleLabel(k))}</span>${host ? `<select data-role="${k}">${['bot'].concat(NETS.players.map(p => p.id)).map(id => `<option value="${id}" ${NETS.roles[k] === id ? 'selected' : ''}>${esc(pName(id))}</option>`).join('')}</select>` : `<b>${esc(pName(NETS.roles[k]))}</b>`}</label>`).join('')}</div>
-      ${NETS.resume ? `<p class="mm-note">Pokračuje se v uložené hře: <b>${esc(NETS.resume.label)}</b>.</p>` : host ? `<label class="mm-role"><span>Hra</span><select class="mm-sel" id="mm-mode"><option value="camp" ${NETS.mode === 'camp' ? 'selected' : ''}>Kampaň (nová)</option>${C.SCENARIOS.map(sc => `<option value="${sc.id}" ${NETS.mode === 'mis' && NETS.scen === sc.id ? 'selected' : ''}>Mise ${sc.n}: ${esc(sc.name)}</option>`).join('')}</select></label>` : `<p class="mm-note">Hra: <b>${NETS.mode === 'camp' ? 'kampaň' : esc((C.SCENARIOS.find(x => x.id === NETS.scen) || {}).name || '')}</b></p>`}
+      ${NETS.resume ? `<p class="mm-note">Pokračuje se v uložené hře: <b>${esc(NETS.resume.label)}</b>.</p>` : host ? `<label class="mm-role"><span>Hra</span><select class="mm-sel" id="mm-mode">${(() => { const c = Camp.migrate(readSave(CAMP_KEY_MP)); return c && !Camp.finished(c) ? `<option value="campcont" ${NETS.mode === 'campcont' ? 'selected' : ''}>Kampaň (pokračovat: ${esc(campMenuLine(c))})</option>` : ''; })()}<option value="camp" ${NETS.mode === 'camp' ? 'selected' : ''}>Kampaň (nová)</option>${C.SCENARIOS.map(sc => `<option value="${sc.id}" ${NETS.mode === 'mis' && NETS.scen === sc.id ? 'selected' : ''}>Mise ${sc.n}: ${esc(sc.name)}</option>`).join('')}</select></label>` : `<p class="mm-note">Hra: <b>${NETS.mode === 'camp' ? 'kampaň' : NETS.mode === 'campcont' ? 'pokračování kampaně' : esc((C.SCENARIOS.find(x => x.id === NETS.scen) || {}).name || '')}</b></p>`}
       ${host ? mmBtn('netstart', 'star', 'Začít hru', '', 'primary') : ''}<button class="mm-back" data-mm="leave">Odejít</button>`;
   } else if (MM === 'load') {
-    const row = (k, d, lab) => d ? `<div class="mm-btn" style="cursor:default">${A.icon('deck')}<span>${lab}<small>${esc(d.label || '')} · ${new Date(d.at).toLocaleString('cs-CZ')}</small></span></div><div class="mm-row"><button class="mm-btn primary" data-load="${k}">Načíst</button><button class="mm-btn" data-del="${k}">Smazat</button></div>` : '';
-    h = `<button class="mm-back" data-mm="main">← zpět</button><h2>Načíst hru</h2>${row(SAVE_SP, sp, 'Hra pro jednoho')}${row(SAVE_MP, mp, 'Online hra (načte hostitel)')}${!sp && !mp ? '<p class="mm-note">Nic uloženého. Hra se ukládá sama na začátku každého kola.</p>' : ''}<p class="mm-note">Ukládá se vždy stav na začátku kola. Online hru načte hostitel a ostatní se připojí kódem.</p>`;
+    const row = (k, d, lab) => d ? `<div class="mm-btn" style="cursor:default">${A.icon('deck')}<span>${lab}<small>${esc(d.label || '')} · ${new Date(d.at).toLocaleString('cs-CZ')}</small></span></div><div class="mm-row"><button class="mm-btn primary" data-load="${k}">Načíst</button><button class="mm-btn" data-dl="${k}">Stáhnout uložení</button><button class="mm-btn" data-del="${k}">Smazat</button></div>` : '';
+    const cSp = readSave(CAMP_KEY_SP), cMp = readSave(CAMP_KEY_MP);
+    const crow = (k, d, lab) => d && Camp.migrate(JSON.parse(JSON.stringify(d))) ? `<div class="mm-row mm-camprow"><span class="mm-note">${lab}: ${esc(campMenuLine(Camp.migrate(JSON.parse(JSON.stringify(d)))))}</span><button class="mm-btn" data-dlcamp="${k}">Stáhnout kampaň</button></div>` : '';
+    h = `<button class="mm-back" data-mm="main">← zpět</button><h2>Načíst hru</h2>${row(SAVE_SP, sp, 'Hra pro jednoho')}${row(SAVE_MP, mp, 'Online hra (načte hostitel)')}${!sp && !mp ? '<p class="mm-note">Nic uloženého. Hra se ukládá sama na začátku každého kola.</p>' : ''}${crow(CAMP_KEY_SP, cSp, 'Kampaň pro jednoho')}${crow(CAMP_KEY_MP, cMp, 'Online kampaň')}
+      <button class="mm-btn" data-upload>${A.icon('deck')}<span>Nahrát uložení ze souboru<small>Soubor .json stažený ze hry (i od jiného hráče)</small></span></button>${NETS.err ? `<p class="mm-err">${esc(NETS.err)}</p>` : ''}<p class="mm-note">Ukládá se vždy stav na začátku kola. Online hru načte hostitel a ostatní se připojí kódem. Stažený soubor je záloha: přenese hru i na jiný počítač.</p>`;
   } else if (MM === 'settings') {
     h = `<button class="mm-back" data-mm="main">← zpět</button><h2>Nastavení</h2><div class="opt mm-settings"><span>Rychlost animací</span><div class="seg" id="mm-speed">${[['1.6', 'Pomalu'], ['1', 'Normálně'], ['0.4', 'Rychle']].map(([v, l]) => `<button data-v="${v}" aria-pressed="${String(S.speed) === v}">${l}</button>`).join('')}</div></div><div class="opt"><span>Monstra pro bota Domu <em>(nic = všechna)</em></span><div class="pool" id="mm-pool"></div></div>`;
   }
@@ -11211,14 +11535,17 @@ function renderMM() {
   box.querySelectorAll('[data-side]').forEach(b => b.addEventListener('click', () => { S.ctl = b.dataset.side === 'heroes' ? { heroes: 'human', overlord: 'bot' } : { heroes: 'bot', overlord: 'human' }; mmGo('single2'); }));
   box.querySelectorAll('[data-mis]').forEach(b => b.addEventListener('click', () => { if (NETS.role === 'host') { NETS.mode = 'mis'; NETS.scen = b.dataset.mis; mmGo('lobby'); return; } S.play = 'single'; S.scenPick = b.dataset.mis; startGame(); }));
   box.querySelectorAll('[data-role]').forEach(s => s.addEventListener('change', () => { NETS.roles[s.dataset.role] = s.value; hostLobby(); }));
-  const md = $('#mm-mode'); if (md) md.addEventListener('change', () => { if (md.value === 'camp') NETS.mode = 'camp'; else { NETS.mode = 'mis'; NETS.scen = md.value; } hostLobby(); });
+  const md = $('#mm-mode'); if (md) md.addEventListener('change', () => { if (md.value === 'camp' || md.value === 'campcont') NETS.mode = md.value; else { NETS.mode = 'mis'; NETS.scen = md.value; } hostLobby(); });
   box.querySelectorAll('[data-load]').forEach(b => b.addEventListener('click', () => loadGame(b.dataset.load)));
-  box.querySelectorAll('[data-del]').forEach(b => b.addEventListener('click', () => { lsDel(b.dataset.del); renderMM(); }));
+  box.querySelectorAll('[data-del]').forEach(b => b.addEventListener('click', () => { if (!b.dataset.confirm) { b.dataset.confirm = '1'; b.textContent = 'Opravdu smazat?'; return; } lsDel(b.dataset.del); renderMM(); }));
+  box.querySelectorAll('[data-dl]').forEach(b => b.addEventListener('click', () => { const k = b.dataset.dl, d = readSave(k); if (d) downloadBundle(saveBundle(k === SAVE_MP ? 'mp' : 'sp', d, null)); }));
+  box.querySelectorAll('[data-dlcamp]').forEach(b => b.addEventListener('click', () => { const k = b.dataset.dlcamp, d = readSave(k); if (d) downloadBundle(saveBundle(k === CAMP_KEY_MP ? 'mp' : 'sp', null, d)); }));
+  box.querySelectorAll('[data-upload]').forEach(b => b.addEventListener('click', () => menuUpload()));
   const spd = $('#mm-speed'); if (spd) spd.querySelectorAll('button').forEach(b => b.addEventListener('click', () => { S.speed = +b.dataset.v; $('#speedsel').value = b.dataset.v; renderMM(); }));
   const pool = $('#mm-pool'); if (pool) { pool.innerHTML = $('#pool').innerHTML; pool.querySelectorAll('[data-pool]').forEach(b => { b.setAttribute('aria-pressed', S.pool.has(b.dataset.pool)); b.addEventListener('click', () => { const t = b.dataset.pool; if (S.pool.has(t)) S.pool.delete(t); else S.pool.add(t); b.setAttribute('aria-pressed', S.pool.has(t)); }); }); }
 }
 async function mmAction(a) {
-  if (['main', 'single', 'multi', 'load', 'settings', 'missions', 'single2', 'lobby'].includes(a)) { NETS.err = ''; return mmGo(a); }
+  if (['main', 'single', 'multi', 'load', 'settings', 'missions', 'single2', 'lobby'].includes(a)) { NETS.err = ''; if (a === 'main' || a === 'load') NETS.loadNote = ''; return mmGo(a); }
   if (a === 'campcont') { S.play = 'camp'; Camp.setKey(); return startGame(); }
   if (a === 'campnew') { Camp.setKey(); Camp.clear(); S.play = 'camp'; return startGame(); }
   if (a === 'host' || a === 'join') {
@@ -11286,7 +11613,7 @@ async function enterGameScreen() {
   if (builtMap !== C.MAP.id) { const ld = el('div', { class: 'maploading' }, 'Připravuji ' + esc(C.MAP.name) + '…'); $('#game').appendChild(ld); await ensureMap(); ld.remove(); }
   $('.top .title').textContent = S.G.scen.name;
   toks.forEach(t => { t.fig.remove(); t.lab.remove(); if (t.glow) t.glow.remove(); }); toks.clear(); S.decals = []; gDecal._n = -1; S.doorState = {};
-  S.viewHero = null; S.viewMode = 'auto';
+  S.viewHero = null; S.viewMode = 'auto'; S.tbSide = null; S.tbHero = '';
   render(); applyZoom(false); centerOn(C.HERO_START[1], false);
 }
 async function clientHandle(m) {
@@ -11294,7 +11621,7 @@ async function clientHandle(m) {
   if (m.s) await applySnap(m.s);
   if (m.t === 'anim') { try { await UIF.anim(Net.dec(m.ev, S.G)); } catch (e) { /* animace je nepovinná */ } return; }
   if (m.t === 'snap') { render(); await drainFx(); return; }
-  if (m.t === 'brief') { if (!m.forRoles.some(k => myRoles().includes(k))) return; await ask('briefing', { who: m.who, title: m.title, body: m.who === 'Dům' ? BRIEF_O() : BRIEF_H() }); return; }
+  if (m.t === 'brief') { if (!m.forRoles.some(k => myRoles().includes(k))) return; if (m.who !== 'Dům' && S.G && S.briefSeen === S.G.mapId + '|' + S.G.scen.id) return; await ask('briefing', { who: m.who, title: m.title, body: m.who === 'Dům' ? BRIEF_O() : BRIEF_H() }); return; }
   if (m.t === 'ask') { clientAsk(m); return; }
   if (m.t === 'cancel') { if (NETS.curAsk === m.id) { NETS.curAsk = null; if (S.mode) { S.mode = null; render(); } } return; }
   if (m.t === 'end') { render(); showEnd(m.res); return; }
@@ -11304,6 +11631,7 @@ async function clientHandle(m) {
     if (m.st.next && (!prev || !prev.next || m.reward !== undefined)) S.campStage = campIsMe(m.st.pickerId) && m.st.pickedBy !== 'bot' ? 'shop' : 'announce';
     S.campTab = S.campTab || (myRoles().includes('overlord') ? 'o' : 'h'); showCamp(); return; }
   if (m.t === 'menu') { netReset(); showMenu(); return; }
+  if (m.t === 'ckpt') { NETS.ckpt = m.d; return; }
 }
 function setupResult(G) {
   return { spots: G.spots.map(s => ({ id: s.id, token: s.token })), locked: G.doors.filter(d => d.state === 'locked').map(d => d.id), groups: G.groups,
@@ -11369,6 +11697,15 @@ async function netStart() {
   NETS.conn.send({ t: 'start', roles: NETS.roles, players: NETS.players });
   if (NETS.resume) { const d = NETS.resume.data; NETS.resume = null; return resumeFrom(d); }
   Camp.setKey('blackmoor.campaign.mp');
+  if (NETS.mode === 'campcont') {
+    // v60: rozehraná online kampaň mezi scénáři: všichni rovnou do tábora (výběr scénáře / obchod)
+    S.play = 'camp'; S.camp = Camp.load();
+    if (S.camp && !Camp.finished(S.camp)) {
+      S.campTab = null; S.campReward = S.camp.lastReward || null; S.campStage = S.camp.next ? 'shop' : 'pick';
+      if (!S.camp.next) campPrepPick();
+      $('#menu').hidden = true; NETS.conn.send({ t: 'camp', st: S.camp, reward: S.campReward }); showCamp(); return;
+    }
+  }
   if (NETS.mode === 'camp') { Camp.clear(); S.play = 'camp'; } else { S.play = 'single'; S.scenPick = NETS.scen; }
   startGame();
 }
@@ -11419,6 +11756,88 @@ function checkpoint(G) {
   const names = {}; ROLE_KEYS.forEach(k => { names[k] = NETS.roles[k] === 'bot' ? 'bot' : pName(NETS.roles[k]); });
   lastCheckpoint = { v: 1, at: Date.now(), label: G.scen.name + ' · kolo ' + G.round, G: Net.encodeState(G, { fullLog: true }), camp: S.camp, play: S.play, scenPick: S.scenPick, ctl: S.ctl, net: NETS.role === 'host' ? { names } : null, uid: maxUidOf(G) + 1 };
   lsSet(NETS.role === 'host' ? SAVE_MP : SAVE_SP, JSON.stringify(lastCheckpoint));
+  // v60: klienti dostanou kopii uložení (jen ke stažení do souboru, ukládá dál hostitel)
+  if (NETS.role === 'host' && NETS.conn) NETS.conn.send({ t: 'ckpt', d: lastCheckpoint });
+}
+// ---------- v60: uložení do souboru a ze souboru ----------
+// soubor: { format: 'blackmoor-save', ver: 1, kind: 'sp'|'mp', at, label, save: <checkpoint>|null, camp: <stav kampaně>|null }
+// Načtení ze souboru jde stejnou cestou jako z localStorage: zapíše se do slotu (SAVE_SP / SAVE_MP, kampaň do svého klíče) a pak loadGame → resumeFrom → Camp.migrate + Core.rehydrate.
+const SAVE_FMT = 'blackmoor-save', CAMP_KEY_SP = 'blackmoor.campaign.v1', CAMP_KEY_MP = 'blackmoor.campaign.mp', AUTOLOAD = 'blackmoor.autoload';
+const fileStamp = () => { const d = new Date(), p = n => String(n).padStart(2, '0'); return d.getFullYear() + '-' + p(d.getMonth() + 1) + '-' + p(d.getDate()) + '_' + p(d.getHours()) + p(d.getMinutes()); };
+function saveBundle(kind, save, camp) { return { format: SAVE_FMT, ver: 1, kind, at: Date.now(), label: save ? save.label : camp ? 'Kampaň · ' + campMenuLine(camp) : '', save: save || null, camp: camp || null }; }
+function downloadBundle(b) {
+  const name = 'blackmoor-' + (b.kind === 'mp' ? 'online' : 'hra') + (b.save ? '' : '-kampan') + '-' + fileStamp() + '.json';
+  try {
+    const blob = new Blob([JSON.stringify(b)], { type: 'application/json' }), a = document.createElement('a');
+    a.href = URL.createObjectURL(blob); a.download = name; document.body.appendChild(a); a.click();
+    setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 1000);
+    return name;
+  } catch (e) { return null; }
+}
+// rozpozná soubor: náš formát, holé uložení (checkpoint) nebo holý stav kampaně; ověří, že jde dekódovat
+function parseSaveText(text) {
+  let o; try { o = JSON.parse(text); } catch (e) { throw new Error('Soubor není platné uložení (nejde přečíst).'); }
+  if (!o || typeof o !== 'object') throw new Error('Soubor není platné uložení.');
+  let b;
+  if (o.format === SAVE_FMT) b = { kind: o.kind === 'mp' ? 'mp' : 'sp', save: o.save || null, camp: o.camp || null };
+  else if (typeof o.G === 'string') b = { kind: o.net ? 'mp' : 'sp', save: o, camp: null };
+  else if (o.heroes && o.ol) b = { kind: 'sp', save: null, camp: o };
+  else throw new Error('Soubor neobsahuje uloženou hru Blackmooru.');
+  if (b.save) {
+    if (typeof b.save.G !== 'string') throw new Error('Uložení je poškozené (chybí stav hry).');
+    try { const G = Net.decodeState(b.save.G, C, null); if (!G.heroes || !G.mapId) throw 0; } catch (e) { throw new Error('Uložení je poškozené (stav hry nejde přečíst).'); }
+    if (b.save.camp && !Camp.migrate(JSON.parse(JSON.stringify(b.save.camp)))) throw new Error('Kampaň v uložení nejde převést na tuto verzi.');
+    b.save.label = b.save.label || 'Nahraná hra'; b.save.at = b.save.at || Date.now();
+  }
+  if (b.camp && !Camp.migrate(JSON.parse(JSON.stringify(b.camp)))) throw new Error('Kampaň v souboru nejde převést na tuto verzi.');
+  return b;
+}
+// zapíše nahrané uložení do slotů; vrací klíč slotu se hrou (nebo null, když soubor nese jen kampaň)
+function importBundle(b) {
+  if (b.camp) lsSet(b.kind === 'mp' ? CAMP_KEY_MP : CAMP_KEY_SP, JSON.stringify(b.camp));
+  if (b.save) { const k = b.kind === 'mp' ? SAVE_MP : SAVE_SP; if (!lsSet(k, JSON.stringify(b.save))) throw new Error('Uložení se nepodařilo zapsat (plné úložiště prohlížeče?).'); return k; }
+  return null;
+}
+function pickSaveFile() {
+  return new Promise((res, rej) => {
+    const inp = document.createElement('input'); inp.type = 'file'; inp.accept = '.json,application/json'; inp.style.display = 'none';
+    inp.addEventListener('change', () => { const f = inp.files && inp.files[0]; inp.remove(); if (!f) return res(null); const r = new FileReader(); r.onload = () => res(String(r.result)); r.onerror = () => rej(new Error('Soubor nejde přečíst.')); r.readAsText(f); });
+    document.body.appendChild(inp); inp.click();
+  });
+}
+// stažení z rozehrané hry: hostitel / hra pro jednoho = poslední uložení (začátek kola); klient = kopie od hostitele
+function gameDownload() {
+  let b = null;
+  if (isClient()) {
+    const d = NETS.ckpt || (S.G ? { v: 1, at: Date.now(), label: S.G.scen.name + ' · kolo ' + S.G.round + ' (rozehrané)', G: Net.encodeState(S.G, { fullLog: true }), camp: NETS.campCopy || null, play: NETS.mode === 'camp' ? 'camp' : 'single', scenPick: S.G.scen.id, ctl: { heroes: 'human', overlord: 'human' }, net: { names: Object.fromEntries(ROLE_KEYS.map(k => [k, NETS.roles[k] === 'bot' ? 'bot' : pName(NETS.roles[k])])) }, uid: maxUidOf(S.G) + 1 } : null);
+    if (d) b = saveBundle('mp', d, null);
+  } else if (lastCheckpoint) b = saveBundle(NETS.role === 'host' ? 'mp' : 'sp', lastCheckpoint, null);
+  else if (S.camp) b = saveBundle(NETS.role ? 'mp' : 'sp', null, S.camp);
+  if (!b) { S.msg = 'Zatím není co stáhnout, hra se ukládá na začátku kola.'; render(); return; }
+  const n = downloadBundle(b);
+  S.msg = n ? 'Staženo: ' + n + (isClient() ? ' (kopie uložení hostitele ze začátku kola; online hru z ní načte ten, kdo bude hostit)' : ' (stav ze začátku kola)') + '.' : 'Stažení se nepodařilo.';
+  render();
+}
+async function gameUpload() {
+  if (isClient()) { S.msg = 'Online hru načítá hostitel: v hlavním menu Načíst hru → Nahrát uložení ze souboru.'; render(); return; }
+  let b; try { const t = await pickSaveFile(); if (!t) return; b = parseSaveText(t); } catch (e) { S.msg = e.message; sfx('deny'); render(); return; }
+  let k; try { k = importBundle(b); } catch (e) { S.msg = e.message; render(); return; }
+  // rozehraná hra má vlastní smyčku: načtení proběhne po znovunačtení stránky
+  try { sessionStorage.setItem(AUTOLOAD, k || (b.kind === 'mp' ? 'camp:mp' : 'camp:sp')); } catch (e) { /* bez sessionStorage */ }
+  if (NETS.role === 'host') NETS.conn.send({ t: 'menu' }); else if (NETS.conn) NETS.conn.send({ t: 'bye', from: Net.myId });
+  setTimeout(() => location.reload(), 150);
+}
+async function menuUpload() {
+  let b; try { const t = await pickSaveFile(); if (!t) return; b = parseSaveText(t); } catch (e) { NETS.err = e.message; renderMM(); return; }
+  let k; try { k = importBundle(b); } catch (e) { NETS.err = e.message; renderMM(); return; }
+  NETS.err = '';
+  afterImport(k, b.kind);
+}
+function afterImport(k, kind) {
+  if (k) return loadGame(k);
+  // jen kampaň mezi scénáři
+  if (kind === 'mp') { NETS.err = ''; NETS.loadNote = 'Online kampaň nahrána. Založ hru a v lobby vyber „Kampaň (pokračovat)“.'; return mmGo('multi'); }
+  NETS.loadNote = 'Kampaň nahrána. Vyber stranu a pokračuj v kampani.'; mmGo('single');
 }
 function loadGame(key) {
   const d = readSave(key); if (!d) return;
@@ -11433,6 +11852,8 @@ async function resumeFrom(d) {
   try { if (SND) SND.start(); } catch (e) { /* bez zvuku */ }
   const G = Net.decodeState(d.G, C, null);
   C.setUid(d.uid || 100000); C.useMap(G.mapId); C.setGrpUp(G.grpUp);
+  // v60: uložená hra převezme aktuální data (karty, staty, scénář) – viz Core.rehydrate
+  try { const rep = C.rehydrate(G); if (rep.unknown) console.warn('Načtení: neznámé karty ponechány beze změny', rep); } catch (e) { console.error(e); }
   S.play = d.play; S.scenPick = d.scenPick; S.camp = d.camp ? Camp.migrate(d.camp) : null;
   if (S.camp) { Camp.setKey(NETS.role === 'host' ? 'blackmoor.campaign.mp' : undefined); Camp.save(S.camp); }
   S.G = G; G.fx = [];
