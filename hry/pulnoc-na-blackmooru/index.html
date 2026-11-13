@@ -2095,8 +2095,8 @@ const MDEF = {
     base: { hp: 4, move: 3, range: 1, mod: 1, dmg: 3, fear: 0, evasion: 0, armor: 0 }, elite: { hp: 7, split: true },
     text: 'Slizová stopa: pole, ze kterého odejde, je do konce příštího kola slizké (vstup za 2 pohyby, kdo na něm skončí tah, utrží 1). Rozprsk: když zemře, jeho pole a sousední pokryje sliz.', eliteText: 'Mateční sliz: 7♥. Když zemře, rozpadne se na 2 malé slimáky.' },
   zalarnik: { cat: 'kobka', name: 'Žalářníci', unit: 'Žalářník', eliteName: 'Kat', glyph: 'Ž', cost: 15, respawn: 3, eliteRespawn: 6, minions: { 2: 1, 3: 1, 4: 2 },
-    base: { hp: 8, move: 3, range: 2, mod: 1, dmg: 3, fear: 0, evasion: 0, armor: 1, chain: 1 }, elite: { hp: 12, mod: 0, dmg: 4, vsHeld: 3 },
-    text: 'Armor 1. Řetěz: zásah přitáhne lovce o 1 a přišpendlí ho.', eliteText: 'Kat: 12♥, dosah 2, 4 dmg. Zásah přitáhne o 1 a přišpendlí. +3 k útoku na lovce, který už byl přišpendlený.' },
+    base: { hp: 8, move: 3, range: 2, mod: 1, dmg: 3, fear: 0, evasion: 0, armor: 1, chain: 1 }, elite: { hp: 12, mod: 1, dmg: 4, vsHeld: 3 },
+    text: 'Armor 1. Řetěz: zásah přitáhne lovce o 1 a přišpendlí ho.', eliteText: 'Kat: 12♥, dosah 2, útok +1, 4 dmg. Zásah přitáhne o 1 a přišpendlí. +3 k útoku na lovce, který už byl přišpendlený.' },
   troll: { cat: 'kobka', boss: true, name: 'Trollové z kanálů', unit: 'Mladý troll', eliteName: 'Obří troll', glyph: 'T', cost: 24, respawn: 8, eliteRespawn: 16, minions: { 2: 1, 3: 1, 4: 1 }, regen: 2,
     base: { hp: 10, move: 3, range: 1, mod: 1, dmg: 3, fear: 0, evasion: 0, armor: 0, push: 1 }, elite: { hp: 20, mod: 2, dmg: 4, fear: 1, armor: 1, push: 1, dismember: true },
     text: 'Poloboss. Regenerace 2 na konci kola (oheň ji ruší).', eliteText: 'Obří troll: 20♥, armor 1. Při 15, 10 a 5♥ mu upadne ruka, noha a hlava a jednají samy.' },
@@ -2108,8 +2108,8 @@ const MDEF = {
     base: { hp: 4, move: 0, range: 1, mod: 1, dmg: 2, fear: 0, evasion: 0, armor: 0 }, text: 'Řev: na začátku kola dá lovcům do 3 polí +1 Strach.' },
   // ---- Hřbitov: neklid mrtvých ----
   kostlivci: { retaliate: true, cat: 'hrbitov', name: 'Kostlivci', unit: 'Kostlivec', eliteName: 'Kostěný rytíř', glyph: 'K', cost: 6, respawn: 1, eliteRespawn: 3, minions: { 2: 3, 3: 4, 4: 5 }, raiseOn: 6, rangedResist: 1,
-    base: { hp: 3, move: 3, range: 1, mod: 2, dmg: 1, fear: 0, evasion: 0, armor: 1 }, elite: { hp: 5, mod: 2, dmg: 3 },
-    text: 'Armor 1. Kosti: útoky, které nejsou ze sousedního pole, mají −1. Odplata: kdo na ně útočí zblízka, dostane 1 Strach (rytíř i 1 zranění). Z hrobu vstávají už na 6+.', eliteText: 'Kostěný rytíř: 5♥, útok +2, 3 dmg.' },
+    base: { hp: 3, move: 3, range: 1, mod: 2, dmg: 2, fear: 0, evasion: 0, armor: 1 }, elite: { hp: 5, mod: 2, dmg: 3, fear: 2 },
+    text: 'Armor 1. Kosti: útoky, které nejsou ze sousedního pole, mají −1. Odplata: kdo na ně útočí zblízka, dostane 1 Strach (rytíř i 1 zranění). Z hrobu vstávají už na 6+.', eliteText: 'Kostěný rytíř: 5♥, útok +2, 3 dmg a 2 Strach.' },
   ghulove: { cat: 'hrbitov', name: 'Ghúlové', unit: 'Ghúl', eliteName: 'Ghúl-žrout', glyph: 'g', cost: 9, respawn: 2, eliteRespawn: 4, minions: { 2: 1, 3: 2, 4: 3 }, feast: true,
     base: { hp: 4, move: 4, range: 1, mod: 1, dmg: 2, fear: 0, evasion: 0, armor: 0 }, elite: { hp: 7, dmg: 3, fear: 1, glutton: true },
     text: 'Hostina: začíná-li aktivaci vedle hrobu nebo ležícího lovce, vyléčí se o 2 a má +1 k útoku.', eliteText: 'Ghúl-žrout: 7♥, 3 dmg + 1 Strach. Když srazí lovce, Dům +1 Hrozba.' },
@@ -2271,7 +2271,7 @@ const EQUIP = {
     ['Švih řetězem', { t: 'attack', range: 1, dmg: 3, mod: 1, pushAdj: 1 }, mv(3)],
     ['Zakotvit', { t: 'rootone', range: 3 }, mv(2)]] },
   lucerna2: { name: 'Lucerna s modrým plamenem', slot: 'ruka', tier: 2, cards: [
-    ['Modrý plamen', { t: 'fire', range: 3, len: 2, dmg: 1, light: true }, mv(3)],
+    ['Modrý plamen', { t: 'fire', range: 3, len: 4, dmg: 1, light: true }, mv(3)],
     ['Spálit', { t: 'attack', range: 2, dmg: 3, mod: 1, burn: true, holy: true }, mv(3)],
     ['Světlo naděje', { t: 'cleanse', range: 3, n: 1 }, { t: 'lightmove', n: 3 }]] },
   krucifix: { name: 'Krucifix', slot: 'ruka', tier: 1, cards: [
@@ -2372,7 +2372,7 @@ const EQUIP = {
     ['Bdění u lože', { t: 'raise', range: 2, half: true, heal: 1 }, mv(3)]] },
   nositka: { name: 'Saniťácká nosítka', slot: 'obourucni', tier: 3, cards: [
     ['Odnést z boje', { t: 'raise', range: 1, half: true, heal: 3 }, mv(3)],
-    ['Polní ošetřovna', { t: 'heal', range: 2, n: 2, all: true }, mv(2)],
+    ['Polní ošetřovna', { t: 'heal', range: 2, n: 3, all: true }, mv(2)],
     ['Opři se o mě', { t: 'heal', range: 1, n: 3 }, mv(4)]] },
   // amulety: pasivní schopnost, žádné karty
   zajic: { name: 'Zaječí tlapka', slot: 'trinket', tier: 1, passive: 'Jednou za kolo: když tvůj útok mine, hoď znovu.', cards: [] },
@@ -6938,20 +6938,46 @@ function buyGroupUp(st, type, k) {
   st.ol.gold -= u.cost; st.ol.grp = st.ol.grp || {}; const g = st.ol.grp[type] = st.ol.grp[type] || {}; g[k] = (g[k] || 0) + 1;
   save(st); return null;
 }
-// bot Domu: soustředí temnou esenci do jedné-dvou skupin dalšího scénáře (posila > elita navíc > zocelení)
+// bot Domu: staví si „jádro“ 2–3 skupin, které se hodí do nejvíc zbývajících scénářů (a do dalšího scénáře),
+// a soustředí do nich temnou esenci (posila > elita navíc > zocelení)
+function botCore(st) {
+  const rem = remaining(st), sc = scenById(st.next);
+  const fit = t => rem.filter(x => (x.cats || []).includes(D.MDEF[t].cat)).length + (sc && (sc.cats || []).includes(D.MDEF[t].cat) ? 3 : 0);
+  const inv = t => { const g = (st.ol.grp || {})[t] || {}; return (g.hp || 0) + 2 * (g.plus || 0) + 3 * (g.elite || 0); };
+  const all = groupsFor(st); if (!all.length) return [];
+  st.ol.core = (st.ol.core || []).filter(t => all.includes(t));
+  const val = t => fit(t) * 2 + inv(t) + (st.ol.core.includes(t) ? 2 : 0) + (D.MDEF[t].cost || 0) / 10;
+  st.ol.core = all.slice().sort((a, b) => val(b) - val(a) || (rnd() < 0.5 ? -1 : 1)).slice(0, 3);
+  return st.ol.core;
+}
 function botGold(st) {
-  const sc = scenById(st.next); if (!sc) return;
-  let next = groupsFor(st).filter(t => (sc.cats || []).includes(D.MDEF[t].cat)); if (!next.length) next = groupsFor(st); if (!next.length) return;
-  const score = t => { const g = (st.ol.grp || {})[t] || {}; return (g.hp || 0) + 2 * (g.plus || 0) + 3 * (g.elite || 0); };
+  const core = botCore(st); if (!core.length) return;
+  const sc = scenById(st.next);
+  const order = core.slice().sort((a, b) => ((sc && (sc.cats || []).includes(D.MDEF[b].cat)) ? 1 : 0) - ((sc && (sc.cats || []).includes(D.MDEF[a].cat)) ? 1 : 0));
   let guard = 0;
-  while (guard++ < 10 && (st.ol.gold || 0) > 0) {
-    const fav = next.slice().sort((a, b) => score(b) - score(a) || (rnd() < 0.5 ? -1 : 1));
+  while (guard++ < 12 && (st.ol.gold || 0) > 0) {
     let done = false;
-    for (const t of fav.slice(0, 2)) {
-      for (const k of ['plus', 'elite', 'hp']) if (!grpCan(st, t, k)) { buyGroupUp(st, t, k); done = true; break; }
-      if (done) break;
-    }
+    for (const k of ['plus', 'elite', 'hp']) { for (const t of order) if (!grpCan(st, t, k)) { buyGroupUp(st, t, k); done = true; break; } if (done) break; }
     if (!done) break;
+  }
+}
+// bot Domu: karty vylepšuje cíleně – drží si 4 oblíbené karty a ty prohlubuje do konce stromu
+function botOlCards(st) {
+  const ok = id => D.OL_VAR[id] && nextVariants(st.ol.up[id] || '').length;
+  st.ol.focus = (st.ol.focus || []).filter(id => D.OL_DECK.includes(id));
+  while (st.ol.focus.length < 4) { const c = D.OL_DECK.filter(id => D.OL_VAR[id] && !st.ol.focus.includes(id)); if (!c.length) break; st.ol.focus.push(c[Math.floor(rnd() * c.length)]); }
+  let g = 0;
+  while (g++ < 8) {
+    const pool = st.ol.focus.filter(ok).filter(id => upCost(st.ol.up[id] || '') <= st.ol.xp);
+    const cand = pool.length ? pool : D.OL_DECK.filter(ok).filter(id => upCost(st.ol.up[id] || '') <= st.ol.xp);
+    if (!cand.length) break;
+    // nejdřív prohlubuj už vylepšenou kartu
+    cand.sort((a, b) => (st.ol.up[b] || '').length - (st.ol.up[a] || '').length);
+    const id = cand[0], cur = st.ol.up[id] || '', vs = nextVariants(cur);
+    if (!st.ol.branch) st.ol.branch = {};
+    if (!st.ol.branch[id]) st.ol.branch[id] = vs[Math.floor(rnd() * vs.length)].slice(-1);
+    const to = vs.find(v => v.slice(-1) === st.ol.branch[id]) || vs[0];
+    if (upgradeOl(st, id, to)) break;
   }
 }
 // výběr dalšího scénáře: vítěz poslední mise (strana st.picker) vybírá z neodehraných
@@ -6996,13 +7022,7 @@ function botUpgrade(st, side) {
     }
   } else {
     botGold(st);
-    let g = 0;
-    while (g++ < 6) {
-      const opts = D.OL_DECK.map(id => ({ id, cur: st.ol.up[id] || '' })).filter(o => D.OL_VAR[o.id] && nextVariants(o.cur).length && upCost(o.cur) <= st.ol.xp);
-      if (!opts.length) break;
-      const o = opts[Math.floor(rnd() * opts.length)], vs = nextVariants(o.cur);
-      upgradeOl(st, o.id, vs[Math.floor(rnd() * vs.length)]);
-    }
+    botOlCards(st);
   }
 }
 
