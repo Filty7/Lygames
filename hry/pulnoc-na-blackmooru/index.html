@@ -1100,41 +1100,81 @@ button.pd-cell { cursor: default; } .pd-cell.full { cursor: pointer; border-styl
 .shopit.big { display: flex; gap: 8px; align-items: center; text-align: left; padding: 8px; }
 .shopit.big .mport { width: 40px; height: 40px; flex: none; } .shopit.big span { display: grid; flex: 1; } .shopit.big small { color: var(--muted); }
 .sh-cost { margin-left: auto; display: inline-flex; align-items: center; gap: 3px; font: 800 22px var(--f-num); font-style: normal; color: #ff8a76; } .sh-cost .ic { width: 16px; height: 16px; } .sh-cost.dim { opacity: .5; }
-/* hlavní menu */
-#menu { place-items: stretch; padding: 0; }
-#menu:has(#legacy:not([hidden])) { place-items: center; padding-block: 32px; }
+/* hlavní menu – v61: pevný rám 16:9 (1600×900), jednotně škálovaný, na okrajích letterbox / pillarbox */
+#menu { position: fixed; inset: 0; overflow: hidden; padding: 0; display: block; min-height: 0; background: #030205; }
+#menu:has(#legacy:not([hidden])) { overflow: auto; display: grid; place-items: center; padding-block: 32px; background: radial-gradient(70% 60% at 50% 40%, #1d1a26 0%, var(--ink-0) 75%); }
 .cp-body.ro { pointer-events: none; opacity: .75; } .cp-body.ro .ro-note { pointer-events: auto; } .ro-note { margin: 0 0 10px; color: #f3cf8e; }
-.rpgmenu { min-height: 100vh; display: grid; grid-template-columns: minmax(420px, 560px) 1fr; background: radial-gradient(120% 90% at 75% 40%, #2a1630 0%, #120c18 45%, #07060a 100%); position: relative; overflow: hidden; }
-.rpgmenu::before { content: ""; position: absolute; inset: 0; background: repeating-linear-gradient(0deg, #ffffff04 0 1px, transparent 1px 3px); pointer-events: none; }
-.mm-left { padding: 56px 48px; display: grid; align-content: center; gap: 14px; position: relative; z-index: 1; background: linear-gradient(90deg, #07060aee 70%, transparent); }
-.mm-eyebrow { font: 400 15px var(--f-disp); letter-spacing: .35em; text-transform: uppercase; color: var(--candle); margin: 0; }
-.mm-title { font: 400 clamp(44px, 5vw, 70px)/0.95 var(--f-disp); color: var(--paper); margin: 0; text-shadow: 0 2px 0 #000, 0 0 40px #e4a84f33; }
-.mm-tag { margin: 0 0 14px; color: var(--muted); font-size: 14px; } .alpha { display: inline-block; padding: 1px 8px; margin-right: 6px; border-radius: 4px; background: #5a1a14; color: #ffcfb8; font-weight: 700; font-size: 12px; letter-spacing: .05em; text-transform: uppercase; }
-.mm-screen { display: grid; gap: 10px; max-width: 420px; }
-.mm-screen h2 { margin: 6px 0 2px; font: 400 26px var(--f-disp); color: var(--paper); }
-.mm-btn { display: flex; align-items: center; gap: 12px; padding: 14px 18px; border-radius: 10px; border: 1px solid #5a4630; background: linear-gradient(#1e1610, #120c08); color: #f0dfbe; font: 600 17px var(--f-body); cursor: pointer; text-align: left; transition: transform .12s, border-color .12s, box-shadow .12s; }
-.mm-btn .ic { width: 22px; height: 22px; color: var(--candle); flex: none; } .mm-btn small { display: block; font-weight: 400; font-size: 12.5px; color: var(--muted); margin-top: 2px; }
-.mm-btn:hover:not(:disabled) { transform: translateX(4px); border-color: var(--candle); box-shadow: 0 0 24px #e4a84f22; }
+.rpgmenu { position: absolute; left: 50%; top: 50%; width: 1600px; height: 900px; transform: translate(-50%, -50%) scale(var(--mms, 1)); transform-origin: 50% 50%; overflow: hidden;
+  background: radial-gradient(60% 70% at 72% 30%, #2c1834 0%, #150e1c 46%, #08060b 100%); box-shadow: 0 0 0 1px #1a1420, 0 0 80px #000; font-size: 15px; }
+.rpgmenu::after { content: ""; position: absolute; inset: 0; background: repeating-linear-gradient(0deg, #ffffff05 0 1px, transparent 1px 3px), radial-gradient(130% 100% at 50% 50%, transparent 55%, #000000c0 100%); pointer-events: none; z-index: 5; }
+.mm-sky { position: absolute; inset: 0; pointer-events: none; }
+.mm-sky svg { position: absolute; display: block; image-rendering: pixelated; shape-rendering: crispEdges; }
+.mm-moon { right: 150px; top: 70px; width: 132px; height: 132px; filter: drop-shadow(0 0 40px #f3e2b855); }
+.mm-stars { left: 560px; top: 0; width: 1040px; height: 420px; }
+.mm-stars rect { animation: mmtw 4s ease-in-out infinite; } .mm-stars rect:nth-child(3n) { animation-delay: -1.3s; animation-duration: 5.2s; } .mm-stars rect:nth-child(4n+1) { animation-delay: -2.6s; animation-duration: 3.4s; }
+@keyframes mmtw { 0%, 100% { opacity: .9; } 50% { opacity: .2; } }
+.mm-manor { left: 620px; bottom: 170px; width: 1000px; height: 500px; filter: drop-shadow(0 0 1px #4a3a5a) drop-shadow(0 -2px 18px #3a234866); }
+.mm-sky::before { content: ""; position: absolute; left: 640px; right: 0; bottom: 120px; height: 420px; background: radial-gradient(50% 60% at 52% 100%, #5a2c4a55, transparent 70%); }
+.mm-manor .win { fill: #e4a84f; animation: mmflick 3.2s steps(1) infinite; } .mm-manor .win.b { animation-duration: 4.7s; animation-delay: -1.1s; } .mm-manor .win.c { animation-duration: 2.3s; animation-delay: -.4s; fill: #c9a6f0; }
+@keyframes mmflick { 0%, 100% { opacity: 1; } 42% { opacity: .55; } 44% { opacity: 1; } 71% { opacity: .78; } 73% { opacity: 1; } }
+.mm-fog { position: absolute; left: 520px; right: -200px; bottom: 120px; height: 190px; pointer-events: none; background: radial-gradient(40% 60% at 30% 60%, #8a7aa018, transparent 70%), radial-gradient(35% 50% at 75% 50%, #8a7aa014, transparent 70%); animation: mmfog 26s ease-in-out infinite alternate; }
+@keyframes mmfog { from { transform: translateX(-60px); } to { transform: translateX(60px); } }
+.mm-ground { position: absolute; left: 0; right: 0; bottom: 0; height: 160px; pointer-events: none; background: linear-gradient(#0a080d00, #0a080d 40%, #060508); }
+@media (prefers-reduced-motion: reduce) { .mm-stars rect, .mm-manor .win, .mm-fog { animation: none; } }
+.mm-left { position: absolute; left: 0; top: 0; bottom: 0; width: 680px; padding: 64px 60px 56px 84px; display: flex; flex-direction: column; justify-content: center; gap: 12px; z-index: 2; overflow: hidden;
+  background: linear-gradient(90deg, #07060af4 0%, #07060ae8 78%, #07060a00 100%); }
+.mm-left::before { content: ""; position: absolute; left: 44px; top: 56px; bottom: 56px; width: 1px; background: linear-gradient(#e4a84f00, #e4a84f66 20%, #e4a84f66 80%, #e4a84f00); }
+.mm-eyebrow { font: 400 16px var(--f-disp); letter-spacing: .4em; text-transform: uppercase; color: var(--candle); margin: 0; transition: font-size .25s; }
+.mm-title { font: 400 72px/0.95 var(--f-disp); white-space: nowrap; color: var(--paper); margin: 0; text-shadow: 0 3px 0 #000, 0 0 46px #e4a84f30; transition: font-size .25s; }
+.mm-tag { margin: 2px 0 18px; color: var(--muted); font-size: 14px; transition: margin .25s; } .alpha { display: inline-block; padding: 1px 8px; margin-right: 6px; border-radius: 4px; background: #5a1a14; color: #ffcfb8; font-weight: 700; font-size: 12px; letter-spacing: .05em; text-transform: uppercase; }
+.rpgmenu.sub .mm-title { font-size: 44px; } .rpgmenu.sub .mm-title br { display: none; } .rpgmenu.sub .mm-eyebrow { font-size: 13px; } .rpgmenu.sub .mm-tag { margin-bottom: 8px; }
+.mm-screen { display: grid; gap: 10px; width: 470px; align-content: start; }
+.mm-screen h2 { margin: 2px 0 2px; font: 400 30px var(--f-disp); color: var(--paper); }
+.mm-btn { display: flex; align-items: center; gap: 14px; padding: 13px 18px; border-radius: 4px; border: 1px solid #4a3a28; background: linear-gradient(#1a130d, #0f0a07); color: #f0dfbe; font: 600 18px var(--f-body); cursor: pointer; text-align: left; position: relative;
+  box-shadow: inset 0 0 0 1px #000, inset 0 0 0 2px #2a1f14; transition: transform .12s, border-color .12s, box-shadow .12s, background .12s; }
+.mm-btn .ic { width: 22px; height: 22px; color: var(--candle); flex: none; } .mm-btn small { display: block; font-weight: 400; font-size: 13px; color: var(--muted); margin-top: 1px; }
+.mm-btn > .ic { box-sizing: content-box; padding: 8px; border: 1px solid #4a3a28; background: #0a0706; border-radius: 2px; }
+.mm-btn:hover:not(:disabled), .mm-btn:focus-visible { transform: translateX(6px); border-color: var(--candle); box-shadow: inset 0 0 0 1px #000, inset 0 0 0 2px #5a4020, 0 0 28px #e4a84f26; outline: none; }
+.mm-btn:hover:not(:disabled)::before, .mm-btn:focus-visible::before { content: ""; position: absolute; left: -16px; top: 50%; width: 8px; height: 8px; margin-top: -4px; background: var(--candle); transform: rotate(45deg); box-shadow: 0 0 10px var(--candle); }
 .mm-btn:disabled { opacity: .4; cursor: not-allowed; }
-.mm-btn.primary { border-color: var(--candle); background: linear-gradient(#3a2810, #1e140a); }
-.mm-back { justify-self: start; background: none; border: 0; color: var(--muted); cursor: pointer; font-size: 14px; padding: 4px 0; } .mm-back:hover { color: var(--paper); }
-.mm-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-.mm-side { display: grid; justify-items: center; gap: 6px; padding: 16px 10px; text-align: center; }
-.mm-side .ic { width: 34px; height: 34px; }
-.mm-note { color: var(--muted); font-size: 13px; margin: 4px 0 0; }
-.mm-input { padding: 11px 14px; border-radius: 8px; border: 1px solid var(--line); background: #0c0b10; color: var(--paper); font: 600 16px var(--f-body); width: 100%; }
+.mm-btn.primary { border-color: #b07a34; background: linear-gradient(#3a2810, #1c1209); }
+.mm-btn.primary > .ic { border-color: #b07a34; color: var(--candle-2); }
+.mm-back { justify-self: start; background: none; border: 0; color: var(--muted); cursor: pointer; font-size: 14px; padding: 2px 0; letter-spacing: .04em; } .mm-back:hover { color: var(--paper); }
+.mm-row { display: grid; grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr); gap: 10px; }
+.mm-row .mm-btn { justify-content: center; }
+.mm-screen [data-load], .mm-screen [data-dl], .mm-screen [data-del], .mm-screen [data-dlcamp] { padding: 8px 10px; font-size: 15px; }
+.mm-camprow { grid-auto-columns: auto; grid-template-columns: 1fr auto; align-items: center; } .mm-camprow .mm-note { margin: 0; }
+.mm-side { display: grid; justify-items: center; gap: 6px; padding: 18px 10px; text-align: center; }
+.mm-side .ic { width: 36px; height: 36px; }
+.mm-note { color: var(--muted); font-size: 13.5px; margin: 2px 0 0; line-height: 1.4; }
+.mm-input { padding: 11px 14px; border-radius: 4px; border: 1px solid #4a3a28; background: #0a0807; color: var(--paper); font: 600 16px var(--f-body); width: 100%; }
 .mm-input.code { text-transform: uppercase; letter-spacing: .3em; font-size: 22px; text-align: center; }
-.mm-code { font: 800 40px var(--f-num); letter-spacing: .25em; color: #f3cf8e; text-align: center; padding: 6px; border: 1px dashed #5a4630; border-radius: 10px; }
-.mm-players { display: grid; gap: 4px; } .mm-players span { padding: 6px 10px; border-radius: 6px; background: #15121a; font-size: 14px; }
-.mm-roles { display: grid; gap: 6px; } .mm-role { display: grid; grid-template-columns: 110px 1fr; gap: 8px; align-items: center; font-size: 14px; }
-.mm-role select, .mm-sel { padding: 8px; border-radius: 6px; background: #0c0b10; color: var(--paper); border: 1px solid var(--line); font: inherit; }
-.mm-mis { display: grid; gap: 6px; } .mm-mis .mm-btn { padding: 10px 14px; font-size: 15px; }
+.mm-code { font: 800 40px var(--f-num); letter-spacing: .25em; color: #f3cf8e; text-align: center; padding: 4px; border: 1px dashed #5a4630; border-radius: 4px; }
+.mm-players { display: flex; flex-wrap: wrap; gap: 4px; } .mm-players span { padding: 5px 10px; border-radius: 4px; background: #15121a; font-size: 14px; }
+.mm-roles { display: grid; gap: 6px; } .mm-role { display: grid; grid-template-columns: 130px 1fr; gap: 8px; align-items: center; font-size: 14px; }
+.mm-role select, .mm-sel { padding: 7px; border-radius: 4px; background: #0c0b10; color: var(--paper); border: 1px solid var(--line); font: inherit; min-width: 0; }
+.mm-modesel { grid-template-columns: 130px 1fr; }
+.mm-mis { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; width: 520px; }
+.mm-mis .mm-btn { padding: 9px 12px; gap: 10px; font-size: 15.5px; align-items: flex-start; min-height: 74px; }
+.mm-mis .mm-btn .mis-n { font: 800 22px/1 var(--f-num); color: var(--candle-2); width: 22px; flex: none; padding-top: 2px; }
+.mm-mis .mm-btn small { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; font-size: 12.5px; line-height: 1.3; }
+.mm-mis .mm-btn .mis-cats { display: flex; gap: 4px; margin-top: 4px; } .mm-mis .grp-cat { margin: 0; }
+.mm-mis .mm-btn:hover:not(:disabled), .mm-mis .mm-btn:focus-visible { transform: translateY(-2px); } .mm-mis .mm-btn::before { display: none; }
 .mm-err { color: #ffb89a; font-size: 13.5px; margin: 0; }
-.mm-right { position: relative; display: grid; place-items: center; align-content: center; gap: 18px; padding: 40px; }
-.mm-right #menuart { height: min(42vh, 360px); width: 100%; } .mm-right #menuart svg { width: 100%; height: 100%; }
-.mm-lore { max-width: 46ch; text-align: center; color: #bfb3a0; font-style: italic; margin: 0; }
+.mm-right { position: absolute; left: 660px; right: 0; top: 0; bottom: 0; z-index: 1; pointer-events: none; }
+.mm-right #menuart { position: absolute; left: 90px; right: 50px; bottom: 132px; height: 290px; }
+.mm-right #menuart svg { width: 100%; height: 100%; filter: drop-shadow(0 0 30px #e4a84f30) drop-shadow(0 12px 0 #0006); }
+.mm-lore { position: absolute; left: 150px; right: 110px; bottom: 50px; text-align: center; color: #bfb3a0; font: italic 400 17px/1.5 var(--f-body); margin: 0; text-shadow: 0 1px 0 #000; }
+.mm-lore::before { content: "✦"; display: block; color: var(--candle); font-style: normal; font-size: 12px; margin-bottom: 6px; opacity: .8; }
+.mm-corner { position: absolute; right: 26px; top: 22px; z-index: 6; display: flex; gap: 8px; align-items: center; }
+.mm-ico { display: inline-flex; align-items: center; gap: 7px; padding: 7px 11px; border-radius: 4px; border: 1px solid #3a2e24; background: #0b0908d0; color: var(--muted); font: 600 13px var(--f-body); cursor: pointer; }
+.mm-ico .ic { width: 18px; height: 18px; } .mm-ico[aria-pressed="true"] { color: var(--candle-2); border-color: #6a5030; } .mm-ico:hover { border-color: var(--candle); }
+.mm-ico[aria-pressed="false"] span { text-decoration: line-through; text-decoration-color: #cf5b45; }
+.mm-settings { display: grid; gap: 6px; }
 .mm-settings .seg { flex-wrap: wrap; }
-@media (max-width: 900px) { .rpgmenu { grid-template-columns: 1fr; } .mm-right { display: none; } }
+.mm-snd-row { display: flex; gap: 8px; }
+.mm-screen .pool { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; width: 520px; }
+.mm-screen .poolit { padding: 1px 6px 1px 1px; font-size: 12.5px; min-width: 0; } .mm-screen .poolit span { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; } .mm-screen .poolit .mport { width: 22px; height: 28px; }
 /* celé UI o kus větší (čitelnost) */
 @media (min-width: 1450px) and (min-height: 760px) { html { zoom: 1.1; } }
 @media (min-width: 1650px) and (min-height: 860px) { html { zoom: 1.18; } }
@@ -1169,17 +1209,135 @@ button.pd-cell { cursor: default; } .pd-cell.full { cursor: pointer; border-styl
 .cp-insp { margin: 8px 0; padding: 8px; border: 1px solid #d79e48; border-radius: 8px; background: #1a130d; }
 .cp-insp .si-cards { display: flex; flex-wrap: wrap; gap: 6px; margin: 6px 0; }
 .cp-insp .cp-h { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+/* ---------- v61: obrazovky kampaně bez posouvání (obchod, výběr scénáře) ---------- */
+.camp-wrap { max-width: 1580px; min-height: 100%; display: flex; flex-direction: column; gap: 10px; padding: 14px 22px 12px; }
+.cp-top { flex-wrap: nowrap; align-items: center; gap: 18px; }
+.cp-tt { flex: none; } .cp-top .eyebrow { margin: 0; font: 400 12px var(--f-disp); letter-spacing: .22em; color: var(--candle); text-transform: uppercase; }
+.cp-top h1 { font-size: 28px; line-height: 1.1; }
+.cp-top .cp-prog { flex: 1; margin: 0; justify-content: center; min-width: 0; }
+.cp-prog span { font-size: 11.5px; padding: 2px 8px; }
+.cp-score { padding: 4px 12px; font-size: 15px; } .cp-score b { font-size: 19px; }
+.cp-end .cp-top { flex-wrap: wrap; }
+/* výsledek poslední mise: jeden pruh */
+.cr { display: grid; grid-template-columns: 1.5fr 1.2fr .8fr; gap: 8px; }
+.cr .cr-res, .cr .cr-box { background: #0c0b10; border: 1px solid var(--line); border-radius: 8px; padding: 5px 12px; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.cr .cr-res.win { border-color: #3a6a4a; } .cr .cr-res.lose { border-color: #6a3a32; }
+.cr .cr-res h2 { font-size: 18px; display: inline; line-height: 1.5; } .cr .cr-res small { color: var(--muted); margin-left: 8px; font-size: 12px; }
+.cr .cr-res p { display: inline; margin: 0 0 0 8px; font-size: 12.5px; color: var(--muted); }
+.cr .cr-box h3 { display: inline; font: 700 11px var(--f-body); text-transform: uppercase; letter-spacing: .12em; color: var(--muted); margin: 0 8px 0 0; }
+.cr .cr-box p { display: inline; margin: 0; font-size: 13px; } .cr .cr-box b { font-size: 15px; }
+.cr-loot { display: inline; margin-left: 8px; font-size: 11.5px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+/* záložky + další scénář v jedné řádce */
+.cp-navrow { display: flex; gap: 14px; align-items: flex-end; border-bottom: 1px solid var(--line); }
+.cp-navrow .cp-tabs { border-bottom: 0; flex: none; gap: 4px; }
+.cp-navrow .cp-tabs button { padding: 5px 12px 6px; font-size: 16px; margin-bottom: -1px; }
+.cp-navrow .cp-nextbar { flex: 1; min-width: 0; margin: 0 0 5px; padding: 3px 10px; flex-wrap: nowrap; font-size: 13.5px; gap: 8px; }
+.cp-nextbar .ic { width: 14px; height: 14px; color: var(--candle); flex: none; } .cp-nextbar > span { flex: none; }
+.nb-cats { display: inline-flex; } .cp-nextbar .nb-goal { flex: 1; min-width: 0; color: var(--muted); font-size: 12.5px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.cp-body { flex: 1; min-height: 0; display: block; }
+.cp-foot { margin-top: auto; padding-top: 8px; gap: 8px; } .cp-foot p { font-size: 13px; } .cp-foot .btn { padding: 6px 13px; }
+.cp-h { margin-bottom: 6px; gap: 10px; } .cp-h h3 { font-size: 18px; } .cp-h .ess b { font-size: 16px; }
+/* lovci: družina vlevo, obchod + detail + truhla vpravo */
+.cp-hgrid { display: grid; grid-template-columns: minmax(0, 1fr) 440px; gap: 12px; align-items: start; }
+.cp-hgrid .cp-party { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+.cp-hgrid .cp-hero { padding: 8px; gap: 7px; border-radius: 8px; }
+.cp-hh .hport { width: 32px; height: 34px; } .cp-hh b { font-size: 15px; line-height: 1.15; } .cp-hh small { font-size: 12px; }
+.cp-hh .xp { margin-left: auto; font: 800 14px var(--f-num); padding: 1px 9px; border: 1px solid #6a5030; border-radius: 99px; white-space: nowrap; }
+.cp-hero .pdoll { gap: 4px; padding: 6px; }
+.cp-hero .pd-cell { min-height: 54px; padding: 3px 2px; gap: 1px; border-radius: 6px; }
+.cp-hero .pd-ic .ic { width: 16px; height: 16px; } .cp-hero .pd-ic.art .iart { width: 22px; height: 22px; }
+.cp-hero .pd-slot { font-size: 8px; letter-spacing: .1em; } .cp-hero .pd-name { font-size: 10.5px; }
+.cp-hero .pd-cell.full:hover .pd-name::after { content: none; }
+.cp-hero .bag { margin: 0; min-height: 30px; padding: 3px 5px; }
+.cp-hero .bagi small { max-width: 72px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.cp-abil { gap: 5px; }
+.ab-row { display: grid; gap: 2px; }
+.ab-name { margin: 0; font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; } .ab-name small { color: var(--muted); }
+.ab-cur { cursor: help; border-bottom: 1px dotted #6a5a48; }
+.ab-next { display: flex; gap: 4px; flex-wrap: wrap; }
+.ab-next .tn { display: inline-flex; gap: 5px; align-items: baseline; padding: 2px 7px; }
+.ab-next .tn b { display: inline; font-size: 11.5px; } .ab-next .tn small { font-size: 10px; opacity: .8; }
+.ab-next .tn.poor { cursor: help; }
+.cp-side { display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+.cp-side > section { background: #0c0b10; border: 1px solid var(--line); border-radius: 8px; padding: 8px 10px; }
+.cp-side .shop-items { grid-template-columns: 1fr 1fr; gap: 6px; }
+.cp-side .si { display: grid; grid-template-columns: 34px minmax(0, 1fr); gap: 4px 8px; padding: 6px 8px; border-radius: 6px; cursor: pointer; align-items: center; transition: border-color .12s, background .12s; }
+.cp-side .si .si-ic { width: 34px; height: 34px; } .cp-side .si-ic.art .iart { width: 28px; height: 28px; }
+.si-tx { min-width: 0; } .si-tx b { display: block; font-size: 13px; line-height: 1.15; }
+.si-tx small { display: block; font-size: 11px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 1px; } .si-tx small .ic { width: 11px; height: 11px; margin-right: 3px; } .si-tx i { font-style: normal; }
+.si-act { grid-column: 1 / -1; display: flex; align-items: center; justify-content: space-between; gap: 6px; }
+.cp-side .si-p { margin: 0; font: 800 18px var(--f-num); color: var(--candle-2); display: inline-flex; gap: 3px; align-items: center; } .si-p .ic { width: 13px; height: 13px; } .cp-side .si-p.poor { color: #7a6a5a; }
+.si-act .btn { padding: 2px 14px; }
+.cp-side .si:hover, .cp-side .si:focus-visible { border-color: var(--candle); background: #15110c; outline: none; }
+.cp-side .si.sel { border-color: var(--candle-2); box-shadow: 0 0 0 1px var(--candle) inset; }
+.cp-side .si-who { grid-column: 1 / -1; display: flex; gap: 4px; align-items: center; font-size: 12px; flex-wrap: nowrap; }
+.si-hero { display: inline-flex; flex-direction: column; align-items: center; padding: 2px 4px; border: 1px solid var(--c, var(--line-2)); border-radius: 5px; background: #0a090c; cursor: pointer; color: var(--fg); line-height: 1.1; }
+.si-hero .hport { width: 22px; height: 24px; } .si-hero small { font-size: 9.5px; } .si-hero > .ic { width: 18px; height: 18px; margin: 3px 0; color: var(--candle); }
+.si-hero:hover { background: #241a10; } .si-hero.mini { padding: 1px 2px; } .si-hero.mini .hport { width: 18px; height: 20px; }
+.cp-det { flex: 1; min-height: 170px; overflow: hidden; }
+.cp-det:has(.cp-insp) { border-color: #d79e48; }
+.det-h { display: flex; gap: 8px; align-items: center; } .det-h .si-ic { width: 32px; height: 32px; } .det-h .si-ic.art .iart { width: 26px; height: 26px; }
+.det-h b { display: block; font-size: 15px; color: var(--paper); } .det-h small { color: var(--muted); font-size: 12px; } .det-btns { margin-left: auto; display: flex; gap: 4px; }
+.cp-det .si-cards { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 6px; } .cp-det .si-cards .card { zoom: .56; } .cp-det .amulet-card { min-height: 0; }
+.cp-det .cp-insp { margin: 0; padding: 0; border: 0; background: none; }
+.det-empty { display: flex; gap: 12px; align-items: center; justify-content: center; height: 100%; min-height: 150px; color: var(--muted); }
+.det-empty .ic { width: 28px; height: 28px; color: #5a4a3a; } .det-empty p { margin: 0; font-size: 13px; max-width: 30ch; } .det-empty b { display: block; color: var(--paper); font: 400 16px var(--f-disp); }
+.cp-chest .chest { max-height: 108px; overflow-y: auto; gap: 4px; }
+.cp-chest .ci { padding: 3px 6px; gap: 6px; border-radius: 6px; flex-wrap: nowrap; } .cp-chest .ci .si-ic { width: 26px; height: 26px; } .cp-chest .ci .si-ic.art .iart { width: 22px; height: 22px; }
+.cp-chest .ci b { font-size: 12.5px; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+.cp-chest .ci-b { gap: 3px; flex-wrap: nowrap; } .cp-chest .cp-h { margin-bottom: 4px; } .cp-chest .sellzone { margin-left: auto; } .cp-chest > p { margin: 0; }
+/* Dům: skupiny monster vlevo, karty vpravo */
+.cp-olgrid { display: grid; grid-template-columns: minmax(0, 1.7fr) minmax(0, 1fr); gap: 12px; align-items: stretch; }
+.cp-olgrid > section { background: #0c0b10; border: 1px solid var(--line); border-radius: 8px; padding: 8px 10px; display: flex; flex-direction: column; min-width: 0; margin: 0; }
+.cp-olgrid .grp-list { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 5px; }
+.cp-olgrid .grp { display: grid; grid-template-columns: 24px minmax(0, 1fr); gap: 2px 6px; padding: 3px 5px; border-radius: 6px; align-items: center; background: #100e14; }
+.cp-olgrid .grp .mport { width: 24px; height: 24px; }
+.cp-olgrid .grp-b { display: flex; gap: 6px; align-items: center; min-width: 0; } .cp-olgrid .grp-b b { font-size: 12.5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; } .cp-olgrid .grp-b .grp-cat { margin: 0; flex: none; }
+.cp-olgrid .grp.nx { border-color: #5a4630; }
+.cp-olgrid .grp-btns { grid-column: 1 / -1; flex-direction: row; gap: 3px; }
+.gb { flex: 1; font: 600 11px/1.25 var(--f-body); padding: 1px 4px; border-radius: 4px; border: 1px solid var(--line-2); background: #141118; color: var(--muted); cursor: pointer; white-space: nowrap; }
+.gb i { font-style: normal; opacity: .75; } .gb.can { border-color: #b07a34; color: var(--candle-2); background: #22180c; } .gb.can:hover { background: #3a2810; }
+.gb.got { box-shadow: inset 0 -2px 0 #f3cf6e; } .gb[aria-disabled="true"] { cursor: not-allowed; opacity: .6; }
+.grp-hint { margin: auto 0 0; padding-top: 8px; font-size: 12.5px; color: var(--muted); min-height: 2.9em; line-height: 1.35; } .grp-hint.on { color: var(--candle-2); } .grp-hint .ic { width: 12px; height: 12px; vertical-align: -1px; } .grp-hint b { color: #d8ccb8; }
+.cp-olgrid .ol-up { grid-template-columns: 1fr 1fr; gap: 5px; }
+.olu-c { margin-left: auto; float: right; font: 700 11px var(--f-num); color: var(--candle-2); } .olu-c.poor { color: #7a6a5a; }
+.cp-olgrid .olu .ab-next .tn { padding: 1px 6px; }
+.cp-olgrid .olu { display: grid; gap: 3px; padding: 4px 8px; border-radius: 6px; align-items: start; background: #100e14; }
+/* výběr scénáře: karty ve dvou sloupcích */
+.cp-pickbox { gap: 6px; }
+.cp-pick { padding: 4px 12px; font-size: 15px; }
+.sc-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+.sc-card { display: grid; grid-template-columns: 30px minmax(0, 1fr); gap: 10px; padding: 6px 12px; border: 1px solid var(--line); border-radius: 8px; background: #0c0b10; transition: border-color .12s, background .12s; }
+.sc-card .sc-n { font: 800 24px/1 var(--f-num); color: var(--candle-2); text-align: center; padding-top: 2px; }
+.sc-main { display: grid; gap: 2px; min-width: 0; align-content: start; }
+.sc-hd { display: flex; align-items: center; gap: 10px; min-width: 0; }
+.sc-hd h3 { font: 400 19px/1.15 var(--f-disp); color: var(--paper); white-space: nowrap; }
+.sc-map { display: inline-flex; gap: 4px; align-items: center; font-size: 12px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; } .sc-map .ic { width: 12px; height: 12px; color: #8a7a6a; flex: none; }
+.sc-card .sc-st { margin-left: auto; flex: none; text-align: right; } .sc-card .sc-st .btn { width: auto; padding: 3px 18px; }
+.sc-hook { margin: 0; font-size: 13px; font-style: italic; color: #b8ac98; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.sc-goal { margin: 0; font-size: 13.5px; line-height: 1.3; } .sc-goal span { color: var(--candle); font-size: 11px; text-transform: uppercase; letter-spacing: .1em; } .sc-goal b { color: var(--fg); font-weight: 700; }
+.sc-mon { display: flex; flex-wrap: wrap; gap: 3px 10px; margin-top: 1px; }
+.sc-bio { display: inline-flex; flex-wrap: wrap; gap: 3px; align-items: center; font-size: 11px; line-height: 1.5; }
+.sc-bio b { color: #ffe0a0; background: #3a2a10; border: 1px solid #8a6a2a; padding: 0 6px; border-radius: 3px; font-weight: 700; }
+.sc-bio i { font-style: normal; color: #d8ccb8; background: #17141b; border: 1px solid #2c2632; padding: 0 5px; border-radius: 3px; }
+.sc-card.played { opacity: .5; filter: grayscale(.6); } .sc-card.next { border-color: var(--candle); box-shadow: 0 0 0 1px var(--candle) inset; }
+@media (max-height: 800px) { .camp-wrap { gap: 8px; padding-top: 10px; padding-bottom: 8px; } }
+.sc-card:has([data-pickscen]):hover { border-color: #8a6a3a; background: #110e0b; }
 </style>
 
 <div id="menu">
   <div id="mainmenu" class="rpgmenu">
+    <div class="mm-sky" aria-hidden="true" id="mm-sky"></div>
+    <div class="mm-fog" aria-hidden="true"></div>
+    <div class="mm-ground" aria-hidden="true"></div>
     <div class="mm-left">
       <p class="mm-eyebrow">Lovci duchů</p>
-      <h1 class="mm-title">Půlnoc<br>na Blackmooru</h1>
+      <h1 class="mm-title">Půlnoc <br>na Blackmooru</h1>
       <p class="mm-tag"><span class="alpha">Alfa test</span> Hraje se na počítači · 1–4 hráči · na mobil zatím ne</p>
       <div id="mm-screen" class="mm-screen"></div>
     </div>
     <div class="mm-right"><div id="menuart" aria-hidden="true"></div><p class="mm-lore">Seance se zvrtla. Tři lovci duchů uvízli v domě, který ožil. Dvanáct kol do půlnoci: lovci hrají kartami, Dům ovládá monstra a karty hrůzy.</p></div>
+    <div class="mm-corner"><button class="mm-ico" id="mm-mus" aria-pressed="true"></button><button class="mm-ico" id="mm-snd" aria-pressed="true"></button></div>
   </div>
   <div class="menu-card" id="legacy" hidden>
     <div id="menuart" aria-hidden="true"></div>
@@ -11106,15 +11264,61 @@ function initFullscreen() {
   document.addEventListener('webkitfullscreenchange', upd);
   upd();
 }
+// tlačítka zvuku: v liště hry i v hlavním menu (v61) ukazují stejný stav
+function syncSoundBtns() {
+  if (!SND) return;
+  const set = (id, ic, on, lab) => { const b = $(id); if (!b) return; b.innerHTML = A.icon(ic) + (lab ? `<span>${lab}</span>` : ''); b.setAttribute('aria-pressed', on); };
+  set('#sndbtn', SND.sfxOn ? 'speaker' : 'speakeroff', SND.sfxOn); set('#musbtn', 'music', SND.musicOn);
+  set('#mm-snd', SND.sfxOn ? 'speaker' : 'speakeroff', SND.sfxOn, 'Zvuky'); set('#mm-mus', 'music', SND.musicOn, 'Hudba');
+  document.querySelectorAll('[data-sndset]').forEach(b => { const on = b.dataset.sndset === 'mus' ? SND.musicOn : SND.sfxOn; b.setAttribute('aria-pressed', on); const sp = b.querySelector('span'); if (sp) sp.textContent = (b.dataset.sndset === 'mus' ? 'Hudba: ' : 'Zvuky: ') + (on ? 'zapnuto' : 'vypnuto'); });
+}
+const toggleSfx = () => { if (!SND) return; SND.start(); SND.setSfx(!SND.sfxOn); syncSoundBtns(); };
+const toggleMusic = () => { if (!SND) return; SND.start(); SND.setMusic(!SND.musicOn); syncSoundBtns(); };
 function initSound() {
-  const upd = () => {
-    if (!SND) return;
-    $('#sndbtn').innerHTML = A.icon(SND.sfxOn ? 'speaker' : 'speakeroff'); $('#sndbtn').setAttribute('aria-pressed', SND.sfxOn);
-    $('#musbtn').innerHTML = A.icon('music'); $('#musbtn').setAttribute('aria-pressed', SND.musicOn);
-  };
-  $('#sndbtn').addEventListener('click', () => { if (SND) { SND.start(); SND.setSfx(!SND.sfxOn); upd(); } });
-  $('#musbtn').addEventListener('click', () => { if (SND) { SND.start(); SND.setMusic(!SND.musicOn); upd(); } });
-  upd();
+  $('#sndbtn').addEventListener('click', toggleSfx);
+  $('#musbtn').addEventListener('click', toggleMusic);
+  const ms = $('#mm-snd'), mu = $('#mm-mus');
+  if (ms) ms.addEventListener('click', toggleSfx); if (mu) mu.addEventListener('click', toggleMusic);
+  syncSoundBtns();
+  // v61: hudba hraje už v menu. Prohlížeč pustí zvuk až po první interakci, proto se WebAudio spouští (nebo probouzí) na prvním kliknutí či klávese.
+  if (!SND) return;
+  const kick = () => { try { SND.start(); } catch (e) { /* bez zvuku */ } };
+  let act = false; try { act = !!(navigator.userActivation && navigator.userActivation.hasBeenActive); } catch (e) { /* nic */ }
+  if (act) kick();
+  const once = () => { kick(); ['pointerdown', 'keydown', 'touchstart'].forEach(t => document.removeEventListener(t, once, true)); };
+  ['pointerdown', 'keydown', 'touchstart'].forEach(t => document.addEventListener(t, once, true));
+}
+// ---------- v61: hlavní menu v pevném rámu 16:9 ----------
+const MM_W = 1600, MM_H = 900;
+function fitMenu() {
+  const f = $('#mainmenu'); if (!f) return;
+  const z = Z(), s = Math.min(window.innerWidth / z / MM_W, window.innerHeight / z / MM_H);
+  f.style.setProperty('--mms', String(Math.max(.2, s)));
+}
+// pixelová noční scéna za menu: měsíc, hvězdy a silueta panství (1 jednotka = 5 px)
+function menuSkyHTML() {
+  const rect = (x, y, w, h, c) => `<rect x="${x}" y="${y}" width="${w}" height="${h}"${c ? ` class="${c}"` : ''}/>`;
+  const tri = (x, y, w, h) => { let o = ''; for (let k = 0; k < h; k++) { const ww = Math.max(2, Math.round(w * (k + 1) / h / 2) * 2); o += rect(x + (w - ww) / 2, y + k, ww, 1); } return o; };
+  // měsíc
+  let moon = ''; const R = 10.5;
+  for (let y = 0; y < 22; y++) { const dy = y + .5 - 11, half = Math.sqrt(Math.max(0, R * R - dy * dy)); const x0 = Math.round(11 - half), x1 = Math.round(11 + half); if (x1 > x0) moon += rect(x0, y, x1 - x0, 1); }
+  const craters = [[6, 6, 3, 2], [13, 9, 4, 3], [8, 14, 2, 2], [15, 15, 2, 1], [4, 11, 2, 1]].map(c => rect(...c)).join('');
+  // hvězdy (pevné rozmístění, ať se scéna nemění)
+  let st = '', seed = 7; const rnd = () => (seed = (seed * 9301 + 49297) % 233280) / 233280;
+  for (let i = 0; i < 46; i++) { const x = Math.floor(rnd() * 208), y = Math.floor(rnd() * 80), big = rnd() < .15; st += rect(x, y, big ? 2 : 1, big ? 2 : 1); }
+  // panství: hlavní křídlo, věž, boční křídla, komíny, okna, mrtvý strom, plot
+  let m = '';
+  m += rect(52, 46, 88, 50) + tri(48, 32, 96, 14) + rect(84, 22, 24, 74) + tri(80, 2, 32, 20) + rect(95, 0, 2, 3)
+    + rect(22, 62, 30, 34) + tri(18, 50, 38, 12) + rect(140, 56, 38, 40) + tri(136, 42, 46, 14)
+    + rect(62, 30, 4, 12) + rect(128, 32, 4, 10) + rect(166, 38, 3, 8) + rect(30, 46, 3, 8)
+    + rect(5, 54, 3, 42) + rect(2, 58, 3, 2) + rect(0, 56, 2, 2) + rect(8, 62, 4, 2) + rect(11, 60, 2, 2) + rect(6, 50, 2, 4) + rect(3, 46, 2, 4) + rect(8, 44, 2, 6)
+    + rect(184, 64, 3, 32) + rect(186, 66, 4, 2) + rect(180, 70, 4, 2) + rect(189, 62, 2, 4)
+    + rect(0, 91, 192, 1) + Array.from({ length: 33 }, (_, i) => rect(i * 6, 88, 1, 8)).join('');
+  const dark = [[60, 56], [70, 56], [118, 56], [128, 72], [28, 70], [146, 66], [168, 66], [60, 72]], lit = [[93, 30, 'win'], [118, 72, 'win b'], [70, 72, 'win'], [158, 66, 'win c'], [38, 70, 'win b'], [128, 56, 'win c']];
+  const wins = dark.map(([x, y]) => rect(x, y, 4, 7)).join('') + lit.map(([x, y, c]) => rect(x, y, x === 93 ? 6 : 4, x === 93 ? 9 : 7, c)).join('') + rect(92, 80, 8, 16);
+  return `<svg class="mm-stars" viewBox="0 0 208 84" fill="#e8dcc4">${st}</svg>
+    <svg class="mm-moon" viewBox="0 0 22 22"><g fill="#efe2bf">${moon}</g><g fill="#d6c49a">${craters}</g></svg>
+    <svg class="mm-manor" viewBox="0 0 192 96"><g fill="#0b0810">${m}</g><g fill="#1c1624">${wins}</g></svg>`;
 }
 function initMenu() {
   const bindSeg = (id, fn) => $(id).querySelectorAll('button').forEach(b => b.addEventListener('click', () => { $(id).querySelectorAll('button').forEach(x => x.setAttribute('aria-pressed', 'false')); b.setAttribute('aria-pressed', 'true'); fn(b.dataset.v); }));
@@ -11133,6 +11337,8 @@ function initMenu() {
   $('#seg-o').querySelectorAll('button').forEach(b => b.addEventListener('click', updPool)); updPool();
   $('#startbtn').addEventListener('click', () => { Camp.setKey(); startGame(); });
   renderMM();
+  const sky = $('#mm-sky'); if (sky) sky.innerHTML = menuSkyHTML();
+  fitMenu(); window.addEventListener('resize', fitMenu); document.addEventListener('fullscreenchange', () => setTimeout(fitMenu, 60));
   $('#savebtn').addEventListener('click', () => { $('#menupop').hidden = true; if (isClient()) { S.msg = 'Online hru ukládá hostitel (sama na začátku každého kola). Kopii si můžeš stáhnout: Menu → Stáhnout uložení.'; render(); return; } if (lastCheckpoint) { lsSet(NETS.role === 'host' ? SAVE_MP : SAVE_SP, JSON.stringify(lastCheckpoint)); S.msg = 'Uloženo: ' + lastCheckpoint.label + ' (od začátku kola).'; } else S.msg = 'Zatím není co uložit, hra se ukládá na začátku kola.'; render(); });
   $('#dlbtn').addEventListener('click', () => { $('#menupop').hidden = true; gameDownload(); });
   $('#ulbtn').addEventListener('click', () => { $('#menupop').hidden = true; gameUpload(); });
@@ -11221,48 +11427,73 @@ function treeHTML(nodes, cur, xp, attr, previewFn) {
   const nxt = Camp.nextVariants(c0);
   return `<div class="tree slim"><div class="tpath">${path.map(node).join('<i class="tarr">›</i>')}</div>${nxt.length ? `<i class="tarr">›</i><div class="tcol">${nxt.map(node).join('')}</div>` : '<small class="tmax">nejvyšší úroveň</small>'}</div>`;
 }
+// v61: kompaktní strom vylepšení – jen aktuální úroveň a varianty, na které jde vylepšit teď
+function treeMiniHTML(nodes, cur, xp, attr, noCost) {
+  const nm = v => Array.isArray(nodes[v]) ? nodes[v][0] : nodes[v];
+  const c0 = cur || '', nxt = Camp.nextVariants(c0), cost = Camp.upCost(c0);
+  if (!nxt.length) return '<small class="tmax">nejvyšší úroveň</small>';
+  return nxt.map(v => { const can = cost <= xp; return `<button class="tn${can ? ' can' : ' poor'}" ${can ? `${attr}="${v}"` : 'aria-disabled="true"'} data-pv="${v}"><b>${esc(nm(v))}</b>${noCost ? '' : `<small>${cost} xp</small>`}</button>`; }).join('');
+}
 function campRewardsHTML(r) {
   if (!r) return '';
-  return `<div class="cr"><div class="cr-res ${r.win ? 'win' : 'lose'}"><p class="eyebrow">${r.n ? r.n + '. scénář kampaně' : 'Scénář ' + (r.scen + 1)} · ${esc(r.name)}</p><h2>${r.win ? 'Lovci uspěli' : 'Dům zvítězil'}</h2><p>${esc(r.reason)}</p></div>
-    <div class="cr-cols"><div class="cr-box h"><h3>Lovci</h3><p><b>+${r.heroes.esence}</b> esence <small>(${C.HEROES.length} za lovce${r.heroes.found ? ', ' + r.heroes.found + ' za nálezy' : ''}${r.heroes.comp ? ', ' + Camp.COMP.heroEss + ' jako kompenzace' : ''})</small></p><p><b>+${r.heroes.xp + (r.heroes.comp ? 1 : 0)}</b> zkušenosti každý${r.heroes.comp ? ' <small>(vč. kompenzace za dvě porážky)</small>' : ''}</p>${r.relic ? `<p class="good-t"><b>Relikvie:</b> ${esc(C.EQUIP[r.relic].name)} je ${r.relicHero && (S.camp && S.camp.heroes[r.relicHero].bag.includes(r.relic)) ? 'v batohu: ' + esc(C.HEROES.find(h => h.id === r.relicHero).name) : 'v truhle'}.</p>` : ''}${r.loot && Object.values(r.loot).some(l => l.length) ? `<p><b>Nálezy s sebou:</b> ${C.HEROES.filter(h => (r.loot[h.id] || []).length).map(h => esc(h.name.split(' ')[0]) + ': ' + r.loot[h.id].map(id => esc(C.D.LOOT[id].name)).join(', ')).join(' · ')}</p>` : ''}</div>
-    <div class="cr-box o"><h3>Dům</h3><p><b>+${r.ol.xp}</b> zkušenosti a <b>+${r.ol.gold || 0}</b> temné esence${r.ol.comp ? ' <small>(vč. kompenzace za dvě porážky)</small>' : ''}</p></div></div></div>`;
+  const relic = r.relic ? ` · <span class="good-t">Relikvie: <b>${esc(C.EQUIP[r.relic].name)}</b> ${r.relicHero && (S.camp && S.camp.heroes[r.relicHero].bag.includes(r.relic)) ? 'v batohu: ' + esc(C.HEROES.find(h => h.id === r.relicHero).name.split(' ')[0]) : 'v truhle'}</span>` : '';
+  const loot = r.loot && Object.values(r.loot).some(l => l.length) ? `<span class="cr-loot">Nálezy: ${C.HEROES.filter(h => (r.loot[h.id] || []).length).map(h => esc(h.name.split(' ')[0]) + ' ' + r.loot[h.id].map(id => esc(C.D.LOOT[id].name)).join(', ')).join(' · ')}</span>` : '';
+  return `<div class="cr"><div class="cr-res ${r.win ? 'win' : 'lose'}"><h2>${r.win ? 'Lovci uspěli' : 'Dům zvítězil'}</h2><small>${r.n ? r.n + '. scénář' : 'Scénář ' + (r.scen + 1)} · ${esc(r.name)}</small><p>${esc(r.reason)}</p></div>
+    <div class="cr-box h"><h3>Lovci</h3><p><b>+${r.heroes.esence}</b> esence · <b>+${r.heroes.xp + (r.heroes.comp ? 1 : 0)}</b> xp každý${r.heroes.comp ? ' <small>(vč. kompenzace)</small>' : ''}${relic}</p>${loot}</div>
+    <div class="cr-box o"><h3>Dům</h3><p><b>+${r.ol.xp}</b> xp · <b>+${r.ol.gold || 0}</b> temné esence${r.ol.comp ? ' <small>(vč. kompenzace)</small>' : ''}</p></div></div>`;
 }
+const shopTileHTML = (st, id, buyFor) => {
+  const e = C.EQUIP[id], p = Camp.price(id), poor = p > st.esence, sel = S.campShopSel === id;
+  const who = buyFor === id ? `<div class="si-who"><span>Komu?</span>${C.HEROES.filter(h => !e.hero || e.hero === h.id).map(h => `<button class="si-hero" data-buy="${id}" data-for="${h.id}" style="--c:${HERO_COLORS[h.id]}" aria-label="Koupit pro: ${esc(h.name)}">${heroPortrait(h.id)}<small>${esc(h.name.split(' ')[0])}</small></button>`).join('')}<button class="si-hero chest" data-buy="${id}" data-for="" aria-label="Koupit do truhly">${A.icon('deck')}<small>Truhla</small></button></div>` : '';
+  return `<div class="si t${e.tier}${sel ? ' sel' : ''}${buyFor === id ? ' buying' : ''}" data-si="${id}" tabindex="0" aria-label="${esc(e.name)}, ${p} esence">
+    <span class="si-ic art">${itemPic(id)}</span><div class="si-tx"><b>${esc(e.name)}</b><small>${A.icon(SLOT_IC[e.slot])}${esc(C.SLOTS[e.slot])} · <i class="ib-tier t${e.tier}">${['startovní', 'běžný', 'vzácný', 'mocný', 'legendární'][e.tier]}</i>${e.hero ? ' · jen ' + esc(C.HEROES.find(h => h.id === e.hero).name.split(' ')[0]) : ''}</small></div>
+    <div class="si-act"><span class="si-p${poor ? ' poor' : ''}">${p}${A.icon('star')}</span>${buyFor === id ? '' : `<button class="btn primary sm" data-pick="${id}" ${poor ? 'disabled' : ''}>Koupit</button>`}</div>${who}</div>`;
+};
+// detail předmětu: náhled z obchodu (najetí / klik) nebo vlastní předmět lovce (klik ve výbavě / batohu)
+function campDetHTML(st, hoverId) {
+  const ci = S.campInspect;
+  if (!hoverId && ci && st.heroes[ci.hero]) {
+    const id = ci.slot ? st.heroes[ci.hero].equip[ci.slot] : st.heroes[ci.hero].bag[ci.bag];
+    if (id && C.EQUIP[id]) {
+      const e = C.EQUIP[id], hn = C.HEROES.find(h => h.id === ci.hero).name.split(' ')[0];
+      return `<div class="cp-insp"><div class="det-h"><span class="si-ic art">${itemPic(id)}</span><div><b>${esc(e.name)}</b><small>${ci.slot ? 'Výbava' : 'Batoh'}: ${esc(hn)} · ${e.passive ? 'pasivní, bez karet' : nCards(e.cards.length) + ' v balíčku'}</small></div><div class="det-btns">${ci.slot && campMay('h') ? '<button class="btn sm" data-insp-chest>Do truhly</button>' : ''}<button class="btn sm ghost" data-insp-close aria-label="Zavřít náhled">✕</button></div></div><div class="si-cards">${itemCardsHTML(id, ci.hero)}</div></div>`;
+    }
+    S.campInspect = null;
+  }
+  const id = hoverId || S.campShopSel;
+  if (id && C.EQUIP[id]) {
+    const e = C.EQUIP[id];
+    return `<div class="det-shop"><div class="det-h"><span class="si-ic art">${itemPic(id)}</span><div><b>${esc(e.name)}</b><small>Obchod · ${Camp.price(id)} esence · ${e.passive ? 'pasivní, bez karet' : nCards(e.cards.length) + ' do balíčku'}</small></div></div><div class="si-cards">${itemCardsHTML(id)}</div></div>`;
+  }
+  return `<div class="det-empty">${A.icon('search')}<p><b>Karty předmětu</b>Najeď na předmět v obchodě, nebo klikni na výbavu či batoh lovce.</p></div>`;
+}
+const nCards = n => n + ' ' + (n === 1 ? 'karta' : n >= 2 && n <= 4 ? 'karty' : 'karet');
 function campHeroesHTML(st) {
-  const shop = Camp.rollShop(st);
-  const buyFor = S.campBuy;
-  let html = `<section class="cp-shop"><div class="cp-h"><h3>Obchod</h3><span class="ess">${A.icon('star')} <b>${st.esence}</b> esence družiny</span><button class="btn sm" data-reroll ${st.rerolled || st.esence < 1 ? 'disabled' : ''}>Přetáhnout nabídku · 1</button></div>
-    <div class="shop-items">${shop.map(id => { const e = C.EQUIP[id], p = Camp.price(id); return `<div class="si t${e.tier}"><div class="si-top"><span class="si-ic art">${itemPic(id)}</span><div><b>${esc(e.name)}</b><div class="si-b">${itemBadge(id)}</div></div><span class="si-p">${p}</span></div>
-      <div class="si-cards">${itemCardsHTML(id)}</div>
-      ${buyFor === id ? `<div class="si-who">Komu? ${C.HEROES.filter(h => !e.hero || e.hero === h.id).map(h => `<button class="btn sm" data-buy="${id}" data-for="${h.id}" style="--c:${HERO_COLORS[h.id]}">${esc(h.name.split(' ')[0])}</button>`).join('')}<button class="btn sm ghost" data-buy="${id}" data-for="">Do truhly</button></div>` : `<button class="btn primary sm" data-pick="${id}" ${p > st.esence ? 'disabled' : ''}>Koupit za ${p}</button>`}</div>`; }).join('') || '<p class="muted">Nabídka je vyprodaná.</p>'}</div></section>`;
-  html += `<section class="cp-party">${C.HEROES.map(h => { const hs = st.heroes[h.id]; return `<div class="cp-hero" style="--c:${HERO_COLORS[h.id]}"><div class="cp-hh">${heroPortrait(h.id)}<div><b>${esc(h.name)}</b><small>${esc(h.archetype)} · <span class="xp">${hs.xp} xp</span></small></div></div>
-      ${paperDollHTML(hs.equip, { slotAttr: true, hero: h.id, sel: S.campInspect && S.campInspect.hero === h.id ? S.campInspect.id : null })}${campInspectHTML(st, h.id)}
-      <div class="bag" data-drop='${JSON.stringify({ where: 'bag', hero: h.id })}'><span class="bag-h">${A.icon('satchel')} Batoh ${hs.bag.length}/${Camp.BAG}</span>${hs.bag.map((id, i) => `<span class="bagi" draggable="true" data-src='${JSON.stringify({ where: 'bag', hero: h.id, idx: i })}' title="${esc(C.EQUIP[id].name)}">${itemPic(id)}<small>${esc(C.EQUIP[id].name)}</small></span>`).join('')}${hs.bag.length < Camp.BAG ? '<span class="bag-empty">přetáhni sem</span>' : ''}</div>
-      <div class="cp-abil">${C.ABIL[h.id].map(ab => { const cur = hs.abil[ab.key] || ''; return `<div class="ab-row"><p class="ab-name">${esc(ab.cat)} · <b>${esc(ab.tree[cur][0])}</b> <small>úroveň ${C.levelOf(cur)}</small></p>${treeHTML(ab.tree, cur, hs.xp, `data-up="${h.id}|${ab.key}" data-v`, true)}</div>`; }).join('')}</div></div>`; }).join('')}</section>`;
-  html += `<section class="cp-chest" data-drop='{"where":"chest"}'><div class="cp-h"><h3>Truhla družiny</h3><div class="sellzone" data-drop='{"where":"sell"}'>${A.icon('star')} Prodat sem · +1 esence</div></div>${st.chest.length ? `<div class="chest">${st.chest.map((id, i) => `<div class="ci" draggable="true" data-src='{"where":"chest","idx":${i}}'><span class="si-ic art">${itemPic(id)}</span><div><b>${esc(C.EQUIP[id].name)}</b><div class="si-b">${itemBadge(id)}</div></div><div class="ci-b">${C.HEROES.map(h => `<button class="btn sm" data-equip="${id}" data-for="${h.id}">${esc(h.name.split(' ')[0])}</button>`).join('')}<button class="btn sm ghost" data-sell="${id}">Prodat · +1</button></div></div>`).join('')}</div>` : '<p class="muted">Prázdná. Sem padá výbava, kterou nahradíte, nebo kterou koupíte do zásoby. Kliknutím na předmět u lovce uvidíte jeho karty (a můžete ho sem odložit).</p>'}</section>`;
-  return html;
-}
-// v60: náhled karet předmětu z vlastní výbavy (srovnání s nabídkou obchodu)
-function campInspectHTML(st, heroId) {
-  const ci = S.campInspect; if (!ci || ci.hero !== heroId) return '';
-  const id = ci.slot ? st.heroes[heroId].equip[ci.slot] : st.heroes[heroId].bag[ci.bag];
-  if (!id || !C.EQUIP[id]) { S.campInspect = null; return ''; }
-  const e = C.EQUIP[id];
-  return `<div class="cp-insp"><div class="cp-h"><b>${esc(e.name)}</b><span class="si-b">${itemBadge(id)}</span><span class="muted sm">${e.passive ? 'pasivní, bez karet' : 'přidává do balíčku ' + e.cards.length + ' ' + (e.cards.length === 1 ? 'kartu' : e.cards.length < 5 ? 'karty' : 'karet')}</span></div><div class="si-cards">${itemCardsHTML(id, heroId)}</div><div class="dlg-btns">${ci.slot && campMay('h') ? '<button class="btn sm ghost" data-insp-chest>Odložit do truhly</button>' : ''}<button class="btn sm" data-insp-close>Zavřít</button></div></div>`;
+  const shop = Camp.rollShop(st), buyFor = S.campBuy;
+  const party = `<section class="cp-party">${C.HEROES.map(h => { const hs = st.heroes[h.id]; return `<div class="cp-hero" style="--c:${HERO_COLORS[h.id]}"><div class="cp-hh">${heroPortrait(h.id)}<div><b>${esc(h.name)}</b><small>${esc(h.archetype)}</small></div><span class="xp">${hs.xp} xp</span></div>
+      ${paperDollHTML(hs.equip, { slotAttr: true, hero: h.id, sel: S.campInspect && S.campInspect.hero === h.id ? S.campInspect.id : null })}
+      <div class="bag" data-drop='${JSON.stringify({ where: 'bag', hero: h.id })}'><span class="bag-h">${A.icon('satchel')} Batoh ${hs.bag.length}/${Camp.BAG}</span>${hs.bag.map((id, i) => `<span class="bagi" draggable="true" data-src='${JSON.stringify({ where: 'bag', hero: h.id, idx: i })}' aria-label="${esc(C.EQUIP[id].name)}">${itemPic(id)}<small>${esc(C.EQUIP[id].name)}</small></span>`).join('')}${hs.bag.length < Camp.BAG ? '<span class="bag-empty">přetáhni sem</span>' : ''}</div>
+      <div class="cp-abil">${C.ABIL[h.id].map(ab => { const cur = hs.abil[ab.key] || ''; return `<div class="ab-row"><p class="ab-name">${esc(ab.cat)} · <b class="ab-cur" data-pv="${cur}">${esc(ab.tree[cur][0])}</b> <small>úr. ${C.levelOf(cur)}</small></p><div class="ab-next">${treeMiniHTML(ab.tree, cur, hs.xp, `data-up="${h.id}|${ab.key}" data-v`)}</div></div>`; }).join('')}</div></div>`; }).join('')}</section>`;
+  const shopH = `<section class="cp-shop"><div class="cp-h"><h3>Obchod</h3><span class="ess">${A.icon('star')} <b>${st.esence}</b> esence</span><button class="btn sm" data-reroll ${st.rerolled || st.esence < 1 ? 'disabled' : ''}>Nová nabídka · 1</button></div>
+    <div class="shop-items">${shop.map(id => shopTileHTML(st, id, buyFor)).join('') || '<p class="muted">Nabídka je vyprodaná.</p>'}</div></section>`;
+  const chest = `<section class="cp-chest" data-drop='{"where":"chest"}'><div class="cp-h"><h3>Truhla</h3><span class="muted sm">${st.chest.length || 'prázdná'}</span><div class="sellzone" data-drop='{"where":"sell"}'>${A.icon('star')} Prodat sem · +1</div></div>${st.chest.length ? `<div class="chest">${st.chest.map((id, i) => `<div class="ci" draggable="true" data-src='{"where":"chest","idx":${i}}'><span class="si-ic art">${itemPic(id)}</span><b>${esc(C.EQUIP[id].name)}</b><div class="ci-b">${C.HEROES.map(h => `<button class="si-hero mini" data-equip="${id}" data-for="${h.id}" style="--c:${HERO_COLORS[h.id]}" aria-label="Vybavit: ${esc(h.name)}">${heroPortrait(h.id)}</button>`).join('')}<button class="btn sm ghost" data-sell="${id}">Prodat +1</button></div></div>`).join('')}</div>` : '<p class="muted sm">Sem padá nahrazená výbava. Předměty jde přetahovat mezi výbavou, batohem a truhlou.</p>'}</section>`;
+  return `<div class="cp-hgrid">${party}<aside class="cp-side">${shopH}<section class="cp-det">${campDetHTML(st)}</section>${chest}</aside></div>`;
 }
 // vylepšení skupin monster za temnou esenci Domu
 function campGrpHTML(st) {
   const types = Camp.groupsFor(st), gold = st.ol.gold || 0;
   if (!types.length) return '';
   const nextCats = new Set((Camp.scenById(st.next) || {}).cats || []);
-  return `<div class="grp-up"><div class="cp-h"><h3>Skupiny monster</h3><span class="ess gold">${A.icon('crown')} ${gold} temné esence</span></div>
-    <p class="muted sm">Vylepšení platí natrvalo, kdykoli skupinu nasadíš. Platí se temnou esencí (${A.icon('crown')}): ${Camp.GRP_UPS.map(u => esc(u.name) + ' ' + u.cost + ' (max ' + u.max + '×)').join(', ')}. ★ = skupina z dalšího scénáře. U každé skupiny je prostředí (kategorie), ve kterém se dá nasadit.</p>
-    <div class="grp-list">${types.sort((a, b) => (nextCats.has(C.MDEF[b].cat) ? 1 : 0) - (nextCats.has(C.MDEF[a].cat) ? 1 : 0)).map(t => { const g = (st.ol.grp || {})[t] || {}; return `<div class="grp${Object.keys(g).length ? ' has' : ''}">${monPortrait(t)}<div class="grp-b"><b>${nextCats.has(C.MDEF[t].cat) ? '★ ' : ''}${esc(C.MDEF[t].name)}</b><span class="grp-cat${nextCats.has(C.MDEF[t].cat) ? ' next' : ''}">${esc(C.CATS[C.MDEF[t].cat] || C.MDEF[t].cat)}</span><small>${grpBadge(t, g) || 'bez vylepšení'} · Zocelení: +${C.D.grpHpPer(t)} zdraví všem figurkám</small></div><div class="grp-btns">${Camp.GRP_UPS.map(u => { const why = Camp.grpCan(st, t, u.k), n = g[u.k] || 0; return `<button class="btn sm${why ? '' : ' primary'}" data-grpup="${t}|${u.k}" ${why ? 'disabled' : ''} title="${esc(grpUpText(t, u) + (why ? ' ' + why : ''))}">${esc(u.name)} ${n}/${u.max} · ${u.cost} ${A.icon('crown')}</button>`; }).join('')}</div></div>`; }).join('')}</div></div>`;
+  const legend = `Vylepšení platí natrvalo. ${Camp.GRP_UPS.map(u => `<b>${esc(u.name)}</b> ${u.cost}`).join(' · ')} ${A.icon('crown')} · ★ = prostředí dalšího scénáře`;
+  return `<section class="grp-up"><div class="cp-h"><h3>Skupiny monster</h3><span class="ess gold">${A.icon('crown')} <b>${gold}</b> temné esence</span></div>
+    <div class="grp-list">${types.sort((a, b) => (nextCats.has(C.MDEF[b].cat) ? 1 : 0) - (nextCats.has(C.MDEF[a].cat) ? 1 : 0)).map(t => { const g = (st.ol.grp || {})[t] || {}, nx = nextCats.has(C.MDEF[t].cat); return `<div class="grp${Object.keys(g).length ? ' has' : ''}${nx ? ' nx' : ''}">${monPortrait(t)}<div class="grp-b"><b>${nx ? '★ ' : ''}${esc(C.MDEF[t].name)}</b><span class="grp-cat${nx ? ' next' : ''}">${esc(C.CATS[C.MDEF[t].cat] || C.MDEF[t].cat)}</span></div><div class="grp-btns">${Camp.GRP_UPS.map(u => { const why = Camp.grpCan(st, t, u.k), n = g[u.k] || 0; return `<button class="gb${why ? '' : ' can'}${n ? ' got' : ''}" data-grpup="${t}|${u.k}" ${why ? 'aria-disabled="true"' : ''} data-hint="${esc(C.MDEF[t].name + ' · ' + u.name + ': ' + grpUpText(t, u) + ' (' + u.cost + ' temné esence, máš ' + n + '/' + u.max + ').' + (why ? ' ' + why : ''))}">${esc(u.name)} <i>${n}/${u.max}</i></button>`; }).join('')}</div></div>`; }).join('')}</div>
+    <p class="grp-hint" data-hint0="${esc(legend.replace(/<[^>]+>/g, ''))}">${legend}</p></section>`;
 }
 const grpUpText = (t, u) => u.k === 'hp' ? '+' + C.D.grpHpPer(t) + ' zdraví všem figurkám' : u.text;
 const grpBadge = (t, g) => [g.hp ? '+' + g.hp * C.D.grpHpPer(t) + ' zdraví' : '', g.plus ? '+' + g.plus + ' přisluhovač' + (g.plus > 1 ? 'i' : '') : '', g.elite ? '+' + g.elite + ' elita' : ''].filter(Boolean).join(' · ');
 function campOlHTML(st) {
-  return `<section class="cp-ol">${campGrpHTML(st)}<div class="cp-h"><h3>Dům: karty</h3><span class="ess o">${A.icon('threat')} 3 sloty na skupiny monster</span><span class="ess gold">${A.icon('crown')} ${st.ol.gold || 0} temné esence</span><span class="ess">${st.ol.xp} xp</span></div>
-    <div class="ol-up">${C.OL_DECK.map(id => { const cur = st.ol.up[id] || '', nodes = Object.assign({ '': C.OL_CARDS[id].name }, Object.fromEntries(Object.entries(C.OL_VAR[id] || {}).map(([k, v]) => [k, v[0]]))); return `<div class="olu">${olCardHTML({ id, v: cur }, 'mini')}${C.OL_VAR[id] ? treeHTML(nodes, cur, st.ol.xp, `data-olup="${id}" data-v`, true) : '<p class="muted">Bez vylepšení.</p>'}</div>`; }).join('')}</div></section>`;
+  return `<div class="cp-olgrid">${campGrpHTML(st)}<section class="cp-olc"><div class="cp-h"><h3>Karty Domu</h3><span class="ess">${st.ol.xp} xp</span><span class="ess o">${A.icon('threat')} 3 sloty skupin</span></div>
+    <div class="ol-up">${C.OL_DECK.map(id => { const cur = st.ol.up[id] || '', nodes = Object.assign({ '': C.OL_CARDS[id].name }, Object.fromEntries(Object.entries(C.OL_VAR[id] || {}).map(([k, v]) => [k, v[0]]))); const nx = Camp.nextVariants(cur), cost = Camp.upCost(cur); return `<div class="olu"><p class="ab-name"><b class="ab-cur" data-pv="${cur}">${esc(nodes[cur] || C.OL_CARDS[id].name)}</b> <small>${cur ? 'úr. ' + C.levelOf(cur) : 'základ'}</small>${C.OL_VAR[id] && nx.length ? `<span class="olu-c${cost > st.ol.xp ? ' poor' : ''}">${cost} xp</span>` : ''}</p><div class="ab-next">${C.OL_VAR[id] ? treeMiniHTML(nodes, cur, st.ol.xp, `data-olup="${id}" data-v`, true) : '<small class="tmax">bez vylepšení</small>'}</div></div>`; }).join('')}</div><p class="grp-hint">Najetím na kartu nebo variantu uvidíš její znění.</p></section></div>`;
 }
 // ---------- kampaň: výběr scénáře, skóre, konec ----------
 const nScen = n => n + ' ' + (n === 1 ? 'scénář' : n >= 2 && n <= 4 ? 'scénáře' : 'scénářů');
@@ -11288,17 +11519,22 @@ function mapInfo(sc) {
 }
 // jen skupiny, které Dům opravdu může koupit (polobossy a poručíci jsou zatím mimo hru – viz Core.scenAllowed)
 const catGroups = c => Object.keys(C.MDEF).filter(t => { const d = C.MDEF[t]; return d.cat === c && !d.object && !d.hidden && !d.part && !d.obelisk && !d.lieutenant && !d.boss; });
-// tabulka scénářů kampaně (generuje se ze SCENARIOS: blurb, goalShort, cats, map)
+// v61: scénáře kampaně jako karty ve dvou sloupcích – jméno, háček, cíl, mapa, monstra, stav
+// první věta (zkratky jako „sv.“ větu neukončí)
+const firstSentence = t => { const s = String(t || ''), re = /[.!?](?=\s|$)/g; let m; while ((m = re.exec(s))) { const w = s.slice(0, m.index).split(/\s/).pop(); if (!(m[0] === '.' && w.length <= 3 && w === w.toLowerCase())) return s.slice(0, m.index + 1); } return s; };
 function scenTableHTML(st, canPick) {
   const hist = st.history || [];
-  const row = sc => {
+  const card = sc => {
     const hi = hist.findIndex(x => x.id === sc.id), h = hist[hi], played = hi >= 0, next = st.next === sc.id;
-    const cats = (sc.cats || []).filter(c => c !== 'boss').map(c => `<span class="sc-cat"><b>${esc(C.CATS[c])}:</b> ${catGroups(c).map(t => esc(C.MDEF[t].name)).join(', ')}</span>`).join('');
-    const st8 = played ? `<span class="sc-res ${h.win ? 'win' : 'lose'}">${hi + 1}. · ${resTxt(h.win)}</span>` : next ? '<span class="sc-res cur">vybráno</span>' : canPick ? `<button class="btn primary sm" data-pickscen="${sc.id}">Vybrat</button>` : '<span class="sc-res">čeká</span>';
-    return `<div class="sc-row${played ? ' played' : ''}${next ? ' next' : ''}" role="row"><span class="sc-n" role="cell">${sc.n}</span><div class="sc-name" role="cell"><b>${esc(sc.name)}</b><small>${esc(sc.blurb || sc.short || '')}</small></div>
-      <div class="sc-goal" role="cell"><span class="sc-lab">O co jde</span>${esc(sc.goalShort || sc.short || '')}</div><div class="sc-mon" role="cell"><span class="sc-lab">Monstra</span>${cats}</div><div class="sc-map" role="cell"><span class="sc-lab">Mapa</span>${esc(mapInfo(sc))}</div><div class="sc-st" role="cell">${st8}</div></div>`;
+    const mons = (sc.cats || []).filter(c => c !== 'boss').map(c => `<span class="sc-bio"><b>${esc(C.CATS[c])}</b>${catGroups(c).map(t => `<i>${esc(C.MDEF[t].name)}</i>`).join('')}</span>`).join('');
+    const st8 = played ? `<span class="sc-res ${h.win ? 'win' : 'lose'}">${hi + 1}. · ${resTxt(h.win)}</span>` : next ? '<span class="sc-res cur">vybráno</span>' : canPick ? `<button class="btn primary sm" data-pickscen="${sc.id}">Vybrat</button>` : '<span class="sc-res">k dispozici</span>';
+    return `<article class="sc-card${played ? ' played' : ''}${next ? ' next' : ''}" role="listitem"><span class="sc-n">${sc.n}</span>
+      <div class="sc-main"><div class="sc-hd"><h3>${esc(sc.name)}</h3><span class="sc-map">${A.icon('door')}${esc(mapInfo(sc))}</span><span class="sc-st">${st8}</span></div>
+      <p class="sc-hook">${esc(firstSentence(sc.blurb || sc.short))}</p>
+      <p class="sc-goal"><span>Cíl:</span> <b>${esc(sc.goalShort || sc.short || '')}</b></p>
+      <div class="sc-mon">${mons}</div></div></article>`;
   };
-  return `<div class="sc-table" role="table"><div class="sc-row sc-head" role="row"><span>#</span><span>Scénář</span><span>O co jde</span><span>Monstra</span><span>Mapa</span><span></span></div>${C.SCENARIOS.map(row).join('')}</div>`;
+  return `<div class="sc-grid" role="list">${C.SCENARIOS.map(card).join('')}</div>`;
 }
 // kdo za vítěznou stranu vybírá: 'bot', 'me' (hra pro jednoho) nebo id hráče (online; u lovců hostitel, je-li mezi lovci, jinak první hráč-lovec)
 function campPickerId(side) {
@@ -11334,7 +11570,7 @@ function campPick(id) {
   showCamp();
 }
 function campHeadHTML(st, title, sub) {
-  return `<header class="cp-top"><div class="cp-tt"><p class="eyebrow">Kampaň Blackmoor · odehráno ${Camp.playedN(st)} z ${C.SCENARIOS.length}</p><h1>${title}</h1>${sub ? `<p class="cp-sub">${sub}</p>` : ''}</div>${campScoreHTML(st)}</header>${campProgHTML(st)}`;
+  return `<header class="cp-top"><div class="cp-tt"><p class="eyebrow">Kampaň Blackmoor · odehráno ${Camp.playedN(st)} z ${C.SCENARIOS.length}</p><h1>${title}</h1>${sub ? `<p class="cp-sub">${sub}</p>` : ''}</div>${campProgHTML(st)}${campScoreHTML(st)}</header>`;
 }
 function campDlButton(box) {
   const f = box.querySelector('.cp-foot'); if (!f || f.querySelector('[data-campdl]')) return;
@@ -11351,6 +11587,8 @@ function showCamp(r) {
   const st = S.camp;
   if (r) S.campReward = r;
   if (!st) return;
+  const pv0 = $('#treepv'); if (pv0) pv0.hidden = true; // náhled karty z minulého vykreslení
+
   // jiná obrazovka kampaně → nahoru
   const view = Camp.finished(st) ? 'end' : !st.next ? 'pick' : S.campStage === 'announce' ? 'announce' : 'shop';
   if (S.campView !== view) { S.campView = view; const bx = $('#camp'); if (bx) bx.scrollTop = 0; }
@@ -11368,7 +11606,7 @@ function showCampPick() {
   box.innerHTML = `<div class="camp-wrap">${campHeadHTML(st, 'Výběr dalšího scénáře')}
     ${campRewardsHTML(S.campReward)}
     <section class="cp-pickbox"><p class="cp-pick ${side}">${A.icon(side === 'heroes' ? 'ally' : 'threat')}<span>${lead}</span></p>${scenTableHTML(st, me)}</section>
-    <footer class="cp-foot"><p>Odehraný scénář už vybrat nejde. Obchod a vylepšení přijdou po výběru.</p><button class="btn ghost" data-menu>Do menu</button></footer></div>`;
+    <footer class="cp-foot"><p>Odehraný scénář už vybrat nejde. <b>Obchod a vylepšení</b> přijdou po výběru.</p><button class="btn ghost" data-menu>Do menu</button></footer></div>`;
   stripTitles(box);
   box.querySelectorAll('[data-pickscen]').forEach(b => b.addEventListener('click', () => campPick(b.dataset.pickscen)));
   campWireCommon(box);
@@ -11409,12 +11647,12 @@ function showCampShop() {
   const tabsOk = NETS.role ? ['h', 'o'].filter(campMay) : ['h', 'o'];
   if (!tabsOk.length) tabsOk.push('h');
   if (!tabsOk.includes(S.campTab)) S.campTab = tabsOk[0];
-  const nextBar = `<div class="cp-nextbar">${A.icon('door')}<span>Další scénář: <b>${esc(next.n + '. ' + next.name)}</b></span><span>Prostředí monster: ${(next.cats || []).filter(c => c !== 'boss').map(c => `<span class="grp-cat next">${esc(C.CATS[c])}</span>`).join(' ')}</span><span class="muted sm">${esc(next.goalShort || next.short || '')}</span></div>`;
-  box.innerHTML = `<div class="camp-wrap">${campHeadHTML(st, 'Mezi scénáři')}
-    ${campRewardsHTML(S.campReward)}${nextBar}
-    <nav class="cp-tabs">${tabsOk.includes('h') ? `<button data-tab="h" aria-pressed="${S.campTab === 'h'}">Lovci: obchod, výbava, schopnosti</button>` : ''}${tabsOk.includes('o') ? `<button data-tab="o" aria-pressed="${S.campTab === 'o'}">Dům: monstra a karty</button>` : ''}</nav>
+  const nextBar = `<div class="cp-nextbar">${A.icon('door')}<span>Další: <b>${esc(next.n + '. ' + next.name)}</b></span><span class="nb-cats">${(next.cats || []).filter(c => c !== 'boss').map(c => `<span class="grp-cat next">${esc(C.CATS[c])}</span>`).join('')}</span><span class="nb-goal">${esc(next.goalShort || next.short || '')}</span></div>`;
+  box.innerHTML = `<div class="camp-wrap cp-shopwrap">${campHeadHTML(st, 'Mezi scénáři')}
+    ${campRewardsHTML(S.campReward)}
+    <div class="cp-navrow"><nav class="cp-tabs">${tabsOk.includes('h') ? `<button data-tab="h" aria-pressed="${S.campTab === 'h'}">Lovci: obchod a výbava</button>` : ''}${tabsOk.includes('o') ? `<button data-tab="o" aria-pressed="${S.campTab === 'o'}">Dům: monstra a karty</button>` : ''}</nav>${nextBar}</div>
     <div class="cp-body">${S.campTab === 'h' ? campHeroesHTML(st) : campOlHTML(st)}</div>
-    <footer class="cp-foot"><p>Další: <b>${esc(next.n + '. ' + next.name)}</b>. ${esc(next.goalShort || next.short)}</p><button class="btn primary" data-next>Hrát scénář ${Camp.playedN(st) + 1} z ${C.SCENARIOS.length}</button><button class="btn ghost" data-menu>Do menu</button></footer></div>`;
+    <footer class="cp-foot"><p>${S.campTab === 'h' ? 'Předměty jde <b>přetahovat</b> mezi výbavou, batohem a truhlou. Klik na výbavu ukáže její karty.' : 'Vylepšení Domu platí po celou kampaň.'}</p><button class="btn primary" data-next>Hrát scénář ${Camp.playedN(st) + 1} z ${C.SCENARIOS.length}</button><button class="btn ghost" data-menu>Do menu</button></footer></div>`;
   stripTitles(box);
   const re = () => showCamp();
   campDlButton(box);
@@ -11436,17 +11674,32 @@ function showCampShop() {
       const w = campDo('moveItem', src, dst); if (w) S.msg = w; sfx('card'); re(); });
   });
   // v60: klik na předmět ve výbavě / v batohu ukáže jeho karty (pro srovnání s obchodem); odložení je tlačítko v náhledu
-  box.querySelectorAll('.cp-hero .pd-cell.full').forEach(b => b.addEventListener('click', () => { const hero = C.HEROES[[...box.querySelectorAll('.cp-hero')].indexOf(b.closest('.cp-hero'))].id; const cur = S.campInspect; S.campInspect = cur && cur.hero === hero && cur.slot === b.dataset.slot ? null : { hero, slot: b.dataset.slot, id: b.dataset.eq }; sfx('card'); re(); }));
-  box.querySelectorAll('.cp-hero .bagi').forEach(b => b.addEventListener('click', () => { const src = JSON.parse(b.dataset.src), id = st.heroes[src.hero].bag[src.idx]; const cur = S.campInspect; S.campInspect = cur && cur.hero === src.hero && cur.bag === src.idx ? null : { hero: src.hero, bag: src.idx, id }; sfx('card'); re(); }));
-  box.querySelectorAll('[data-insp-close]').forEach(b => b.addEventListener('click', () => { S.campInspect = null; re(); }));
-  box.querySelectorAll('[data-insp-chest]').forEach(b => b.addEventListener('click', () => { const ci = S.campInspect; if (ci && ci.slot) campDo('toChest', ci.hero, ci.slot); S.campInspect = null; sfx('card'); re(); }));
+  // v61: dlaždice obchodu – najetí ukáže karty v panelu detailu, klik ho připne
+  const det = box.querySelector('.cp-det');
+  const showDet = id => { if (det) { det.innerHTML = campDetHTML(st, id); wireDet(); } };
+  const wireDet = () => {
+    if (!det) return;
+    det.querySelectorAll('[data-insp-close]').forEach(b => b.addEventListener('click', () => { S.campInspect = null; re(); }));
+    det.querySelectorAll('[data-insp-chest]').forEach(b => b.addEventListener('click', () => { const ci = S.campInspect; if (ci && ci.slot) campDo('toChest', ci.hero, ci.slot); S.campInspect = null; sfx('card'); re(); }));
+  };
+  box.querySelectorAll('.si[data-si]').forEach(t => {
+    t.addEventListener('mouseenter', () => showDet(t.dataset.si));
+    t.addEventListener('mouseleave', () => showDet(null));
+    t.addEventListener('focus', () => showDet(t.dataset.si));
+    t.addEventListener('click', e => { if (e.target.closest('button')) return; const id = t.dataset.si; S.campShopSel = S.campShopSel === id ? null : id; S.campInspect = null; sfx('card'); re(); });
+  });
+  box.querySelectorAll('[data-hint]').forEach(b => { const hp = b.closest('section') && b.closest('section').querySelector('.grp-hint'); if (!hp) return; const h0 = hp.innerHTML;
+    b.addEventListener('mouseenter', () => { hp.textContent = b.dataset.hint; hp.classList.add('on'); }); b.addEventListener('mouseleave', () => { hp.innerHTML = h0; hp.classList.remove('on'); }); });
+  box.querySelectorAll('.cp-hero .pd-cell.full').forEach(b => b.addEventListener('click', () => { S.campShopSel = null; const hero = C.HEROES[[...box.querySelectorAll('.cp-hero')].indexOf(b.closest('.cp-hero'))].id; const cur = S.campInspect; S.campInspect = cur && cur.hero === hero && cur.slot === b.dataset.slot ? null : { hero, slot: b.dataset.slot, id: b.dataset.eq }; sfx('card'); re(); }));
+  box.querySelectorAll('.cp-hero .bagi').forEach(b => b.addEventListener('click', () => { S.campShopSel = null; const src = JSON.parse(b.dataset.src), id = st.heroes[src.hero].bag[src.idx]; const cur = S.campInspect; S.campInspect = cur && cur.hero === src.hero && cur.bag === src.idx ? null : { hero: src.hero, bag: src.idx, id }; sfx('card'); re(); }));
+  wireDet();
   box.querySelectorAll('[data-up]').forEach(b => b.addEventListener('click', () => { const [hid, key] = b.dataset.up.split('|'); const w = campDo('upgradeHero', hid, key, b.dataset.v); sfx(w ? 'deny' : 'coin'); re(); }));
   box.querySelectorAll('[data-olup]').forEach(b => b.addEventListener('click', () => { const w = campDo('upgradeOl', b.dataset.olup, b.dataset.v); sfx(w ? 'deny' : 'coin'); re(); }));
-  box.querySelectorAll('[data-grpup]').forEach(b => b.addEventListener('click', () => { const [t, k] = b.dataset.grpup.split('|'); const w = campDo('buyGroupUp', t, k); sfx(w ? 'deny' : 'coin'); re(); }));
+  box.querySelectorAll('[data-grpup]').forEach(b => b.addEventListener('click', () => { if (b.getAttribute('aria-disabled') === 'true') { sfx('deny'); return; } const [t, k] = b.dataset.grpup.split('|'); const w = campDo('buyGroupUp', t, k); sfx(w ? 'deny' : 'coin'); re(); }));
   // náhled karty uzlu stromu při najetí
   box.querySelectorAll('[data-pv]').forEach(b => b.addEventListener('mouseenter', () => {
     const v = b.dataset.pv, row = b.closest('.ab-row'), olu = b.closest('.olu'); let html = '';
-    if (row) { const up = row.querySelector('[data-up]') || null; const hero = C.HEROES[[...box.querySelectorAll('.cp-hero')].indexOf(b.closest('.cp-hero'))].id; const ab = C.ABIL[hero][[...b.closest('.cp-abil').querySelectorAll('.ab-row')].indexOf(row)]; html = cardHTML(C.D.abilityCard(hero, ab, v), 'mini', hero); }
+    if (row && b.closest('.cp-hero')) { const hero = C.HEROES[[...box.querySelectorAll('.cp-hero')].indexOf(b.closest('.cp-hero'))].id; const ab = C.ABIL[hero][[...b.closest('.cp-abil').querySelectorAll('.ab-row')].indexOf(row)]; html = cardHTML(C.D.abilityCard(hero, ab, v), 'mini', hero); }
     else if (olu) { const id = C.OL_DECK[[...box.querySelectorAll('.olu')].indexOf(olu)]; html = olCardHTML({ id, v }, 'mini'); }
     let pv = $('#treepv'); if (!pv) { pv = el('div', { id: 'treepv' }); document.body.appendChild(pv); }
     pv.innerHTML = html; const r = rz(b.getBoundingClientRect()); pv.style.left = Math.min(window.innerWidth / Z() - 170, r.right + 8) + 'px'; pv.style.top = Math.max(8, Math.min(window.innerHeight / Z() - 260, r.top - 60)) + 'px'; pv.hidden = false;
@@ -11506,7 +11759,7 @@ function renderMM() {
       + mmBtn('campnew', 'crown', cs ? 'Nová kampaň' : 'Kampaň', cs ? 'Rozehraná kampaň se smaže' : nScen(C.SCENARIOS.length) + ', další vybírá vítěz mise; mezi nimi obchod a vylepšení', cs ? '' : 'primary')
       + mmBtn('missions', 'door', 'Jednotlivá mise', 'Vyber si scénář');
   } else if (MM === 'missions') {
-    h = `<button class="mm-back" data-mm="${NETS.role === 'host' ? 'lobby' : 'single2'}">← zpět</button><h2>Vyber misi</h2><div class="mm-mis">${C.SCENARIOS.map(sc => `<button class="mm-btn" data-mis="${sc.id}">${A.icon('door')}<span>${sc.n}. ${esc(sc.name)}<small>${esc(sc.short || '')}</small></span></button>`).join('')}</div>`;
+    h = `<button class="mm-back" data-mm="${NETS.role === 'host' ? 'lobby' : 'single2'}">← zpět</button><h2>Vyber misi</h2><div class="mm-mis">${C.SCENARIOS.map(sc => `<button class="mm-btn" data-mis="${sc.id}"><span class="mis-n">${sc.n}</span><span>${esc(sc.name)}<small>${esc(sc.goalShort || sc.short || '')}</small><span class="mis-cats">${(sc.cats || []).filter(c => c !== 'boss').map(c => `<span class="grp-cat">${esc(C.CATS[c])}</span>`).join('')}</span></span></button>`).join('')}</div>`;
   } else if (MM === 'multi') {
     const nm = lsGet(NAME_KEY) || '';
     h = `<button class="mm-back" data-mm="main">← zpět</button><h2>Hra více hráčů</h2><input class="mm-input" id="mm-name" maxlength="16" placeholder="Tvoje jméno" value="${esc(nm)}">
@@ -11518,7 +11771,7 @@ function renderMM() {
     h = `<h2>${host ? 'Tvoje hra' : 'Připojeno'}</h2><div class="mm-code">${esc(NETS.code || '')}</div><p class="mm-note">${host ? 'Pošli kód ostatním. Až budou všichni tady, rozděl role a začni.' : 'Čekáme, až hostitel rozdělí role a spustí hru.'}</p>
       <div class="mm-players">${NETS.players.map(p => `<span>${esc(p.name)}${p.id === Net.myId ? ' (ty)' : ''}${p.host ? ' · hostitel' : ''}</span>`).join('')}</div>
       <div class="mm-roles">${ROLE_KEYS.map(k => `<label class="mm-role"><span>${esc(roleLabel(k))}</span>${host ? `<select data-role="${k}">${['bot'].concat(NETS.players.map(p => p.id)).map(id => `<option value="${id}" ${NETS.roles[k] === id ? 'selected' : ''}>${esc(pName(id))}</option>`).join('')}</select>` : `<b>${esc(pName(NETS.roles[k]))}</b>`}</label>`).join('')}</div>
-      ${NETS.resume ? `<p class="mm-note">Pokračuje se v uložené hře: <b>${esc(NETS.resume.label)}</b>.</p>` : host ? `<label class="mm-role"><span>Hra</span><select class="mm-sel" id="mm-mode">${(() => { const c = Camp.migrate(readSave(CAMP_KEY_MP)); return c && !Camp.finished(c) ? `<option value="campcont" ${NETS.mode === 'campcont' ? 'selected' : ''}>Kampaň (pokračovat: ${esc(campMenuLine(c))})</option>` : ''; })()}<option value="camp" ${NETS.mode === 'camp' ? 'selected' : ''}>Kampaň (nová)</option>${C.SCENARIOS.map(sc => `<option value="${sc.id}" ${NETS.mode === 'mis' && NETS.scen === sc.id ? 'selected' : ''}>Mise ${sc.n}: ${esc(sc.name)}</option>`).join('')}</select></label>` : `<p class="mm-note">Hra: <b>${NETS.mode === 'camp' ? 'kampaň' : NETS.mode === 'campcont' ? 'pokračování kampaně' : esc((C.SCENARIOS.find(x => x.id === NETS.scen) || {}).name || '')}</b></p>`}
+      ${NETS.resume ? `<p class="mm-note">Pokračuje se v uložené hře: <b>${esc(NETS.resume.label)}</b>.</p>` : host ? `<label class="mm-role mm-modesel"><span>Hra</span><select class="mm-sel" id="mm-mode">${(() => { const c = Camp.migrate(readSave(CAMP_KEY_MP)); return c && !Camp.finished(c) ? `<option value="campcont" ${NETS.mode === 'campcont' ? 'selected' : ''}>Kampaň (pokračovat: ${esc(campMenuLine(c))})</option>` : ''; })()}<option value="camp" ${NETS.mode === 'camp' ? 'selected' : ''}>Kampaň (nová)</option>${C.SCENARIOS.map(sc => `<option value="${sc.id}" ${NETS.mode === 'mis' && NETS.scen === sc.id ? 'selected' : ''}>Mise ${sc.n}: ${esc(sc.name)}</option>`).join('')}</select></label>` : `<p class="mm-note">Hra: <b>${NETS.mode === 'camp' ? 'kampaň' : NETS.mode === 'campcont' ? 'pokračování kampaně' : esc((C.SCENARIOS.find(x => x.id === NETS.scen) || {}).name || '')}</b></p>`}
       ${host ? mmBtn('netstart', 'star', 'Začít hru', '', 'primary') : ''}<button class="mm-back" data-mm="leave">Odejít</button>`;
   } else if (MM === 'load') {
     const row = (k, d, lab) => d ? `<div class="mm-btn" style="cursor:default">${A.icon('deck')}<span>${lab}<small>${esc(d.label || '')} · ${new Date(d.at).toLocaleString('cs-CZ')}</small></span></div><div class="mm-row"><button class="mm-btn primary" data-load="${k}">Načíst</button><button class="mm-btn" data-dl="${k}">Stáhnout uložení</button><button class="mm-btn" data-del="${k}">Smazat</button></div>` : '';
@@ -11527,9 +11780,12 @@ function renderMM() {
     h = `<button class="mm-back" data-mm="main">← zpět</button><h2>Načíst hru</h2>${row(SAVE_SP, sp, 'Hra pro jednoho')}${row(SAVE_MP, mp, 'Online hra (načte hostitel)')}${!sp && !mp ? '<p class="mm-note">Nic uloženého. Hra se ukládá sama na začátku každého kola.</p>' : ''}${crow(CAMP_KEY_SP, cSp, 'Kampaň pro jednoho')}${crow(CAMP_KEY_MP, cMp, 'Online kampaň')}
       <button class="mm-btn" data-upload>${A.icon('deck')}<span>Nahrát uložení ze souboru<small>Soubor .json stažený ze hry (i od jiného hráče)</small></span></button>${NETS.err ? `<p class="mm-err">${esc(NETS.err)}</p>` : ''}<p class="mm-note">Ukládá se vždy stav na začátku kola. Online hru načte hostitel a ostatní se připojí kódem. Stažený soubor je záloha: přenese hru i na jiný počítač.</p>`;
   } else if (MM === 'settings') {
-    h = `<button class="mm-back" data-mm="main">← zpět</button><h2>Nastavení</h2><div class="opt mm-settings"><span>Rychlost animací</span><div class="seg" id="mm-speed">${[['1.6', 'Pomalu'], ['1', 'Normálně'], ['0.4', 'Rychle']].map(([v, l]) => `<button data-v="${v}" aria-pressed="${String(S.speed) === v}">${l}</button>`).join('')}</div></div><div class="opt"><span>Monstra pro bota Domu <em>(nic = všechna)</em></span><div class="pool" id="mm-pool"></div></div>`;
+    h = `<button class="mm-back" data-mm="main">← zpět</button><h2>Nastavení</h2><div class="opt mm-settings"><span>Zvuk</span><div class="mm-snd-row"><button class="mm-ico" data-sndset="mus">${A.icon('music')}<span></span></button><button class="mm-ico" data-sndset="sfx">${A.icon('speaker')}<span></span></button></div></div><div class="opt mm-settings"><span>Rychlost animací</span><div class="seg" id="mm-speed">${[['1.6', 'Pomalu'], ['1', 'Normálně'], ['0.4', 'Rychle']].map(([v, l]) => `<button data-v="${v}" aria-pressed="${String(S.speed) === v}">${l}</button>`).join('')}</div></div><div class="opt"><span>Monstra pro bota Domu <em>(nic = všechna)</em></span><div class="pool" id="mm-pool"></div></div>`;
   }
   box.innerHTML = h;
+  const fr = $('#mainmenu'); if (fr) fr.classList.toggle('sub', MM !== 'main');
+  box.querySelectorAll('[data-sndset]').forEach(b => b.addEventListener('click', () => { if (b.dataset.sndset === 'mus') toggleMusic(); else toggleSfx(); }));
+  syncSoundBtns();
   box.querySelectorAll('[data-mm]').forEach(b => b.addEventListener('click', () => mmAction(b.dataset.mm)));
   box.querySelectorAll('[data-side]').forEach(b => b.addEventListener('click', () => { S.ctl = b.dataset.side === 'heroes' ? { heroes: 'human', overlord: 'bot' } : { heroes: 'bot', overlord: 'human' }; mmGo('single2'); }));
   box.querySelectorAll('[data-mis]').forEach(b => b.addEventListener('click', () => { if (NETS.role === 'host') { NETS.mode = 'mis'; NETS.scen = b.dataset.mis; mmGo('lobby'); return; } S.play = 'single'; S.scenPick = b.dataset.mis; startGame(); }));
@@ -11556,7 +11812,7 @@ async function mmAction(a) {
   if (a === 'netstart') return netStart();
   if (a === 'leave') { if (NETS.conn) NETS.conn.send({ t: 'bye', from: Net.myId }); netReset(); return mmGo('multi'); }
 }
-function showMenu() { $('#game').hidden = true; $('#camp').hidden = true; $('#modal').hidden = true; $('#menu').hidden = false; hideSetupBar(); renderMM(); }
+function showMenu() { $('#game').hidden = true; $('#camp').hidden = true; $('#modal').hidden = true; $('#menu').hidden = false; hideSetupBar(); renderMM(); fitMenu(); }
 
 // ---------- online: spojení ----------
 function netReset() { if (NETS.conn) try { NETS.conn.close(); } catch (e) { /* nic */ } Object.assign(NETS, { role: null, code: null, conn: null, players: [], pending: new Map(), q: [], qRun: false, resume: null, waiting: '', curAsk: null }); }
