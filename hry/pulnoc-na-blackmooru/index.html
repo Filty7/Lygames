@@ -2447,9 +2447,9 @@ const ABIL = {
       A: T('Hojivé světlo', { t: 'heal', range: 4, n: 3, x2: true }, SE_),
       AA: T('Zázrak', { t: 'heal', range: 99, n: 2, x2: true, all: true }, SE_),
       AB: T('Požehnání', { t: 'heal', range: 4, n: 3, x2: true, all: true }, SE_),
-      B: T('Vedení', { t: 'guide', range: 3, armor: 1 }, SE_),
-      BA: T('Prozřetelnost', { t: 'guide', range: 99, armor: 1, all: true }, SE_),
-      BB: T('Druhý dech', { t: 'guide', range: 3, armor: 3, all: true }, SE_) } },
+      B: T('Vedení', { t: 'heal', range: 3, n: 2, x2: true, guide: true, armor: 1 }, SE_),
+      BA: T('Prozřetelnost', { t: 'heal', range: 99, n: 1, x2: true, all: true, guide: true, armor: 1 }, SE_),
+      BB: T('Druhý dech', { t: 'heal', range: 3, n: 1, x2: true, all: true, guide: true, armor: 3 }, SE_) } },
   ],
   wren: [
     { key: 'pohyb', cat: 'Pohyb', tree: {
@@ -2910,7 +2910,7 @@ function describe0(s) {
   if (s.t === 'repel' && (s.weaken || s.dmg)) return 'Monstra do ' + s.range + ' odstrč o ' + s.n + (s.weaken ? ', do konce kola −' + s.weaken + ' k útoku' : '') + (s.dmg ? ', utrží ' + s.dmg : '');
   if (s.t === 'armorup' && s.ally) return 'Do konce kola +' + s.n + ' armor tobě a lovcům do ' + s.ally;
   if (s.t === 'react' && s.kind === 'guard' && s.perArmor) return 'Reakce: −' + s.dmg + ' zranění a −1 za každý tvůj armor' + (s.fear ? ', −' + s.fear + ' Strach' : '') + ' tobě' + (s.ally ? ' nebo lovci do ' + s.ally : '') + (s.counter ? '; pak protiútok ' + s.counter.dmg + ' dmg +1 za armor' : '');
-  if (s.t === 'heal' && (s.x2 || s.bless)) return (s.all ? (s.range >= 90 ? 'Všichni lovci kdekoli' : 'Lovci do ' + s.range + ' (i ty)') : 'Lovec do ' + s.range + ' (i ty)') + ' vyléčí ' + s.n + (s.x2 ? ' (dvojnásob, má-li pozitivní stav: armor, přípravu, únik…)' : '') + (s.fear ? ' a −' + s.fear + ' Strach' : '') + (s.bless ? '; dostane do konce kola +1 k útokům a +1 armor' : '') + '; ležícího zvedne';
+  if (s.t === 'heal' && (s.x2 || s.bless)) return (s.all ? (s.range >= 90 ? 'Všichni lovci kdekoli' : 'Lovci do ' + s.range + ' (i ty)') : 'Lovec do ' + s.range + ' (i ty)') + ' vyléčí ' + s.n + (s.x2 ? ' (dvojnásob, má-li pozitivní stav: armor, přípravu, únik…)' : '') + (s.fear ? ' a −' + s.fear + ' Strach' : '') + (s.bless ? '; dostane do konce kola +1 k útokům a +1 armor' : '') + (s.guide ? '; pak má příští útok s výhodou' + (s.armor ? ' a +' + s.armor + ' armor do konce kola' : '') : '') + '; ležícího zvedne';
   if (s.t === 'buff' && (s.stillAdv || s.lifesteal || s.selfDmg || s.through)) return 'Do konce kola +' + s.mod + ' k útokům a +' + s.dmg + ' dmg' + (s.range ? '; dosah útoků na dálku +' + s.range : '') + (s.through ? '; střílíš skrz figurky' : '') + (s.stillAdv ? '; dokud se v tomto kole nepohneš, útoky mají výhodu' : '') + (s.crit9 ? '; kritik už na 9' : '') + (s.lifesteal ? '; zásahy tě vyléčí o zranění, které projde' : '');
   if (s.t === 'momentum' && s.per) return 'Do konce tahu: +' + (s.amt || 1) + ' k útokům' + (s.dmgToo ? ' a +1 dmg' : '') + ' za ' + (s.per === 2 ? 'každá 2 ušlá pole' : 'každé ušlé pole') + ' (bez stropu, počítá se i pohyb před zahráním)';
   if (s.t === 'momentum' && (s.dmgToo || s.evade)) return 'Do konce tahu: +1 k útokům za každé ušlé pole (max +' + s.max + ')' + (s.dmgToo ? ' a +1 dmg za každá 2 pole' : '') + (s.evade ? '; únik ' + s.evade : '');
@@ -4077,7 +4077,8 @@ function cannotPlay(G, h, card, half) {
     case 'buff': return h.buff && h.buff.round === G.round && h.buff.dmg ? 'Soustředění už platí.' : null;
     case 'phase': return h.phaseRound === G.round && !s.move && !s.draw ? 'Už platí.' : null;
     case 'taunt': return null;
-    case 'heal': return (healTargets(G, h, s.range).length || (s.fear && G.heroes.some(o => !o.escaped && o.fear > 0 && dist(o.pos, h.pos) <= s.range))) ? null : 'Nikdo poblíž není zraněný.';
+    case 'heal': if (s.guide) return G.heroes.some(o => !o.escaped && !o.lost && dist(o.pos, h.pos) <= s.range) ? null : 'Nikdo v dosahu.';
+      return (healTargets(G, h, s.range).length || (s.fear && G.heroes.some(o => !o.escaped && o.fear > 0 && dist(o.pos, h.pos) <= s.range))) ? null : 'Nikdo poblíž není zraněný.';
     case 'raise': return G.heroes.some(o => o.downed && !o.escaped && !o.lost && dist(o.pos, h.pos) <= s.range) ? null : 'Poblíž neleží žádný lovec, kterého jde zvednout.';
     case 'cleanse': return null;
     case 'dash': case 'rally': return null;
@@ -4495,14 +4496,16 @@ async function resolveCard(G, h, card, half, C, ui) {
     }
     case 'heal': {
       let targets;
-      if (s.all) targets = G.heroes.filter(o => !o.escaped && !o.lost && dist(o.pos, h.pos) <= s.range && (o.downed || o.hp < o.maxHp || (o.bleed || 0) > 0 || (s.fear && o.fear)));
-      else { const cand = G.heroes.filter(o => !o.escaped && !o.lost && dist(o.pos, h.pos) <= s.range && (o.downed || o.hp < o.maxHp || (o.bleed || 0) > 0 || (s.fear && o.fear > 0))); const o = await pick('hero', cand); if (!o) return false; targets = [o]; }
+      const hurt = o => s.guide || o.downed || o.hp < o.maxHp || (o.bleed || 0) > 0 || (s.fear && o.fear);
+      if (s.all) targets = G.heroes.filter(o => !o.escaped && !o.lost && dist(o.pos, h.pos) <= s.range && hurt(o));
+      else { const cand = G.heroes.filter(o => !o.escaped && !o.lost && dist(o.pos, h.pos) <= s.range && hurt(o)); const o = await pick('hero', cand); if (!o) return false; targets = [o]; }
       if (!targets.length) return false;
       for (const o of targets) {
         if (o.downed) { o.downed = false; o.hp = Math.min(o.maxHp, healBy(G, h, s.n)); log(G, h.name + ' křísí ' + o.name + ': ' + o.hp + ' zdraví, bez Paniky.'); await ui.anim({ type: 'float', at: o.pos, text: 'Na nohou! +' + o.hp + ' ♥', cls: 'good' }); }
         else { const n = healHero(G, o, healBy(G, h, s.n * (s.x2 && posStatus(G, o) ? 2 : 1))); log(G, h.name + ' léčí ' + o.name + ': +' + n + ' zdraví.'); await ui.anim({ type: 'float', at: o.pos, text: '+' + n + ' ♥', cls: 'good' }); }
         if (s.fear) { o.fear = Math.max(0, o.fear - s.fear); }
         if (s.fearCost) addFear(G, o, s.fearCost);
+        if (s.guide && !o.downed) { o.advNext = ADV_KEEP; if (s.armor) addArmor(G, o, s.armor); log(G, o.name + ': příští útok s výhodou' + (s.armor ? ', armor +' + s.armor : '') + '.'); await ui.anim({ type: 'float', at: o.pos, text: 'Výhoda' + (s.armor ? ', armor +' + s.armor : ''), cls: 'good' }); }
         if (s.bless && !o.downed) { const b = buffOf(G, o) || { mod: 0, dmg: 0 }; o.buff = Object.assign({}, b, { round: G.round, mod: Math.max(b.mod || 0, 1), dmg: b.dmg || 0 }); addArmor(G, o, 1); }
       }
       if (s.drain) for (const m of G.monsters.filter(m => !mdef(m).object && dist(m.pos, h.pos) <= 1).slice()) { m.hp -= s.drain; await ui.anim({ type: 'float', at: m.pos, text: '−' + s.drain, cls: 'dmg' }); if (m.hp <= 0) { killMonster(G, m); await ui.anim({ type: 'kill', who: 'm:' + m.uid }); } }
@@ -10699,7 +10702,7 @@ function topHTML(s, c) {
     case 'crossfire': R('crosshair', s.range, { diag: 'cross' }); atk(s); N.push('Stojíš-li mezi dvěma monstry v přímce, střílíš na obě.'); break;
     case 'grenade': R('lob', s.range, { diag: 'area' }); L.push(LN_('drop', 'zranění · okolí ' + s.splash, s.dmg, 'c-dmg')); MOD(s.mod); N.push('Zasáhne i lovce vedle.'); break;
     case 'pulse': R('aura', s.range); L.push(LN_('drop', 'monstrům, bez hodu', s.dmg, 'c-dmg')); L.push(LN_('heart', 'lovcům', '+' + s.heal, 'c-heal')); break;
-    case 'heal': if (s.self) { L.push(LN_('heart', 'vyléčíš se', '+' + s.n, 'c-heal')); if (s.fear) L.push(LN_('panic', 'strach', '−' + s.fear, 'c-fear')); break; } R(s.all ? 'aura' : 'lob', s.range >= 90 ? '' : s.range, { label: s.all ? (s.range >= 90 ? 'všichni kdekoli' : 'všichni') : 'jeden lovec' }); L.push(LN_('heart', 'léčí' + (s.x2 ? ` <i class="bon">(${BI('×2', 'star', 'pos')})</i>` : ''), '+' + s.n, 'c-heal')); if (s.fear) L.push(LN_('panic', 'strach', '−' + s.fear, 'c-fear')); if (s.bless) x('star', 'požehná: +1 hod, +1 armor', '', 'c-pos'); if (s.fearCost) x('panic', 'strach cíli', '+' + s.fearCost, 'c-fear'); N.push('Zvedne ležícího.'); break;
+    case 'heal': if (s.self) { L.push(LN_('heart', 'vyléčíš se', '+' + s.n, 'c-heal')); if (s.fear) L.push(LN_('panic', 'strach', '−' + s.fear, 'c-fear')); break; } R(s.all ? 'aura' : 'lob', s.range >= 90 ? '' : s.range, { label: s.all ? (s.range >= 90 ? 'všichni kdekoli' : 'všichni') : 'jeden lovec' }); L.push(LN_('heart', 'léčí' + (s.x2 ? ` <i class="bon">(${BI('×2', 'star', 'pos')})</i>` : ''), '+' + s.n, 'c-heal')); if (s.fear) L.push(LN_('panic', 'strach', '−' + s.fear, 'c-fear')); if (s.bless) x('star', 'požehná: +1 hod, +1 armor', '', 'c-pos'); if (s.guide) { L.push(LN_('die', 'výhoda na příští útok', '', 'c-pos')); if (s.armor) L.push(LN_('shield', 'armor', '+' + s.armor, 'c-ar')); } if (s.fearCost) x('panic', 'strach cíli', '+' + s.fearCost, 'c-fear'); N.push('Zvedne ležícího.'); break;
     case 'raise': R('lob', s.range); if (s.half) { L.push(LN_('raise', 'zvedne na polovinu', '', 'c-heal')); L.push(LN_('heart', 'a hned léčí', '+' + s.heal, 'c-heal')); } else L.push(LN_('raise', 'zvedne na', s.hp, 'c-heal')); N.push('Bez Paniky.'); break;
     case 'cleanse': R('aura', s.range); L.push(LN_('panic', 'strach', '−' + s.n, 'c-fear')); if (s.heal) L.push(LN_('heart', 'léčí', '+' + s.heal, 'c-heal')); break;
     case 'rally': R('aura', s.range, { label: 'lovci' }); if (s.fear) L.push(LN_('panic', 'strach', '−' + s.fear, 'c-fear')); L.push(LN_('die', 'k útokům', '+' + s.mod, 'c-mod')); if (s.dmg) L.push(LN_('drop', 'zranění', '+' + s.dmg, 'c-dmg')); if (s.selfFear) x('panic', 'strach tobě', '+' + s.selfFear, 'c-fear'); if (s.extraPlay) N.push('Lovec má příště 4 zahrání.'); if (s.peekAny) N.push('Prohlédni žeton kdekoli.'); if (s.draw) N.push('Lízni ' + s.draw + '.'); break;
