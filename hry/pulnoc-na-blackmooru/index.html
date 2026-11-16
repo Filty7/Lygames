@@ -8997,7 +8997,7 @@ function envPadlock(x, y) {
 function buildDoors() {
   for (const d of C.DOOR_DEFS) {
     const v = doorVariants(d);
-    const g = sv('g', { class: 'door' + (d.arch ? ' arch' : ''), 'data-door': d.id }, `<g class="v-closed">${v.closed}</g><g class="v-open">${v.open}</g><g class="v-locked">${v.locked}</g>` + (envOn() && !d.arch ? envPadlock(...px(d.hex)) : '')); // v64: zámek uprostřed hexu dveří
+    const g = sv('g', { class: 'door' + (d.arch ? ' arch' : ''), 'data-door': d.id }, `<g class="v-closed">${v.closed}</g><g class="v-open">${v.open}</g><g class="v-locked">${v.locked}</g>` + (envOn() && !d.arch ? envPadlock(...envDoorMid(d)) : '')); // v64b: zámek uprostřed dveří
     depthAdd(g, v.z, d.rooms[0]);
   }
   if (!C.MAP.exit) return;
@@ -9280,6 +9280,13 @@ function envDoorVariants(d) {
   const thr = `<ellipse cx="${x}" cy="${(yb - 4).toFixed(1)}" rx="15" ry="4.5" fill="url(#ag-cold)" opacity=".55"/>`; // světlý práh = volný průchod
   if (d.arch) { const v = thr + envImg(ENV_DOOR.arch, x, yb + .5); return { closed: v, open: v, locked: v, z: yb + .05 }; }
   return { closed: envImg(ENV_DOOR.closed, x, yb + .5), open: thr + envImg(ENV_DOOR.open, x, yb + .5), locked: envImg(ENV_DOOR.locked, x, yb + .5), z: yb + .05 };
+}
+// v64b: střed obrázku zamčených dveří (pro zámek)
+function envDoorMid(d) {
+  const [x, y] = px(d.hex), sp = ES(ENV_DOOR.locked);
+  if (!sp) return [x, y];
+  if (isVertDoor(d)) { const bot = y + SIZE * KY / 2, k = EK * (WPX / (sp.w * EK)); return [x, bot - sp.ay * k + sp.h * k / 2]; }
+  const yb = y + TW / 2 + .5; return [x, yb - sp.ay * EK + sp.h * EK / 2];
 }
 const ENV_ICON = { shelf: 1, plant: 1, fountain: 1, pantry: 1, statue: 1, clock: 1, piano: 1, coatrack: 1, seance: 1, winerack: 1, barrel: 1, crate: 1, wardrobe: 1, chest: 1, fireplace: 1, coffin: 1, desk: 1 };
 function envFurnName(f) {
