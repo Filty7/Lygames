@@ -8617,7 +8617,8 @@ function placeInDepth(node) {
 }
 function mergeIv(list) { list.sort((a, b) => a[0] - b[0]); const out = []; for (const iv of list) { const l = out[out.length - 1]; if (l && iv[0] <= l[1]) l[1] = Math.max(l[1], iv[1]); else out.push(iv.slice()); } return out; }
 // v63d: beta prostředí = vyšší vnitřní zdi kolem chodby (HIE), svislé zdi na ně plynule navazují
-const HIE = 32, hiNow = () => envOn() ? HIE : HI;
+// v63e: HIE 32 → 24 (mezi původními 14 a 32); zrcadlo .76, svícny níž
+const HIE = 24, hiNow = () => envOn() ? HIE : HI;
 const vH = y => { const hi = hiNow(); return y <= TBAND ? HN + (hi - HN) * (y / TBAND) : y <= BBAND ? hi : hi + (HS - hi) * ((y - BBAND) / Math.max(1, BOT - BBAND)); };
 const isFenceRoom = id => !!id && C.OUTDOOR && C.OUTDOOR.has(id);
 const roomAtX = (x, row, side) => { const R = C.ROOM_DEFS.find(R => x > R.k0 + 0.5 - 1e-6 && x < R.k1 + 0.5 + 1e-6 && (side > 0 ? R.y0 === row : R.y1 === row)); return R ? R.id : null; };
@@ -8773,7 +8774,7 @@ function buildNorthWall() {
 function addMirror(sp, x, yb, h, z, room) {
   if (envOn() && ES('mir_n')) {
     // v63b: pixel-art zrcadlo – zdobný tmavě zlacený rám, studené sklo, oko; stavy = samostatné sprity (mrknutí, praskliny, roztříštěné)
-    const sc = h >= 20 ? 1 : .8, yy = h >= 20 ? yb + 4 : yb + .5, m = ES('mir_n'), k = EK * sc; // v63d: na vyšší vnitřní zdi větší zrcadlo (vejde se pod horní hranu)
+    const sc = h >= 20 ? 1 : .76, yy = h >= 20 ? yb + 4 : yb + 3, m = ES('mir_n'), k = EK * sc; // v63d: na vyšší vnitřní zdi větší zrcadlo; v63e: zeď 24 → zrcadlo .76, spodní hrana na patě zdi (horní okraj nepřesahuje římsu)
     const v = n => `<g class="mv mv-${n.slice(4)}">${envImg(n, x, yy, sc)}</g>`;
     const g = sv('g', { class: 'mirror benvm', 'data-spawn': sp.id }, `<ellipse cx="${x}" cy="${(yy - m.h * k * .5).toFixed(1)}" rx="${(m.w * k * .62).toFixed(1)}" ry="${(m.h * k * .6).toFixed(1)}" fill="#000" opacity=".35"/>` + ['mir_n', 'mir_b', 'mir_c1', 'mir_c2', 'mir_x'].map(v).join(''));
     g._mx = x; g._my = yy - m.ay * k + m.h * k * .47; g._mr = m.w * k * .2;
@@ -8826,12 +8827,17 @@ function buildWalls() {
         const low = holes.some(r => ya >= r + (env ? hh : .17) - 1e-6 && ya < r + 1.5);
         const left = C.ROOM_DEFS.find(R => R.k1 === k && ya >= R.y0 && yb <= R.y1), right = C.ROOM_DEFS.find(R => R.k0 === k && ya >= R.y0 && yb <= R.y1);
         const fv = isFenceRoom((right || left || {}).id), hg = isHedgeRoom((right || left || {}).id);
-        const g = sv('g', { class: 'wallsect' + (fv ? ' fence' : '') + (hg ? ' hedge' : '') }, fv ? fencePieceV(k, ya, yb) : hg ? hedgePieceV(k, ya, yb, low ? .45 : 1) : wallPieceV(k, ya, yb, low ? .3 : 1));
+        const g = sv('g', { class: 'wallsect' + (fv ? ' fence' : '') + (hg ? ' hedge' : '') }, fv ? fencePieceV(k, ya, yb) : hg ? hedgePieceV(k, ya, yb, low ? .45 : 1) : wallPieceV(k, ya, yb, env ? envVfront(holes, ya) : low ? .3 : 1));
         depthAdd(g, wy(yb) + TW / 2 + 0.1, (right || left || {}).id);
         if (left && right) g.dataset.room2 = left.id;
       }
     }
   }
+}
+// v63e: beta = boční zeď před dveřmi (blíž k divákovi) je nižší a plynule stoupá – její vršek nikdy nezasáhne nad spodní hranu dveří
+function envVfront(holes, ya) {
+  let f = 1; for (const r of holes) if (ya > r && ya < r + 3) f = Math.min(f, Math.max(0, (wy(ya) - wy(r) - SIZE * KY / 2 - 2) / vH(ya)));
+  return f;
 }
 const isVertDoor = d => C.ROOM_DEFS.some(R => Math.abs(R.k0 + .5 - C.xcOf(d.hex)) < 1e-6 || Math.abs(R.k1 + .5 - C.xcOf(d.hex)) < 1e-6) && !C.ROOM_DEFS.some(R => R.y0 === d.hex[1] || R.y1 === d.hex[1]);
 function gateVariants(d) {
@@ -9183,14 +9189,15 @@ function envNorthDecor(r) {
 }
 // v63c: všechny dveře mají šířku hexu (dvoukřídlé, sprity hd_*). Zamčené = řetězy, zámek a přibité prkno.
 // v63d: otevřené dveře = jen boční zárubně (hd_jamb, bez křídel a nadpraží) – průchod je úplně volný.
-// Dveře ve svislé boční zdi = stejné sprity zepředu (bez zkosení), menší, stojí v otvoru boční zdi.
+// Dveře ve svislé boční zdi = stejné sprity zepředu (bez zkosení), stojí v otvoru boční zdi (v63e: šířka hexu, boční zeď před nimi nižší).
 const ENV_DOOR = { closed: 'hd_closed', open: 'hd_jamb', locked: 'hd_lock', arch: 'hd_archx' };
 function envDoorVariants(d) {
   const [x, y] = px(d.hex), yb = y + TW / 2;
   if (!ES('hd_closed')) return null;
   if (isVertDoor(d)) {
-    const sc = .64, bot = y + 3.5, D = SIZE * KY * 2 - 1, one = nm => envImg(nm, x, bot, sc);
-    const sh = `<ellipse cx="${x}" cy="${(bot - 1).toFixed(1)}" rx="15" ry="2.6" fill="#000" opacity=".4"/>`;
+    // v63e: na celou šířku hexu, spodní hrana na levém a pravém dolním lomu hexu (y + SIZE·KY/2)
+    const bot = y + SIZE * KY / 2, D = SIZE * KY * 2 - 1, one = nm => envImg(nm, x, bot, WPX / (ES(nm).w * EK));
+    const sh = `<ellipse cx="${x}" cy="${(bot - 1).toFixed(1)}" rx="${(WPX / 2).toFixed(1)}" ry="3" fill="#000" opacity=".4"/>`;
     if (d.arch) { const v = sh + one(ENV_DOOR.arch); return { closed: v, open: v, locked: v, z: y + D / 2 + .6 }; }
     return { closed: sh + one(ENV_DOOR.closed), open: sh + one(ENV_DOOR.open), locked: sh + one(ENV_DOOR.locked), z: y + D / 2 + .6 };
   }
@@ -9270,7 +9277,7 @@ function envInteriorSconces() {
     for (let xc = R.k0 + 1.3; xc < R.k1 - .2; xc += 2.45) {
       if (avoid.some(a => Math.abs(a - xc) < .85)) continue;
       const x = PADX + WPX * xc;
-      const sy = yb - 9; // v63d: výš na vyšší zdi
+      const sy = yb - 6.5; // v63d: výš na vyšší zdi; v63e: zeď 24 → níž
       envLightPts.push([x, sy - 10, R.id]);
       depthAdd(sv('g', { class: 'wallsect benv' }, envImg('sconce', x, sy, .74) + envFlames('sconce', x, sy, .74, .85)), yb + .02, R.id);
     }
@@ -9519,7 +9526,7 @@ async function buildMap() {
   gDecor.innerHTML = (THEME() === 'farm' ? `<rect x="${wx(Math.max(...C.ROOM_DEFS.map(r => r.k1))) + 4}" y="${wy(0) - 40}" width="200" height="${VH + 80}" fill="#0c1c28"/>${[0, 1, 2, 3, 4, 5, 6, 7, 8].map(i => `<path d="M${wx(Math.max(...C.ROOM_DEFS.map(r => r.k1))) + 14 + (i % 3) * 9} ${wy(0) + i * 38}q6 -3 12 0" stroke="#3a6a8a" stroke-width="1.4" fill="none" opacity=".6"/>`).join('')}<text x="${wx(Math.max(...C.ROOM_DEFS.map(r => r.k1))) + 24}" y="${wy(2)}" class="river-lbl" transform="rotate(90 ${wx(Math.max(...C.ROOM_DEFS.map(r => r.k1))) + 24} ${wy(2)})">Černý potok</text>` : '') + C.ROOM_DEFS.map(R => { const mid = isBM() && R.id === 'C'; const x = mid ? (wx(R.k0) + wx(R.k1)) / 2 : wx(R.k0) + 8, y = wy(R.y1) - (isFenceRoom(R.id) ? 21 : 4); return `<text x="${x}" y="${y}" class="room-lbl" data-room="${R.id}" text-anchor="${mid ? 'middle' : 'start'}">${esc(R.name)}</text>`; }).join('');
   buildLights(); buildWalls(); buildDoors(); buildFurniture();
   if (envOn()) { envInteriorSconces(); envLights(); svg.classList.add('benvmap'); envOccC = null; envOccE.clear();
-    defs.insertAdjacentHTML('beforeend', `<radialGradient id="boccg"><stop offset="0" stop-color="#7c7c7c"/><stop offset=".5" stop-color="#848484"/><stop offset="1" stop-color="#fff"/></radialGradient><mask id="bocc" maskUnits="userSpaceOnUse" x="-100" y="-200" width="${VW + 200}" height="${VH + 400}" style="mask-type:luminance;color-interpolation:sRGB"><rect x="-100" y="-200" width="${VW + 200}" height="${VH + 400}" fill="#fff"/><g class="boccm"></g></mask>`); }
+    defs.insertAdjacentHTML('beforeend', `<radialGradient id="boccg"><stop offset="0" stop-color="#575757"/><stop offset=".5" stop-color="#5c5c5c"/><stop offset="1" stop-color="#fff"/></radialGradient><mask id="bocc" maskUnits="userSpaceOnUse" x="-100" y="-200" width="${VW + 200}" height="${VH + 400}" style="mask-type:luminance;color-interpolation:sRGB"><rect x="-100" y="-200" width="${VW + 200}" height="${VH + 400}" fill="#fff"/><g class="boccm"></g></mask>`); }
   $('#mapwrap').appendChild(svg);
   await pixelizeDepth();
   addAmbientAnims();
@@ -10202,7 +10209,7 @@ function setTokPos(t, hex) {
 // ---------- v63d: zakrytí figurek zdí (beta prostředí) ----------
 // Figurka stojící za zdí / dveřmi / vysokým nábytkem (překážka je blíž k divákovi a v obraze ji překrývá) je zakrytá
 // včetně ukazatele životů a kruhu výběru (štítek se přesune do hloubkové vrstvy hned za figurku). Překážka pak kolem
-// figurky měkce zprůhlední na ~50 %: maska #bocc s rozmazanou elipsou na každou zakrytou figurku (elipsa jede s figurkou).
+// figurky měkce zprůhlední na ~66 % (v63e; dřív ~50 %): maska #bocc s rozmazanou elipsou na každou zakrytou figurku (elipsa jede s figurkou).
 // Zdi jsou pointer-events: none, zprůhledněné dveře a nábytek také → klik i najetí jdou na figurku / hex pod ní.
 let envOccC = null, envOccRaf = 0;
 const envOccE = new Map();
@@ -10228,7 +10235,7 @@ function envOcc() {
   if (!svg || !svg.classList.contains('benvmap')) return;
   const mg = svg.querySelector('#bocc .boccm'); if (!mg) return;
   const cands = envOccCands(), masked = new Set();
-  for (const [id, e] of envOccE) if (!toks.has(id)) { e.remove(); envOccE.delete(id); }
+  for (const [id, e] of envOccE) if (!id.startsWith('spot:') && !toks.has(id)) { e.remove(); envOccE.delete(id); }
   for (const [id, t] of toks) {
     const tm = /translate\(([-\d.]+)px,\s*([-\d.]+)px\)/.exec(t.fig.style.transform || '');
     let occ = false;
@@ -10248,6 +10255,27 @@ function envOcc() {
     else if (t.lab.parentNode !== gTop) gTop.insertBefore(t.lab, gTop.querySelector('.hlpills, .passov'));
     t.fig.classList.toggle('bocc', occ);
   }
+  // v63e: neprohledané místo s kořistí (nábytek .loot) zakryté zdí/dveřmi → stejné místní zprůhlednění jako u figurky;
+  // po prohledání (třída .loot zmizí) zeď znovu neprůhledná. Značka (pergamen) je ve vrchní vrstvě, vidět je vždy.
+  const spotLive = new Set();
+  for (const f of cands) {
+    if (!f.n.classList.contains('spot')) continue;
+    const key = 'spot:' + f.n.dataset.k; let occ = false;
+    if (f.n.classList.contains('loot')) {
+      const fx = (f.x0 + f.x1) / 2, fy = f.y1 - 3, z = f.n._z;
+      for (const q of cands) { if (!q.trig || q === f || !(q.n._z > z)) continue;
+        if (Math.min(q.x1, f.x1 - 4) - Math.max(q.x0, f.x0 + 4) >= 4 && q.y0 < fy + 2 && q.y1 > fy - 4) { occ = true; break; } }
+      if (occ) for (const q of cands) if (q !== f && q.n._z > z && q.x0 < f.x1 + 5 && q.x1 > f.x0 - 5 && q.y0 < f.y1 + 8 && q.y1 > f.y0 - 16) masked.add(q);
+    }
+    spotLive.add(key);
+    let e = envOccE.get(key);
+    if (!e) { e = sv('ellipse', { class: 'boccE', fill: 'url(#boccg)' }); mg.appendChild(e); envOccE.set(key, e); }
+    const w = f.x1 - f.x0, h = f.y1 - f.y0 + 12; // + značka nad předmětem
+    e.setAttribute('cx', ((f.x0 + f.x1) / 2).toFixed(1)); e.setAttribute('cy', (f.y1 - h * .45).toFixed(1));
+    e.setAttribute('rx', Math.max(19, w * .62 + 4).toFixed(1)); e.setAttribute('ry', (h * .62 + 7).toFixed(1));
+    e.classList.toggle('on', occ);
+  }
+  for (const [id, e] of envOccE) if (id.startsWith('spot:') && !spotLive.has(id)) { e.remove(); envOccE.delete(id); }
   // maska se sundá až po doznění elipsy (jinak by zeď skokem zneprůhledněla)
   for (const q of cands) { const on = masked.has(q); if (on !== !!q.on) { q.on = on; clearTimeout(q.offT); q.n.classList.toggle('bocc-on', on);
     if (on) q.tgt.setAttribute('mask', 'url(#bocc)'); else q.offT = setTimeout(() => { if (!q.on) q.tgt.removeAttribute('mask'); }, 450); } }
