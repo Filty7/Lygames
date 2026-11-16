@@ -368,6 +368,44 @@ body.busy .bsigc { animation-play-state: paused; }
 .boccE.on { opacity: 1; }
 .l-depth .bocc-on, .l-depth .bocc-on * { pointer-events: none !important; }
 @media (prefers-reduced-motion: reduce) { .blglint { display: none; } .blhalo, .bsigp, .benvm .mv-b { animation: none !important; } }
+/* v64: beta = šestiúhelníková záře pod figurkami (lovci modrá, monstra tmavě červená) místo kruhů výběru */
+svg.bglow .tok-act, svg.bglow .tok-actg { display: none; }
+.l-hg { pointer-events: none; }
+.hg { --hc: #9ad6ff; --hg: #5fb4ff; transition: transform .26s ease-in-out, opacity .35s; }
+.hg-m { --hc: #c7342a; --hg: #8a0c08; }
+.hg.off { opacity: 0; }
+.hg .hg-f { opacity: .15; transition: opacity .3s; }
+.hg .hg-n { opacity: .24; transition: opacity .3s; }
+.hg-m .hg-f { opacity: .17; } .hg-m .hg-n { opacity: .26; }
+.hg.down .hg-f { opacity: .12; } .hg.down .hg-n { opacity: .18; }
+.hg .hg-o { opacity: 0; transition: opacity .3s; }
+.hg .hg-o path { fill: none; stroke-linejoin: round; stroke-linecap: round; }
+.hg .hg-o1 { stroke: var(--hc); stroke-width: 1.15; stroke-dasharray: 6 .9 2.6 .7 9 1.3 3.4 .8 5 1.1; }
+.hg .hg-o2 { stroke: var(--hc); stroke-width: 3; stroke-opacity: .22; }
+.hg .hg-o3 { stroke: var(--hg); stroke-width: 6.5; stroke-opacity: .12; }
+.hg .hg-o4 { stroke: var(--hc); stroke-width: .6; stroke-opacity: .4; stroke-dasharray: .8 1.6; }
+.hg.hov .hg-f { opacity: .3; } .hg-m.hov .hg-f { opacity: .32; }
+.hg.cand .hg-o2, .hg.cand .hg-o3 { display: none; }
+.hg.cand .hg-f, .hg.sel .hg-f { opacity: .34; } .hg.cand .hg-n, .hg.sel .hg-n { opacity: .5; }
+.hg.cand .hg-o { opacity: .55; animation: hgp 1.6s ease-in-out infinite alternate; }
+.hg.sel .hg-o { opacity: .9; }
+.hg.tgt .hg-f { opacity: .5; } .hg.tgt .hg-n { opacity: .55; }
+.hg.tgt .hg-o { opacity: .85; animation: hgp .8s ease-in-out infinite alternate; }
+.hg.act .hg-f { opacity: .55; } .hg.act .hg-n { opacity: .6; }
+.hg.act .hg-o { opacity: 1; animation: hgpa 2.4s ease-in-out infinite alternate; }
+.hg.hov.cand .hg-f, .hg.hov.sel .hg-f, .hg.hov.tgt .hg-f { opacity: .8; }
+.hg.hov.cand .hg-o, .hg.hov.sel .hg-o, .hg.hov.tgt .hg-o { opacity: 1; animation: none; }
+@keyframes hgp { from { opacity: .35; } to { opacity: .9; } }
+@keyframes hgpa { from { opacity: .72; } to { opacity: 1; } }
+svg.bglow .hov.onfig { fill-opacity: 0; stroke-opacity: .35; filter: none; }
+.ring.bhex { stroke-linejoin: round; stroke-dasharray: 6 .9 2.6 .7 9 1.3; }
+.atk-tgt.bhex, .atk-src.bhex { stroke-linejoin: round; }
+@media (prefers-reduced-motion: reduce) { .hg .hg-o { animation: none !important; } }
+/* v64: beta zamčené dveře = pixel-art železný visací zámek s rezavě žhnoucím tělem uprostřed hexu dveří */
+.door .blpad { display: none; } .door.dlk .blpad { display: inline; }
+.blpad-gl { animation: blpad 2.8s ease-in-out infinite alternate; }
+@keyframes blpad { from { opacity: .5; } to { opacity: .9; } }
+@media (prefers-reduced-motion: reduce) { .blpad-gl { animation: none; } }
 @keyframes flick2 { 0%, 100% { opacity: 1; } 20% { opacity: .82; } 45% { opacity: .95; } 60% { opacity: .75; } 80% { opacity: .9; } }
 .fear-wisp { animation: wisp 1.1s ease-out both; }
 @keyframes wisp { from { transform: translateY(0); opacity: .95; } to { transform: translateY(-22px); opacity: 0; } }
@@ -8918,10 +8956,48 @@ function doorVariants(d) {
   const lock = `<path d="M${TL[0] + 1} ${TL[1] + 3}L${BR[0] - 1} ${BR[1] - 3}M${TR[0] - 1} ${TR[1] + 3}L${BL[0] + 1} ${BL[1] - 3}" stroke="#8a8a90" stroke-width="1.6" stroke-dasharray="1.6 1"/><rect x="${x - 3.5}" y="${t + H * .45}" width="7" height="6" fill="#c9a24a"/><path d="M${x - 2} ${t + H * .45}v-2a2 2 0 0 1 4 0v2" fill="none" stroke="#c9a24a" stroke-width="1.2"/>`;
   return { closed: posts + leaf, open, locked: posts + leaf + lock, z: y + ROWH * 2.6 };
 }
+// v64: pixel-art visací zámek (30×36 px = 15×18 jednotek, pixel = ½ jako sprity prostředí): železný třmen,
+// náznak řetězu na obě strany, rezavě žhnoucí tělo s klíčovou dírkou. Kreslí se jednou do plátna.
+function envPadlockURL() {
+  if (envPadlockURL.u) return envPadlockURL.u;
+  const W = 30, H = 36, cv = document.createElement('canvas'); cv.width = W; cv.height = H; const g = cv.getContext('2d');
+  const R = (x, y, w, h, c) => { g.fillStyle = c; g.fillRect(x, y, w, h); };
+  let sd = 91; const rnd = () => (sd = (sd * 16807) % 2147483647) / 2147483647;
+  // řetěz: články střídavě zepředu (ovál) a z boku (čárka), od třmenu ven a mírně dolů
+  const link = (x, y, side) => { if (side) { R(x, y + 1, 4, 2, '#140c0c'); R(x, y + 1, 4, 1, '#6e6a70'); } else { R(x, y, 5, 4, '#140c0c'); R(x + 1, y + 1, 3, 2, '#08060a'); R(x + 1, y, 3, 1, '#8a868c'); R(x, y + 1, 1, 2, '#55525a'); } };
+  link(0, 13, 0); link(4, 12, 1); link(25, 13, 0); link(22, 12, 1);
+  // třmen
+  const cx = 15, cy = 10.5, ro = 8.5, ri = 4.8;
+  for (let y = 0; y < 19; y++) for (let x = 0; x < W; x++) {
+    const px0 = x + .5, py0 = y + .5, dx = px0 - cx; let d;
+    if (py0 <= cy) d = Math.hypot(dx, py0 - cy); else d = Math.abs(dx);
+    if (d > ro || d < ri) continue;
+    const edge = d > ro - .9 || d < ri + .9;
+    R(x, y, 1, 1, edge ? '#120a0a' : dx < -2 ? (py0 < cy - 4 ? '#b4b0b4' : '#8c888e') : dx < 2 ? '#6a666e' : '#3e3a42');
+  }
+  // tělo
+  const bx = 3, by = 15, bw = 24, bh = 20;
+  R(bx + 1, by, bw - 2, bh, '#1a0604'); R(bx, by + 1, bw, bh - 2, '#1a0604');
+  for (let y = by + 1; y < by + bh - 1; y++) { const t = (y - by) / bh; R(bx + 1, y, bw - 2, 1, t < .25 ? '#a23e16' : t < .6 ? '#7e2c10' : '#561a08'); }
+  R(bx + 1, by + 2, 1, bh - 4, '#bc5a22'); R(bx + bw - 2, by + 2, 1, bh - 4, '#481406');
+  for (let i = 0; i < 46; i++) { const x = bx + 2 + Math.floor(rnd() * (bw - 4)), y = by + 3 + Math.floor(rnd() * (bh - 5)); R(x, y, 1, 1, rnd() < .55 ? '#5a1a08' : rnd() < .5 ? '#c8662a' : '#a64416'); }
+  // železný pás nahoře a dole s nýty
+  R(bx + 1, by + 1, bw - 2, 2, '#3a2e30'); R(bx + 1, by + 1, bw - 2, 1, '#6a5c5a');
+  R(bx + 1, by + bh - 3, bw - 2, 2, '#2a2024');
+  for (const x of [bx + 3, bx + bw - 4]) { R(x, by + 1, 1, 1, '#d8d0c8'); R(x, by + bh - 3, 1, 1, '#a89c94'); }
+  // klíčová dírka se žhnoucím nitrem
+  const kx = 15, ky = by + 8;
+  R(kx - 2, ky - 2, 4, 4, '#0a0202'); R(kx - 1, ky - 3, 2, 6, '#0a0202'); R(kx - 1, ky + 2, 2, 5, '#0a0202'); R(kx - 2, ky + 5, 4, 2, '#0a0202');
+  R(kx - 1, ky - 1, 1, 1, '#ffb050'); R(kx, ky, 1, 1, '#e8702a'); R(kx - 1, ky + 3, 1, 2, '#a83a12');
+  return (envPadlockURL.u = cv.toDataURL());
+}
+function envPadlock(x, y) {
+  return `<g class="blpad"><ellipse class="blpad-gl" cx="${x}" cy="${(y + 1.5).toFixed(1)}" rx="15" ry="11" fill="url(#blpadg)"/><image class="benvi" href="${envPadlockURL()}" x="${(x - 7.5).toFixed(1)}" y="${(y - 9).toFixed(1)}" width="15" height="18" style="image-rendering:pixelated"/></g>`;
+}
 function buildDoors() {
   for (const d of C.DOOR_DEFS) {
     const v = doorVariants(d);
-    const g = sv('g', { class: 'door' + (d.arch ? ' arch' : ''), 'data-door': d.id }, `<g class="v-closed">${v.closed}</g><g class="v-open">${v.open}</g><g class="v-locked">${v.locked}</g>`);
+    const g = sv('g', { class: 'door' + (d.arch ? ' arch' : ''), 'data-door': d.id }, `<g class="v-closed">${v.closed}</g><g class="v-open">${v.open}</g><g class="v-locked">${v.locked}</g>` + (envOn() && !d.arch ? envPadlock(...px(d.hex)) : '')); // v64: zámek uprostřed hexu dveří
     depthAdd(g, v.z, d.rooms[0]);
   }
   if (!C.MAP.exit) return;
@@ -9505,7 +9581,7 @@ let builtMap = null, mapListeners = false;
 async function ensureMap() {
   if (builtMap === mapKey()) return;
   const wrap = $('#mapwrap'); if (svg && svg.parentNode) svg.remove();
-  toks.forEach(t => { t.fig.remove(); t.lab.remove(); if (t.glow) t.glow.remove(); }); toks.clear();
+  toks.forEach(t => { t.fig.remove(); t.lab.remove(); if (t.glow) t.glow.remove(); if (t.hg) t.hg.remove(); }); toks.clear();
   await buildMap();
 }
 async function buildMap() {
@@ -9526,7 +9602,7 @@ async function buildMap() {
   gDecor.innerHTML = (THEME() === 'farm' ? `<rect x="${wx(Math.max(...C.ROOM_DEFS.map(r => r.k1))) + 4}" y="${wy(0) - 40}" width="200" height="${VH + 80}" fill="#0c1c28"/>${[0, 1, 2, 3, 4, 5, 6, 7, 8].map(i => `<path d="M${wx(Math.max(...C.ROOM_DEFS.map(r => r.k1))) + 14 + (i % 3) * 9} ${wy(0) + i * 38}q6 -3 12 0" stroke="#3a6a8a" stroke-width="1.4" fill="none" opacity=".6"/>`).join('')}<text x="${wx(Math.max(...C.ROOM_DEFS.map(r => r.k1))) + 24}" y="${wy(2)}" class="river-lbl" transform="rotate(90 ${wx(Math.max(...C.ROOM_DEFS.map(r => r.k1))) + 24} ${wy(2)})">Černý potok</text>` : '') + C.ROOM_DEFS.map(R => { const mid = isBM() && R.id === 'C'; const x = mid ? (wx(R.k0) + wx(R.k1)) / 2 : wx(R.k0) + 8, y = wy(R.y1) - (isFenceRoom(R.id) ? 21 : 4); return `<text x="${x}" y="${y}" class="room-lbl" data-room="${R.id}" text-anchor="${mid ? 'middle' : 'start'}">${esc(R.name)}</text>`; }).join('');
   buildLights(); buildWalls(); buildDoors(); buildFurniture();
   if (envOn()) { envInteriorSconces(); envLights(); svg.classList.add('benvmap'); envOccC = null; envOccE.clear();
-    defs.insertAdjacentHTML('beforeend', `<radialGradient id="boccg"><stop offset="0" stop-color="#575757"/><stop offset=".5" stop-color="#5c5c5c"/><stop offset="1" stop-color="#fff"/></radialGradient><mask id="bocc" maskUnits="userSpaceOnUse" x="-100" y="-200" width="${VW + 200}" height="${VH + 400}" style="mask-type:luminance;color-interpolation:sRGB"><rect x="-100" y="-200" width="${VW + 200}" height="${VH + 400}" fill="#fff"/><g class="boccm"></g></mask>`); }
+    defs.insertAdjacentHTML('beforeend', `<radialGradient id="blpadg"><stop offset="0" stop-color="#ff6a1e" stop-opacity=".55"/><stop offset=".45" stop-color="#c8300e" stop-opacity=".25"/><stop offset="1" stop-color="#7a1004" stop-opacity="0"/></radialGradient><radialGradient id="boccg"><stop offset="0" stop-color="#575757"/><stop offset=".5" stop-color="#5c5c5c"/><stop offset="1" stop-color="#fff"/></radialGradient><mask id="bocc" maskUnits="userSpaceOnUse" x="-100" y="-200" width="${VW + 200}" height="${VH + 400}" style="mask-type:luminance;color-interpolation:sRGB"><rect x="-100" y="-200" width="${VW + 200}" height="${VH + 400}" fill="#fff"/><g class="boccm"></g></mask>`); }
   $('#mapwrap').appendChild(svg);
   await pixelizeDepth();
   addAmbientAnims();
@@ -9549,12 +9625,12 @@ async function buildMap() {
     const d = S.mdrag; if (!d) return;
     d.moved = true; const p = svgPoint(ev);
     d.t.fig.style.transition = 'none'; d.t.lab.style.transition = 'none';
-    const tr = `translate(${p.x.toFixed(1)}px,${(p.y + 4).toFixed(1)}px)`; d.t.fig.style.transform = tr; d.t.lab.style.transform = tr;
+    const tr = `translate(${p.x.toFixed(1)}px,${(p.y + 4).toFixed(1)}px)`; d.t.fig.style.transform = tr; d.t.lab.style.transform = tr; if (d.t.hg) { d.t.hg.style.transition = 'none'; d.t.hg.style.transform = tr; }
     const h = hexAtPoint(p.x, p.y); hoverHex(h);
   });
   window.addEventListener('pointerup', ev => {
     const d = S.mdrag; if (!d) return; S.mdrag = null; S.noClick = true;
-    d.t.fig.style.transition = ''; d.t.lab.style.transition = '';
+    d.t.fig.style.transition = ''; d.t.lab.style.transition = ''; if (d.t.hg) d.t.hg.style.transition = '';
     if (!d.moved) { S.noClick = false; return; }
     const p = svgPoint(ev), h = hexAtPoint(p.x, p.y), G = S.G;
     const rr = h && C.roomOf(h), alone = C.aliveOf(G, d.mon.type) === 1;
@@ -10201,7 +10277,7 @@ function zFor(hex) { return px(hex)[1] + (onEdge(hex) ? 6 : 0.5); }
 function setTokPos(t, hex) {
   const [x, y] = px(hex);
   const tr = `translate(${x.toFixed(1)}px,${y.toFixed(1)}px)`;
-  t.fig.style.transform = tr; t.lab.style.transform = tr; if (t.glow) t.glow.style.transform = tr;
+  t.fig.style.transform = tr; t.lab.style.transform = tr; if (t.glow) t.glow.style.transform = tr; if (t.hg) { t.hg.style.transitionDuration = t.fig.style.transitionDuration; t.hg.style.transform = tr; }
   t.pos = hex.slice();
   t.fig._z = zFor(hex);
   placeInDepth(t.fig);
@@ -10280,6 +10356,65 @@ function envOcc() {
   for (const q of cands) { const on = masked.has(q); if (on !== !!q.on) { q.on = on; clearTimeout(q.offT); q.n.classList.toggle('bocc-on', on);
     if (on) q.tgt.setAttribute('mask', 'url(#bocc)'); else q.offT = setTimeout(() => { if (!q.on) q.tgt.removeAttribute('mask'); }, 450); } }
 }
+// ---------- v64: beta = šestiúhelníková záře pod figurkami místo kruhů výběru ----------
+// Každý lovec má pod sebou slabou světle modrou záři vyplňující celý hex (měkký přechod + jemný šum), každé monstrum
+// tmavě červenou. Stavy, které dřív ukazoval kruh, záři zesílí a přidají texturovaný obrys hexu:
+//   act = na tahu (dřív .tok-act), cand = lze vybrat (ring-act), sel = zvolené (ring-sel), tgt = cíl útoku (ring-atk),
+//   hov = najetí myší (na kandidáta = nejsilnější). Záře leží ve vlastní vrstvě nad podlahou a tmou, POD zvýrazněním
+//   pohybu a pod hloubkovou vrstvou → zdi a dveře ji zakrývají stejně jako podlahu (i místní zprůhlednění v63).
+let gHg = null, hgHovK = null;
+const hgMarks = new Map();
+const HG_RANK = { 'ring-act': 1, 'ring-sel': 2, 'ring-atk': 3 };
+function hgDefs() {
+  if (document.getElementById('hgNb')) return;
+  const gd = document.querySelector('#gdefs defs'); if (!gd) return;
+  // šum: předpočítaná textura (48×48 px = 24×24 jednotek mapy, pixel = ½ jako sprity prostředí)
+  const noise = (rgb, seed) => { const cv = document.createElement('canvas'); cv.width = cv.height = 48; const g = cv.getContext('2d'); let s = seed;
+    const r = () => (s = (s * 16807) % 2147483647) / 2147483647;
+    for (let y = 0; y < 48; y++) for (let x = 0; x < 48; x++) { const v = r(); if (v < .34) { g.fillStyle = `rgba(${rgb},${(.18 + r() * .5).toFixed(2)})`; g.fillRect(x, y, 1, 1); } else if (v > .9) { g.fillStyle = 'rgba(0,0,0,.35)'; g.fillRect(x, y, 1, 1); } }
+    return cv.toDataURL(); };
+  const pat = (id, url) => `<pattern id="${id}" patternUnits="userSpaceOnUse" width="24" height="24"><image href="${url}" width="24" height="24" style="image-rendering:pixelated"/></pattern>`;
+  const grad = (id, c) => `<radialGradient id="${id}" cx=".5" cy=".5" r=".55"><stop offset="0" stop-color="${c}" stop-opacity=".62"/><stop offset=".55" stop-color="${c}" stop-opacity=".4"/><stop offset=".86" stop-color="${c}" stop-opacity=".58"/><stop offset="1" stop-color="${c}" stop-opacity=".85"/></radialGradient>`;
+  gd.insertAdjacentHTML('beforeend', pat('hgNb', noise('168,220,255', 7)) + pat('hgNr', noise('190,40,30', 13)) + grad('hgGb', '#8ccfff') + grad('hgGr', '#a3150f'));
+}
+function hgInner(kind) {
+  const b = kind === 'h', o = hexPts(0, 0, SIZE - 1.4), f = hexPts(0, 0, SIZE - 1.6), i = hexPts(0, 0, SIZE - 3.4);
+  return `<path class="hg-f" d="${f}" fill="url(#${b ? 'hgGb' : 'hgGr'})"/><path class="hg-n" d="${f}" fill="url(#${b ? 'hgNb' : 'hgNr'})"/>` +
+    `<g class="hg-o"><path class="hg-o3" d="${o}"/><path class="hg-o2" d="${o}"/><path class="hg-o1" d="${o}"/><path class="hg-o4" d="${i}"/></g>`;
+}
+// figurka, pod kterou se kreslí záře (lovci, monstra kromě objektů jako zrcadla; ne vyvolané předměty)
+function hgFigAt(h) {
+  const G = S.G; if (!G) return false;
+  return G.heroes.some(x => !x.escaped && C.eq(x.pos, h)) || G.monsters.some(m => !C.MDEF[m.type].object && C.eq(m.pos, h) && monsterShown(m));
+}
+// náhrada hlRing v betě: pod figurkou = zesílená záře, jinde (dveře, místa, zjevení) = šestiúhelníkový obrys v barvě kruhu
+function hgRing(h, cls) {
+  if (hgFigAt(h)) { const k = C.K(h); hgMarks.set(k, Math.max(hgMarks.get(k) || 0, HG_RANK[cls] || 1)); return; }
+  gHl.insertAdjacentHTML('beforeend', `<path d="${pts(h, SIZE - 2.6)}" class="ring bhex ${cls}"/>`);
+}
+function hgLayer() { if (!gHg || !svg.contains(gHg)) { gHg = sv('g', { class: 'l-hg' }); svg.insertBefore(gHg, gHl); } return gHg; }
+function hgUpdate() {
+  if (!svg) return;
+  const on = betaOn(); svg.classList.toggle('bglow', on);
+  if (!on) { if (gHg) gHg.remove(); gHg = null; toks.forEach(t => { t.hg = null; }); return; }
+  hgDefs(); const L = hgLayer(), G = S.G, a = G.active || {};
+  for (const [id, t] of toks) {
+    const ent = t.kind === 'h' ? G.heroes.find(h => 'h:' + h.id === id) : t.kind === 'm' ? G.monsters.find(m => 'm:' + m.uid === id) : null;
+    if (!ent || (t.kind === 'm' && C.MDEF[ent.type].object)) { if (t.hg) { t.hg.remove(); t.hg = null; } continue; }
+    if (!t.hg || t.hg.parentNode !== L) { if (t.hg) t.hg.remove(); t.hg = sv('g', { class: 'hg ' + (t.kind === 'h' ? 'hg-h' : 'hg-m') }, hgInner(t.kind)); t.hg._t = t; t.hg.style.transform = t.fig.style.transform; L.appendChild(t.hg); }
+    const c = t.fig.classList, mk = hgMarks.get(C.K(ent.pos)) || 0, hc = t.hg.classList;
+    hc.toggle('off', c.contains('fog') || c.contains('gone') || !!t.dying);
+    hc.toggle('act', t.kind === 'h' ? a.hero === ent.id : a.monster === ent.uid);
+    hc.toggle('down', !!ent.downed); hc.toggle('cand', mk === 1); hc.toggle('sel', mk === 2); hc.toggle('tgt', mk === 3);
+  }
+  for (const n of [...L.children]) if (!n._t || toks.get(n._t.id) !== n._t || n._t.hg !== n) n.remove();
+  hgHover();
+}
+// najetí: figurka pod myší (hoverTok) nebo hex pod myší v režimu výběru (hoverHex)
+function hgHover() {
+  if (!gHg) return;
+  for (const t of toks.values()) if (t.hg) t.hg.classList.toggle('hov', t === hovT || (!!hgHovK && !!t.pos && C.K(t.pos) === hgHovK));
+}
 function setFacing(t, dx) { if (!t || Math.abs(dx) < 1) return; t.face = dx < 0 ? -1 : 1; t.fig.querySelector('.tok-face').setAttribute('transform', `scale(${t.face},1)`); }
 const BADGE = (ic, color, txt, cls) => ({ ic, color, txt: txt === undefined ? '' : txt, cls });
 function badgesFor(kind, ent) {
@@ -10350,7 +10485,7 @@ function renderBadges(t, list) {
   t.lab.querySelector('.lab-mark').setAttribute('transform', `translate(0,${y0 - (a.length ? 10 : 0) - (h.length ? 10 : 0) - 6})`);
 }
 let hovT = null;
-function hoverTok(t) { if (hovT && hovT !== t) hovT.lab.classList.remove('show'); hovT = t; if (t) t.lab.classList.add('show'); }
+function hoverTok(t) { if (hovT && hovT !== t) hovT.lab.classList.remove('show'); hovT = t; if (t) t.lab.classList.add('show');  hgHover(); }
 
 // ---------- vykreslení stavu ----------
 function renderMap() {
@@ -10375,7 +10510,7 @@ function renderMap() {
     const prev = S.doorState[d.id], quietDoors = G.phase === 'setup' || S._lastPhase === 'setup'; if (!quietDoors && prev && prev !== d.state && d.state === 'open') sfx(d.portcullis ? 'clank' : 'door'); if (!quietDoors && prev && prev !== d.state && d.state === 'locked') sfx('lock');
     S.doorState[d.id] = d.state;
   }
-  { let db = ''; for (const d of G.doors) { if (d.state !== 'locked' || !d.rooms.some(roomVisible)) continue; const [x, y] = px(d.hex), yy = y - (isVertDoor(d) ? 30 : 32); db += `<g class="door-badge" transform="translate(${x},${yy})"><circle r="6.5" class="bd-bg"/>${A.iconG('lock', 0, 0, 8.5, '#f3cf8e')}</g>`; }
+  { let db = ''; const envL = svg.classList.contains('benvmap'); for (const d of G.doors) { if (envL) { const dg = gDepth.querySelector(`[data-door="${d.id}"]`); if (dg) dg.classList.toggle('dlk', d.state === 'locked'); if (dg && dg.querySelector('.blpad')) continue; } if (d.state !== 'locked' || !d.rooms.some(roomVisible)) continue; const [x, y] = px(d.hex), yy = y - (isVertDoor(d) ? 30 : 32); db += `<g class="door-badge" transform="translate(${x},${yy})"><circle r="6.5" class="bd-bg"/>${A.iconG('lock', 0, 0, 8.5, '#f3cf8e')}</g>`; }
     let g = gTop.querySelector('.doorbadges'); if (!g) { g = sv('g', { class: 'doorbadges' }); gTop.insertBefore(g, gTop.firstChild); } if (g._s !== db) { g._s = db; g.innerHTML = db; } }
   for (const mEl of gDepth.querySelectorAll('.mirror')) {
     const sp = C.SPAWN_DEFS.find(x => x.id === mEl.dataset.spawn), obj = sp && G.monsters.find(m => C.MDEF[m.type].object && C.eq(m.pos, sp.hex));
@@ -10467,9 +10602,10 @@ function renderMap() {
     t.lab.querySelector('.pl-fill').setAttribute('width', (16 * Math.min(1, left / 3)).toFixed(1));
     if (!t.anim && (!t.pos || !C.eq(t.pos, z.pos))) setTokPos(t, z.pos);
   }
-  for (const [id, t] of [...toks]) if (!live.has(id) && !t.dying) { t.fig.remove(); t.lab.remove(); if (t.glow) t.glow.remove(); toks.delete(id); }
+  for (const [id, t] of [...toks]) if (!live.has(id) && !t.dying) { t.fig.remove(); t.lab.remove(); if (t.glow) t.glow.remove(); if (t.hg) t.hg.remove(); toks.delete(id); }
   renderDecals();
   if (betaOn()) bSpeedVar();
+  hgUpdate(); // v64
   envOccSoon(); // v63d
 }
 function flameSVG() {
@@ -10577,7 +10713,9 @@ function hlPill(h, text, cls, data, lift) {
   const [x, y] = px(h), w = 10 + text.length * 5.4, yy = y - (lift || 0) - 14;
   gTop.querySelector('.hlpills').appendChild(sv('g', Object.assign({ class: 'pill ' + (cls || '') }, data || {}), `<rect x="${x - w / 2}" y="${yy - 12}" width="${w}" height="14" rx="7"/><text x="${x}" y="${yy - 2}" text-anchor="middle">${esc(text)}</text>`));
 }
-function hlRing(h, cls) { const [x, y] = px(h); gHl.insertAdjacentHTML('beforeend', `<ellipse cx="${x}" cy="${y}" rx="18" ry="${(18 * KY).toFixed(1)}" class="ring ${cls}"/>`); }
+// v64: značky útočníka a cíle během útoku – v betě šestiúhelník místo elipsy
+function atkMarks(ax, ay, bx, by, enemy) { const e = enemy ? ' enemy' : ''; return betaOn() ? `<path d="${hexPts(bx, by, SIZE - 2)}" class="atk-tgt bhex"/><path d="${hexPts(ax, ay, SIZE - 2.6)}" class="atk-src bhex${e}"/>` : `<ellipse cx="${bx}" cy="${by}" rx="19" ry="${19 * KY}" class="atk-tgt"/><ellipse cx="${ax}" cy="${ay}" rx="17" ry="${17 * KY}" class="atk-src${e}"/>`; }
+function hlRing(h, cls) { if (betaOn()) return hgRing(h, cls); const [x, y] = px(h); gHl.insertAdjacentHTML('beforeend', `<ellipse cx="${x}" cy="${y}" rx="18" ry="${(18 * KY).toFixed(1)}" class="ring ${cls}"/>`); }
 const INTER_LBL = { pry: 'Páčit · 2', search: 'Hledat · 1', unlock: 'Odemknout · 2', give: 'Předat klíč · 1', take: 'Vzít klíč · 1', lever: 'Přetáhnout páku · 2' };
 function furnH(f, d = 30) { const e = envOn() ? envFurnTop(f) : null; return e || A.FURN_H[f.icon] || d; }
 function liftOf(hex) { const G = S.G; const m = C.monsterAt(G, hex); if (m) return A.HEIGHT[m.type + (m.elite ? 'E' : '')] || 46; const h = G.heroes.find(x => !x.escaped && C.eq(x.pos, hex)); if (h) return h.downed ? 14 : 52; const f = C.furnAt(hex); return f ? furnH(f, 20) : 6; }
@@ -10593,7 +10731,7 @@ function renderLos() {
   if (!src) { const h = losHero(); if (!h || h.escaped) return; src = h.pos; }
   const vis = C.ALL_HEXES.filter(x => !C.eq(x, src) && C.hexRevealed(G, x) && !C.isBlock(x) && C.los(G, src, x));
   const [x, y] = px(src);
-  gHl.insertAdjacentHTML('beforeend', `<path d="${vis.map(v => pts(v, SIZE - 1.5)).join('')}" class="los"/><ellipse cx="${x}" cy="${y}" rx="20" ry="${20 * KY}" class="los-src"/>`);
+  gHl.insertAdjacentHTML('beforeend', `<path d="${vis.map(v => pts(v, SIZE - 1.5)).join('')}" class="los"/>${betaOn() ? `<path d="${hexPts(x, y, SIZE - 1.5)}" class="los-src"/>` : `<ellipse cx="${x}" cy="${y}" rx="20" ry="${20 * KY}" class="los-src"/>`}`);
 }
 // v60: podržený Alt = průchodnost: neprůchozí pole červeně, náročný terén (pohyb za 2) žlutě
 function passOverlay(on) {
@@ -10613,7 +10751,7 @@ function passOverlay(on) {
   document.body.appendChild(el('div', { id: 'passleg', class: 'passov-leg' }, `Průchodnost:<i style="background:#e0302a"></i>nejde projít<i style="background:#f0c020"></i>pohyb za 2 (náročný terén, zavřené dveře, sliz)`));
 }
 function renderHighlights() {
-  gHl.innerHTML = '';
+  gHl.innerHTML = ''; hgMarks.clear();
   gDepth.querySelectorAll('.furn.cand').forEach(f => f.classList.remove('cand'));
   let pills = gTop.querySelector('.hlpills'); if (pills) pills.innerHTML = ''; else gTop.appendChild(sv('g', { class: 'hlpills' }));
   renderLos();
@@ -10654,6 +10792,7 @@ function hoverHex(h) {
   // v59: při nové mapě (další scénář bez obnovení stránky) se svg staví znovu – starý obrys zůstával v odpojeném svg a hover zmizel
   if (!hovEl || !svg.contains(hovEl)) { hovEl = sv('path', { class: 'hov' }); svg.insertBefore(hovEl, gDepth); }
   hovEl.setAttribute('d', h && (C.isPlayable(h) || C.isWallHex(h)) ? pts(h, SIZE - 2) : '');
+  const hk = h ? C.K(h) : null; if (hk !== hgHovK) { hgHovK = hk; hgHover(); hovEl.classList.toggle('onfig', !!(hk && hgMarks.has(hk))); } // v64: kandidát pod myší = zesílená záře místo zlatého hexu
 }
 
 // ---------- příprava Domu ----------
@@ -11116,7 +11255,7 @@ async function stepAnim(ev) {
   if (isBetaMon(t)) bmStep(t, pushed); // v61d
   if (pushed) { sfx('push'); const [fx0, fy0] = px(from); particles(fx0, fy0, 8, '#6a5a4a', 12, 4, 1.4, 600); }
   const [x, y] = px(ev.hex), tr = `translate(${x.toFixed(1)}px,${y.toFixed(1)}px)`;
-  t.fig.style.transform = tr; t.lab.style.transform = tr; if (t.glow) t.glow.style.transform = tr;
+  t.fig.style.transform = tr; t.lab.style.transform = tr; if (t.glow) t.glow.style.transform = tr; if (t.hg) { t.hg.style.transitionDuration = t.fig.style.transitionDuration; t.hg.style.transform = tr; }
   sfx(isS ? 'glide' : !isM ? 'step' : ent.type === 'krysy' ? 'scurry' : ent.type === 'zbroj' ? 'clank' : 'glide');
   await sleep(dur(270));
   t.fig.classList.remove('walking', 'gliding', 'pushed');
@@ -11132,17 +11271,17 @@ async function cryptAnim(ev) {
   t.anim = true;
   const from = t.pos || ev.from, [fx0, fy0] = px(from);
   sfx('door'); particles(fx0, fy0 - 6, 10, '#7a8a9a', 10, 8, 1.2, 700);
-  await Promise.all([t.fig, t.lab].concat(t.glow ? [t.glow] : []).map(n => animate(n, [{ opacity: 1 }, { opacity: 0 }], 260).catch(() => {})));
-  [t.fig, t.lab].concat(t.glow ? [t.glow] : []).forEach(n => { n.style.opacity = '0'; n.style.transition = 'none'; });
+  await Promise.all([t.fig, t.lab].concat(t.glow ? [t.glow] : [], t.hg ? [t.hg] : []).map(n => animate(n, [{ opacity: 1 }, { opacity: 0 }], 260).catch(() => {})));
+  [t.fig, t.lab].concat(t.glow ? [t.glow] : [], t.hg ? [t.hg] : []).forEach(n => { n.style.opacity = '0'; n.style.transition = 'none'; });
   const [x, y] = px(ev.hex), tr = `translate(${x.toFixed(1)}px,${y.toFixed(1)}px)`;
-  t.fig.style.transform = tr; t.lab.style.transform = tr; if (t.glow) t.glow.style.transform = tr;
+  t.fig.style.transform = tr; t.lab.style.transform = tr; if (t.glow) t.glow.style.transform = tr; if (t.hg) { t.hg.style.transitionDuration = t.fig.style.transitionDuration; t.hg.style.transform = tr; }
   t.pos = ev.hex.slice(); t.fig._z = zFor(ev.hex); placeInDepth(t.fig);
   t.fig.getBoundingClientRect();
   if (await camTo(ev.hex, 160)) await sleep(120);
-  [t.fig, t.lab].concat(t.glow ? [t.glow] : []).forEach(n => { n.style.transition = ''; });
+  [t.fig, t.lab].concat(t.glow ? [t.glow] : [], t.hg ? [t.hg] : []).forEach(n => { n.style.transition = ''; });
   particles(x, y - 6, 10, '#7a8a9a', 10, 8, 1.2, 700);
-  await Promise.all([t.fig, t.lab].concat(t.glow ? [t.glow] : []).map(n => animate(n, [{ opacity: 0 }, { opacity: 1 }], 300).catch(() => {})));
-  [t.fig, t.lab].concat(t.glow ? [t.glow] : []).forEach(n => { n.style.opacity = ''; });
+  await Promise.all([t.fig, t.lab].concat(t.glow ? [t.glow] : [], t.hg ? [t.hg] : []).map(n => animate(n, [{ opacity: 0 }, { opacity: 1 }], 300).catch(() => {})));
+  [t.fig, t.lab].concat(t.glow ? [t.glow] : [], t.hg ? [t.hg] : []).forEach(n => { n.style.opacity = ''; });
   t.anim = false;
   await floatAnim({ at: ev.hex, text: 'Krypta', cls: 'info' });
   render();
@@ -11217,7 +11356,7 @@ async function killAnim(ev) {
   const type = [...t.fig.classList].find(c => c.startsWith('mon-')); const key = type ? type.slice(4) : 'sluha';
   const [snd, style, col, decal] = DEATH[key] || DEATH.sluha;
   const hex = t.pos, [x, y] = px(hex), b = t.fig.querySelector('.tok-body');
-  t.lab.remove();
+  t.lab.remove(); if (t.hg) t.hg.classList.add('off'); // v64
   if (!t.fig.classList.contains('fog') && isBetaMon(t)) { // v61d: snímek „die“ a vlastní rozpad
     particles(x, y - (t.h || 30) * .5, 10, col, 18, 10, 1.4, 900);
     await bmDeath(t, key, snd);
@@ -11230,7 +11369,7 @@ async function killAnim(ev) {
     else if (decal) addDecal(hex, decal === 'slime' ? 'ecto' : decal, 1);
     await animate(b, DEATH_KF[style] || DEATH_KF.fade, style === 'fade' || style === 'rise' || style === 'burnup' ? 950 : 750);
   }
-  t.fig.remove(); if (t.glow) t.glow.remove(); toks.delete(ev.who);
+  t.fig.remove(); if (t.glow) t.glow.remove(); if (t.hg) t.hg.remove(); toks.delete(ev.who);
   render();
 }
 async function spawnAnim(ev) {
@@ -11435,7 +11574,7 @@ async function rollAnim(ev) {
   let aim = null;
   if (ev.from) {
     const [ax, ay] = px(ev.from), [bx, by] = px(ev.at);
-    aim = fxAdd(`<line x1="${ax}" y1="${ay}" x2="${bx}" y2="${by}" class="atk-line${ev.enemy ? ' enemy' : ''}"/><ellipse cx="${bx}" cy="${by}" rx="19" ry="${19 * KY}" class="atk-tgt"/><ellipse cx="${ax}" cy="${ay}" rx="17" ry="${17 * KY}" class="atk-src${ev.enemy ? ' enemy' : ''}"/>`);
+    aim = fxAdd(`<line x1="${ax}" y1="${ay}" x2="${bx}" y2="${by}" class="atk-line${ev.enemy ? ' enemy' : ''}"/>${atkMarks(ax, ay, bx, by, ev.enemy)}`);
   }
   const wrap = $('#mapwrap');
   let [x, y] = screenPos(ev.at, tl + 18);
@@ -11553,7 +11692,7 @@ const human = {
     react: async (G, kind, info) => {
       await camTo(info.monster.pos, 120);
       const [ax, ay] = px(info.hero.pos), [bx, by] = px(info.monster.pos);
-      const aim = fxAdd(`<line x1="${ax}" y1="${ay}" x2="${bx}" y2="${by}" class="atk-line"/><ellipse cx="${bx}" cy="${by}" rx="19" ry="${19 * KY}" class="atk-tgt"/><ellipse cx="${ax}" cy="${ay}" rx="17" ry="${17 * KY}" class="atk-src"/>`);
+      const aim = fxAdd(`<line x1="${ax}" y1="${ay}" x2="${bx}" y2="${by}" class="atk-line"/>${atkMarks(ax, ay, bx, by, false)}`);
       const card = G.ol.hand.find(c => c.id === kind), v = (card && card.v) || '', cn = C.olName(kind, v);
       const r = kind === 'zjeveni'
         ? await ask('yesno', { peek: true, olcard: kind, olv: v, title: C.mname(info.monster) + ' minul ' + info.hero.name, text: 'Zahrát ' + cn + '? ' + C.olText(kind, v), yes: 'Zahrát', no: 'Nechat' })
@@ -12607,7 +12746,7 @@ async function startGame() {
   const G = C.newGame(opts); S.G = G;
   if (builtMap !== mapKey()) { $('#menu').hidden = true; $('#game').hidden = false; const ld = el('div', { class: 'maploading' }, 'Připravuji ' + esc(C.MAP.name) + '…'); $('#game').appendChild(ld); await ensureMap(); ld.remove(); }
   $('.top .title').textContent = G.scen.name;
-  toks.forEach(t => { t.fig.remove(); t.lab.remove(); if (t.glow) t.glow.remove(); }); toks.clear(); S.decals = []; gDecal._n = -1; S.doorState = {};
+  toks.forEach(t => { t.fig.remove(); t.lab.remove(); if (t.glow) t.glow.remove(); if (t.hg) t.hg.remove(); }); toks.clear(); S.decals = []; gDecal._n = -1; S.doorState = {};
   S.viewHero = null; S.viewMode = 'auto'; S.tbSide = null; S.tbHero = '';
   $('#menu').hidden = true; $('#game').hidden = false; $('#modal').hidden = true;
   Bots.overlordBot.pool = null; // v61b: monstra si bot Domu vybírá sám (D.bestCombos)
@@ -13271,7 +13410,7 @@ async function enterGameScreen() {
   $('#menu').hidden = true; $('#camp').hidden = true; $('#game').hidden = false;
   if (builtMap !== mapKey()) { const ld = el('div', { class: 'maploading' }, 'Připravuji ' + esc(C.MAP.name) + '…'); $('#game').appendChild(ld); await ensureMap(); ld.remove(); }
   $('.top .title').textContent = S.G.scen.name;
-  toks.forEach(t => { t.fig.remove(); t.lab.remove(); if (t.glow) t.glow.remove(); }); toks.clear(); S.decals = []; gDecal._n = -1; S.doorState = {};
+  toks.forEach(t => { t.fig.remove(); t.lab.remove(); if (t.glow) t.glow.remove(); if (t.hg) t.hg.remove(); }); toks.clear(); S.decals = []; gDecal._n = -1; S.doorState = {};
   S.viewHero = null; S.viewMode = 'auto'; S.tbSide = null; S.tbHero = '';
   render(); applyZoom(false); centerOn(C.HERO_START[1], false);
 }
