@@ -2544,7 +2544,7 @@ const EQUIP = {
   brokovnice: { name: 'Dvouhlavňová brokovnice', slot: 'obourucni', tier: 0, cards: [
     ['Výstřel', { t: 'attack', range: 3, dmg: 3, mod: 1, vsLone: { mod: 1, dmg: 0 } }, mv(2)],
     ['Obě hlavně', { t: 'attack', range: 3, dmg: 3, mod: 1, pierce: true }, mv(2)],
-    ['Výstřel za běhu', { t: 'attack', range: 3, dmg: 3, mod: -2, perStep: 'mod', uncapped: true }, mv(4)],
+    ['Střela v běhu', { t: 'attack', range: 3, dmg: 3, mod: -2, perStep: 'mod', uncapped: true }, mv(4)],
     ['Přebít', { t: 'drawdisc', draw: 1, advNext: true, advKeep: true }, mv(2)]] },
   kamera: { name: 'Kamera s magnéziem', slot: 'hlava', tier: 0, cards: [
     ['Záblesk', { t: 'flash', range: 2, light: true }, SE],
@@ -2565,7 +2565,7 @@ const EQUIP = {
     ['Vidění', { t: 'drawdisc', draw: 2, disc: 0, free: true }, mv(3)]] },
   maska: { name: 'Železná maska kajícníka', slot: 'hlava', tier: 2, cards: [
     ['Bez tváře', { t: 'nofear', free: true }, mv(2)],
-    ['Kajícná modlitba', { t: 'selfcalm', fear: 2, armor: 1 }, mv(3)],
+    ['Kající prosba', { t: 'selfcalm', fear: 2, armor: 1 }, mv(3)],
     ['Děsivý pohled', { t: 'scare', range: 2, push: 1, weaken: 1, advNext: true }, mv(3)]] },
   // ruka
   dyka: { name: 'Lovecká dýka', slot: 'ruka', tier: 1, cards: [
@@ -2596,7 +2596,7 @@ const EQUIP = {
   kopi: { name: 'Stříbrné kopí opata Benedikta', slot: 'obourucni', tier: 4, rare: true, cards: [
     ['Bodnutí kopím', { t: 'attack', range: 2, dmg: 4, mod: 2, ignoreEv: true, pierce: true, holy: true }, mv(3)],
     ['Svaté světlo', { t: 'flash', range: 3, light: true }, mv(3)],
-    ['Opatova přímluva', { t: 'rally', range: 3, fear: 2, mod: 1, dmg: 1 }, { t: 'search', range: 2 }],
+    ['Přímluva opata', { t: 'rally', range: 3, fear: 2, mod: 1, dmg: 1 }, { t: 'search', range: 2 }],
     ['Zeď z kopí', { t: 'armorup', n: 2, spikes: 1 }, mv(3)]] },
   puska: { name: 'Lovecká puška s optikou', slot: 'obourucni', tier: 3, cards: [
     ['Mířený výstřel', { t: 'attack', range: 7, dmg: 3, mod: 2, still: true, perDist: 'dmg', uncapped: true }, mv(3)],
@@ -2616,16 +2616,16 @@ const EQUIP = {
   // tělo
   templar: { name: 'Zbroj padlého templáře', slot: 'telo', tier: 3, cards: [
     ['Nezlomný', { t: 'armorup', n: 3, steady: true, free: true }, mv(3)],
-    ['Templářský úder', { t: 'attack', range: 1, dmg: 3, mod: 2, perArmor: 'dmg', uncapped: true, push: 1 }, mv(3)],
+    ['Úder templáře', { t: 'attack', range: 1, dmg: 3, mod: 2, perArmor: 'dmg', uncapped: true, push: 1 }, mv(3)],
     ['Posedlost', { t: 'cursed' }, { t: 'cursed' }, { cursed: true }]] },
   plast: { name: 'Plášť z rubáše', slot: 'telo', tier: 2, cards: [
-    ['Splynout se stínem', { t: 'invis' }, mv(3)],
+    ['Stínem skrytý', { t: 'invis' }, mv(3)],
     ['Mlha', { t: 'phase', evade: 1, free: true }, mv(3)],
     ['Prázdný plášť', { t: 'react', kind: 'dodge', selfFear: 1 }, mv(2)]] },
   vesta: { name: 'Polní lékařská vesta', slot: 'telo', tier: 2, cards: [
     ['Morfium', { t: 'heal', range: 1, n: 3, fearCost: 1 }, mv(3)],
     ['Škrtidlo', { t: 'raise', range: 1, half: true, heal: 4 }, mv(3)],
-    ['Kapsy plné všeho', { t: 'drawdisc', draw: 2, disc: 0, free: true }, SE]] },
+    ['Plné kapsy', { t: 'drawdisc', draw: 2, disc: 0, free: true }, SE]] },
   // nohy
   holinky: { name: 'Jezdecké holínky s ostruhami', slot: 'nohy', tier: 2, cards: [
     ['Cvalem', { t: 'phase', draw: 1, free: true }, mv(5)],
@@ -2638,7 +2638,7 @@ const EQUIP = {
   okovane: { name: 'Okované boty', slot: 'nohy', tier: 1, cards: [
     ['Dupnutí', { t: 'stomp' }, mv(2)],
     ['Pevně stát', { t: 'armorup', n: 1, steady: true, free: true }, mv(2)],
-    ['Kopnout do zámku', { t: 'pry', mod: 2, advNext: true }, mv(3)]] },
+    ['Kop do zámku', { t: 'pry', mod: 2, advNext: true }, mv(3)]] },
   paveza: { name: 'Pavéza', slot: 'ruka', tier: 1, cards: [
     ['Štítová stěna', { t: 'armorup', n: 2, ally: 1 }, mv(2)],
     ['Hrana pavézy', { t: 'attack', range: 1, dmg: 1, mod: 1, perArmor: 'dmg', uncapped: true, push: 1 }, mv(3)],
@@ -2675,7 +2675,7 @@ const EQUIP = {
     ['Lampička', { t: 'light' }, mv(3)],
     ['Nástražná past', { t: 'htrap', range: 2, dmg: 2, root: true }, mv(3)]] },
   jed: { name: 'Lahvička jedu', slot: 'telo', tier: 1, cards: [
-    ['Napuštění čepele', { t: 'venom' }, mv(3)],
+    ['Jed na čepel', { t: 'venom' }, mv(3)],
     ['Jedová šipka', { t: 'attack', range: 4, dmg: 1, mod: 2, poison: 2 }, mv(3)],
     ['Protijed', { t: 'antidote', heal: 1 }, mv(3)]] },
   lehke: { name: 'Lehké boty', slot: 'nohy', tier: 1, cards: [
@@ -2693,9 +2693,9 @@ const EQUIP = {
     ['Bdění u lože', { t: 'raise', range: 2, half: true, heal: 1 }, mv(3)]] },
   nositka: { name: 'Saniťácká nosítka', slot: 'obourucni', tier: 3, cards: [
     ['Odnést z boje', { t: 'raise', range: 1, half: true, heal: 3 }, mv(3)],
-    ['Polní ošetřovna', { t: 'heal', range: 2, n: 3, all: true }, mv(2)],
+    ['Polní lazaret', { t: 'heal', range: 2, n: 3, all: true }, mv(2)],
     ['Opři se o mě', { t: 'heal', range: 1, n: 3 }, mv(4)],
-    ['Zvednout z bojiště', { t: 'raise', range: 3, half: true, armor: 1 }, mv(3)]] },
+    ['Vynést raněné', { t: 'raise', range: 3, half: true, armor: 1 }, mv(3)]] },
   // amulety: pasivní schopnost, žádné karty
   zajic: { name: 'Zaječí tlapka', slot: 'trinket', tier: 1, passive: 'Jednou za kolo: když tvůj útok mine, hoď znovu.', cards: [] },
   medailon: { name: 'Medailon odvahy', slot: 'trinket', tier: 1, passive: 'Odvaha +1.', cards: [] },
@@ -2730,7 +2730,7 @@ const ABIL = {
     { key: 'stoj', cat: 'Nehybný', tree: {
       '': T('Výzva', { t: 'pull', range: 3, root: true }, mv(2)),
       A: T('Hák a štít', { t: 'pull', range: 3, disarm: true }, mv(2)),
-      AA: T('Strach z vojáka', { t: 'yank', range: 3, all: true, pull: 2, disarm: true, disarmN: 2, dmgEach: 1 }, mv(2)),
+      AA: T('Děsivý voják', { t: 'yank', range: 3, all: true, pull: 2, disarm: true, disarmN: 2, dmgEach: 1 }, mv(2)),
       AB: T('Dvě výzvy', { t: 'yank', range: 5, n: 2, pull: 3, disarm: true }, mv(4)),
       B: T('Kotva', { t: 'anchor', armor: 1, mod: 1, dmg: 0 }, mv(2)),
       BA: T('Skála', { t: 'anchor', armor: 2, mod: 1, dmg: 1 }, mv(2)),
@@ -2826,9 +2826,9 @@ function buildDeck(d, loadout) {
 const PANIC = { item: 'panika', itemName: 'Strach', name: 'Panika', panic: true, pri: { t: 'panic' }, sec: { t: 'panic' } };
 const WATER = { item: 'voda', itemName: 'Nález · jednorázová', name: 'Svěcená voda', single: true, pri: { t: 'attack', range: 2, dmg: 5, mod: 3, ignoreEv: true, holy: true }, sec: { t: 'cleanse', range: 2, n: 3 } };
 // scénář 5: voda ze Svěcené kašny (jen horní akce; jakmile kartu odhodíš nebo padneš, voda je pryč)
-const FONT_WATER = { item: 'kasna', itemName: 'Scénář · Rajský dvůr', name: 'Svěcená voda z kašny', single: true, scenWater: true, pri: { t: 'pour' }, sec: { t: 'nobottom' } };
+const FONT_WATER = { item: 'kasna', itemName: 'Scénář · Rajský dvůr', name: 'Voda z kašny', single: true, scenWater: true, pri: { t: 'pour' }, sec: { t: 'nobottom' } };
 const HAMMER = { item: 'kladivo', itemName: 'Nález · jednorázová', name: 'Kladivo', single: true, pri: { t: 'attack', range: 1, dmg: 6, mod: 3 }, sec: { t: 'pry', mod: 3 } };
-const LANTERN = { item: 'lucernaN', itemName: 'Nález · jednorázová', name: 'Petrolejová lucerna', single: true, pri: { t: 'grenade', range: 3, dmg: 4, splash: 2, mod: 2 }, sec: { t: 'lightmove', n: 4 } };
+const LANTERN = { item: 'lucernaN', itemName: 'Nález · jednorázová', name: 'Petrolejka', single: true, pri: { t: 'grenade', range: 3, dmg: 4, splash: 2, mod: 2 }, sec: { t: 'lightmove', n: 4 } };
 // Nálezy (loot): Dům schová jen žeton „Nález“, obsah se losuje z tohoto balíčku až při nalezení (nebo Vycítění).
 // Nezahrané nálezy zůstávají lovci i do dalších scénářů (kampaň: st.heroes[id].loot).
 const LOOT_ITEM = (id, name, pri, sec) => ({ item: 'loot_' + id, loot: id, itemName: 'Nález · jednorázová', name, single: true, pri, sec });
@@ -2848,14 +2848,14 @@ const OL_CARDS = {
   studeny: { name: 'Studený dotek', cat: 'kletba', react: true, text: 'Reakce: útočící lovec má na hod −2.' },
   zamceni: { name: 'Zamčení', cat: 'dum', text: 'Zabouchni a natrvalo zamkni jedny dveře (i otevřené, pokud v nich nikdo nestojí).' },
   sepot: { name: 'Šepot', cat: 'kletba', text: 'Všichni lovci ve vybrané místnosti dostanou 1 Strach.' },
-  zhasnuti: { name: 'Zhasnutí světel', cat: 'kletba', text: 'Místnost má Tmu, dokud ji lovci nerozsvítí (lovci −2 k útokům do ní i z ní, kdo v ní skončí tah, dostane 1 Strach).' },
+  zhasnuti: { name: 'Zhasnuté svíce', cat: 'kletba', text: 'Místnost má Tmu, dokud ji lovci nerozsvítí (lovci −2 k útokům do ní i z ní, kdo v ní skončí tah, dostane 1 Strach).' },
   podlaha: { name: 'Zrádná podlaha', cat: 'dum', text: 'Tajně označ až 3 nesousedící pole. Kdo na ně vstoupí, končí pohyb a utrží 1 zranění.' },
   // Probuzení: celá větev je zatím mimo hru (není v OL_DECK); definice zůstává kvůli starým uloženým hrám
   probuzeni: { name: 'Probuzení', cat: 'vyvolani', text: 'Probuď 1 spící skupinu.' },
   ztrata: { name: 'Ztráta', cat: 'kletba', text: 'Každý lovec odhodí náhodnou kartu z ruky.' },
   // bývalé Zjevení: reakce Domu, když monstrum mine útok (id zůstává kvůli uloženým hrám a vylepšením)
   zjeveni: { name: 'Ruka Domu', cat: 'kletba', react: true, text: 'Reakce: když monstrum mine útok, hází znovu (stejný cíl, vše stejné).' },
-  hlad: { name: 'Neutuchající hlad', cat: 'vyvolani', text: 'Aktivuj už aktivovanou skupinu znovu, každé monstrum má 1 akci.' },
+  hlad: { name: 'Věčný hlad', cat: 'vyvolani', text: 'Aktivuj už aktivovanou skupinu znovu, každé monstrum má 1 akci.' },
   prohozeni: { name: 'Prohození', cat: 'dum', text: 'Prohoď pozice dvou lovců do vzdálenosti 6 od sebe.' },
   hruza: { name: 'Hrůza', cat: 'kletba', text: 'Každý lovec utrží 1 zranění za každou Paniku v ruce. Lovci bez Paniky dostanou 1 Strach.' },
   nakaza: { name: 'Nákaza', cat: 'kletba', text: 'Otrávení lovci +1 jed, krvácející +1 krvácení. Kdo nemá ani jedno, dostane 1 Strach.' },
@@ -2866,7 +2866,7 @@ const OL_CARDS = {
 const OL_DECK = ['studeny', 'zamceni', 'sepot', 'zhasnuti', 'podlaha', 'ztrata', 'zjeveni', 'hlad', 'prohozeni', 'hruza', 'nakaza', 'navrat', 'zleoko', 'zavoj'];
 const OL_VAR = {
   sepot: {
-    A: ['Šepot šílenství', 'Lovci ve vybrané místnosti dostanou 2 Strach.'],
+    A: ['Šílený šepot', 'Lovci ve vybrané místnosti dostanou 2 Strach.'],
     AA: ['Hlasy ve zdech', 'Lovci ve vybrané místnosti dostanou 2 Strach a každý odhodí 1 náhodnou kartu.'],
     AB: ['Ozvěna', 'Lovci ve vybrané místnosti dostanou 1 Strach a každý odhodí 2 náhodné karty.'],
     B: ['Jméno ve tmě', 'Všichni lovci kdekoli dostanou 1 Strach.'],
@@ -2916,17 +2916,17 @@ const OL_VAR = {
     BB: ['Trnitá pečeť', 'Zamkni jedny dveře: páčení má −2 a každý pokus dá lovci 1 zranění.'] },
   podlaha: {
     A: ['Propadla', 'Až 3 tajné pasti: 2 zranění a konec pohybu.'],
-    AA: ['Hladová podlaha', 'Až 3 tajné pasti: 4 zranění a konec pohybu.'],
+    AA: ['Hladová prkna', 'Až 3 tajné pasti: 4 zranění a konec pohybu.'],
     AB: ['Ruce z podlahy', 'Až 3 tajné pasti: 2 zranění, konec pohybu a přišpendlení.'],
     B: ['Prohnilá prkna', 'Až 5 tajných pastí: 1 zranění a konec pohybu.'],
     BA: ['Shnilá podlaha', 'Až 5 tajných pastí: 2 zranění a konec pohybu.'],
-    BB: ['Chňapající ruce', 'Až 5 tajných pastí: 1 zranění, konec pohybu a přišpendlení.'] },
+    BB: ['Chňapavé ruce', 'Až 5 tajných pastí: 1 zranění, konec pohybu a přišpendlení.'] },
   prohozeni: {
     A: ['Rozdělení', 'Prohoď dva lovce do 8 polí od sebe, oba +1 Strach.'],
     AA: ['Ztracení', 'Prohoď dva lovce do 8 polí od sebe, oba +2 Strach.'],
     AB: ['Výměna', 'Prohoď dva lovce kdekoli v domě, oba +1 Strach.'],
-    B: ['Zakřivená chodba', 'Prohoď dva lovce do 6 polí od sebe; náhodný z nich je přišpendlen.'],
-    BA: ['Spoutaná výměna', 'Prohoď dva lovce do 6 polí od sebe; oba jsou přišpendleni.'],
+    B: ['Křivá chodba', 'Prohoď dva lovce do 6 polí od sebe; náhodný z nich je přišpendlen.'],
+    BA: ['Pouto záměny', 'Prohoď dva lovce do 6 polí od sebe; oba jsou přišpendleni.'],
     BB: ['Dlouhá chodba', 'Prohoď dva lovce do 10 polí od sebe; náhodný z nich je přišpendlen.'] },
   hruza: {
     A: ['Ochromení', 'Každý lovec utrží 2 zranění za každou Paniku v ruce. Lovci bez Paniky dostanou 1 Strach.'],
@@ -2934,7 +2934,7 @@ const OL_VAR = {
     AB: ['Tíseň', 'Každý lovec utrží 1 zranění za každou Paniku v ruce. Lovci bez Paniky dostanou 3 Strach.'],
     B: ['Upřený pohled', 'Každý lovec dostane 2 Strach.'],
     BA: ['Děs z temnoty', 'Každý lovec dostane 2 Strach. Kdo už má v ruce Paniku, utrží navíc 1 zranění.'],
-    BB: ['Všudypřítomná hrůza', 'Každý lovec dostane 3 Strach. Kdo tím propadne panice, utrží navíc 1 zranění.'] },
+    BB: ['Hrůza všude', 'Každý lovec dostane 3 Strach. Kdo tím propadne panice, utrží navíc 1 zranění.'] },
   nakaza: {
     A: ['Hnisání', 'Otrávení lovci +3 jed, krvácející +1 krvácení. Kdo nemá ani jedno, dostane 1 Strach.'],
     AA: ['Sněť', 'Otrávení a krvácející lovci hned utrží zranění rovné jedu + krvácení. Kdo nemá ani jedno, dostane 2 Strach.'],
@@ -2952,7 +2952,7 @@ const OL_VAR = {
   zleoko: {
     A: ['Zlý pohled', 'Lovci ve vybrané místnosti a v místnostech sousedících dveřmi útočí do konce kola s nevýhodou.'],
     AA: ['Vševidoucí oko', 'Všichni lovci kdekoli útočí do konce kola s nevýhodou.'],
-    AB: ['Vyhlédnutá kořist', 'Lovci ve vybrané místnosti a v místnostech sousedících dveřmi útočí do konce kola s nevýhodou a jsou Označení.'],
+    AB: ['Zvolená kořist', 'Lovci ve vybrané místnosti a v místnostech sousedících dveřmi útočí do konce kola s nevýhodou a jsou Označení.'],
     B: ['Uřknutí', 'Jeden lovec kdekoli útočí do konce kola s nevýhodou a dostane 1 Strach.'],
     BA: ['Zlá ruka', 'Jeden lovec kdekoli útočí do konce kola s nevýhodou a v příštím tahu má jen 2 zahrání.'],
     BB: ['Dvojí uřknutí', 'Dva lovci kdekoli útočí do konce kola s nevýhodou a dostanou 1 Strach.'] },
@@ -3672,7 +3672,7 @@ const recallable = (c, half) => !!c && !c.panic && !c.single && !c.cursed && !(h
 
 // ---------- karty lovců ----------
 const RESHUFFLE_FEAR = 1; // únava: každé zamíchání discardu = Strach (trest za tenký balíček)
-// Svěcená voda z kašny: mimo ruku nepřežije – z discardu/balíčku odchází ze hry
+// Voda z kašny: mimo ruku nepřežije – z discardu/balíčku odchází ze hry
 function purgeWater(G, h) {
   for (const p of ['discard', 'deck']) {
     const w = h[p].filter(c => c.scenWater); if (!w.length) continue;
@@ -4540,7 +4540,7 @@ async function resolveCard(G, h, card, half, C, ui) {
       else { ms = []; for (let i = 0; i < (s.n || 1); i++) { const m = await pick('monster', all.filter(x => !ms.includes(x) && dist(x.pos, h.pos) > 1 && !mdef(x).immobile), { optional: i > 0 }); if (!m) break; ms.push(m); } }
       if (!ms.length) return false;
       ms.sort((a, b) => dist(a.pos, h.pos) - dist(b.pos, h.pos));
-      // Strach z vojáka: odzbrojí se jen až disarmN náhodných z přitažených
+      // Děsivý voják: odzbrojí se jen až disarmN náhodných z přitažených
       const disSet = s.disarmN ? new Set(shuffle(ms.slice()).slice(0, s.disarmN)) : null;
       for (const m of ms) {
         if (!G.monsters.includes(m)) continue;
@@ -5699,7 +5699,7 @@ async function playOlCard(G, uidC, C, ui, phase) {
         else if (np) d = np * (({ A: 2, AA: 3 })[v] || 1);
         else f = v === 'AB' ? 3 : 1;
         if (d) damageHero(G, h, d);
-        // Všudypřítomná hrůza: kdo tím propadne panice, utrží navíc 1 zranění
+        // Hrůza všude: kdo tím propadne panice, utrží navíc 1 zranění
         if (f && addFear(G, h, f) && v === 'BB') { d += 1; damageHero(G, h, 1); }
         if (d || f) { log(G, nm + ': ' + h.name + (d ? ' −' + d + ' zdraví' + (np && v[0] !== 'B' ? ' (Panika v ruce: ' + np + ')' : '') : '') + (f ? ' +' + f + ' Strach' : '') + '.'); await fl(h, (d ? '−' + d + ' ♥ ' : '') + (f ? '+' + f + ' strach' : '')); }
       }
@@ -13007,7 +13007,7 @@ const GOAL_H = {
   cleanse: { story: 'Pod klášterem leží katakomby a kletba z nich prosakuje nahoru.', goal: 'Očistěte 5 ze 6 relikviářů.',
     how: ['Očista = prohledat relikviář. Když v jeho místnosti stojí do 2 polí od něj monstrum, selže.', 'Katakomby jsou propojené průchody. Monstra spí, dokud se k nim nepřiblížíte na 5 polí nebo nevstoupíte do jejich místnosti.', 'V jednom z nich je schovaná relikvie: silné kopí se třemi kartami, které vám zůstane.'] },
   altar: { story: 'V opuštěném klášteře sv. Benedikta krvácí oltář a mrtví mniši se vracejí z hrobek.', goal: 'Vylijte na Krvavý oltář třikrát svěcenou vodu.',
-    how: ['Lovec, který začne tah vedle Svěcené kašny v Rajském dvoře, dostane do ruky kartu Svěcená voda z kašny (jen jednu).', 'Vodu vyliješ horní akcí, když stojíš vedle Krvavého oltáře v Presbytáři. Spodní akci nemá. Když kartu odhodíš nebo padneš, voda se rozlije a musíš pro novou.', 'Železné mříže jsou zkratky. Páka je vždy za mříží: lovec vedle ní ji při pohybu za 2 pohyb přetáhne a mříž zůstane natrvalo otevřená.', 'Po každém vylití oltář krvácí: Dům +1 Hrozba.'] },
+    how: ['Lovec, který začne tah vedle Svěcené kašny v Rajském dvoře, dostane do ruky kartu Voda z kašny (jen jednu).', 'Vodu vyliješ horní akcí, když stojíš vedle Krvavého oltáře v Presbytáři. Spodní akci nemá. Když kartu odhodíš nebo padneš, voda se rozlije a musíš pro novou.', 'Železné mříže jsou zkratky. Páka je vždy za mříží: lovec vedle ní ji při pohybu za 2 pohyb přetáhne a mříž zůstane natrvalo otevřená.', 'Po každém vylití oltář krvácí: Dům +1 Hrozba.'] },
   maze: { story: 'Živé bludiště v zahradách Blackmooru se za vámi zavřelo. Každou noc roste jinak.', goal: 'Najděte pravou branku a utečte. Stačí dva z vás.',
     how: ['Na okrajích bludiště jsou čtyři branky, pravá je jen jedna. Lovec vedle branky ji za 1 akci vyzkouší.', 'Falešná branka je zarostlá zeď: lovec dostane 1 Strach a Dům si lízne kartu. Pravá se otevře a vstupem na ni lovec uteče.', 'Živé ploty blokují výhled. Zahrady se odkrývají postupně, jak procházíte průchody.', 'Od 9. kola se bludiště probouzí: všechna monstra jsou vzhůru, i v zahradách, které jste ještě neviděli.'] },
   fire: { story: 'Mlýn na Černém potoce hoří a plameny se ženou přes statek k řece.', goal: 'Dostaňte aspoň dva lovce přes brod na pravém konci mapy.',
