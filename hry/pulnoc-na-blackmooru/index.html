@@ -9223,7 +9223,7 @@ function envFurn(f) {
   if (n === '') return '';             // jídelní stůl kreslí celý prostřední hex
   if (!n || !ES(n)) return null;
   const dy = envFurnDy(n);
-  let s = envImg(n, 0, dy);
+  let s = envImg(n, 0, dy, /^ch_/.test(n) ? .85 : 1); // převržené židle a křesla o 15 % menší
   if (n === 'dining') s += [-30, 28].map(x => envImg('tablecand', x, -13) + envFlames('tablecand', x, -13)).join('');
   if (n === 'fireplace') { const sp = ES(n), bw = sp.ax * EK; s += [-4.5, 0, 4.5].map((x, i) => envFlame(x - bw * .02, dy - 7 - (i === 1 ? 1 : 0), 1.7, i)).join('') + `<ellipse class="bhalo" cx="0" cy="${dy - 9}" rx="16" ry="9" fill="url(#ag-warm)"/>`; }
   if (n === 'fountain') s += `<g class="bshim"><rect x="-9" y="${dy - 12}" width="3" height=".8" fill="#c8dcec"/><rect x="5" y="${dy - 10}" width="2.5" height=".8" fill="#c8dcec"/></g><g class="bshim b2"><rect x="-3" y="${dy - 9}" width="3" height=".8" fill="#dcecf8"/><rect x="8" y="${dy - 13}" width="2" height=".8" fill="#dcecf8"/></g>`;
