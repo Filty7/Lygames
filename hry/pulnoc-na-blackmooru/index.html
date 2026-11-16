@@ -747,6 +747,22 @@ svg.bglow .hov.onfig { fill-opacity: 0; stroke-opacity: .35; filter: none; }
 .c-emb.art .iart { width: 36px; height: 36px; display: block; }
 .c-emb.art.cur { position: absolute; left: 50%; top: auto; bottom: 26px; transform: translateX(-50%); }
 .iart { image-rendering: pixelated; image-rendering: crisp-edges; }
+/* v66 beta: obrázky výbavy = pixelová rytina ve čtvercové dlaždici; rámeček podle vzácnosti */
+.eqt { --tc: #6a6158; --tg: #ffffff10; position: relative; display: block; box-sizing: border-box; flex: none; border-radius: 3px;
+  background: radial-gradient(ellipse at 50% 38%, #3a3026 0%, #1c1814 58%, #0d0b0a 100%);
+  border: 1px solid var(--tc); box-shadow: 0 0 0 1px #000, inset 0 1px 0 #ffffff14, inset 0 -2px 4px #000a, inset 0 0 8px #000c, 0 0 6px var(--tg); }
+.eqt::before { content: ""; position: absolute; inset: 2px; border: 1px solid #ffffff0d; border-radius: 1px; pointer-events: none; }
+.eqt > .bit { position: absolute; inset: 9%; background-position: center; background-size: contain; background-repeat: no-repeat; image-rendering: pixelated; filter: drop-shadow(0 1px 0 #000) drop-shadow(0 0 1px #000); }
+.eqt.t0 { --tc: #4c4640; } .eqt.t1 { --tc: #7a6f62; } .eqt.t2 { --tc: #8ea3bb; --tg: #8ea3bb22; } .eqt.t3 { --tc: #c9a24a; --tg: #e8c46a33; } .eqt.t4 { --tc: #d4573c; --tg: #ff6a3a44; }
+.eqt.t3::before, .eqt.t4::before { border-color: color-mix(in srgb, var(--tc) 35%, transparent); }
+.art:has(> .eqt), .am-ic:has(> .eqt), .pd-ic:has(> .eqt) { background: none !important; border-radius: 0; overflow: visible; }
+.si-ic:has(> .eqt) .eqt, .pd-ic:has(> .eqt) .eqt { width: 100%; height: 100%; }
+.pd-ic.art:has(> .eqt) { width: auto; height: auto; } .pd-ic.art > .eqt { width: 46px !important; height: 46px !important; } .cp-hero .pd-ic.art > .eqt { width: 44px !important; height: 44px !important; }
+.bagi .eqt { width: 22px; height: 22px; }
+.amulet-card .am-ic .eqt { width: 44px; height: 44px; }
+.cp-side .si:has(.si-ic > .eqt) { grid-template-columns: 46px minmax(0, 1fr); } .cp-side .si .si-ic:has(> .eqt) { width: 46px; height: 46px; } .cp-side .si-ic > .eqt { width: 46px !important; height: 46px !important; }
+.det-h .si-ic:has(> .eqt) { width: 42px; height: 42px; } .det-h .si-ic > .eqt { width: 40px !important; height: 40px !important; }
+.cp-chest .ci .si-ic:has(> .eqt) { width: 32px; height: 32px; } .cp-chest .ci .si-ic > .eqt { width: 30px !important; height: 30px !important; }
 .si-ic.art, .pd-ic.art { background: radial-gradient(circle at 50% 40%, #2e2418, #0c0a10 75%); }
 .si-ic.art .iart { width: 34px; height: 34px; } .pd-ic.art .iart { width: 30px; height: 30px; display: block; }
 .bagi .iart { width: 20px; height: 20px; } .amulet-card .am-ic .iart { width: 40px; height: 40px; }
@@ -9747,6 +9763,8 @@ async function prepareSprites() {
 }
 // obrázek předmětu: pixel art, dokud se nepřipraví, vektorová předloha; bez obrázku ikona
 function itemPic(id, fallbackIc) {
+  // beta: pixelová rytina z karet v3 ve čtvercové dlaždici (rámeček podle vzácnosti)
+  if (S.beta && typeof BetaCards !== 'undefined' && BetaCards.items[id]) { bcStyle(); const e = C.EQUIP[id] || {}; return `<i class="iart eqt t${e.tier || 0}${e.relic ? ' relic' : ''}" aria-hidden="true"><i class="bit bit-${id}"></i></i>`; }
   const s = SPR['i:' + id];
   if (s && s.url) return `<img class="iart" src="${s.url}" alt="" draggable="false">`;
   if (A.ITEM_ART && A.ITEM_ART[id]) return `<svg class="iart" viewBox="-16 -16 32 32" aria-hidden="true">${A.itemArt(id)}</svg>`;
