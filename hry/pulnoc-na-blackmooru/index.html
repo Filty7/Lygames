@@ -1906,6 +1906,15 @@ body.bui #game .top #viewbtn.bview.kon { color: #ff6a5a !important; text-shadow:
 @keyframes mtdrip { 0% { transform: scaleY(.3); } 70% { transform: scaleY(1); } 100% { transform: scaleY(1.06); } }
 .rpgmenu.bmm.sub .mm-title .mt-cap { font-size: 92px; } .rpgmenu.bmm.sub .mm-title .mt-a { margin-left: 52px; font-size: 22px; } .rpgmenu.bmm.sub .mm-title .mt-drip { display: none; }
 .rpgmenu.bmm .mm-title { animation: none; }
+
+.rpgmenu.bmm .mm-title .mt-a { margin: 0 0 -34px 128px; position: relative; z-index: 1; -webkit-mask-position: 130px 60px; mask-position: 130px 60px; }
+.rpgmenu.bmm .mm-title .mt-b { font-variant-ligatures: none; font-feature-settings: "liga" 0, "dlig" 0, "clig" 0; }
+.rpgmenu.bmm.sub .mm-title .mt-a { margin: 0 0 -16px 66px; }
+
+.rpgmenu.bmm .mm-title .mt-a { margin: 0 0 -40px 176px; -webkit-mask: none; mask: none; }
+.rpgmenu.bmm .mm-title .mt-k { font: 700 108px/1 'BM Gotisch', var(--f-disp); vertical-align: 2px; margin: 0 1px; }
+.rpgmenu.bmm .mm-title .mt-drip.d1 { top: 112px; } .rpgmenu.bmm .mm-title .mt-drip.d2 { top: 116px; } .rpgmenu.bmm .mm-title .mt-drip.d3 { top: 114px; }
+.rpgmenu.bmm.sub .mm-title .mt-a { margin: 0 0 -20px 96px; } .rpgmenu.bmm.sub .mm-title .mt-k { font-size: 56px; }
 </style>
 
 <div id="menu">
@@ -14107,7 +14116,7 @@ function renderMM() {
   box.querySelectorAll('[data-upload]').forEach(b => b.addEventListener('click', () => menuUpload()));
   const spd = $('#mm-speed'); if (spd) spd.querySelectorAll('button').forEach(b => b.addEventListener('click', () => { S.speed = +b.dataset.v; $('#speedsel').value = b.dataset.v; renderMM(); }));
   const fsel = $('#mm-fs'); if (fsel) fsel.querySelectorAll('button').forEach(b => b.addEventListener('click', () => { fsSet(b.dataset.v === '1'); renderMM(); }));
-  { const mm = $('#mainmenu'), on = !!(S.beta && typeof BetaCards !== 'undefined' && BetaCards.ui && BetaCards.ui.menu); if (mm) { mm.classList.toggle('bmm', on); const tt = mm.querySelector('.mm-title'); if (tt) { if (!tt.dataset.h0) tt.dataset.h0 = tt.innerHTML; const want = on ? '<span class="mt-a">Půlnoc na</span><span class="mt-b"><span class="mt-cap">B</span>lackmooru</span><i class="mt-drip d1"></i><i class="mt-drip d2"></i><i class="mt-drip d3"></i>' : tt.dataset.h0; if (tt.innerHTML !== want) tt.innerHTML = want; } if (on) { bcStyle(); mmGrunge(mm); if (!mm.querySelector('.mm-win')) mm.insertAdjacentHTML('beforeend', '<i class="mm-cl c1" aria-hidden="true"></i><i class="mm-cl c2" aria-hidden="true"></i><i class="mm-cl c3" aria-hidden="true"></i><i class="mm-win" aria-hidden="true"></i><i class="mm-crow r" aria-hidden="true"></i><i class="mm-crow l" aria-hidden="true"></i><i class="mm-fog2" aria-hidden="true"></i><i class="mm-fog2 f2" aria-hidden="true"></i>'); } } }
+  { const mm = $('#mainmenu'), on = !!(S.beta && typeof BetaCards !== 'undefined' && BetaCards.ui && BetaCards.ui.menu); if (mm) { mm.classList.toggle('bmm', on); const tt = mm.querySelector('.mm-title'); if (tt) { if (!tt.dataset.h0) tt.dataset.h0 = tt.innerHTML; const want = on ? '<span class="mt-a">Půlnoc na</span><span class="mt-b"><span class="mt-cap">B</span>lac<span class="mt-k">k</span>mooru</span><i class="mt-drip d1"></i><i class="mt-drip d2"></i><i class="mt-drip d3"></i>' : tt.dataset.h0; if (tt.innerHTML !== want) tt.innerHTML = want; } if (on) { bcStyle(); mmGrunge(mm); if (!mm.querySelector('.mm-win')) mm.insertAdjacentHTML('beforeend', '<i class="mm-cl c1" aria-hidden="true"></i><i class="mm-cl c2" aria-hidden="true"></i><i class="mm-cl c3" aria-hidden="true"></i><i class="mm-win" aria-hidden="true"></i><i class="mm-crow r" aria-hidden="true"></i><i class="mm-crow l" aria-hidden="true"></i><i class="mm-fog2" aria-hidden="true"></i><i class="mm-fog2 f2" aria-hidden="true"></i>'); } } }
   const bsel = $('#mm-beta'); if (bsel) bsel.querySelectorAll('button').forEach(b => b.addEventListener('click', () => { const v = b.dataset.v === '1'; if (v !== !!S.beta) setBeta(v, true); renderMM(); }));
 }
 // v69c: špína, krev a rozpad písma názvu (generuje se jednou do textur)
