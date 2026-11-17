@@ -1919,6 +1919,15 @@ body.bui #game .top #viewbtn.bview.kon { color: #ff6a5a !important; text-shadow:
 .rpgmenu.bmm .mm-title .mt-pix { display: block; width: 708px; height: 240px; image-rendering: pixelated; margin: -10px 0 -6px -12px; filter: drop-shadow(0 0 10px #000); }
 .rpgmenu.bmm.sub .mm-title .mt-pix { width: 472px; height: 160px; margin: -8px 0 -6px -8px; }
 .rpgmenu.bmm .mm-title::after { margin-top: 4px; }
+
+.rpgmenu.bmm .bsides { gap: 14px; }
+.rpgmenu.bmm .mm-btn.bside { flex-direction: column; justify-content: center; gap: 8px; min-width: 190px; padding: 14px 18px 12px; font-size: 30px; }
+.rpgmenu.bmm .mm-btn.bside > .ic { display: none; }
+.rpgmenu.bmm .mm-sym { display: block; width: 72px; height: 72px; background-position: center; background-size: contain; background-repeat: no-repeat; image-rendering: pixelated; filter: drop-shadow(0 2px 0 #000) drop-shadow(0 0 6px #000); transition: filter .25s; }
+.rpgmenu.bmm .mm-sym.bit { position: static; }
+.rpgmenu.bmm .bside:hover .mm-sym.bit { filter: drop-shadow(0 2px 0 #000) drop-shadow(0 0 10px #6ab0ff); }
+.rpgmenu.bmm .bside:hover .mm-sym.hsig-dum { filter: drop-shadow(0 2px 0 #000) drop-shadow(0 0 10px #ff2a1a); }
+.rpgmenu.bmm .mm-btn.bside:hover::before { display: none; }
 </style>
 
 <div id="menu">
@@ -14073,7 +14082,7 @@ function renderMM() {
     h = mmBtn('single', 'hand', 'Hra pro jednoho', 'Ty proti botům: za lovce, nebo za Dům', 'primary') + mmBtn('multi', 'ally', 'Hra více hráčů', 'Online přes kód, každý na svém počítači')
       + mmBtn('load', 'deck', 'Načíst hru', sp || mp ? 'Uložené hry: ' + [sp && 'pro jednoho', mp && 'online'].filter(Boolean).join(', ') : 'Nic uloženého · nahrát ze souboru') + mmBtn('settings', 'clock', 'Nastavení', 'Zvuk, rychlost animací, beta grafika');
   } else if (MM === 'single') {
-    h = `<button class="mm-back" data-mm="main">← zpět</button><h2>Za koho hraješ?</h2>${NETS.loadNote ? `<p class="mm-note">${esc(NETS.loadNote)}</p>` : ''}<div class="mm-row"><button class="mm-btn mm-side" data-side="heroes">${A.icon('ally')}<span>Lovci<small>Tři lovci duchů, karty a výbava</small></span></button><button class="mm-btn mm-side" data-side="overlord">${A.icon('threat')}<span>Dům<small>Monstra, kletby a karty hrůzy</small></span></button></div>`;
+    h = `<button class="mm-back" data-mm="main">← zpět</button><h2>Za koho hraješ?</h2>${NETS.loadNote ? `<p class="mm-note">${esc(NETS.loadNote)}</p>` : ''}${S.beta && typeof BetaCards !== 'undefined' && BetaCards.house ? (bcStyle(), `<div class="mm-row bsides"><button class="mm-btn mm-side bside" data-side="heroes"><i class="mm-sym bit bit-lucerna2"></i><span>Lovci</span></button><button class="mm-btn mm-side bside" data-side="overlord"><i class="mm-sym hsig-dum"></i><span>Dům</span></button></div>`) : `<div class="mm-row"><button class="mm-btn mm-side" data-side="heroes">${A.icon('ally')}<span>Lovci<small>Tři lovci duchů, karty a výbava</small></span></button><button class="mm-btn mm-side" data-side="overlord">${A.icon('threat')}<span>Dům<small>Monstra, kletby a karty hrůzy</small></span></button></div>`}`;
   } else if (MM === 'single2') {
     const cs = camp && !Camp.finished(camp) ? camp : null;
     h = `<button class="mm-back" data-mm="single">← zpět</button><h2>Hraješ za ${S.ctl.heroes === 'human' ? 'lovce' : 'Dům'}</h2>` + (NETS.loadNote ? `<p class="mm-note">${esc(NETS.loadNote)}</p>` : '')
