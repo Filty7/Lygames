@@ -2054,6 +2054,14 @@ body.bui .shop .shopit:hover:not([disabled]) { filter: drop-shadow(0 0 6px #ffcc
 body.bui .shop .shopit .mport { border-radius: 50%; box-shadow: 0 0 0 1.5px #8a6a3a, 0 0 0 3px #1a120c; background: #1a120c; }
 body.bui .shop .sh-cost { color: #8a2414; font-weight: 700; }
 body.bui .shop.center .btn { background: none !important; border: 9px solid transparent !important; border-image: var(--bu-btn) 18 fill / 9px / 0 stretch !important; border-radius: 0 !important; color: #ffe070 !important; font: 400 18px/1 var(--f-disp) !important; padding: 3px 14px !important; box-shadow: none !important; }
+
+/* v77: páky a jejich mříže, svěcená kašna */
+.lvnum { font: 700 6.5px/1 Georgia, serif; fill: #fff6e0; paint-order: stroke; stroke: #0a0608; stroke-width: 1.2px; }
+.lvbadge.on { opacity: .55; filter: grayscale(.6); }
+.lvglow { opacity: .22; animation: lvg 1.8s ease-in-out infinite alternate; }
+@keyframes lvg { to { opacity: .45; } }
+.fontglow { opacity: .75; animation: lvg2 2.4s ease-in-out infinite alternate; }
+@keyframes lvg2 { from { opacity: .45; } to { opacity: .95; } }
 </style>
 
 <div id="menu">
@@ -9756,6 +9764,7 @@ async function envFloor() {
   // dlouhý roztrhaný běhoun chodbou (mezi řadami hexů) – kamenné dlaždice zůstávají vidět nad i pod ním
   if (isShack()) { const R = RR('S'); if (R && ES('k_bear')) rug('k_bear', (wx(R.k0) + wx(R.k1)) / 2 - 6, (wy(R.y0) + wy(R.y1)) / 2 + 8, false);
     const Lr = RR('L'); if (Lr && ES('rug_s')) rug('rug_s', (wx(Lr.k0) + wx(Lr.k1)) / 2 - 10, (wy(Lr.y0) + wy(Lr.y1)) / 2 + 8, false); }
+  if (isAbbey()) { const Sr = RR('S'); if (Sr && ES('persian')) rug('persian', (wx(Sr.k0) + wx(Sr.k1)) / 2 - 4, (wy(Sr.y0) + wy(Sr.y1)) / 2 + 6, false); const Kr = RR('K'); if (Kr && ES('rug_s')) rug('rug_s', (wx(Kr.k0) + wx(Kr.k1)) / 2 - 8, (wy(Kr.y0) + wy(Kr.y1)) / 2 + 2, false); }
   if (isBM()) { const R = RR('C'); if (R && ES('run_m')) {
     const cy = (wy(R.y0 + 1) + wy(R.y1 - 1)) / 2 + 1, xl = wx(R.k0) + 16, xr = wx(R.k1) - 16, L = ES('run_l').w * EK, Rw = ES('run_r').w * EK, M = ES('run_m').w * EK;
     g.save(); g.beginPath(); g.rect(xl + L - 1, cy - 50, xr - Rw - xl - L + 2, 100); g.clip();
@@ -9920,6 +9929,9 @@ function envDoorVariants(d) {
   const [x, y] = px(d.hex), yb = y + TW / 2;
   if (!ES('hd_closed')) return null;
   const DD = isShack() ? { closed: 'k_door', open: 'k_dopen', locked: 'k_dlock' } : isAbbey() ? { closed: d.portcullis ? 'c_bars' : 'c_door', open: 'c_dopen', locked: 'c_dlock' } : isCrypt() ? { closed: /Mříž/.test(d.name || '') ? 'c_bars' : 'c_door', open: 'c_dopen', locked: 'c_dlock' } : ENV_DOOR;
+  const lvI = isAbbey() && d.portcullis ? C.LEVERS.findIndex(l => l.door === d.id) : -1;
+  if (lvI >= 0 && isVertDoor(d)) { const bot = y + SIZE * KY / 2, one = nm => envImg(nm, x, bot, WPX / (ES(nm).w * EK)), b = leverBadge(lvI, x, bot - SIZE * KY * 2 - 4, false), bo = leverBadge(lvI, x, bot - SIZE * KY * 2 - 4, true);
+    return { closed: one('c_bars') + b, open: one('c_dopen') + bo, locked: one('c_bars') + b, z: y + SIZE * KY + .6 }; }
   if (isVertDoor(d)) {
     // v63e: na celou šířku hexu, spodní hrana na levém a pravém dolním lomu hexu (y + SIZE·KY/2)
     const bot = y + SIZE * KY / 2, D = SIZE * KY * 2 - 1, one = nm => envImg(nm, x, bot, WPX / (ES(nm).w * EK));
@@ -9964,10 +9976,11 @@ function e5FurnName(f) {
   if (f.icon === 'bush') return /Růž/.test(f.name) ? 'y_rose' : 'y_bramble';
   if (f.icon === 'bench') return garden ? 'y_bench' : /Klekátko/.test(f.name) ? 'a_kneel' : 'c_pew';
   if (f.icon === 'statue') return /Panny/.test(f.name) ? 'a_madonna' : 'a_throne';
-  return { holyfont: 'a_font', bloodaltar: 'a_altar', lever: 'a_lever', gravecross: 'y_gs_step', angel: 'y_angel', bed: 'a_cot', pillar: 'c_pillar', shelf: 'shelf', table: 'table', well: 'c_well', brazier: 'a_cand', barrel: 'barrel', cauldron: 'k_cauldron', sacks: 'k_sacks', logs: 'k_logs' }[f.icon] || null;
+  if (f.icon === 'lever') return ''; // páku kreslí renderScenObjs (stav, znak)
+  return { holyfont: 'a_font', bloodaltar: 'a_altar', gravecross: 'y_gs_step', angel: 'y_angel', bed: 'a_cot', pillar: 'c_pillar', shelf: 'shelf', table: 'table', well: 'c_well', brazier: 'a_cand', barrel: 'barrel', cauldron: 'k_cauldron', sacks: 'k_sacks', logs: 'k_logs' }[f.icon] || null;
 }
 function e5NorthDecor(R, xa, xb, yb) {
-  const L = { N: [['a_win1', .2, .45], ['a_rose', .5, .42], ['a_win2', .8, .45]], S: [['a_cross', .5, .5], ['c_torch', .2, .55]], O: [['a_cross', .55, .5], ['c_torch', .25, .55]] }[R.id] || [];
+  const L = { N: [['a_win1', .2, .45], ['a_rose', .5, .42], ['a_win2', .8, .45]], S: [['port2', .2, .5], ['a_cross', .45, .5], ['c_torch', .62, .55], ['port3', .82, .5]], O: [['a_cross', .55, .5], ['c_torch', .25, .55]] }[R.id] || [];
   let s = '';
   for (const [n, f, hf] of L) { const x = xa + (xb - xa) * f, y = yb - HN * (1 - hf) + 6; s += envImg(n, x, y, 1);
     if (/^a_(win|rose)/.test(n)) { const col = n === 'a_win2' ? '#f0b040' : n === 'a_rose' ? '#6a8cff' : '#d03a3a'; let d = ''; const rr = envRng(Math.round(x)); for (let i = 0; i < 70; i++) { const a = rr() * 6.283, q = Math.sqrt(rr()); d += `M${(x + Math.cos(a) * q * 20).toFixed(1)} ${(yb + 16 + Math.sin(a) * q * 8).toFixed(1)}h1v1h-1z`; } s += `<path d="${d}" fill="${col}" opacity=".35"/>`; } // barevné světlo vitráže jako rozptýlené pixely
@@ -10016,6 +10029,7 @@ function envFurn(f) {
   if (n === 'fireplace') { const sp = ES(n), bw = sp.ax * EK; s += [-4.5, 0, 4.5].map((x, i) => envFlame(x - bw * .02, dy - 7 - (i === 1 ? 1 : 0), 1.7, i)).join('') + `<ellipse class="bhalo" cx="0" cy="${dy - 9}" rx="16" ry="9" fill="url(#ag-warm)"/>`; }
   if (n === 'fountain') s += `<g class="bshim"><rect x="-9" y="${dy - 12}" width="3" height=".8" fill="#c8dcec"/><rect x="5" y="${dy - 10}" width="2.5" height=".8" fill="#c8dcec"/></g><g class="bshim b2"><rect x="-3" y="${dy - 9}" width="3" height=".8" fill="#dcecf8"/><rect x="8" y="${dy - 13}" width="2" height=".8" fill="#dcecf8"/></g>`;
   if (n === 'c_brazier') { const sp = ES(n), ty = dy - sp.ay * EK + 6; s += [-3, 0, 3].map((x, i) => envFlame(x, ty - (i === 1 ? 1.5 : 0), 1.4, i)).join('') + `<ellipse class="bhalo" cx="0" cy="${ty}" rx="14" ry="8" fill="url(#ag-warm)"/>`; envLightPts.push([px(f.hex)[0], px(f.hex)[1] + ty, C.roomOf(f.hex)]); }
+  if (n === 'a_font') { const sp = ES(n), ty = dy - sp.ay * EK; s = `<ellipse class="fontglow" cx="0" cy="${dy - 4}" rx="26" ry="14" fill="url(#ag-cold)"/>` + envImg(n, 0, dy, 1.3) + `<g class="bshim"><rect x="-6" y="${ty + 14}" width="4" height=".8" fill="#e0f4ff"/><rect x="3" y="${ty + 16}" width="3" height=".8" fill="#e0f4ff"/></g><g class="bshim b2"><rect x="-1" y="${ty + 15}" width="4" height=".8" fill="#e0f4ff"/></g>` + [[-9, -6], [8, -14], [-4, -20], [11, -2]].map(([a, b], i) => `<rect class="mote" x="${a}" y="${dy + b - 10}" width="1" height="1" fill="#cfe8ff" style="--n:${40 + i * 6};--s:${20 + i * 3};--dy:-14px;--dx:0px;animation-delay:calc(var(--T) * -${i * 9})"/>`).join(''); if (f.spot) s += envLootFx(n, dy); return s; }
   if (n === 'a_altar') { const sp = ES(n), w = sp.w * EK, ty = dy - sp.ay * EK; for (const [cx, cy] of [[-w * .36, 9], [-w * .26, 7], [w * .14, 8], [w * .26, 10]]) s += envFlame(cx, ty + cy, .8, 0); s += `<ellipse class="bhalo" cx="0" cy="${ty + 8}" rx="22" ry="10" fill="#ff2a1a" opacity=".1"/>`; envLightPts.push([px(f.hex)[0], px(f.hex)[1] + ty + 6, C.roomOf(f.hex)]); }
   if (n === 'a_cand') { const sp = ES(n), w = sp.w * EK, ty = dy - sp.ay * EK; for (const cx of [-w * .4, -w * .2, 0, w * .2, w * .4]) s += envFlame(cx, ty + 3 + Math.abs(cx) * .15, .8, 1); envLightPts.push([px(f.hex)[0], px(f.hex)[1] + ty, C.roomOf(f.hex)]); }
   if (n === 'c_altar') { const sp = ES(n), w = sp.w * EK; for (const cx of [-w * .3, w * .22]) s += envFlame(cx, dy - sp.ay * EK + 5, .8, 0); }
@@ -10142,7 +10156,7 @@ function envFloorFx() {
     // slábnou s výškou, silně rozmazané do mlžného závoje, mihotají; část na koberci je maskou ztlumená (~20 %)
     let cur = ''; for (let i = 1; i <= 14; i++) cur += `<path d="${hexPts(x, y - i * 1.3, SIZE - 2.4)}" opacity="${(.34 * Math.pow(1 - i / 15, 1.4)).toFixed(3)}"/>`;
     let cur2 = ''; for (let i = 1; i <= 4; i++) cur2 += `<path d="${hexPts(x, y - i * 1.1, SIZE - 2.4)}" opacity="${(.2 * (1 - i / 5)).toFixed(3)}"/>`;
-    const curtain = `<g class="bsigc" filter="url(#bsigblur)" fill="none" stroke="#b49ae0" stroke-width="1.4">${cur}</g><g class="bsigc b2" filter="url(#bsigblur2)" fill="none" stroke="#e0d0ff" stroke-width=".8">${cur2}</g>`;
+    const curtain = isCrypt() || isAbbey() ? '' : `<g class="bsigc" filter="url(#bsigblur)" fill="none" stroke="#b49ae0" stroke-width="1.4">${cur}</g><g class="bsigc b2" filter="url(#bsigblur2)" fill="none" stroke="#e0d0ff" stroke-width=".8">${cur2}</g>`;
     const underRug = envRugBoxes.some(b => x + 18 > b[0] && x - 18 < b[2] && y + 12 > b[1] && y - 12 < b[3]); // v65: místo celomapové masky jen ztlumení
     s += `<g class="lit bsig${underRug ? ' rugd' : ''}" data-room="${C.roomOf(sp.hex)}"><ellipse cx="${x}" cy="${y}" rx="22" ry="${(22 * KY).toFixed(1)}" fill="url(#ag-spawn)" opacity=".28"/><path class="bsigp" d="${hexPts(x, y, SIZE - 2.4)}" fill="none" stroke="#a894c8" stroke-width=".9" opacity=".22"/>${curtain}${m}</g>`; }
   s = `<filter id="bsigblur" x="-20%" y="-60%" width="140%" height="220%"><feGaussianBlur stdDeviation="1.3 2.6"/></filter><filter id="bsigblur2" x="-20%" y="-60%" width="140%" height="220%"><feGaussianBlur stdDeviation=".6 1"/></filter>`
@@ -10340,7 +10354,7 @@ function buildLightsTheme() {
   let s = ''; const th = THEME();
   const warm = { stove: 46, brazier: 52, altar: 40, cauldron: 36, reliquary: 30, fireplace: 56, bloodaltar: 34 };
   for (const f of C.FURN_DEFS) if (warm[f.icon]) { const [x, y] = px(f.hex); s += `<g class="lit flick" data-room="${C.roomOf(f.hex)}"><ellipse cx="${x}" cy="${y}" rx="${warm[f.icon]}" ry="${warm[f.icon] * KY}" fill="url(#ag-warm)"/></g>`; }
-  for (const sp of C.SPAWN_DEFS) { const [x, y] = px(sp.hex); s += `<g class="lit" data-room="${C.roomOf(sp.hex)}"><ellipse cx="${x}" cy="${y}" rx="26" ry="${26 * KY}" fill="url(#ag-spawn)"/></g>`; }
+  if (!envOn()) for (const sp of C.SPAWN_DEFS) { const [x, y] = px(sp.hex); s += `<g class="lit" data-room="${C.roomOf(sp.hex)}"><ellipse cx="${x}" cy="${y}" rx="26" ry="${26 * KY}" fill="url(#ag-spawn)"/></g>`; } // v77: v betě záře zjevení nesmí svítit přes zdi (světla jsou nad mapou)
   if (th === 'yard') for (const R of C.ROOM_DEFS) { const cx = (wx(R.k0) + wx(R.k1)) / 2, cy = (wy(R.y0) + wy(R.y1)) / 2; s += `<g class="lit" data-room="${R.id}"><ellipse cx="${cx}" cy="${cy}" rx="${(wx(R.k1) - wx(R.k0)) * .55}" ry="${(wy(R.y1) - wy(R.y0)) * .6}" fill="url(#ag-cold)" opacity=".8"/></g>`; }
   if (th === 'crypt' || th === 'shack' || th === 'abbey' || th === 'church') for (const R of C.ROOM_DEFS.filter(r => r.y0 === 0 && !isFenceRoom(r.id))) for (let k = R.k0 + 2; k < R.k1; k += 3) s += `<g class="lit flick" data-room="${R.id}"><ellipse cx="${PADX + WPX * (k + .5)}" cy="${wy(1) - 8}" rx="30" ry="18" fill="url(#ag-warm)"/></g>`;
   gLight.innerHTML = s + '<g class="heroglows"></g>';
@@ -11616,6 +11630,13 @@ function flameSVG() {
     <circle class="ember e1" cx="-3" cy="-14" r=".9" fill="#ffcf6a"/><circle class="ember e2" cx="4" cy="-18" r=".8" fill="#ffb43a"/><circle class="ember e3" cx="0" cy="-10" r=".7" fill="#fff2b0"/>`;
 }
 // v58: stav objektů scénářů (páky, svíce, oltář, plameny fronty) – dynamická vrstva v hloubce
+// v77: znak páky – štít s římskou číslicí v barvě páky; stejný znak visí nad mříží, kterou páka otevírá
+const LEV_COL = [['#4a7ad8', '#9cc0ff', '#16244a'], ['#d8a030', '#ffe08a', '#4a2c08'], ['#c03a3a', '#ff9a8a', '#3a0c0c']];
+function leverBadge(i, x, y, on) {
+  const [c, hi, dk] = LEV_COL[i % LEV_COL.length], n = 'I'.repeat(i + 1);
+  return `<g class="lvbadge${on ? ' on' : ''}" transform="translate(${x.toFixed(1)},${y.toFixed(1)})"><path d="M-6 -7h12v6q0 6 -6 9q-6 -3 -6 -9z" fill="${dk}" stroke="#0a0608" stroke-width="1.6"/><path d="M-4.6 -5.6h9.2v4.6q0 4.6 -4.6 7q-4.6 -2.4 -4.6 -7z" fill="${c}"/><path d="M-4.6 -5.6h9.2v1.2h-9.2z" fill="${hi}" opacity=".8"/><text x="0" y="2.2" text-anchor="middle" class="lvnum">${n}</text></g>`;
+}
+const leverIdx = id => C.LEVERS.findIndex(l => l.id === id);
 function renderScenObjs(G) {
   const act = G.active && G.active.hero && G.heroes.find(h => h.id === G.active.hero);
   const key = JSON.stringify([G.levers || null, (G.candles || []).map(c => c.lit + (C.candleGuarded(G, c) ? 'g' : '')), G.altar && G.altar.n, G.fireFront, act && act.pos, S.viewMode, heroView()]);
@@ -11624,6 +11645,8 @@ function renderScenObjs(G) {
   const add = (hex, html, room, dz, cls) => { const [x, y] = px(hex); const g = sv('g', { class: 'scenobj ' + (cls || ''), transform: `translate(${x.toFixed(1)},${(y + 3).toFixed(1)})` }, html); g._z = y + 3 + (dz || .2); if (room) g.dataset.room = room; placeInDepth(g); };
   for (const l of C.LEVERS) {
     const on = !!(G.levers && G.levers[l.id]), av = !on && act && C.adjLevers(G, act).some(x => x.id === l.id);
+    if (envOn() && ES('a_lever')) { const i = leverIdx(l.id), col = LEV_COL[i % LEV_COL.length][0];
+      add(l.hex, (av ? `<ellipse cx="0" cy="-2" rx="16" ry="${16 * KY}" class="lever-av"/>` : '') + (on ? '' : `<ellipse class="lvglow" cx="0" cy="-6" rx="17" ry="11" fill="${col}"/>`) + `<g ${on ? 'transform="scale(-1,1)"' : ''}>${envImg('a_lever', 0, 4, 1.25)}</g>` + leverBadge(i, 0, -30, on) + (on ? `<path d="M5 -38l2.4 2.6l4.6 -5" fill="none" stroke="#7ad08a" stroke-width="2"/>` : ''), C.roomOf(l.hex), .3, 'blever'); continue; }
     add(l.hex, (av ? `<ellipse cx="0" cy="-2" rx="16" ry="${16 * KY}" class="lever-av"/>` : '') + (on ? `<path d="M0 -12L10 -4" stroke="#6a6c72" stroke-width="2.6" stroke-linecap="round"/><circle cx="10" cy="-4" r="3" fill="#7ad08a" stroke="#0c0a10" stroke-width=".8"/>` : `<path d="M0 -12L-8 -28" stroke="#6a6c72" stroke-width="2.6" stroke-linecap="round"/><circle cx="-8" cy="-28" r="3.2" fill="#c8402a" stroke="#0c0a10" stroke-width=".8"/>`), C.roomOf(l.hex), .3, 'lever-h' + (on ? ' on' : ''));
   }
   for (const c of G.candles || []) {
