@@ -2465,7 +2465,6 @@ MAPS.klaster = {
     { id: 'U', name: 'Klášterní kuchyně', k0: 13, k1: 21, y0: 8, y1: 12, floor: 'dirt', wall: 'stone' },
   ],
   doors: [
-    { id: 'd1', hex: [14, 4], rooms: ['X', 'N'], name: 'Chodba – Ambit', noLock: true },
     { id: 'd2', hex: [14, 8], rooms: ['X', 'U'], name: 'Chodba – Kuchyně', noLock: true },
     { id: 'd3', hex: [11, 7], rooms: ['X', 'K'], name: 'Chodba – Kapitulní síň' },
     { id: 'd4', hex: [16, 5], rooms: ['X', 'L'], name: 'Chodba – Loď' },
@@ -2474,8 +2473,8 @@ MAPS.klaster = {
     { id: 'd7', hex: [6, 11], rooms: ['D', 'R'], name: 'Dvůr – Refektář' },
     { id: 'a2', hex: [13, 9], rooms: ['R', 'U'], name: 'Průchod Refektář – Kuchyně', arch: true },
     { id: 'd9', hex: [21, 1], rooms: ['N', 'S'], name: 'Ambit – Sakristie' },
-    { id: 'd10', hex: [24, 4], rooms: ['S', 'P'], name: 'Sakristie – Presbytář' },
-    { id: 'd11', hex: [21, 11], rooms: ['U', 'P'], name: 'Kuchyně – Presbytář' },
+    { id: 'd10', hex: [26, 4], rooms: ['S', 'P'], name: 'Sakristie – Presbytář' },
+    // v77: bez dveří Kuchyně – Presbytář; bez mříží se k oltáři chodí oklikou přes sakristii
     { id: 'm1', hex: [6, 5], rooms: ['D', 'K'], name: 'Železná mříž u dvora', portcullis: true, noLock: true },
     { id: 'm2', hex: [21, 5], rooms: ['L', 'P'], name: 'Železná mříž u presbytáře', portcullis: true, noLock: true },
   ],
@@ -2529,7 +2528,7 @@ MAPS.klaster = {
     { hex: [20, 7], kind: 'rough', name: 'Lavice', icon: 'bench' },
     // Presbytář
     { hex: [22, 10], kind: 'block', name: 'Sloup', icon: 'pillar' },
-    { hex: [26, 5], kind: 'block', name: 'Socha Panny', icon: 'statue' },
+    { hex: [26, 7], kind: 'block', name: 'Socha Panny', icon: 'statue' },
     { hex: [25, 10], kind: 'rough', name: 'Klekátko', icon: 'bench' },
     { hex: [26, 11], kind: 'block', name: 'Svícen', icon: 'brazier' },
     // Refektář
@@ -3425,11 +3424,11 @@ const SCENARIOS = [
     short: 'Očistěte 5 ze 6 relikviářů. Někde leží relikvie.',
     blurb: 'Pod klášterem leží katakomby a kletba z nich prosakuje nahoru. Ve tmě spí věci, které se nemají budit.',
     goalShort: 'Očistit 5 ze 6 relikviářů. Monstrum u relikviáře očistu překazí.' },
-  { id: 'oltar', n: 5, map: 'klaster', name: 'Krvavý oltář', goal: 'altar', cats: ['kobka', 'sal'], need: 3, pourThreat: 1, budgetBonus: -1,
+  { id: 'oltar', n: 5, map: 'klaster', name: 'Krvavý oltář', goal: 'altar', cats: ['kobka', 'sal'], need: 3, pourThreat: 1, budgetBonus: -2,
     tokens: ['loot', 'trap', 'loot', 'trap', 'loot'], setup: ['tokens', 'locks', 'buy', 'place', 'curse'], locks: 2,
     short: 'Noste svěcenou vodu z kašny na Krvavý oltář. Třikrát.',
     blurb: 'Opuštěný klášter sv. Benedikta. Na oltáři v presbytáři se srazila krev a mniši se z hrobek vracejí v noci.',
-    goalShort: 'Nabrat vodu ze Svěcené kašny na jednom konci kláštera a třikrát ji vylít na Krvavý oltář na druhém. Páky otevírají zkratky.' },
+    goalShort: 'Nabrat vodu ze Svěcené kašny na jednom konci kláštera a třikrát ji vylít na Krvavý oltář na druhém. Páky I a II otevřou mříže a s nimi rovnou cestu středem.' },
   { id: 'bludiste', n: 6, map: 'bludiste', mapGen: 'bludiste', name: 'Zelené bludiště', goal: 'maze', cats: ['zahrada', 'sal'], wakeAll: 9,
     tokens: ['loot', 'loot', 'trap', 'trap', 'loot'], setup: ['tokens', 'exit', 'locks', 'buy', 'place', 'curse'], locks: 1,
     short: 'Najděte pravou branku z bludiště. Stačí, když utečou dva.',
@@ -11646,7 +11645,7 @@ function renderScenObjs(G) {
   for (const l of C.LEVERS) {
     const on = !!(G.levers && G.levers[l.id]), av = !on && act && C.adjLevers(G, act).some(x => x.id === l.id);
     if (envOn() && ES('a_lever')) { const i = leverIdx(l.id), col = LEV_COL[i % LEV_COL.length][0];
-      add(l.hex, (av ? `<ellipse cx="0" cy="-2" rx="16" ry="${16 * KY}" class="lever-av"/>` : '') + (on ? '' : `<ellipse class="lvglow" cx="0" cy="-6" rx="17" ry="11" fill="${col}"/>`) + `<g ${on ? 'transform="scale(-1,1)"' : ''}>${envImg('a_lever', 0, 4, 1.25)}</g>` + leverBadge(i, 0, -30, on) + (on ? `<path d="M5 -38l2.4 2.6l4.6 -5" fill="none" stroke="#7ad08a" stroke-width="2"/>` : ''), C.roomOf(l.hex), .3, 'blever'); continue; }
+      add(l.hex, (av ? `<ellipse cx="0" cy="-2" rx="16" ry="${16 * KY}" class="lever-av"/>` : '') + (on ? '' : `<ellipse class="lvglow" cx="0" cy="-6" rx="17" ry="11" fill="${col}"/>`) + `<g ${on ? 'transform="scale(-1,1)"' : ''}>${envImg('a_lever', (ES('a_lever').ax - ES('a_lever').w / 2) * EK * 1.25, 4, 1.25)}</g>` + leverBadge(i, 0, -30, on) + (on ? `<path d="M5 -38l2.4 2.6l4.6 -5" fill="none" stroke="#7ad08a" stroke-width="2"/>` : ''), C.roomOf(l.hex), .3, 'blever'); continue; }
     add(l.hex, (av ? `<ellipse cx="0" cy="-2" rx="16" ry="${16 * KY}" class="lever-av"/>` : '') + (on ? `<path d="M0 -12L10 -4" stroke="#6a6c72" stroke-width="2.6" stroke-linecap="round"/><circle cx="10" cy="-4" r="3" fill="#7ad08a" stroke="#0c0a10" stroke-width=".8"/>` : `<path d="M0 -12L-8 -28" stroke="#6a6c72" stroke-width="2.6" stroke-linecap="round"/><circle cx="-8" cy="-28" r="3.2" fill="#c8402a" stroke="#0c0a10" stroke-width=".8"/>`), C.roomOf(l.hex), .3, 'lever-h' + (on ? ' on' : ''));
   }
   for (const c of G.candles || []) {
@@ -14217,7 +14216,7 @@ const BRIEF_S = {
   circles: ['Na hřbitově u sv. Jiljí bloudí duše, které nemohou odejít.', 'Nasbírejte 6 vyvolání.', ['Svítí vždy jen jeden kruh. Začni v něm tah a získáš vyvolání.', 'Krypty propojují hřbitov.']],
   obelisks: ['Čtyři pohanské obelisky drží les v moci Domu.', 'Rozbijte všechny obelisky.', ['Každý obelisk trápí svou místnost.', 'V nábytku je schované kladivo.']],
   cleanse: ['Kletba prosakuje z katakomb pod klášterem.', 'Očistěte 5 relikviářů.', ['Monstrum do 2 polí od relikviáře očistu překazí.']],
-  altar: ['Oltář v klášteře sv. Benedikta krvácí.', 'Třikrát vylijte svěcenou vodu na Krvavý oltář.', ['Vodu nabereš u Svěcené kašny.', 'Když nositel padne, voda se rozlije.']],
+  altar: ['Oltář v klášteře sv. Benedikta krvácí.', 'Třikrát vylijte svěcenou vodu na Krvavý oltář.', ['Vodu nabereš u Svěcené kašny.', 'Páky I a II otevřou mříže – rovná cesta středem kláštera.', 'Když nositel padne, voda se rozlije.']],
   maze: ['Živé bludiště se za vámi zavřelo.', 'Najděte pravou branku a utečte. Stačí dva.', ['Lovec vedle branky ji za 1 akci vyzkouší.', 'Falešná branka = Strach.']],
   fire: ['Mlýn hoří a plameny se ženou k řece.', 'Dostaňte dva lovce přes brod vpravo.', ['Oheň postupuje každé kolo doprava.']],
   dawn: ['Poslední noc v kostele sv. Rocha.', 'Vydržte do svítání s aspoň jednou hořící svící.', ['Svíci, u které stojí lovec, monstrum nezhasne.']],
