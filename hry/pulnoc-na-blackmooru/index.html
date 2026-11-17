@@ -2062,6 +2062,7 @@ body.bui .shop.center .btn { background: none !important; border: 9px solid tran
 @keyframes lvg { to { opacity: .45; } }
 .fontglow { opacity: .75; animation: lvg2 2.4s ease-in-out infinite alternate; }
 @keyframes lvg2 { from { opacity: .45; } to { opacity: .95; } }
+.holy{pointer-events:none}.holy-beam{mix-blend-mode:screen}
 </style>
 
 <div id="menu">
@@ -2479,8 +2480,10 @@ MAPS.klaster = {
     { id: 'm2', hex: [21, 5], rooms: ['L', 'P'], name: 'Železná mříž u presbytáře', portcullis: true, noLock: true },
   ],
   // páky: lovec vedle páky ji za 2 pohyb přetáhne → mříž se natrvalo otevře
-  levers: [{ id: 'p1', hex: [5, 3], door: 'm1', name: 'Páka mříže' }, { id: 'p2', hex: [23, 6], door: 'm2', name: 'Páka mříže' }],
-  fountain: [4, 6], altar: [24, 8],
+  levers: [{ id: 'p1', hex: [5, 3], door: 'm1', name: 'Páka mříže' }, { id: 'p2', hex: [20, 6], door: 'm2', name: 'Páka mříže' }],
+  // v77: svaté světlo z vitráží – lovce stojícího v něm monstra napadají s nevýhodou
+  holy: [[3, 7], [9, 6], [17, 6], [23, 9]],
+  fountain: [4, 6], altar: [22, 7],
   exit: null,
   spots: [
     { id: 's1', name: 'Truhla mnicha', hex: [7, 2], icon: 'chest' },
@@ -2492,9 +2495,9 @@ MAPS.klaster = {
   ],
   furn: [
     { hex: [4, 6], kind: 'block', name: 'Svěcená kašna', icon: 'holyfont', fountain: true },
-    { hex: [24, 8], kind: 'block', name: 'Krvavý oltář', icon: 'bloodaltar', altar: true },
+    { hex: [22, 7], kind: 'block', name: 'Krvavý oltář', icon: 'bloodaltar', altar: true },
     { hex: [5, 3], kind: 'low', name: 'Páka mříže', icon: 'lever', lever: 'p1' },
-    { hex: [23, 6], kind: 'low', name: 'Páka mříže', icon: 'lever', lever: 'p2' },
+    { hex: [20, 6], kind: 'low', name: 'Páka mříže', icon: 'lever', lever: 'p2' },
     // Rajský dvůr: zahrada s křížem cest
     { hex: [1, 2], kind: 'block', name: 'Starý tis', icon: 'tree' },
     { hex: [4, 1], kind: 'rough', name: 'Růžový keř', icon: 'bush' },
@@ -3424,11 +3427,11 @@ const SCENARIOS = [
     short: 'Očistěte 5 ze 6 relikviářů. Někde leží relikvie.',
     blurb: 'Pod klášterem leží katakomby a kletba z nich prosakuje nahoru. Ve tmě spí věci, které se nemají budit.',
     goalShort: 'Očistit 5 ze 6 relikviářů. Monstrum u relikviáře očistu překazí.' },
-  { id: 'oltar', n: 5, map: 'klaster', name: 'Krvavý oltář', goal: 'altar', cats: ['kobka', 'sal'], need: 3, pourThreat: 1, budgetBonus: -2,
+  { id: 'oltar', n: 5, map: 'klaster', name: 'Krvavý oltář', goal: 'altar', cats: ['kobka', 'sal'], need: 3, pourThreat: 1, budgetBonus: -1,
     tokens: ['loot', 'trap', 'loot', 'trap', 'loot'], setup: ['tokens', 'locks', 'buy', 'place', 'curse'], locks: 2,
     short: 'Noste svěcenou vodu z kašny na Krvavý oltář. Třikrát.',
     blurb: 'Opuštěný klášter sv. Benedikta. Na oltáři v presbytáři se srazila krev a mniši se z hrobek vracejí v noci.',
-    goalShort: 'Nabrat vodu ze Svěcené kašny na jednom konci kláštera a třikrát ji vylít na Krvavý oltář na druhém. Páky I a II otevřou mříže a s nimi rovnou cestu středem.' },
+    goalShort: 'Nabrat vodu ze Svěcené kašny na jednom konci kláštera a třikrát ji vylít na Krvavý oltář na druhém. Páky I a II otevřou mříže a s nimi rovnou cestu středem. Ve světle z vitráží na lovce monstra útočí s nevýhodou.' },
   { id: 'bludiste', n: 6, map: 'bludiste', mapGen: 'bludiste', name: 'Zelené bludiště', goal: 'maze', cats: ['zahrada', 'sal'], wakeAll: 9,
     tokens: ['loot', 'loot', 'trap', 'trap', 'loot'], setup: ['tokens', 'exit', 'locks', 'buy', 'place', 'curse'], locks: 1,
     short: 'Najděte pravou branku z bludiště. Stačí, když utečou dva.',
@@ -3529,7 +3532,7 @@ const MD = (typeof MapData !== 'undefined') ? MapData : require('./maps.js');
 const MAPS = MD.MAPS;
 let MAP, COLS, ROWS, ROOM_DEFS, ROOMS, ROOM_OF, HOUSE, DOOR_DEFS, DOOR_OF, EXIT, EXIT_ROOM, SPOT_DEFS, FURN_DEFS, FURN, SPAWN_DEFS, MIRRORS, HERO_START,
   SETUP_BANNED, MONSTER_ROOMS, CURSE_ROOMS, LOCKABLE, WALL_ZONES, FENCE_HEXES, ALL_HEXES, WALL_HEXES, ROOM_HEXES, OUTDOOR, CIRCLES = [], OBELISK_SITES = [], CRYPTS = [],
-  LEVERS = [], FOUNTAIN = null, ALTAR = null, CANDLES = [], EXIT_DOORS = [];
+  LEVERS = [], HOLY = [], FOUNTAIN = null, ALTAR = null, CANDLES = [], EXIT_DOORS = [];
 const NH = 3;
 const NOWHERE = [-99, -99];
 const onGrid = h => h[0] >= 0 && h[0] < COLS && h[1] >= 0 && h[1] < ROWS;
@@ -3586,6 +3589,7 @@ function useMap(id) {
   CRYPTS = (M.crypts || []).map(c => { const room = roomOf(c.hex) || (ROOM_DEFS.find(R => R.id === c.id) || {}).id; return { id: c.id, hex: c.hex.slice(), room, adj: neighbors(c.hex).filter(n => roomOf(n) === room && !isBlock(n)) }; });
   OBELISK_SITES = (M.obeliskSites || []).map(h => h.slice());
   LEVERS = (M.levers || []).map(l => Object.assign({}, l, { hex: l.hex.slice() }));
+  HOLY = (M.holy || []).map(h => h.slice());
   FOUNTAIN = M.fountain ? M.fountain.slice() : null; ALTAR = M.altar ? M.altar.slice() : null;
   CANDLES = (M.candles || []).map(c => Object.assign({}, c, { hex: c.hex.slice() }));
   EXIT_DOORS = DOOR_DEFS.filter(d => d.exit);
@@ -5647,7 +5651,7 @@ function monsterAttackInfo(G, m, h) {
   if (d.swarm) { const n = Math.min(3, G.monsters.filter(o => o !== m && o.type === m.type && dist(o.pos, h.pos) === 1).length); if (n) mods.push({ label: 'smečka', v: n }); }
   const darkHere = isDark(G, m.pos) || isDark(G, h.pos);
   const plus = (d.darkAdv && isDark(G, h.pos)) || (zonesOf(m.pos).some(r => G.darkAtk.has(r)) && isDark(G, m.pos)) || (d.packAdv && G.monsters.some(o => o !== m && o.type === m.type && dist(o.pos, h.pos) === 1));
-  const minus = (s.range > 1 && dist(m.pos, h.pos) === 1) || saltAt(G, h.pos) || (m.disUntil || -1) >= G.round || !!m.disNext;
+  const minus = (s.range > 1 && dist(m.pos, h.pos) === 1) || saltAt(G, h.pos) || holyAt(h.pos) || (m.disUntil || -1) >= G.round || !!m.disNext;
   const sum = mods.reduce((a, x) => a + x.v, 0), adv = advOf(plus, minus);
   return { mods, sum, chance: chanceFor(sum, 10, adv), adv };
 }
@@ -5697,6 +5701,7 @@ function reactOptions0(G, who, h, m, dmg, fear) {
   }
   return opts;
 }
+const holyAt = h => HOLY.some(x => eq(x, h)); // v77: svaté světlo
 async function monsterAttack(G, m, h, C, ui) {
   const d = mdef(m), s = mstats(G, m), info = monsterAttackInfo(G, m, h);
   if (d.invisible) m.visibleRound = G.round;
@@ -6775,10 +6780,10 @@ API = {
   capRange, capSpec, veilOf, darkVarOf, PROH_RANGE,
   markMonster, markHero, heroMarked, heroInvisible, pierceArmor, isPierced, applyStatus, addPoison, addBleed, tickDots, healHero, healMonster, FIRE_DMG, FIRE_DMG_H, trapImmune, recallable, peekSpot, doSearch, nearestUnknownSpots, senseSpots, pushStep, STATUS_TXT,
   useMap, MAPS, isFence, blocksSight, OBELISK_SITES, MAP, OUTDOOR,
-  LEVERS, FOUNTAIN, ALTAR, CANDLES, EXIT_DOORS, adjLevers, adjExits, adjCandles, setRealExit, mazeExits, frontBurning, fireAt, isBars, exitDoorAt, LEVER_COST, canStillEscape, purgeWater, candleGuarded,
+  LEVERS, HOLY, holyAt, FOUNTAIN, ALTAR, CANDLES, EXIT_DOORS, adjLevers, adjExits, adjCandles, setRealExit, mazeExits, frontBurning, fireAt, isBars, exitDoorAt, LEVER_COST, canStillEscape, purgeWater, candleGuarded,
   _heroTurn: heroTurn, _monsterAttack: monsterAttack, _heroMove: heroMove, _checkWin: checkWin, _activateGroup: activateGroup, _endRound: endRound, _freeRespawn: freeRespawn, _damageHero: damageHero,
 };
-function syncApi() { Object.assign(API, { LEVERS, FOUNTAIN, ALTAR, CANDLES, EXIT_DOORS, CRYPTS, MAP, COLS, ROWS, ROOM_DEFS, ROOMS, DOOR_DEFS, EXIT, EXIT_ROOM, SPOT_DEFS, FURN_DEFS, SPAWN_DEFS, MIRRORS, HERO_START, WALL_HEXES, ALL_HEXES, ROOM_HEXES, MONSTER_ROOMS, CURSE_ROOMS, LOCKABLE, SETUP_BANNED, CIRCLES, OBELISK_SITES, OUTDOOR }); }
+function syncApi() { Object.assign(API, { LEVERS, HOLY, FOUNTAIN, ALTAR, CANDLES, EXIT_DOORS, CRYPTS, MAP, COLS, ROWS, ROOM_DEFS, ROOMS, DOOR_DEFS, EXIT, EXIT_ROOM, SPOT_DEFS, FURN_DEFS, SPAWN_DEFS, MIRRORS, HERO_START, WALL_HEXES, ALL_HEXES, ROOM_HEXES, MONSTER_ROOMS, CURSE_ROOMS, LOCKABLE, SETUP_BANNED, CIRCLES, OBELISK_SITES, OUTDOOR }); }
 syncApi();
 return API;
 })();
@@ -6862,7 +6867,10 @@ function heroGoals(G, h) {
   if (goal === 'altar') {
     // páka v místnosti, kde lovec stojí: nejdřív ji přetáhni (otevře zkratku)
     const lv = C.LEVERS.find(l => !(G.levers && G.levers[l.id]) && roomOf(l.hex) === roomOf(h.pos));
-    if (lv && (roomOf(lv.hex) === roomOf(C.FOUNTAIN) ? hasWater(h) : !hasWater(h))) return adjFree(lv.hex);
+    if (lv) return adjFree(lv.hex); // v77: páky leží na zkratce – přetáhni ji cestou
+    // nejbližší lovec k nepřetažené páce (do 8 polí) ji jde přetáhnout – zkratka se vyplatí
+    { const on = C.LEVERS.filter(l => !(G.levers && G.levers[l.id]) && dist(h.pos, l.hex) <= 8 && !mates.some(o => dist(o.pos, l.hex) < dist(h.pos, l.hex)));
+      if (on.length) return adjFree(on[0].hex); }
     if (hasWater(h)) return adjFree(C.ALTAR);
     return adjFree(C.FOUNTAIN);
   }
@@ -11475,6 +11483,7 @@ function renderMap() {
   else for (const s of G.salt) { if (!roomVisible(C.roomOf(s.hex)) || !C.saltable(G, s.hex)) continue; const [x, y] = px(s.hex); ov += `<g class="salt"><path d="${hexPts(x, y, SIZE - 4)}" fill="#f1ece0" fill-opacity=".12" stroke="#f8f4ea" stroke-width="2.2" stroke-dasharray="1.2 2.2" stroke-linecap="round"/><circle cx="${x - 6}" cy="${y - 2}" r="1" fill="#fff" class="twinkle"/><circle cx="${x + 7}" cy="${y + 3}" r=".9" fill="#fff" class="twinkle t2"/></g>`; }
   for (const f of G.fire) { if (!roomVisible(C.roomOf(f.hex))) continue; const [x, y] = px(f.hex); ov += betaOn() ? `<path d="${hexPts(x, y, SIZE - .5)}" fill="#1a0602" opacity=".75"/><path d="${hexPts(x, y, SIZE - 3)}" fill="#ff5a14" opacity=".18"/>` : `<path d="${hexPts(x, y, SIZE - 2)}" fill="#3a1206" opacity=".7"/><ellipse cx="${x}" cy="${y}" rx="40" ry="${40 * KY}" fill="url(#ag-warm)" class="fireglow"/>`; }
   if (betaOn()) ov += obRoomFX(G);
+  if (C.HOLY && C.HOLY.length) ov += holyFX(G);
   for (const c of G.circles || []) { if (!roomVisible(c.room)) continue; const bad = !C.circleActive(G, c), on = c.hexes.some(x => G.heroes.some(h => !h.downed && C.eq(h.pos, x)));
     const cx = c.hexes.reduce((a, x) => a + px(x)[0], 0) / 3, cy = c.hexes.reduce((a, x) => a + px(x)[1], 0) / 3;
     if (betaOn() && !bad) ov += hgArea(c.hexes, 'circ', 'hga-circ');
@@ -11755,6 +11764,17 @@ function obPat(kind) {
   OB_PAT[kind] = 1; return id;
 }
 const OB_TINT = { ice: ['#c8dcf4', .16], dark: ['#06020c', .38], pain: ['#5a0806', .2], hunger: ['#4a6a14', .16] };
+// v77: svaté světlo z vitráží – šikmý paprsek a barevná mozaika na podlaze
+function holyFX(G) {
+  const hs = C.HOLY.filter(h => roomVisible(C.roomOf(h))); if (!hs.length) return '';
+  let o = `<defs><linearGradient id="holyBeam" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff2c0" stop-opacity="0"/><stop offset=".5" stop-color="#ffe6a0" stop-opacity=".2"/><stop offset="1" stop-color="#fff4c8" stop-opacity=".42"/></linearGradient><radialGradient id="holyPool"><stop offset="0" stop-color="#fff4c8" stop-opacity=".55"/><stop offset=".6" stop-color="#ffd878" stop-opacity=".22"/><stop offset="1" stop-color="#ffd878" stop-opacity="0"/></radialGradient></defs>`;
+  const GL = ['#4a7ad8', '#d83a3a', '#e8b83a', '#4ab868', '#9a5ad8'];
+  for (const h of hs) { const [x, y] = px(h), r = envRng(h[0] * 31 + h[1] * 7); let tiles = '';
+    if (betaOn()) for (let i = 0; i < 6; i++) { const a = r() * Math.PI * 2, d = Math.sqrt(r()) * (SIZE - 10), tx = x + Math.cos(a) * d, ty = y + Math.sin(a) * d * KY, z = 3;
+      tiles += `<rect x="${(tx - z / 2).toFixed(1)}" y="${(ty - z / 2).toFixed(1)}" width="${z}" height="${z}" fill="${GL[Math.floor(r() * GL.length)]}" opacity=".3"/>`; }
+    o += `<g class="holy"><path d="M${x - 12} ${y - 100}L${x + 4} ${y - 100}L${x + 26} ${y + 6}L${x - 26} ${y + 6}Z" fill="url(#holyBeam)" class="holy-beam"/><path d="${hexPts(x, y, SIZE - 2)}" fill="#ffe8a8" fill-opacity=".1" stroke="#ffe6a0" stroke-opacity=".45" stroke-width="1.2" stroke-dasharray="3 2.4"/><ellipse cx="${x}" cy="${y}" rx="${SIZE * .95}" ry="${SIZE * .95 * KY}" fill="url(#holyPool)" class="holy-pool"/>${tiles}</g>`; }
+  return o;
+}
 function obRoomFX(G) {
   let ov = '';
   for (const m of G.monsters) { const k = C.MDEF[m.type].obelisk; if (!k) continue; const r = C.roomOf(m.pos); if (!r || !roomVisible(r)) continue;
@@ -14216,7 +14236,7 @@ const BRIEF_S = {
   circles: ['Na hřbitově u sv. Jiljí bloudí duše, které nemohou odejít.', 'Nasbírejte 6 vyvolání.', ['Svítí vždy jen jeden kruh. Začni v něm tah a získáš vyvolání.', 'Krypty propojují hřbitov.']],
   obelisks: ['Čtyři pohanské obelisky drží les v moci Domu.', 'Rozbijte všechny obelisky.', ['Každý obelisk trápí svou místnost.', 'V nábytku je schované kladivo.']],
   cleanse: ['Kletba prosakuje z katakomb pod klášterem.', 'Očistěte 5 relikviářů.', ['Monstrum do 2 polí od relikviáře očistu překazí.']],
-  altar: ['Oltář v klášteře sv. Benedikta krvácí.', 'Třikrát vylijte svěcenou vodu na Krvavý oltář.', ['Vodu nabereš u Svěcené kašny.', 'Páky I a II otevřou mříže – rovná cesta středem kláštera.', 'Když nositel padne, voda se rozlije.']],
+  altar: ['Oltář v klášteře sv. Benedikta krvácí.', 'Třikrát vylijte svěcenou vodu na Krvavý oltář.', ['Vodu nabereš u Svěcené kašny.', 'Páky I a II otevřou mříže – rovná cesta středem kláštera.', 'Ve světle z vitráží na tebe monstra útočí s nevýhodou.', 'Když nositel padne, voda se rozlije.']],
   maze: ['Živé bludiště se za vámi zavřelo.', 'Najděte pravou branku a utečte. Stačí dva.', ['Lovec vedle branky ji za 1 akci vyzkouší.', 'Falešná branka = Strach.']],
   fire: ['Mlýn hoří a plameny se ženou k řece.', 'Dostaňte dva lovce přes brod vpravo.', ['Oheň postupuje každé kolo doprava.']],
   dawn: ['Poslední noc v kostele sv. Rocha.', 'Vydržte do svítání s aspoň jednou hořící svící.', ['Svíci, u které stojí lovec, monstrum nezhasne.']],
