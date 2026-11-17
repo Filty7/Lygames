@@ -1677,20 +1677,20 @@ button.pd-cell { cursor: default; } .pd-cell.full { cursor: pointer; border-styl
 body.bui #game .top { left: 50%; right: auto; top: 0; width: 700px; height: 182px; padding: 0; transform: translateX(-50%); display: block; background: var(--bu-top) center top / 100% auto no-repeat; image-rendering: pixelated; filter: drop-shadow(0 6px 10px #000c); pointer-events: none; }
 body.bui #game .top > * { position: absolute; }
 body.bui #game .top .title, body.bui #game .top #phase, body.bui #game .top #viewlbl, body.bui #game .top .spacer, body.bui #game .top #fsbtn, body.bui #game .top #zfit, body.bui #game .top #zoomlbl, body.bui #game .top .clock .stat, body.bui #game .top .clock .dial { display: none !important; }
-body.bui #game .top .clock { left: 260px; top: 24px; width: 180px; height: 180px; display: block; }
-body.bui .bclock-w, body.bui .bclock { position: absolute; inset: 0; width: 180px; height: 180px; filter: drop-shadow(0 3px 4px #000c); }
+body.bui #game .top .clock { left: 241px; top: 6px; width: 218px; height: 218px; display: block; }
+body.bui .bclock-w, body.bui .bclock { position: absolute; inset: 0; width: 218px; height: 218px; filter: drop-shadow(0 3px 4px #000c); }
 body.bui .bclock image { image-rendering: pixelated; }
 body.bui .bc-tick { stroke: #3a2a18; stroke-width: 2.6; stroke-linecap: square; opacity: .85; }
 /* levé křídlo: hrozba + karty Domu (velké ikony, čísla pod nimi); pod tím cíl */
 body.bui #game .top { zoom: .8; }
 body.bui #game .top .stat.threat, body.bui #olstats span { display: flex; flex-direction: column; align-items: center; gap: 0; }
 body.bui #game .top .stat.threat { flex-direction: row; gap: 8px; justify-content: center; } body.bui #olstats span { flex-direction: row; gap: 6px; }
-body.bui #game .top .stat.threat { left: 132px; top: 33px; width: 72px; pointer-events: auto; }
+body.bui #game .top .stat.threat { left: 73px; top: 31px; width: 160px; height: 51px; align-items: center; pointer-events: auto; }
 body.bui #game .top .stat.threat .lbl-sm { display: none; }
 body.bui #game .top .stat.threat::before { content: ""; width: 30px; height: 30px; background: radial-gradient(circle at 50% 58%, #ffd0a0 0 12%, #ff7a3a 24%, #c0200f 46%, #4a0806 68%, transparent 71%); border-radius: 50%; filter: drop-shadow(0 0 6px #ff301a); }
-body.bui #game .top .stat.threat b { font: 800 19px/1 var(--f-num); color: #ffa080; text-shadow: 0 0 6px #ff200080, 0 1px 0 #000; margin-top: 1px; }
-body.bui #olstats { left: 92px; top: 92px; width: 150px; justify-content: center; display: flex; gap: 26px; pointer-events: auto; color: #e0d0b4; }
-body.bui #olstats .ic { width: 28px; height: 28px; filter: drop-shadow(0 1px 0 #000); } body.bui #olstats b { font: 800 18px/1 var(--f-num); margin-top: 2px; text-shadow: 0 1px 0 #000; }
+body.bui #game .top .stat.threat b { font: 800 21px/1 var(--f-num); color: #ffa080; text-shadow: 0 0 6px #ff200080, 0 1px 0 #000; }
+body.bui #olstats { left: 80px; top: 90px; width: 150px; height: 48px; align-items: center; justify-content: center; display: flex; gap: 22px; pointer-events: auto; color: #e0d0b4; }
+body.bui #olstats .ic { width: 26px; height: 26px; filter: drop-shadow(0 1px 0 #000); } body.bui #olstats b { font: 800 19px/1 var(--f-num); text-shadow: 0 1px 0 #000; }
 body.bui #game .top #goal { display: none !important; left: 80px; top: 94px; width: 152px; height: 42px; border: 0; background: none; padding: 0; justify-content: center; font-size: 12px; line-height: 1.1; text-align: center; flex-wrap: wrap; color: #e0c890; pointer-events: auto; }
 body.bui #game .top #goal b { font-size: 14px; }
 /* pravé křídlo: Deník a Karty každé ve svém výklenku */
@@ -1700,18 +1700,19 @@ body.bui #game .top .btn[aria-expanded="true"], body.bui #game .bmenu .btn[aria-
 body.bui #game .top .popwrap:has(#logbtn) { left: 470px; top: 40px; width: 156px; display: flex; justify-content: center; } body.bui #game .top #handsbtn { left: 470px; top: 98px; width: 156px; }
 body.bui #game .top #logbtn { width: 100%; }
 body.bui #game .top #handsbtn kbd { display: none; }
-body.bui #game .top .zoom, body.bui #game .top #losbtn, body.bui #game .top #viewbtn { display: none !important; }
+body.bui #game .top .zoom, body.bui #game .top #losbtn, body.bui #game .top #viewbtn:not(.bview) { display: none !important; }
 body.bui #game .top .pop { top: calc(100% + 18px); }
 body.bui #game .top .popwrap:has(#logbtn) .pop { right: -120px; }
 /* Menu vpravo nahoře */
 body.bui #game > .popwrap.bmenu { position: absolute; right: 16px; top: 12px; z-index: 13; }
 body.bui #game > .popwrap.bmenu > .btn { background: linear-gradient(#2a1c12, #170e08); border: 1px solid #5a4024; border-radius: 4px; color: #ecdab8; font: 400 18px/1 var(--f-disp); padding: 7px 14px; box-shadow: 0 2px 6px #000c, inset 0 1px 0 #ffffff14; text-shadow: 0 1px 0 #000; }
 /* světlo tahu: krátký neonový paprsek dolů ze spodní hrany horního dílu */
-body.bui #game .top::after { content: ""; position: absolute; left: 22%; right: 22%; top: 168px; height: 70px; pointer-events: none; opacity: 0; transition: opacity .8s, background .8s; filter: blur(5px);
-  background: radial-gradient(ellipse 50% 100% at 50% 0%, var(--tl, #8ac0ff) 0%, color-mix(in srgb, var(--tl, #8ac0ff) 45%, transparent) 22%, transparent 70%); mix-blend-mode: screen; }
-body.bui.turn-h #game .top::after { opacity: .75; --tl: #7ab8ff; }
-body.bui.turn-o #game .top::after { opacity: .85; --tl: #ff2a1a; animation: bturnO 2.6s ease-in-out infinite alternate; }
-@keyframes bturnO { to { filter: blur(5px) brightness(1.4); } }
+#bturnglow { display: none; } body.bui #bturnglow { display: block; position: absolute; left: 50%; top: 100px; width: 620px; height: 130px; transform: translateX(-50%); z-index: 11; pointer-events: none; opacity: 0; transition: opacity .8s; filter: blur(10px); mix-blend-mode: screen;
+  background: radial-gradient(ellipse 50% 50% at 50% 38%, color-mix(in srgb, var(--tl, #7ab8ff) 80%, transparent) 0%, color-mix(in srgb, var(--tl, #7ab8ff) 30%, transparent) 45%, transparent 100%); }
+body.bui.turn-h #bturnglow { opacity: .7; --tl: #6aa8ff; }
+body.bui.turn-o #bturnglow { opacity: .75; --tl: #ff2416; animation: bturnO 2.6s ease-in-out infinite alternate; }
+@keyframes bturnO { to { filter: blur(10px) brightness(1.35); } }
+body.bui #game .top #viewbtn.bview { display: block !important; left: 470px; top: 98px; width: 156px; }
 /* hodiny */
 body.bui .bc-num { font: 400 30px/1 var(--f-disp); fill: #2a1c10; text-anchor: middle; dominant-baseline: middle; }
 body.bui .bc-hand { transform-box: view-box; transform-origin: 90px 90px; }
@@ -1735,7 +1736,7 @@ body.bui #side .hsum:nth-child(2) { transform: translateX(-4px) rotate(-.4deg); 
 body.bui #side .hsum:hover, body.bui #side .msum:hover { filter: brightness(1.15); }
 body.bui #side .hsum.active::before { opacity: 1; filter: brightness(1.35) drop-shadow(0 0 6px var(--c)); }
 body.bui #side .hsum.viewing::before { opacity: 1; filter: brightness(1.3) drop-shadow(0 0 5px #e8d0a0); }
-body.bui #side .hsum.acted, body.bui #side .msum.done { filter: brightness(.48) saturate(.6); }
+body.bui #side .hsum.acted, body.bui #side .msum.done { filter: brightness(.66) saturate(.7); }
 body.bui #side .hsum.acted:hover, body.bui #side .msum.done:hover { filter: brightness(.7) saturate(.7); }
 body.bui #side .hs-top .hport, body.bui #side .ms-p .mport { border-radius: 50%; box-shadow: 0 0 0 1.5px #8a6a3a, 0 0 0 3px #1a120c, 0 2px 4px #000; background: #1a1410; cursor: zoom-in; }
 body.bui #side .hs-top .hport { width: 34px; height: 34px; }
@@ -1817,7 +1818,7 @@ body.bui #bactions .btn.blink { animation: bblink 1.1s ease-in-out infinite; }
 @keyframes bblink { 50% { box-shadow: 0 3px 8px #000d, 0 0 22px #ffb04acc, inset 0 0 12px #ffb04a66; color: #fff; border-color: #ffc060; } }
 body.bui #bbtools { display: flex; gap: 6px; align-items: center; padding: 5px 8px; background: linear-gradient(#2c1d12, #160d07); border: 1px solid #5a4024; border-radius: 4px; box-shadow: 0 3px 8px #000d; }
 body.bui #bbtools .dock-lock, body.bui #bbtools .dock-size { position: static; } body.bui #bbtools .dock-size { display: flex; gap: 4px; }
-body.bui #bbtools .dock-lock, body.bui #bbtools .dock-size button { width: 30px; height: 30px; border-radius: 3px; background: none !important; border: 0 !important; box-shadow: none !important; color: #ecdab8 !important; font: 400 22px/1 var(--f-disp); }
+body.bui #bbtools .dock-lock, body.bui #bbtools .dock-size button { width: 24px; height: 24px; border-radius: 3px; background: none !important; border: 0 !important; box-shadow: none !important; color: #ecdab8 !important; font: 400 18px/1 var(--f-disp); } body.bui #bbtools .dock-lock .ic { width: 13px; height: 13px; }
 body.bui #bbtools .dock-lock[aria-pressed="true"] { color: #ffd890 !important; text-shadow: 0 0 8px #ffb04a; }
 body.bui #bbtools .dock-lock:hover, body.bui #bbtools .dock-size button:hover:not(:disabled) { color: #fff3cc !important; }
 /* volba uprostřed (např. s Panikou / bez Paniky) */
@@ -12354,13 +12355,18 @@ function buiApply(G) {
   if (os._s !== ost) { os._s = ost; os.innerHTML = ost; }
   document.body.classList.toggle('turn-o', G.phase === 'overlord' || G.phase === 'house');
   document.body.classList.toggle('turn-h', G.phase === 'heroes' || G.phase === 'start');
+  { let tg = $('#bturnglow'); if (!tg) { tg = el('div', { id: 'bturnglow' }); $('#game').appendChild(tg); } }
+  // z pohledu Domu: místo „Karty“ přepínač pohledu (jedno slovo)
+  { const vb = $('#viewbtn'), hb = $('#handsbtn'), ol = S.ctl.overlord === 'human' && S.ctl.heroes !== 'human' && !NETS.role ? true : S.ctl.overlord === 'human' && S.ctl.heroes !== 'human';
+    if (vb) { vb.classList.toggle('bview', ol && G.phase !== 'setup'); if (ol) { vb.textContent = view() === 'all' ? 'Kořist' : 'Dům'; vb.title = view() === 'all' ? 'Ukázat, co vidí lovci' : 'Ukázat celý dům'; } }
+    if (hb && ol) hb.hidden = true; }
   let vg = $('#bvign'); if (!vg) { vg = el('div', { id: 'bvign' }); $('#game').insertBefore(vg, $('#mapover')); }
 }
 function renderTop() {
   const G = S.G;
   buiApply(G);
   { const hb = $('#handsbtn'); if (hb) hb.hidden = handsHidden(); }
-  { const vb = $('#viewbtn'); if (vb) { vb.hidden = S.ctl.overlord !== 'human' || G.phase === 'setup'; vb.textContent = view() === 'all' ? 'Pohled lovců' : 'Celý dům'; vb.setAttribute('aria-pressed', view() === 'all'); } }
+  { const vb = $('#viewbtn'); if (vb) { vb.hidden = S.ctl.overlord !== 'human' || G.phase === 'setup'; vb.textContent = vb.classList.contains('bview') && buiOn() ? (view() === 'all' ? 'Kořist' : 'Dům') : view() === 'all' ? 'Pohled lovců' : 'Celý dům'; vb.setAttribute('aria-pressed', view() === 'all'); } }
   $('#round').textContent = G.round + ' / ' + G.maxRound;
   $('#clock-hand').style.transform = `rotate(${(G.round / G.maxRound) * 360}deg)`;
   $('#threat').textContent = G.threat;
