@@ -10912,13 +10912,28 @@ function bSaltDefs() {
 // obrys sjednocené plochy soli: hrany hexů, za kterými už sůl není
 function bSaltOverlay(list) {
   const cs = list.map(h => px(h)), has = (x, y) => cs.some(([a, b]) => Math.abs(a - x) < 2 && Math.abs(b - y) < 2);
-  let fill = '', edge = '';
+  let fill = ''; const edges = [];
   for (const [x, y] of cs) {
     fill += hexPts(x, y, SIZE + .6);
     const c = []; for (let i = 0; i < 6; i++) { const a = Math.PI / 180 * (60 * i - 30); c.push([x + SIZE * Math.cos(a), y + SIZE * Math.sin(a) * KY]); }
-    for (let i = 0; i < 6; i++) { const p = c[i], q = c[(i + 1) % 6], mx = (p[0] + q[0]) / 2, my = (p[1] + q[1]) / 2; if (!has(2 * mx - x, 2 * my - y)) edge += `M${p[0].toFixed(1)} ${p[1].toFixed(1)}L${q[0].toFixed(1)} ${q[1].toFixed(1)}`; }
+    for (let i = 0; i < 6; i++) { const p = c[i], q = c[(i + 1) % 6], mx = (p[0] + q[0]) / 2, my = (p[1] + q[1]) / 2; if (!has(2 * mx - x, 2 * my - y)) edges.push([p, q]); }
   }
-  return `<g class="salt bsalt"><path d="${fill}" fill="#f4efe4" fill-opacity=".16"/><path d="${fill}" fill="url(#bsaltp)" opacity=".7"/><path d="${edge}" fill="none" stroke="#000" stroke-opacity=".45" stroke-width="3.6" stroke-linecap="round" stroke-linejoin="round"/><path d="${edge}" fill="none" stroke="#f6f1e6" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" class="bsalt-e"/></g>`;
+  // okraj = vysypaná čára soli: zrnka kolem hrany (víc u středu čáry) a občas kopeček
+  let sh = '', g1 = '', g2 = '', hi = '';
+  const sq = (x, y, w) => `M${x.toFixed(1)} ${y.toFixed(1)}h${w}v${w}h-${w}z`;
+  for (const [p, q] of edges) {
+    let sd = Math.round(Math.abs(p[0] * 13.7 + p[1] * 7.3 + q[0] * 3.1 + q[1] * 5.9)) % 2147483646 + 1; const rnd = () => (sd = (sd * 16807) % 2147483647) / 2147483647;
+    const dx = q[0] - p[0], dy = q[1] - p[1], L = Math.hypot(dx, dy), ux = dx / L, uy = dy / L, nx = -uy, ny = ux;
+    const g = () => (rnd() + rnd() + rnd() - 1.5) * 1.15;
+    for (let t = 0; t <= L; t += .55) {
+      const bx = p[0] + ux * t, by = p[1] + uy * t, mound = rnd() < .05;
+      const n = mound ? 24 : 3; const spread = mound ? 2.3 : 1;
+      if (mound) sh += `M${(bx - 2.4).toFixed(1)} ${(by + 1.2).toFixed(1)}h4.8v1h-4.8z`;
+      for (let k = 0; k < n; k++) { const o = g() * spread, a = (rnd() - .5) * (mound ? 2.4 : .5), gx = bx + nx * o + ux * a, gy = by + ny * o * KY + uy * a - (mound ? Math.max(0, 2.2 - Math.abs(o)) * 1.2 : 0), w = rnd() < .3 ? 1 : .7, r = rnd();
+        sh += sq(gx, gy + .6, w); if (r < .55) g1 += sq(gx, gy, w); else if (r < .9) g2 += sq(gx, gy, w); else hi += sq(gx, gy, .7); }
+    }
+  }
+  return `<g class="salt bsalt"><path d="${fill}" fill="#f4efe4" fill-opacity=".16"/><path d="${fill}" fill="url(#bsaltp)" opacity=".7"/><path d="${sh}" fill="#000" fill-opacity=".45"/><path d="${g2}" fill="#cfc8b8"/><path d="${g1}" fill="#f2ede2"/><path d="${hi}" fill="#fff" class="bsalt-e"/></g>`;
 }
 function bFireSVG(seed) {
   const d = -((seed * 0.137) % 1) * .9;
