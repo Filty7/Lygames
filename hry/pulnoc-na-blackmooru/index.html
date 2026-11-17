@@ -1929,6 +1929,61 @@ body.bui #game .top #viewbtn.bview.kon { color: #ff6a5a !important; text-shadow:
 .rpgmenu.bmm .bside:hover .mm-sym.hsig-dum { filter: drop-shadow(0 2px 0 #000) drop-shadow(0 0 10px #ff2a1a); }
 .rpgmenu.bmm .mm-btn.bside:hover::before { display: none; }
 .bgrave-n text { font: 700 10px 'BM Gotisch', var(--f-disp); fill: #ff7a5a; letter-spacing: .02em; paint-order: stroke; stroke: #000; stroke-width: 1.4px; filter: drop-shadow(0 0 2px #ff2a10); } .bgrave-n { pointer-events: none; }
+
+/* v71: beta zvýraznění polí (pohyb, dosah, výběr pole/místnosti, Alt průchodnost, kruhy) */
+.hga { pointer-events: none; }
+.hga path { stroke-linejoin: round; stroke-linecap: round; }
+.hga-f { fill: var(--hc); opacity: .06; }
+.hga-n { opacity: .2; }
+.hga-i { fill: none; stroke: var(--hc); stroke-width: .6; stroke-opacity: .28; stroke-dasharray: .8 1.6; }
+.hga-o3 { fill: none; stroke: var(--hc); stroke-width: 5; stroke-opacity: .09; }
+.hga-o1 { fill: none; stroke: var(--hc); stroke-width: 1.1; stroke-opacity: .7; stroke-dasharray: 6 .9 2.6 .7 9 1.3 3.4 .8 5 1.1; }
+.hga-a-range .hga-o1, .hga-a-ally .hga-o1 { stroke-dasharray: 3 2.2 1.2 2; }
+.hga-pick .hga-f, .hga-atk .hga-f { opacity: .13; } .hga-pick .hga-n, .hga-atk .hga-n { opacity: .4; } .hga-pick .hga-o1, .hga-atk .hga-o1 { stroke-opacity: .9; stroke-width: 1.3; }
+.hga-pick .hga-o1, .hga-atk .hga-o1 { animation: hgp 1.6s ease-in-out infinite alternate; }
+.hga-faint .hga-o1 { stroke-opacity: .4; } .hga-faint .hga-n { opacity: .14; }
+.bpass .hga-f { opacity: .12; } .bpass .hga-n { opacity: .34; } .bpass .hga-i { stroke-opacity: .4; } .bpass .hga-o1 { stroke-opacity: .85; }
+.hga-circ .hga-f { opacity: .1; } .hga-circ .hga-n { opacity: .3; } .hga-circ .hga-o3 { stroke-opacity: .16; stroke-width: 6; }
+.hga-circ { animation: hgcirc 2.6s ease-in-out infinite alternate; }
+@keyframes hgcirc { from { opacity: .65; } to { opacity: 1; } }
+@media (prefers-reduced-motion: reduce) { .hga-o1, .hga-circ { animation: none !important; } }
+
+/* v71: beta hod na útok pod hodinami, pixelová D10 */
+body.bui .roll.broll { position: absolute; left: 50%; top: 204px; transform: translate(-50%, 0); z-index: 12; background: none; outline: 0; box-shadow: none; border: 22px solid transparent; border-image: var(--bu-paper) 70 fill / 22px / 0 stretch; padding: 2px 14px 4px; filter: drop-shadow(0 12px 22px #000e); min-width: 230px; animation: brpop .22s ease-out; }
+@keyframes brpop { from { transform: translate(-50%, -10px) scale(.94); opacity: 0; } }
+body.bui .roll.broll.out { opacity: 0; }
+body.bui .roll.broll .die { width: 66px; height: 72px; clip-path: none; box-shadow: none; background: var(--bd-h) center / 100% 100% no-repeat; image-rendering: pixelated; color: #1a1009; font: 400 24px/1 var(--f-pix); padding: 0 0 12px; filter: drop-shadow(0 3px 0 #0008); }
+body.bui .roll.broll .die span { text-shadow: 0 1px 0 #fff4d466; }
+body.bui .roll.broll.enemy .die { background-image: var(--bd-o); color: #ffe6d8; } body.bui .roll.broll.enemy .die span { text-shadow: 0 1px 0 #000a; }
+body.bui .roll.broll.crit .die { background-image: var(--bd-c); color: #2a1604; }
+body.bui .roll.broll.fumble .die { background-image: var(--bd-f); color: #1a161c; }
+body.bui .roll.broll .die.die2 { width: 46px; height: 50px; font-size: 18px; padding-bottom: 9px; }
+body.bui .roll.broll .roll-who { display: block; font: 500 13px 'BM Gotisch', var(--f-disp); letter-spacing: .08em; text-transform: none; color: #b8a888; }
+body.bui .roll.broll.enemy .roll-who { color: #e07a66; }
+body.bui .roll.broll .roll-total b { font: 400 30px var(--f-pix); color: #f0e2c4; text-shadow: 0 2px 0 #000; }
+body.bui .roll.broll .roll-res { color: #c8b898; font: 500 13px var(--f-body); }
+body.bui .roll.broll .roll-stamp { font: 700 17px 'BM Gotisch', var(--f-disp); background: #120c08ee; border-width: 2px; right: -26px; top: -18px; letter-spacing: .06em; }
+body.bui .roll.broll .mchip { border-radius: 0; }
+/* v71: deník úkolu vlevo nahoře */
+#bquest { position: absolute; left: 14px; top: 12px; z-index: 9; width: 238px; padding: 6px 14px 8px 16px; cursor: pointer; isolation: isolate; color: #d8c8a8; font: 400 14px/1.2 var(--f-body); transform: rotate(-.6deg); transition: filter .2s; user-select: none; }
+#bquest::before { content: ""; position: absolute; inset: 0; z-index: -1; border: 20px solid transparent; border-image: var(--bu-paper) 70 fill / 20px / 0 stretch; }
+#bquest::after { content: ""; position: absolute; inset: 4px; z-index: -2; background: #0b0807b0; border-radius: 6px; filter: blur(3px); }
+#bquest:hover { filter: brightness(1.12); }
+#bquest .bq-h { font: 700 19px/1 'BM Gotisch', var(--f-disp); letter-spacing: .04em; color: #e8d6b0; display: flex; justify-content: space-between; align-items: baseline; text-shadow: 0 1px 0 #000; }
+#bquest .bq-tg { font: 400 14px var(--f-pix); color: #8a7a60; }
+#bquest .bq-n { font: 500 12px 'BM Gotisch', var(--f-disp); color: #9a8a6c; margin: 1px 0 5px; letter-spacing: .03em; }
+#bquest .bq-i { display: grid; grid-template-columns: 14px 1fr; gap: 6px; align-items: start; margin-top: 4px; }
+#bquest .bq-c { width: 11px; height: 11px; margin-top: 2px; border: 1.5px solid #8a7656; box-shadow: inset 0 0 0 1px #0006; position: relative; }
+#bquest .bq-i.done .bq-c::after { content: ""; position: absolute; left: 1px; top: -4px; width: 5px; height: 10px; border: solid #c43a28; border-width: 0 3px 3px 0; transform: rotate(40deg); }
+#bquest .bq-i.done .bq-t { color: #8a7c66; text-decoration: line-through; text-decoration-color: #a0302288; }
+#bquest .bq-t b { color: #f3dfae; font-size: 15px; }
+#bquest .bq-t small { display: block; font-size: 11.5px; color: #9a8a70; font-style: italic; margin-top: 1px; }
+#bquest .bq-pips { display: flex; gap: 4px; margin-top: 4px; }
+#bquest .bq-pips i { width: 12px; height: 12px; border-radius: 50%; border: 1.5px solid #6a4a8a; background: #1a1020; }
+#bquest .bq-pips i.on { background: radial-gradient(#e8c8ff, #9a5ad8 60%, #4a2070); border-color: #c89aff; box-shadow: 0 0 6px #b070ff; }
+#bquest.mini .bq-n { display: none; }
+/* v71: sněžení v popředí */
+#bsnow { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 5; pointer-events: none; image-rendering: pixelated; }
 </style>
 
 <div id="menu">
@@ -11072,6 +11127,7 @@ function renderMap() {
   for (const f of G.fire) { if (!roomVisible(C.roomOf(f.hex))) continue; const [x, y] = px(f.hex); ov += betaOn() ? `<path d="${hexPts(x, y, SIZE - .5)}" fill="#1a0602" opacity=".75"/><path d="${hexPts(x, y, SIZE - 3)}" fill="#ff5a14" opacity=".18"/>` : `<path d="${hexPts(x, y, SIZE - 2)}" fill="#3a1206" opacity=".7"/><ellipse cx="${x}" cy="${y}" rx="40" ry="${40 * KY}" fill="url(#ag-warm)" class="fireglow"/>`; }
   for (const c of G.circles || []) { if (!roomVisible(c.room)) continue; const bad = !C.circleActive(G, c), on = c.hexes.some(x => G.heroes.some(h => !h.downed && C.eq(h.pos, x)));
     const cx = c.hexes.reduce((a, x) => a + px(x)[0], 0) / 3, cy = c.hexes.reduce((a, x) => a + px(x)[1], 0) / 3;
+    if (betaOn() && !bad) ov += hgArea(c.hexes, 'circ', 'hga-circ');
     ov += `<g class="circ${bad ? ' bad' : ''}${on ? ' on' : ''}">${c.hexes.map(x => `<path d="${pts(x, SIZE - 2)}" class="circ-hex"/>`).join('')}<ellipse cx="${cx}" cy="${cy}" rx="${WPX * .95}" ry="${WPX * .95 * KY}" class="circ-ring"/><ellipse cx="${cx}" cy="${cy}" rx="${WPX * .7}" ry="${WPX * .7 * KY}" class="circ-ring r2"/>${[0, 1, 2, 3, 4].map(i => { const a = i / 5 * Math.PI * 2 - Math.PI / 2, b = (i + 2) / 5 * Math.PI * 2 - Math.PI / 2; return `<path d="M${(cx + Math.cos(a) * WPX * .7).toFixed(1)} ${(cy + Math.sin(a) * WPX * .7 * KY).toFixed(1)}L${(cx + Math.cos(b) * WPX * .7).toFixed(1)} ${(cy + Math.sin(b) * WPX * .7 * KY).toFixed(1)}" class="circ-star"/>`; }).join('')}</g>`; }
   for (const r of G.cleansed || []) { if (!roomVisible(r)) continue; const R0 = C.ROOM_DEFS.find(x => x.id === r), x0 = wx(R0.k0), y0 = wy(R0.y0), w = wx(R0.k1) - x0; ov += `<rect x="${x0}" y="${y0}" width="${w}" height="${wy(R0.y1) - y0}" class="cleansed"/><text x="${x0 + 10}" y="${y0 + 16}" class="clean-lbl">OČIŠTĚNO</text>`; }
   for (const g of G.goo || []) { if (!roomVisible(C.roomOf(g.hex))) continue; const [x, y] = px(g.hex); ov += `<g class="goo"><path d="${hexPts(x, y, SIZE - 2)}" fill="#5a6a1a" fill-opacity=".38" stroke="#9ab030" stroke-opacity=".55" stroke-width="1.2" stroke-dasharray="3 2"/><ellipse cx="${x - 4}" cy="${y + 2}" rx="8" ry="${8 * KY}" fill="#8a9a2a" opacity=".45"/><ellipse cx="${x + 6}" cy="${y - 3}" rx="3.4" ry="${3.4 * KY}" fill="#c8d860" opacity=".5"/><circle cx="${x + 2}" cy="${y + 5}" r="1.6" fill="#c8d860" opacity=".6"/></g>`; }
@@ -11313,10 +11369,28 @@ function outlinePath(hexes) {
   }
   return d;
 }
-function hlArea(hexes, cls) { if (!hexes.length) return; gHl.insertAdjacentHTML('beforeend', `<path d="${hexes.map(h => pts(h, SIZE - .6)).join('')}" class="area-fill ${cls}"/><path d="${outlinePath(hexes)}" class="area-line ${cls}"/>`); }
+// v71: beta – zvýraznění polí ve stejné stylizaci jako záře pod figurkami (pixelový šum + ručně kreslený obrys), slabší opacita
+const HGC = { 'a-move': '243,207,142', 'a-mmove': '255,122,90', 'a-range': '255,74,58', 'a-ally': '143,216,200', pick: '143,216,200', faint: '154,143,176', atk: '255,90,70', imp: '196,92,24', rough: '186,152,34', circ: '196,130,255' };
+function hgPat(key) {
+  const id = 'hgP-' + key.replace(/[^a-z]/g, ''); if (document.getElementById(id)) return id;
+  const gd = document.querySelector('#gdefs defs'); if (!gd) return id;
+  const rgb = HGC[key] || '255,255,255', cv = document.createElement('canvas'); cv.width = cv.height = 48; const g = cv.getContext('2d'); let s = 0; for (const ch of key) s = (s * 31 + ch.charCodeAt(0)) % 2147483647; s = s || 7;
+  const r = () => (s = (s * 16807) % 2147483647) / 2147483647;
+  for (let y = 0; y < 48; y++) for (let x = 0; x < 48; x++) { const v = r(); if (v < .34) { g.fillStyle = `rgba(${rgb},${(.18 + r() * .5).toFixed(2)})`; g.fillRect(x, y, 1, 1); } else if (v > .9) { g.fillStyle = 'rgba(0,0,0,.35)'; g.fillRect(x, y, 1, 1); } }
+  gd.insertAdjacentHTML('beforeend', `<pattern id="${id}" patternUnits="userSpaceOnUse" width="24" height="24"><image href="${cv.toDataURL()}" width="24" height="24" style="image-rendering:pixelated"/></pattern>`);
+  return id;
+}
+function hgArea(hexes, key, cls) {
+  if (!hexes.length) return '';
+  const id = hgPat(key), f = hexes.map(h => pts(h, SIZE - 1.6)).join(''), i = hexes.map(h => pts(h, SIZE - 3.6)).join(''), o = outlinePath(hexes);
+  return `<g class="hga hga-${key} ${cls || ''}" style="--hc:rgb(${HGC[key] || '255,255,255'})"><path class="hga-f" d="${f}"/><path class="hga-n" d="${f}" fill="url(#${id})"/><path class="hga-i" d="${i}"/><path class="hga-o3" d="${o}"/><path class="hga-o1" d="${o}"/></g>`;
+}
+let hgPend = null;
+function hlArea(hexes, cls) { if (!hexes.length) return; if (betaOn()) { gHl.insertAdjacentHTML('beforeend', hgArea(hexes, cls)); return; } gHl.insertAdjacentHTML('beforeend', `<path d="${hexes.map(h => pts(h, SIZE - .6)).join('')}" class="area-fill ${cls}"/><path d="${outlinePath(hexes)}" class="area-line ${cls}"/>`); }
 function rangeHexes(from, range) { const G = S.G; return C.ALL_HEXES.filter(x => C.dist(x, from) <= range && (C.isPlayable(x) || C.isWallHex(x)) && C.hexRevealed(G, x) && !C.isBlock(x)); }
 function hlHex(h, cls, label) {
-  gHl.insertAdjacentHTML('beforeend', `<path d="${pts(h, SIZE - 2.2)}" class="hl ${cls}"/>`);
+  if (betaOn() && hgPend && /^hl-(pick|faint|atk)$/.test(cls)) { const k = cls.slice(3); (hgPend[k] = hgPend[k] || []).push(h); }
+  else gHl.insertAdjacentHTML('beforeend', `<path d="${pts(h, SIZE - 2.2)}" class="hl ${cls}"/>`);
   if (label !== undefined && label !== '') { const [x, y] = px(h); gHl.insertAdjacentHTML('beforeend', `<text x="${x}" y="${y + 3.5}" class="hl-txt" text-anchor="middle">${label}</text>`); }
 }
 function hlPill(h, text, cls, data, lift) {
@@ -11350,17 +11424,27 @@ function passOverlay(on) {
   let lg = $('#passleg'); if (lg) lg.remove();
   if (!on || !S.G || $('#game').hidden) return;
   const G = S.G, vis = h => C.zonesOf(h).some(roomVisible);
-  let imp = '', rough = '';
+  let imp = '', rough = ''; const impL = [], roughL = [];
   for (const h of C.ALL_HEXES) {
     if (!vis(h)) continue;
     const d = C.doorAt(G, h);
-    if (C.isBlock(h) || (C.isWallHex(h) && !d) || C.isFence(h) || (d && (d.state === 'locked' || C.isBars(d) || d.state === 'shut' || (d.exit && d.state !== 'open'))) || G.monsters.some(m => C.MDEF[m.type].object && C.eq(m.pos, h))) imp += pts(h, SIZE - 1.5);
-    else if (C.isRough(h) || (d && d.state === 'closed') || (C.slimeAt && C.slimeAt(G, h))) rough += pts(h, SIZE - 1.5);
+    if (C.isBlock(h) || (C.isWallHex(h) && !d) || C.isFence(h) || (d && (d.state === 'locked' || C.isBars(d) || d.state === 'shut' || (d.exit && d.state !== 'open'))) || G.monsters.some(m => C.MDEF[m.type].object && C.eq(m.pos, h))) { imp += pts(h, SIZE - 1.5); impL.push(h); }
+    else if (C.isRough(h) || (d && d.state === 'closed') || (C.slimeAt && C.slimeAt(G, h))) { rough += pts(h, SIZE - 1.5); roughL.push(h); }
   }
-  g = sv('g', { class: 'passov' }); g.innerHTML = `<path class="imp" d="${imp}"/><path class="rough" d="${rough}"/>`; gTop.appendChild(g);
-  document.body.appendChild(el('div', { id: 'passleg', class: 'passov-leg' }, `Průchodnost:<i style="background:#e0302a"></i>nejde projít<i style="background:#f0c020"></i>pohyb za 2 (náročný terén, zavřené dveře, sliz)`));
+  if (betaOn()) { g = sv('g', { class: 'passov bpass' }); g.innerHTML = hgArea(impL, 'imp') + hgArea(roughL, 'rough'); gTop.appendChild(g); }
+  else { g = sv('g', { class: 'passov' }); g.innerHTML = `<path class="imp" d="${imp}"/><path class="rough" d="${rough}"/>`; gTop.appendChild(g); }
+  const ci = betaOn() ? '#c45c18' : '#e0302a', cr = betaOn() ? '#ba9822' : '#f0c020';
+  document.body.appendChild(el('div', { id: 'passleg', class: 'passov-leg' }, `Průchodnost:<i style="background:${ci}"></i>nejde projít<i style="background:${cr}"></i>pohyb za 2 (náročný terén, zavřené dveře, sliz)`));
 }
 function renderHighlights() {
+  hgPend = {};
+  try { renderHighlights0(); } finally {
+    const P = hgPend; hgPend = null;
+    // místnosti zvlášť, ať má každá vlastní obrys
+    for (const k in P) { const by = new Map(); for (const h of P[k]) { const r = C.roomOf(h) || ''; if (!by.has(r)) by.set(r, []); by.get(r).push(h); } for (const l of by.values()) gHl.insertAdjacentHTML('afterbegin', hgArea(l, k, 'hga-c')); }
+  }
+}
+function renderHighlights0() {
   gHl.innerHTML = ''; hgMarks.clear();
   gDepth.querySelectorAll('.furn.cand').forEach(f => f.classList.remove('cand'));
   let pills = gTop.querySelector('.hlpills'); if (pills) pills.innerHTML = ''; else gTop.appendChild(sv('g', { class: 'hlpills' }));
@@ -12180,6 +12264,30 @@ function attackStyle(ev) {
   if (item === 'savle') return { kind: 'melee', fx: 'slash', snd: 'blade' };
   return ranged ? { kind: 'proj', proj: 'bullet', snd: 'shot' } : { kind: 'melee', fx: 'slash', snd: 'blade' };
 }
+// v71: beta – pixelová desetistěnná kostka (D10), čtyři barevná provedení jako CSS proměnné
+function bD10(pal) {
+  const W = 24, H = 26, cv = document.createElement('canvas'); cv.width = W; cv.height = H; const g = cv.getContext('2d');
+  const T = [12, 1], L1 = [2, 10], L2 = [3, 17], B = [12, 24], R2 = [21, 17], R1 = [22, 10], FL = [6.5, 12], FC = [12, 17.5], FR = [17.5, 12];
+  const poly = (c, ...p) => { g.fillStyle = c; g.beginPath(); g.moveTo(...p[0]); for (const q of p.slice(1)) g.lineTo(...q); g.closePath(); g.fill(); };
+  poly(pal[1], T, L1, L2, FL); poly(pal[2], T, FR, R2, R1); poly(pal[3], FL, L2, B, FC); poly(pal[4], FC, B, R2, FR); poly(pal[0], T, FL, FC, FR);
+  const im = g.getImageData(0, 0, W, H), d = im.data, solid = new Uint8Array(W * H);
+  for (let i = 0; i < W * H; i++) solid[i] = d[i * 4 + 3] > 110 ? 1 : 0;
+  let sd = 5;
+  const rnd = () => (sd = (sd * 16807) % 2147483647) / 2147483647;
+  const hex = c => [1, 3, 5].map(k => parseInt(c.slice(k, k + 2), 16));
+  for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) { const i = y * W + x, o = i * 4;
+    if (solid[i]) { d[o + 3] = 255; const r = rnd(); const k = r < .12 ? .82 : r > .95 ? 1.12 : 1; for (let j = 0; j < 3; j++) d[o + j] = Math.min(255, d[o + j] * k); }
+    else { const n = (x > 0 && solid[i - 1]) || (x < W - 1 && solid[i + 1]) || (y > 0 && solid[i - W]) || (y < H - 1 && solid[i + W]); if (n) { const c = hex(pal[5]); d[o] = c[0]; d[o + 1] = c[1]; d[o + 2] = c[2]; d[o + 3] = 255; } else d[o + 3] = 0; } }
+  g.putImageData(im, 0, 0);
+  // hrany mezi stěnami
+  g.fillStyle = pal[5] + '66'; for (const [a, b] of [[T, FL], [T, FR], [FL, FC], [FR, FC]]) { const n = 14; for (let i = 0; i <= n; i++) g.fillRect(Math.round(a[0] + (b[0] - a[0]) * i / n - .5), Math.round(a[1] + (b[1] - a[1]) * i / n - .5), 1, 1); }
+  return cv.toDataURL();
+}
+function bD10Init() {
+  if (document.body.style.getPropertyValue('--bd-h')) return;
+  const P = { h: ['#eadfc4', '#c9b998', '#a28e6c', '#86724f', '#6a573a', '#1a1009'], o: ['#c4362a', '#97231c', '#741813', '#5a100c', '#420907', '#120303'], c: ['#ffeaa8', '#f1c972', '#c99a3e', '#a47828', '#7c5818', '#221404'], f: ['#8c858c', '#6c666e', '#55505a', '#443f48', '#34303a', '#0c0a0e'] };
+  for (const k in P) document.body.style.setProperty('--bd-' + k, `url(${bD10(P[k])})`);
+}
 async function rollAnim(ev) {
   render();
   const G = S.G, st = betaOn() ? bAttackStyle(ev, attackStyle(ev)) : attackStyle(ev); // v61c: beta střely
@@ -12200,10 +12308,11 @@ async function rollAnim(ev) {
   let [x, y] = screenPos(ev.at, tl + 18);
   x = Math.min(Math.max(x, 150), wrap.scrollWidth - 150);
   const below = y - wrap.scrollTop < 140;
-  const box = el('div', { class: 'roll' + (ev.enemy ? ' enemy' : '') + (below ? ' below' : '') });
-  box.style.left = x + 'px'; box.style.top = (below ? screenPos(ev.at, -24)[1] : y) + 'px';
+  const bR = buiOn();
+  const box = el('div', { class: 'roll' + (ev.enemy ? ' enemy' : '') + (bR ? ' broll' : below ? ' below' : '') });
+  if (bR) bD10Init(); else { box.style.left = x + 'px'; box.style.top = (below ? screenPos(ev.at, -24)[1] : y) + 'px'; }
   box.innerHTML = `${ev.adv ? `<div class="roll-adv ${ev.adv > 0 ? 'adv' : 'dis'}">${ev.adv > 0 ? 'Výhoda · platí vyšší kostka' : 'Nevýhoda' + (ev.why && ev.why.length ? ' (' + esc(ev.why.join(', ')) + ')' : '') + ' · platí nižší kostka'}</div>` : ''}<div class="roll-who">${ev.pry ? 'Páčení dveří' : ev.friendly ? 'Výbuch zasahuje lovce' : ev.enemy ? 'Útok Domu' : 'Hod lovce'}</div><div class="roll-row">${ev.dice ? '<div class="die die2"><span>?</span></div>' : ''}<div class="die"><span>?</span></div><div class="roll-calc"></div><div class="roll-total"></div></div><div class="roll-res"></div><div class="roll-dmg"></div>`;
-  wrap.appendChild(box);
+  (bR ? $('#game') : wrap).appendChild(box);
   const span = box.querySelector('.die:not(.die2) span'), span2 = box.querySelector('.die2 span'), calc = box.querySelector('.roll-calc'), tot = box.querySelector('.roll-total');
   sfx('dice');
   box.classList.add('rolling');
@@ -12453,7 +12562,7 @@ function buiApply(G) {
   { const tools = $('#bbtools'), lk = $('#docklock'), sz = $('.dock-size'), dock = $('#handdock');
     if (on && tools && lk && lk.parentNode !== tools) { tools.appendChild(lk); tools.appendChild(sz); }
     if (!on && dock && lk && lk.parentNode !== dock) { dock.appendChild(lk); dock.appendChild(sz); } }
-  if (!on) { const mp = $('#game > .popwrap.bmenu'); if (mp) { mp.classList.remove('bmenu'); $('#game .top').appendChild(mp); } return; }
+  if (!on) { const mp = $('#game > .popwrap.bmenu'); if (mp) { mp.classList.remove('bmenu'); $('#game .top').appendChild(mp); } ['#bquest', '#bsnow'].forEach(k => { const e = $(k); if (e) e.remove(); }); return; }
   bcStyle();
   const ck = $('#game .top .clock'); if (ck) { let w = ck.querySelector('.bclock-w'); if (!w) { w = el('div', { class: 'bclock-w' }); ck.appendChild(w); } if (w._k !== G.maxRound) { w._k = G.maxRound; w.innerHTML = buiClockSVG(G); w._r = null; } if (!S.clockHold && w._r !== G.round) { w._r = G.round; buiClockSet(G.round - 1 + (G.phase === 'over' ? 1 : 0), G.maxRound, false); } }
   // Menu do pravého horního rohu
@@ -12469,6 +12578,43 @@ function buiApply(G) {
     if (vb) { vb.classList.toggle('bview', ol && G.phase !== 'setup'); if (ol) { vb.textContent = 'Kořist'; vb.title = view() === 'all' ? 'Ukázat, co vidí lovci' : 'Zpět na celý dům'; } }
     if (hb && ol) hb.hidden = true; }
   let vg = $('#bvign'); if (!vg) { vg = el('div', { id: 'bvign' }); $('#game').insertBefore(vg, $('#mapover')); }
+  buiQuest(G); bSnow(G);
+}
+// v71: deník úkolu – papírek vlevo nahoře s postupem scénáře (klik = sbalit)
+function questItems(G) {
+  const g = G.scen.goal, it = (t, done, extra) => ({ t, done, extra });
+  if (g === 'escape') { const found = G.exitUnlocked || G.heroes.some(h => h.keys.length);
+    return [it('Najdi pravý klíč', found, 'Jeden z klíčů je falešný.'), it('Odemkni hlavní dveře', !!G.exitUnlocked), it(`Utečte ven: <b>${G.escaped}</b> / 2`, G.escaped >= 2, 'Stačí dva lovci.')]; }
+  if (g === 'circles') { const ac = G.circles[G.activeCircle], need = G.scen.need;
+    let pips = ''; for (let i = 0; i < need; i++) pips += `<i class="${i < G.progress ? 'on' : ''}"></i>`;
+    return [it(`Vyvolání <b>${G.progress}</b> / ${need}<span class="bq-pips">${pips}</span>`, G.progress >= need), it('Začni tah v zářícím kruhu', false, ac ? 'Kruh teď svítí: ' + esc(C.ROOMS[ac.room]) : '')]; }
+  const gl = $('#goal'); return [it(gl ? gl.innerHTML : esc(G.scen.goalShort || ''), false, esc(G.scen.goalShort || ''))];
+}
+function buiQuest(G) {
+  let q = $('#bquest');
+  if (!q) { q = el('div', { id: 'bquest', role: 'button', tabindex: '0', title: 'Úkol scénáře (klikni pro sbalení)' }); $('#game').appendChild(q);
+    const tg = () => { S.questMini = !S.questMini; try { localStorage.setItem('bm_qmini', S.questMini ? '1' : '0'); } catch (e) {} q._s = null; buiQuest(S.G); };
+    q.addEventListener('click', tg); q.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); tg(); } });
+    if (S.questMini === undefined) { try { S.questMini = localStorage.getItem('bm_qmini') === '1'; } catch (e) { S.questMini = false; } } }
+  q.hidden = G.phase === 'setup';
+  const items = questItems(G);
+  const h = `<div class="bq-h">Úkol<span class="bq-tg">${S.questMini ? '+' : '–'}</span></div><div class="bq-n">${esc(G.scen.name)}</div>` + items.map((x, i) => (S.questMini && i > 0 && !(G.scen.goal === 'escape' && !items[i - 1].done)) ? '' : `<div class="bq-i${x.done ? ' done' : ''}"><span class="bq-c"></span><span class="bq-t">${x.t}${x.extra && !S.questMini ? `<small>${x.extra}</small>` : ''}</span></div>`).join('');
+  if (q._s !== h) { q._s = h; q.innerHTML = h; q.classList.toggle('mini', !!S.questMini); }
+}
+// v71: lehké sněžení v popředí (scénář na hřbitově)
+function bSnow(G) {
+  const on = G && C.MAP && G.scen && G.scen.map === 'hrbitov' && !reduced;
+  let cv = $('#bsnow');
+  if (!on) { if (cv) { cv.remove(); } return; }
+  if (cv) return;
+  cv = el('canvas', { id: 'bsnow', 'aria-hidden': 'true' }); $('#game').insertBefore(cv, $('#bvign'));
+  const ctx = cv.getContext('2d'), P = 3; let W = 0, H = 0, fl = [], last = 0;
+  const size = () => { W = Math.ceil(cv.clientWidth / P); H = Math.ceil(cv.clientHeight / P); cv.width = W; cv.height = H; const n = Math.round(W * H / 900); while (fl.length < n) fl.push(mk(true)); fl.length = n; };
+  const mk = any => { const z = Math.random(); return { x: Math.random() * (W || 600), y: any ? Math.random() * (H || 300) : -2, z, v: .25 + z * .55, s: z > .82 ? 2 : 1, ph: Math.random() * 6.28, a: .25 + z * .5 }; };
+  const step = t => { if (!cv.isConnected) return; requestAnimationFrame(step); if (t - last < 40) return; const dt = Math.min(3, (t - last) / 40); last = t;
+    if (Math.ceil(cv.clientWidth / P) !== W) size(); ctx.clearRect(0, 0, W, H);
+    for (const f of fl) { f.y += f.v * dt; f.ph += .03 * dt; f.x += (Math.sin(f.ph) * .25 + .12) * dt; if (f.y > H + 2 || f.x > W + 2) Object.assign(f, mk(false), { x: Math.random() * W }); ctx.fillStyle = `rgba(232,240,252,${f.a.toFixed(2)})`; ctx.fillRect(f.x | 0, f.y | 0, f.s, f.s); } };
+  size(); addEventListener('resize', size); requestAnimationFrame(step);
 }
 function renderTop() {
   const G = S.G;
@@ -14561,7 +14707,7 @@ function finishGame(res) {
   showEnd(res);
 }
 
-window.__UI = { setLootMark: n => { envLootMarkN = n; if (gTop) gTop._spots = null; }, hostCtl, UIF, S, toks, bPose, bmPose, setBeta, setZoom, BFX: { fxBuff, fxDebuff, fxHeal, fxPoison, fxBleed, fxCamFlash, bProjectile, bHitFx, bDeathFx, bDecalAt, bStrike, B_MON_PROJ, B_HERO_PROJ }, px, hexAtPoint, render, cardHTML, olCardHTML, SPR, showCamp, startGame, lootPopup, NETS, human, Bots, showLegacy: () => { $('#mainmenu').hidden = true; $('#legacy').hidden = false; } };
+window.__UI = { rollAnim, renderHighlights, passOverlay, setLootMark: n => { envLootMarkN = n; if (gTop) gTop._spots = null; }, hostCtl, UIF, S, toks, bPose, bmPose, setBeta, setZoom, BFX: { fxBuff, fxDebuff, fxHeal, fxPoison, fxBleed, fxCamFlash, bProjectile, bHitFx, bDeathFx, bDecalAt, bStrike, B_MON_PROJ, B_HERO_PROJ }, px, hexAtPoint, render, cardHTML, olCardHTML, SPR, showCamp, startGame, lootPopup, NETS, human, Bots, showLegacy: () => { $('#mainmenu').hidden = true; $('#legacy').hidden = false; } };
 if (document.readyState === 'loading') window.addEventListener('DOMContentLoaded', initMenu); else initMenu();
 })();
 
