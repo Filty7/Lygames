@@ -163,6 +163,8 @@ kbd { font: 600 10px var(--f-body); border: 1px solid var(--line-2); border-radi
 body.busy svg.map .flick, body.busy .tok-idle, body.busy .mir-eye, body.busy .lid, body.busy #mapover::after, body.busy .fx-amb { animation-play-state: paused !important; }
 @keyframes drift { from { transform: translateX(-14px); } to { transform: translateX(14px); } }
 .fireglow { animation: fglow .4s ease-in-out infinite alternate; }
+.bfire { animation: bfire .95s steps(10) infinite; image-rendering: pixelated; } @keyframes bfire { to { transform: translateX(-840px); } }
+.bsalt .bsalt-e { filter: drop-shadow(0 0 2px #fff8); }
 @keyframes fglow { from { opacity: .7; } to { opacity: 1; } }
 .flame-big, .fire-anim { transform-box: fill-box; transform-origin: 50% 100%; animation: flick .22s ease-in-out infinite alternate; }
 @keyframes flick { from { transform: scale(1, .92) skewX(-3deg); } to { transform: scale(.96, 1.06) skewX(3deg); } }
@@ -10786,8 +10788,9 @@ function renderMap() {
   for (const d of G.doors) if (!d.rooms.some(roomVisible)) ov += `<path d="${pts(d.hex, SIZE + 2)}" fill="#030204"/>`;
   for (const sp of G.spots) if (sp.sensed && !roomVisible(C.roomOf(sp.hex))) ov += `<path d="${pts(sp.hex, SIZE - 1)}" fill="#241e1a" stroke="#f3cf8e" stroke-opacity=".6" stroke-width="1" stroke-dasharray="2 2"/>`;
   for (const d of G.doors) if (d.rooms.some(r => roomVisible(r) && roomDark(G, r)) && d.rooms.some(roomVisible)) ov += `<path d="${pts(d.hex, SIZE - .5)}" fill="#03040a" opacity=".62"/>`;
-  for (const s of G.salt) { if (!roomVisible(C.roomOf(s.hex)) || !C.saltable(G, s.hex)) continue; const [x, y] = px(s.hex); ov += `<g class="salt"><path d="${hexPts(x, y, SIZE - 4)}" fill="#f1ece0" fill-opacity=".12" stroke="#f8f4ea" stroke-width="2.2" stroke-dasharray="1.2 2.2" stroke-linecap="round"/><circle cx="${x - 6}" cy="${y - 2}" r="1" fill="#fff" class="twinkle"/><circle cx="${x + 7}" cy="${y + 3}" r=".9" fill="#fff" class="twinkle t2"/></g>`; }
-  for (const f of G.fire) { if (!roomVisible(C.roomOf(f.hex))) continue; const [x, y] = px(f.hex); ov += `<path d="${hexPts(x, y, SIZE - 2)}" fill="#3a1206" opacity=".7"/><ellipse cx="${x}" cy="${y}" rx="40" ry="${40 * KY}" fill="url(#ag-warm)" class="fireglow"/>`; }
+  if (betaOn()) { bSaltDefs(); const sl = G.salt.filter(s => roomVisible(C.roomOf(s.hex)) && C.saltable(G, s.hex)).map(s => s.hex); if (sl.length) ov += bSaltOverlay(sl); }
+  else for (const s of G.salt) { if (!roomVisible(C.roomOf(s.hex)) || !C.saltable(G, s.hex)) continue; const [x, y] = px(s.hex); ov += `<g class="salt"><path d="${hexPts(x, y, SIZE - 4)}" fill="#f1ece0" fill-opacity=".12" stroke="#f8f4ea" stroke-width="2.2" stroke-dasharray="1.2 2.2" stroke-linecap="round"/><circle cx="${x - 6}" cy="${y - 2}" r="1" fill="#fff" class="twinkle"/><circle cx="${x + 7}" cy="${y + 3}" r=".9" fill="#fff" class="twinkle t2"/></g>`; }
+  for (const f of G.fire) { if (!roomVisible(C.roomOf(f.hex))) continue; const [x, y] = px(f.hex); ov += betaOn() ? `<path d="${hexPts(x, y, SIZE - .5)}" fill="#1a0602" opacity=".75"/><path d="${hexPts(x, y, SIZE - 3)}" fill="#ff5a14" opacity=".18"/>` : `<path d="${hexPts(x, y, SIZE - 2)}" fill="#3a1206" opacity=".7"/><ellipse cx="${x}" cy="${y}" rx="40" ry="${40 * KY}" fill="url(#ag-warm)" class="fireglow"/>`; }
   for (const c of G.circles || []) { if (!roomVisible(c.room)) continue; const bad = !C.circleActive(G, c), on = c.hexes.some(x => G.heroes.some(h => !h.downed && C.eq(h.pos, x)));
     const cx = c.hexes.reduce((a, x) => a + px(x)[0], 0) / 3, cy = c.hexes.reduce((a, x) => a + px(x)[1], 0) / 3;
     ov += `<g class="circ${bad ? ' bad' : ''}${on ? ' on' : ''}">${c.hexes.map(x => `<path d="${pts(x, SIZE - 2)}" class="circ-hex"/>`).join('')}<ellipse cx="${cx}" cy="${cy}" rx="${WPX * .95}" ry="${WPX * .95 * KY}" class="circ-ring"/><ellipse cx="${cx}" cy="${cy}" rx="${WPX * .7}" ry="${WPX * .7 * KY}" class="circ-ring r2"/>${[0, 1, 2, 3, 4].map(i => { const a = i / 5 * Math.PI * 2 - Math.PI / 2, b = (i + 2) / 5 * Math.PI * 2 - Math.PI / 2; return `<path d="M${(cx + Math.cos(a) * WPX * .7).toFixed(1)} ${(cy + Math.sin(a) * WPX * .7 * KY).toFixed(1)}L${(cx + Math.cos(b) * WPX * .7).toFixed(1)} ${(cy + Math.sin(b) * WPX * .7 * KY).toFixed(1)}" class="circ-star"/>`; }).join('')}</g>`; }
@@ -10810,7 +10813,7 @@ function renderMap() {
   if (gDepth._fk !== fk) {
     gDepth._fk = fk;
     gDepth.querySelectorAll('.flames').forEach(n => n.remove());
-    for (const f of G.fire) { if (!roomVisible(C.roomOf(f.hex))) continue; const [x, y] = px(f.hex); const g = sv('g', { class: 'flames', transform: `translate(${x},${y})` }, flameSVG()); g._z = y + 0.3; placeInDepth(g); }
+    for (const f of G.fire) { if (!roomVisible(C.roomOf(f.hex))) continue; const [x, y] = px(f.hex); const g = sv('g', { class: 'flames', transform: `translate(${x},${y})` }, betaOn() ? bFireSVG(x * 7 + y * 13) : flameSVG()); g._z = y + 0.3; placeInDepth(g); }
   }
   renderScenObjs(G);
   renderSpots();
@@ -10865,6 +10868,61 @@ function renderMap() {
   hgUpdate(); // v64
   envOccSoon(); // v63d
   fxPos(); fxSync(); // v65
+}
+// v67 beta: pixelový oheň přes celý hex (doom-fire, generuje se jednou do pruhu snímků) a textura rozsypané soli
+const BFIRE_N = 10, BFIRE_W = 84;
+let bFireURL = null, bSaltURL = null;
+function bFireStrip() {
+  if (bFireURL) return bFireURL;
+  const W = BFIRE_W, H = 84, cx = 42, cy = 49, R = 48, N = BFIRE_N;
+  const inHex = (x, y, k) => { const dx = Math.abs(x - cx) / (R * k), dy = Math.abs(y - cy) / (R * k * KY); return dx <= SQ3 / 2 && dy <= 1 - dx / SQ3; };
+  let seed = 7; const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
+  // plamínky rozesazené po celém hexu (mřížka s rozptylem), nízké
+  const tg = []; for (let y = cy - 29; y <= cy + 31; y += 8) for (let x = cx - 41; x <= cx + 41; x += 10) { const bx = x + (rnd() - .5) * 7 + ((y / 8 | 0) % 2) * 5, by = y + (rnd() - .5) * 5; if (!inHex(bx, by, .84)) continue; const big = 1 - Math.hypot((bx - cx) / 42, (by - cy) / 30) * .4; tg.push({ bx, by, h: (9 + rnd() * 12) * big, w: (4.2 + rnd() * 2.6) * big, ph: rnd() * 6.28, k: 1 + (rnd() * 2 | 0) }); }
+  tg.sort((a, b) => a.by - b.by);
+  const COL = [[255, 246, 200], [255, 214, 90], [255, 150, 40], [222, 72, 22], [140, 30, 12]];
+  const cv = document.createElement('canvas'); cv.width = W * N; cv.height = H; const ctx = cv.getContext('2d');
+  const put = (x, y, c, a = 1) => { ctx.fillStyle = `rgba(${c[0]},${c[1]},${c[2]},${a})`; ctx.fillRect(x, y, 1, 1); };
+  for (let n = 0; n < N; n++) {
+    const ox = n * W, P = n / N * 6.2832;
+    // žhavé uhlíky = podklad
+    for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) { if (!inHex(x + .5, y + .5, .98)) continue; const e = inHex(x + .5, y + .5, .82) ? 1 : .55, r = rnd() / e; if (e < 1 && rnd() < .3) continue; put(ox + x, y, r < .035 ? COL[2] : r < .13 ? COL[3] : r < .42 ? COL[4] : [36, 7, 3], (r < .13 ? .85 : .72) * e); }
+    for (const t of tg) {
+      const h = t.h * (.72 + .28 * Math.sin(P * t.k + t.ph)), sw = 1.6 * Math.sin(P * t.k * 2 + t.ph * 1.7);
+      for (let j = 0; j < h; j++) { const f = j / h, hw = t.w * Math.pow(1 - f, .75) * (f < .18 ? .7 + f * 1.6 : 1), xc = t.bx + sw * f * f * 2;
+        for (let x = Math.floor(xc - hw); x <= Math.ceil(xc + hw); x++) { const d = Math.abs(x + .5 - xc) / Math.max(.5, hw); if (d > 1) continue; const I = (1 - d) * (1 - f * .55) + (rnd() - .5) * .12;
+          put(ox + x, Math.round(t.by - j), I > .8 ? COL[0] : I > .58 ? COL[1] : I > .34 ? COL[2] : I > .15 ? COL[3] : COL[4], d > .75 ? .7 : f > .8 ? .8 : 1); } }
+    }
+    for (let i = 0; i < 6; i++) { const x = cx + (rnd() - .5) * 70, y = cy - 20 - rnd() * 26; put(ox + Math.round(x), Math.round(y), COL[1 + (rnd() * 2 | 0)], .9); } // jiskry
+  }
+  return (bFireURL = cv.toDataURL());
+}
+function bSaltTile() {
+  if (bSaltURL) return bSaltURL;
+  const S2 = 64, cv = document.createElement('canvas'); cv.width = cv.height = S2; const ctx = cv.getContext('2d'); let seed = 11; const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
+  const dot = (x, y, w, h, c) => { ctx.fillStyle = c; for (const ox of [0, -S2, S2]) for (const oy of [0, -S2, S2]) ctx.fillRect(x + ox, y + oy, w, h); };
+  for (let i = 0; i < 150; i++) { const x = rnd() * S2 | 0, y = rnd() * S2 | 0, big = rnd() < .22; dot(x, y + 1, big ? 2 : 1, 1, '#00000066'); dot(x, y, big ? 2 : 1, 1, rnd() < .5 ? '#f6f2e8' : '#dcd6c8'); if (big && rnd() < .4) dot(x, y, 1, 1, '#ffffff'); }
+  for (let i = 0; i < 9; i++) { const x = rnd() * S2 | 0, y = rnd() * S2 | 0; for (let k = 0; k < 7; k++) dot(x + (rnd() * 6 | 0) - 3, y + (rnd() * 4 | 0) - 2, 1, 1, '#efe9dc'); } // hrudky
+  return (bSaltURL = cv.toDataURL());
+}
+function bSaltDefs() {
+  const defs = svg.querySelector('defs'); if (!defs || defs.querySelector('#bsaltp')) return;
+  defs.insertAdjacentHTML('beforeend', `<pattern id="bsaltp" patternUnits="userSpaceOnUse" width="32" height="32"><image href="${bSaltTile()}" width="32" height="32" style="image-rendering:pixelated"/></pattern>`);
+}
+// obrys sjednocené plochy soli: hrany hexů, za kterými už sůl není
+function bSaltOverlay(list) {
+  const cs = list.map(h => px(h)), has = (x, y) => cs.some(([a, b]) => Math.abs(a - x) < 2 && Math.abs(b - y) < 2);
+  let fill = '', edge = '';
+  for (const [x, y] of cs) {
+    fill += hexPts(x, y, SIZE + .6);
+    const c = []; for (let i = 0; i < 6; i++) { const a = Math.PI / 180 * (60 * i - 30); c.push([x + SIZE * Math.cos(a), y + SIZE * Math.sin(a) * KY]); }
+    for (let i = 0; i < 6; i++) { const p = c[i], q = c[(i + 1) % 6], mx = (p[0] + q[0]) / 2, my = (p[1] + q[1]) / 2; if (!has(2 * mx - x, 2 * my - y)) edge += `M${p[0].toFixed(1)} ${p[1].toFixed(1)}L${q[0].toFixed(1)} ${q[1].toFixed(1)}`; }
+  }
+  return `<g class="salt bsalt"><path d="${fill}" fill="#f4efe4" fill-opacity=".16"/><path d="${fill}" fill="url(#bsaltp)" opacity=".7"/><path d="${edge}" fill="none" stroke="#000" stroke-opacity=".45" stroke-width="3.6" stroke-linecap="round" stroke-linejoin="round"/><path d="${edge}" fill="none" stroke="#f6f1e6" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" class="bsalt-e"/></g>`;
+}
+function bFireSVG(seed) {
+  const d = -((seed * 0.137) % 1) * .9;
+  return `<ellipse cx="0" cy="2" rx="${WPX * .62}" ry="${WPX * .62 * KY}" fill="url(#ag-warm)" class="fireglow" opacity=".8"/><svg x="-21" y="-24.5" width="42" height="42" viewBox="0 0 ${BFIRE_W} 84" overflow="hidden"><image href="${bFireStrip()}" width="${BFIRE_W * BFIRE_N}" height="84" class="bfire" style="animation-delay:${d.toFixed(2)}s"/></svg>`;
 }
 function flameSVG() {
   return `<g class="flame-big"><path d="M-9 0Q-12 -10 -5 -16Q-6 -9 -1 -22Q4 -12 6 -17Q12 -9 9 0Z" fill="url(#ag-fire)" opacity=".92"/><path d="M-4 0Q-5 -6 0 -11Q4 -6 4 0Z" fill="#fff2b0"/></g>
