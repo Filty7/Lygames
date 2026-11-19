@@ -3058,8 +3058,8 @@ MAPS.tanecnice = {
     { hex: [10, 13], kind: 'block', name: 'Hostina', icon: 'table', p: 'p_tab_m' }, { hex: [11, 13], kind: 'block', name: 'Hostina', icon: 'table', p: 'p_tab_r' },
     { hex: [6, 8], kind: 'block', name: 'Svatební dort', icon: 'table', p: 'p_cake' },
     { hex: [13, 7], kind: 'block', name: 'Šampaňská věž', icon: 'table', p: 'p_tower' },
-    { hex: [7, 11], kind: 'rough', name: 'Ledová labuť', icon: 'table', p: 'p_swan' },
-    { hex: [12, 11], kind: 'rough', name: 'Stolek pro dva', icon: 'table', p: 'p_dinner' },
+    { hex: [7, 11], kind: 'block', name: 'Ledová labuť', icon: 'table', p: 'p_swan' },
+    { hex: [12, 11], kind: 'block', name: 'Stolek pro dva', icon: 'table', p: 'p_dinner' },
     { hex: [1, 2], kind: 'block', name: 'Palma', icon: 'plant', p: 'p_palm' }, { hex: [1, 11], kind: 'block', name: 'Harfa', icon: 'statue', p: 'p_harp' }, { hex: [4, 4], kind: 'rough', name: 'Růže', icon: 'bush', p: 'p_roses' }, { hex: [1, 5], kind: 'block', name: 'Fontána', icon: 'fountain' },
     { hex: [3, 6], kind: 'block', name: 'Mramorová tanečnice', icon: 'statue', p: 'p_statue' },
     { hex: [2, 10], kind: 'rough', name: 'Karetní stolek', icon: 'table', p: 'p_cards' }, { hex: [3, 12], kind: 'rough', name: 'Punč', icon: 'table', p: 'p_punch' }, { hex: [1, 13], kind: 'block', name: 'Krb', icon: 'fireplace', p: 'p_fire' },
@@ -7262,23 +7262,32 @@ const BALL_DANCES = []; // kompatibilita API
 const BALL_BRIDE_EVERY = 0, BALL_BRIDES_LOSE = 0;
 const onParquet = (G, x) => !!(G.ball && roomOf(x) === roomOf(G.ball.center));
 const ballDancers = G => G.monsters.filter(m => m.type === 'tanecnik');
-const ballFloor = G => ROOM_HEXES.filter(x => roomOf(x) === roomOf(G.ball.center) && !isBlock(x) && isPlayable(x) && !isWallHex(x));
+const ballFloor = G => ROOM_HEXES.filter(x => roomOf(x) === roomOf(G.ball.center) && !isBlock(x) && !isRough(x) && isPlayable(x) && !isWallHex(x) && !G.ball.clues.some(cl => eq(cl.hex, x)));
+// v86: symetrické taneční sestavy kolem středu sálu (10 míst; padlí v obrazci prostě chybí)
+const BALL_FORMS = [
+  { id: 'kruh', name: 'Kruh', slots: c => ringHexes(c, 2).filter(x => !(x[1] === c[1] && Math.abs(x[0] - c[0]) === 2)) },
+  { id: 'rady', name: 'Dvě řady', slots: c => [-2, -1, 0, 1, 2].flatMap(d => [[c[0] - 2, c[1] + d], [c[0] + 2, c[1] + d]]) },
+  { id: 'pruhy', name: 'Dva pruhy', slots: c => [-2, -1, 0, 1, 2].flatMap(d => [[c[0] + d, c[1] - 2], [c[0] + d, c[1] + 2]]) },
+  { id: 'hvezda', name: 'Hvězda', slots: c => CDIRS.map(d => cubeAdd(c, d, 2)).concat(CDIRS.filter((d, i) => i % 3 !== 0).map(d => cubeAdd(c, d, 1))) },
+  { id: 'kriz', name: 'Kříž', slots: c => [0, 1].flatMap(i => [1, 2, -1, -2].map(k => cubeAdd(c, CDIRS[i], k))).concat([2, -2].map(k => cubeAdd(c, CDIRS[2], k))) },
+];
+function ringHexes(c, r) { return ALL_HEXES.filter(x => dist(x, c) === r); }
 function ballFormation(G, dancers) {
-  // nová formace: cíle poblíž středu sálu, každý tanečník do BALL_MOVE polí, co nejvíc promíchat
-  const c = G.ball.center, floor = ballFloor(G);
-  let best = null, bestScore = -1;
-  for (let t = 0; t < 120; t++) {
-    const rad = 2 + Math.floor(rng() * 2);
-    const pool = shuffle(floor.filter(x => dist(x, c) <= rad + 1 && !dancers.some(d => eq(d.pos, x)) || (rng() < .15 && dist(x, c) <= rad + 1)));
-    if (pool.length < dancers.length) continue;
-    const tg = pool.slice(0, dancers.length), order = shuffle(dancers.slice()), as = [];
-    let ok = true, score = 0;
-    for (const d of order) {
-      const i = tg.findIndex(x => dist(x, d.pos) <= BALL_MOVE && dist(x, d.pos) >= 2);
-      if (i < 0) { ok = false; break; }
-      as.push({ d, to: tg[i] }); score += dist(tg[i], d.pos); tg.splice(i, 1);
+  const c = G.ball.center, floor = ballFloor(G), ok = x => floor.some(f => eq(f, x));
+  const forms = BALL_FORMS.filter(f => f.id !== G.ball.form);
+  const F = pickR(forms); G.ball.form = F.id;
+  let slots = F.slots(c).map(x => ok(x) ? x : floor.filter(f => !F.slots(c).some(s => eq(s, f))).sort((a, b) => dist(a, x) - dist(b, x))[0]).filter(Boolean);
+  slots = slots.filter((x, i) => slots.findIndex(y => eq(x, y)) === i);
+  let best = null, bestKey = null;
+  for (let t = 0; t < 250; t++) {
+    const free = slots.slice(), as = [];
+    for (const d of shuffle(dancers.slice())) {
+      free.sort((a, b) => dist(a, d.pos) - dist(b, d.pos) + (rng() - .5) * 1.5);
+      const to = free.shift(); if (!to) break; as.push({ d, to });
     }
-    if (ok && score > bestScore) { best = as; bestScore = score; }
+    const mx = Math.max(...as.map(a => dist(a.d.pos, a.to))), sum = as.reduce((s, a) => s + dist(a.d.pos, a.to), 0);
+    const key = [mx <= BALL_MOVE ? 0 : mx, -sum]; // v dosahu 4 a co nejvíc promíchat
+    if (!best || key[0] < bestKey[0] || (key[0] === bestKey[0] && key[1] < bestKey[1])) { best = as; bestKey = key; }
   }
   return best;
 }
@@ -7361,13 +7370,13 @@ async function ballRoundStart(G, C, ui) {
   for (const t of targets) {
     const o = heroAt(G, t) || G.monsters.find(m => m.type !== 'tanecnik' && eq(m.pos, t));
     if (!o || (o.type && mdef(o).object)) continue;
-    const free = neighbors(t).filter(x => roomOf(x) && !isBlock(x) && isPlayable(x) && !isWallHex(x) && linkOK(t, x) && !busy(x) && !ds.some(d => eq(d.pos, x)));
+    const free = neighbors(t).filter(x => roomOf(x) && !isBlock(x) && !isRough(x) && isPlayable(x) && !isWallHex(x) && linkOK(t, x) && !busy(x) && !ds.some(d => eq(d.pos, x)));
     const to = free.length ? pickR(free) : null; if (!to) continue;
     o.pos = to.slice(); moves.push({ who: (o.type ? 'm:' + o.uid : 'h:' + o.id), hex: to.slice() });
     if (!o.type) hurt.push(o);
   }
   for (const a of as) { a.d.pos = a.to.slice(); moves.push({ who: 'm:' + a.d.uid, hex: a.to.slice() }); }
-  log(G, 'Orchestr hraje valčík. Tanečníci se v kruzích přesouvají do nové formace.');
+  log(G, 'Orchestr hraje valčík. Tanečníci se přesouvají do nové sestavy: ' + (BALL_FORMS.find(f => f.id === b.form) || {}).name + '.');
   if (G.fx) G.fx.push({ t: 'dance' });
   await ui.anim({ type: 'dance', moves });
   for (const h of hurt) {
@@ -7753,7 +7762,7 @@ API = {
   markMonster, markHero, heroMarked, heroInvisible, pierceArmor, isPierced, applyStatus, addPoison, addBleed, tickDots, healHero, healMonster, FIRE_DMG, FIRE_DMG_H, trapImmune, recallable, peekSpot, doSearch, nearestUnknownSpots, senseSpots, pushStep, STATUS_TXT,
   useMap, MAPS, isFence, blocksSight, OBELISK_SITES, MAP, OUTDOOR,
   LEVERS, HOLY, holyAt, FOUNTAIN, ALTAR, CANDLES, EXIT_DOORS, adjLevers, adjExits, adjCandles, setRealExit, mazeExits, frontBurning, fireAt, isBars, exitDoorAt, LEVER_COST, canStillEscape, purgeWater, candleGuarded,
-  bossGoals, isBossGoal, bossOf, ballDo, BALL_DANCES, BALL_PHASES, BALL_PHASE_HP, BALL_MASK_HP, TRAP_KINDS, laneHexes, sewWater, sewLevelOf, combSees, combSense, combHolder, onParquet, furnGone: h => FURN_GONE.has(K(h)), HUNT_CATCH, SEW_NEED, BALL_BRIDES_LOSE, BALL_BRIDE_EVERY, isNpc, rotHex,
+  bossGoals, isBossGoal, bossOf, ballDo, ballRoundStart, BALL_DANCES, BALL_PHASES, BALL_PHASE_HP, BALL_MASK_HP, TRAP_KINDS, laneHexes, sewWater, sewLevelOf, combSees, combSense, combHolder, onParquet, furnGone: h => FURN_GONE.has(K(h)), HUNT_CATCH, SEW_NEED, BALL_BRIDES_LOSE, BALL_BRIDE_EVERY, isNpc, rotHex,
   _heroTurn: heroTurn, _monsterAttack: monsterAttack, _heroMove: heroMove, _checkWin: checkWin, _activateGroup: activateGroup, _endRound: endRound, _freeRespawn: freeRespawn, _damageHero: damageHero,
 };
 function syncApi() { Object.assign(API, { LEVERS, HOLY, FOUNTAIN, ALTAR, CANDLES, EXIT_DOORS, CRYPTS, MAP, COLS, ROWS, ROOM_DEFS, ROOMS, DOOR_DEFS, EXIT, EXIT_ROOM, SPOT_DEFS, FURN_DEFS, SPAWN_DEFS, MIRRORS, HERO_START, WALL_HEXES, ALL_HEXES, ROOM_HEXES, MONSTER_ROOMS, CURSE_ROOMS, LOCKABLE, SETUP_BANNED, CIRCLES, OBELISK_SITES, OUTDOOR }); }
@@ -13439,7 +13448,7 @@ async function animInner(ev) {
     await drainFx();
     if (betaOn()) { betaCastHook(ev); bScanAll(); }
     if (ev.type === 'step') return stepAnim(ev);
-    if (ev.type === 'dance') { sfx('step'); for (const mv of ev.moves || []) { const t = toks.get(mv.who); if (t) { xrayOff(t, 900); t.fig.classList.add('gliding'); } } render(); await sleep(dur(700)); for (const mv of ev.moves || []) { const t = toks.get(mv.who); if (t) t.fig.classList.remove('gliding'); } return; }
+    if (ev.type === 'dance') return danceAnim(ev);
     if (ev.type === 'crypt') return cryptAnim(ev);
     if (ev.type === 'reveal') { render(); await sleep(dur(260)); return; }
     if (ev.type === 'roll') { if (heroView() && ev.at && !C.hexRevealed(G, ev.at)) return; if (await camTo(ev.at, 120)) await sleep(380); return rollAnim(ev); }
@@ -13547,6 +13556,30 @@ async function stepAnim(ev) {
   if (isBetaMon(t)) bmStepEnd(t);
   t.anim = false; t.pos = ev.hex.slice();
   t.fig._z = zFor(ev.hex); placeInDepth(t.fig); xrayOff(t, 380);
+}
+// v86: tanec – všichni tanečníci (a odstrčené figurky) kloužou do nové formace najednou, skrz cokoli
+async function danceAnim(ev) {
+  const moves = (ev.moves || []).map(mv => ({ mv, t: toks.get(mv.who) })).filter(x => x.t && x.t.pos);
+  if (!moves.length) { render(); return; }
+  const D = dur(1300), td = `${D.toFixed(0)}ms, .35s`;
+  for (const { mv, t } of moves) {
+    t.anim = true; xrayOff(t, D + 600);
+    t.fig.style.transitionTimingFunction = t.lab.style.transitionTimingFunction = 'ease-in-out';
+    t.fig.style.transitionDuration = td; t.lab.style.transitionDuration = td; if (t.glow) t.glow.style.transitionDuration = td; if (t.hg) t.hg.style.transitionDuration = td;
+    t.fig._z = Math.max(zFor(t.pos), zFor(mv.hex)) + 0.2; placeInDepth(t.fig);
+    setFacing(t, px(mv.hex)[0] - px(t.pos)[0]);
+    if (isBetaMon(t)) bmPose(t, mv.who.startsWith('m:') && mv.dance !== false ? 'move' : 'hurt');
+    t.fig.classList.add('gliding');
+  }
+  moves[0].t.fig.getBoundingClientRect();
+  for (const { mv, t } of moves) { const [x, y] = px(mv.hex), tr = `translate(${x.toFixed(1)}px,${y.toFixed(1)}px)`; t.fig.style.transform = tr; t.lab.style.transform = tr; if (t.glow) t.glow.style.transform = tr; if (t.hg) t.hg.style.transform = tr; }
+  sfx('glide'); await sleep(D + 60);
+  for (const { mv, t } of moves) {
+    t.fig.classList.remove('gliding'); t.fig.style.transitionTimingFunction = t.lab.style.transitionTimingFunction = '';
+    if (isBetaMon(t)) bmStepEnd(t);
+    t.anim = false; t.pos = mv.hex.slice(); t.fig._z = zFor(mv.hex); placeInDepth(t.fig);
+  }
+  render();
 }
 // průchod kryptou: lovec zmizí ve vchodu a vynoří se u jiného
 async function cryptAnim(ev) {
