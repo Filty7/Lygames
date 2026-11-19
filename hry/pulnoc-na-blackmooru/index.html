@@ -10171,7 +10171,7 @@ function setAmb(name) {
   if (windG) { windG.gain.cancelScheduledValues(t); windG.gain.setValueAtTime(windG.gain.value, t); windG.gain.linearRampToValueAtTime(AMBV.wind, t + 3); }
 }
 // ---------- hlášky lovců (střídají se varianty, nikdy dvakrát stejná po sobě) ----------
-const VOX = { ashford: { select: 6, attack: 4, fear: 3, death: 3 }, varga: { select: 6, attack: 4, fear: 3, death: 3 } }, voxBuf = {}, voxLast = {}; let voxT = 0;
+const VOX = { ashford: { select: 6, attack: 4, fear: 3, death: 3 }, varga: { select: 6, attack: 4, fear: 3, death: 3 }, wren: { select: 6, attack: 4, fear: 3, death: 3 } }, voxBuf = {}, voxLast = {}; let voxT = 0;
 async function voice(hero, cat, chance) {
   if (!started || !P.sfxOn || !VOX[hero] || !VOX[hero][cat]) return;
   if (chance != null && Math.random() > chance) return;
@@ -13569,7 +13569,7 @@ async function animInner(ev) {
     const G = S.G;
     await drainFx();
     if (betaOn()) { betaCastHook(ev); bScanAll(); }
-    if (ev.type === 'step') return stepAnim(ev);
+    if (ev.type === 'step') { if (ev.who.startsWith('h:') && G.phase !== 'setup') voxMine(ev.who.slice(2), 'select', .05); return stepAnim(ev); }
     if (ev.type === 'dance') return danceAnim(ev);
     if (ev.type === 'crypt') return cryptAnim(ev);
     if (ev.type === 'reveal') { render(); await sleep(dur(260)); return; }
@@ -13594,6 +13594,7 @@ async function animInner(ev) {
     if (ev.type === 'trap') return trapAnim(ev);
     if (ev.type === 'explode') { if (heroView() && !C.hexRevealed(G, ev.at)) return; return explosion(ev.at); }
     if (ev.type === 'pry') {
+      { const a = G.active; if (a && a.hero) voxMine(a.hero, 'select', .35); }
       if (heroView() && !C.hexRevealed(G, ev.at) && !C.hexRevealed(G, ev.from)) return;
       await camTo(ev.at, 120);
       const [x, y] = px(ev.at), [fx0] = px(ev.from), dir = fx0 < x ? -1 : 1;
@@ -13912,11 +13913,15 @@ const SCEN_SND = { blackmoor: ['panstvi', 'panstvi'], hlasy: ['hrbitov', 'hrbito
 function sndScene(G) { if (!SND || !SND.setScene) return; const sc = G && G.scen && SCEN_SND[G.scen.id] || ['menu', 'menu']; SND.setScene(sc[0]); SND.setAmb(sc[1]); SND.setTension(false); }
 function sndMenu() { if (!SND || !SND.setScene) return; SND.setScene('menu'); SND.setAmb('menu'); SND.setTension(false); }
 function bellRound(G) { const lvl = G.maxRound ? Math.min(1, G.round / G.maxRound) : .5; if (!(SND && SND.roundBell && SND.roundBell(lvl))) sfx('bell'); }
+// v91: hlášky „začátek tahu“ slyší jen hráč, který lovce ovládá; útok, strach a pád slyší všichni
+function heroMine(id) { return NETS.role ? NETS.roles[id] === Net.myId : S.ctl.heroes === 'human'; }
+function voxMine(id, cat, chance) { if (SND && SND.voice && heroMine(id)) SND.voice(id, cat, chance); }
+const VOX_ATK = ['attack', 'lunge', 'charge', 'swapatk', 'sweep', 'crossfire', 'grenade'];
 function sndTick(G) {
   if (!SND || !SND.setScene || !G) return;
   SND.setTension(!G.over && G.phase !== 'setup' && G.maxRound && G.round >= G.maxRound);
   const a = G.active, hid = a && a.side === 'heroes' && a.hero;
-  if (hid && hid !== S.voxHero) { S.voxHero = hid; const h = G.heroes.find(x => x.id === hid); if (h && !h.downed) SND.voice(hid, 'select'); }
+  if (hid && hid !== S.voxHero) { S.voxHero = hid; const h = G.heroes.find(x => x.id === hid); if (h && !h.downed) voxMine(hid, 'select'); }
   if (!hid) S.voxHero = null;
   S.voxDown = S.voxDown || {};
   for (const h of G.heroes) { if (h.downed && !S.voxDown[h.id] && G.phase !== 'setup') SND.voice(h.id, 'death'); S.voxDown[h.id] = !!h.downed; }
@@ -15527,6 +15532,7 @@ function tryPlay(uidC, half) {
   const why = C.cannotPlay(S.G, h, c, half);
   if (why) { S.msg = why; sfx('deny'); render(); const e = document.querySelector(`.dock-hand [data-uid="${uidC}"]`); if (e) e.classList.add('shake'); return; }
   sfx('play'); S.selected = null;
+  { const sp = c[half]; if (!c.panic && !(sp && VOX_ATK.includes(sp.t))) voxMine(h.id, 'select', .25); }
   m.resolve({ type: 'play', uid: uidC, half });
 }
 function tryPlayOl(uidC) {
