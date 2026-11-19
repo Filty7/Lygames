@@ -10155,7 +10155,7 @@ function setAmb(name) {
   if (windG) { windG.gain.cancelScheduledValues(t); windG.gain.setValueAtTime(windG.gain.value, t); windG.gain.linearRampToValueAtTime(AMBV.wind, t + 3); }
 }
 // ---------- hlášky lovců (střídají se varianty, nikdy dvakrát stejná po sobě) ----------
-const VOX = { ashford: { select: 6, attack: 5, fear: 3, death: 3 } }, voxBuf = {}, voxLast = {}; let voxT = 0;
+const VOX = { ashford: { select: 6, attack: 4, fear: 3, death: 3 } }, voxBuf = {}, voxLast = {}; let voxT = 0;
 async function voice(hero, cat, chance) {
   if (!started || !P.sfxOn || !VOX[hero] || !VOX[hero][cat]) return;
   if (chance != null && Math.random() > chance) return;
