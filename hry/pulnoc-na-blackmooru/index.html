@@ -9865,7 +9865,7 @@ function start() {
   revIn = ctx.createGain(); revIn.gain.value = .75; revIn.connect(rev); rev.connect(comp);
   noiseBuf = ctx.createBuffer(1, ctx.sampleRate * 2, ctx.sampleRate);
   const d = noiseBuf.getChannelData(0); for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1;
-  startWind(); startMusic();
+  startWind(); startAmb(); musLoad();
 }
 // ---------- stavebnice ----------
 const now = () => ctx.currentTime;
@@ -10007,16 +10007,17 @@ function play(name, opts) {
 
 // ---------- vítr a dům ----------
 function startWind() {
+  windG = ctx.createGain(); windG.gain.value = AMBV.wind != null ? AMBV.wind : 1; windG.connect(ambG);
   const s = ctx.createBufferSource(); s.buffer = noiseBuf; s.loop = true;
   const f = ctx.createBiquadFilter(); f.type = 'bandpass'; f.frequency.value = 420; f.Q.value = .9;
   const g = ctx.createGain(); g.gain.value = .05;
   const l = ctx.createOscillator(), lg = ctx.createGain(); l.frequency.value = .06; lg.gain.value = 220; l.connect(lg); lg.connect(f.frequency);
   const l2 = ctx.createOscillator(), lg2 = ctx.createGain(); l2.frequency.value = .11; lg2.gain.value = .035; l2.connect(lg2); lg2.connect(g.gain);
-  s.connect(f); f.connect(g); g.connect(ambG); s.start(); l.start(); l2.start();
+  s.connect(f); f.connect(g); g.connect(windG); s.start(); l.start(); l2.start();
   const s2 = ctx.createBufferSource(); s2.buffer = noiseBuf; s2.loop = true; s2.playbackRate.value = .7;
   const f2 = ctx.createBiquadFilter(); f2.type = 'bandpass'; f2.frequency.value = 1400; f2.Q.value = 12;
   const g2 = ctx.createGain(); g2.gain.value = .012; const l3 = ctx.createOscillator(), lg3 = ctx.createGain(); l3.frequency.value = .045; lg3.gain.value = 500; l3.connect(lg3); lg3.connect(f2.frequency);
-  s2.connect(f2); f2.connect(g2); g2.connect(ambG); s2.start(); l3.start();
+  s2.connect(f2); f2.connect(g2); g2.connect(windG); s2.start(); l3.start();
   const creak = () => {
     if (P.sfxOn && ctx.state === 'running') {
       const t = now(), r = Math.random();
@@ -10060,9 +10061,114 @@ function scheduleMusic() {
 }
 function startMusic() { nextBar = now() + .5; scheduleMusic(); setInterval(scheduleMusic, 500); }
 
+
+// =================== v89: hudba ve stemech, prostředí, hlášky ===================
+// 13 stemů jednoho motivu (D moll, 80 BPM, 20 taktů = 60 s) hraje stále spolu; scéna jen určuje, které jsou slyšet.
+const MUS = { base: (typeof window !== 'undefined' && window.BM_AUDIO) || 'audio/', stems: ['basy', 'plocha', 'sbor', 'motiv', 'celesta', 'harfa', 'klavir', 'varhany', 'zvony', 'pizz', 'tep', 'boj', 'napeti'],
+  buf: {}, g: {}, ok: false, failed: false, loading: null, t0: 0, scene: 'menu', tension: false, LEN: 60, BEAT: .75, BAR: 3, out: null, combatEnd: 0 };
+const SCENES = {
+  menu: ['motiv', 'plocha', 'basy'], panstvi: ['klavir', 'harfa', 'basy'], hrbitov: ['zvony', 'sbor', 'celesta'], krypta: ['basy', 'tep', 'zvony'],
+  les: ['harfa', 'pizz', 'sbor'], klaster: ['varhany', 'sbor', 'zvony'], ples: ['harfa', 'pizz', 'motiv'], boss: ['motiv', 'basy', 'tep', 'plocha', 'sbor'],
+};
+let windG = null;
+function musLoad() {
+  if (MUS.loading) return MUS.loading;
+  MUS.loading = Promise.all(MUS.stems.concat(['zvon']).map(async k => { const r = await fetch(MUS.base + 'm_' + k + '.ogg'); if (!r.ok) throw new Error(k); MUS.buf[k] = await ctx.decodeAudioData(await r.arrayBuffer()); }))
+    .then(() => { MUS.ok = true; musStart(); }).catch(() => { MUS.failed = true; startMusic(); });
+  return MUS.loading;
+}
+function musWant(k) { const sc = SCENES[MUS.scene] || SCENES.menu; return sc.includes(k) || (k === 'napeti' && MUS.tension); }
+function musStart() {
+  MUS.out = ctx.createGain(); MUS.out.gain.value = 1.5; MUS.out.connect(musG);
+  MUS.t0 = now() + .1;
+  for (const k of MUS.stems) {
+    const g = ctx.createGain(); g.gain.value = 0; g.connect(MUS.out); MUS.g[k] = g;
+    const s = ctx.createBufferSource(); s.buffer = MUS.buf[k]; s.loop = true; s.loopStart = 0; s.loopEnd = MUS.LEN; s.connect(g); s.start(MUS.t0);
+    if (musWant(k)) { g.gain.setValueAtTime(0, MUS.t0); g.gain.linearRampToValueAtTime(1, MUS.t0 + 3); }
+  }
+}
+function musRamp(k, v, sec) { const g = MUS.g[k] && MUS.g[k].gain; if (!g) return; const t = now(); g.cancelScheduledValues(t); g.setValueAtTime(g.value, t); g.linearRampToValueAtTime(v, t + sec); }
+function setScene(name) { MUS.scene = SCENES[name] ? name : 'menu'; if (!MUS.ok) return; for (const k of MUS.stems) if (k !== 'boj') musRamp(k, musWant(k) ? 1 : 0, 3); }
+function setTension(on) { if (MUS.tension === !!on) return; MUS.tension = !!on; if (MUS.ok) musRamp('napeti', on ? 1 : 0, on ? 4 : 3); }
+const musPos = () => (((now() - MUS.t0) % MUS.LEN) + MUS.LEN) % MUS.LEN;
+const nextGrid = q => { const p = musPos(); return now() + (q - (p % q)) % q; };
+// boj: přidá se od dalšího taktu, 3 takty drží, 2 takty odezní; další útok jen prodlouží
+function combat() {
+  if (!MUS.ok || !P.musicOn) return;
+  const g = MUS.g.boj.gain, t = now();
+  if (t < MUS.combatEnd - MUS.BAR * 2) { const hold = nextGrid(MUS.BAR) + MUS.BAR * 3; g.cancelScheduledValues(t); g.setValueAtTime(g.value, t); g.linearRampToValueAtTime(1, t + .3); g.setValueAtTime(1, hold); g.linearRampToValueAtTime(0, hold + MUS.BAR * 2); MUS.combatEnd = hold + MUS.BAR * 2; return; }
+  const st = nextGrid(MUS.BAR), hold = st + MUS.BAR * 3;
+  g.cancelScheduledValues(t); g.setValueAtTime(g.value, t); g.linearRampToValueAtTime(.12, st); g.linearRampToValueAtTime(1, st + MUS.BEAT); g.setValueAtTime(1, hold); g.linearRampToValueAtTime(0, hold + MUS.BAR * 2);
+  MUS.combatEnd = hold + MUS.BAR * 2;
+}
+// zvon konce kola na nejbližší dobu; s každým kolem hlasitější (lvl 0..1)
+function roundBell(lvl) {
+  if (!started || !P.sfxOn) return false;
+  if (!MUS.ok) return false;
+  const s = ctx.createBufferSource(), g = ctx.createGain(); s.buffer = MUS.buf.zvon; g.gain.value = .35 + .75 * Math.max(0, Math.min(1, lvl)); s.connect(g); g.connect(sfxG); s.start(nextGrid(MUS.BEAT));
+  return true;
+}
+// ---------- zvuky prostředí (procedurální smyčky) ----------
+const AMBV = {}; let ambBus = null, ambName = 'menu'; const AMB = {};
+const AMB_SCENES = {
+  menu: { wind: .9 }, panstvi: { wind: .8, rain: .5, fire: .25 }, hrbitov: { wind: 1, crows: .8, owl: .6 }, les: { wind: 1, crows: .6, owl: .5 },
+  krypta: { wind: .25, drips: .9, water: .3 }, klaster: { wind: .7, rain: .9, thunder: .7 }, zahrada: { wind: .9, crows: .7 }, mlyn: { wind: .6, fire: 1 },
+  svitani: { wind: .8, rain: .6 }, ples: { wind: .3, murmur: .8, fire: .2 }, mlha: { wind: .7, owl: .8, crows: .4 }, hon: { wind: 1, rain: .7, thunder: .9 }, kanaly: { water: 1, drips: .8, wind: .15 },
+};
+function startAmb() {
+  ambBus = ctx.createGain(); ambBus.gain.value = 1; ambBus.connect(ambG);
+  const lay = (name, build) => { const g = ctx.createGain(); g.gain.value = 0; g.connect(ambBus); AMB[name] = g; build(g); };
+  const loopNoise = (g, type, f, q, v, lfo) => { const s = ctx.createBufferSource(); s.buffer = noiseBuf; s.loop = true; const fl = ctx.createBiquadFilter(); fl.type = type; fl.frequency.value = f; fl.Q.value = q; const gg = ctx.createGain(); gg.gain.value = v; s.connect(fl); fl.connect(gg); gg.connect(g); s.start(); if (lfo) { const l = ctx.createOscillator(), lg = ctx.createGain(); l.frequency.value = lfo[0]; lg.gain.value = v * lfo[1]; l.connect(lg); lg.connect(gg.gain); l.start(); } };
+  lay('rain', g => { loopNoise(g, 'highpass', 1200, .5, .05); loopNoise(g, 'bandpass', 3800, .6, .03, [.13, .4]); });
+  lay('water', g => { loopNoise(g, 'lowpass', 420, .7, .09, [.07, .5]); loopNoise(g, 'bandpass', 1100, 2, .015, [.21, .8]); });
+  lay('fire', g => { loopNoise(g, 'lowpass', 180, .7, .07, [.3, .4]); });
+  lay('murmur', g => { loopNoise(g, 'bandpass', 520, 1.2, .025, [.4, .6]); loopNoise(g, 'bandpass', 1300, 2.5, .01, [.7, .8]); });
+  ['crows', 'owl', 'drips', 'thunder'].forEach(n => lay(n, () => {}));
+  const rnd = (a, b) => a + Math.random() * (b - a);
+  const on = n => AMBV[n] > 0 && P.sfxOn && ctx.state === 'running';
+  // praskání ohně
+  setInterval(() => { if (!on('fire')) return; const t = now(); for (let i = 0; i < 3; i++) if (Math.random() < .6) noise(t + Math.random() * .25, .002, .05 + Math.random() * .08, .02 + Math.random() * .04, 'highpass', 1800 + Math.random() * 2500, .7, { dest: AMB.fire }); }, 250);
+  // kapky deště (jednotlivé) a kapání v kobce
+  setInterval(() => { if (on('rain')) { const t = now(); for (let i = 0; i < 4; i++) noise(t + Math.random() * .3, .001, .02, .015, 'bandpass', 2500 + Math.random() * 3000, 3, { dest: AMB.rain }); } }, 300);
+  const drip = () => { if (on('drips')) { const t = now(), f = rnd(700, 1300); tone('sine', f, t, .002, .05, .09, { dest: AMB.drips, to: f * .55, glide: .07, wet: 1.4 }); } setTimeout(drip, rnd(900, 3200)); }; setTimeout(drip, 1500);
+  // vrány: 1–3 zakrákání
+  const crow = () => { if (on('crows')) { const t = now() + .05, n = 1 + Math.floor(Math.random() * 3), f0 = rnd(430, 560), pan = rnd(-.8, .8);
+      for (let i = 0; i < n; i++) { const tt = t + i * rnd(.32, .45); const o = ctx.createOscillator(), fl = ctx.createBiquadFilter(), g = ctx.createGain(), p = ctx.createStereoPanner ? ctx.createStereoPanner() : null;
+        o.type = 'sawtooth'; o.frequency.setValueAtTime(f0 * 1.15, tt); o.frequency.exponentialRampToValueAtTime(f0 * .8, tt + .22); fl.type = 'bandpass'; fl.frequency.value = 1500; fl.Q.value = 2.2;
+        g.gain.setValueAtTime(.0001, tt); g.gain.exponentialRampToValueAtTime(.06, tt + .02); g.gain.exponentialRampToValueAtTime(.0001, tt + .24);
+        o.connect(fl); fl.connect(g); if (p) { p.pan.value = pan; g.connect(p); p.connect(AMB.crows); } else g.connect(AMB.crows); o.start(tt); o.stop(tt + .3);
+        noise(tt, .01, .02, .2, 'bandpass', 2200, 3, { dest: AMB.crows }); } }
+    setTimeout(crow, rnd(7000, 18000)); }; setTimeout(crow, 4000);
+  // sova
+  const owl = () => { if (on('owl')) { const t = now() + .05; [0, .55, .85].forEach((d, i) => { tone('sine', i === 0 ? 390 : 360, t + d, .06, .05, .28, { dest: AMB.owl, wet: 1.4, to: (i === 0 ? 390 : 360) * .93 }); }); } setTimeout(owl, rnd(14000, 30000)); }; setTimeout(owl, 9000);
+  // hrom
+  const thunder = () => { if (on('thunder')) { const t = now(); noise(t, .3, .14, 3.5, 'lowpass', 160, .7, { dest: AMB.thunder, to: 60, glide: 3.5 }); noise(t + .1, .05, .05, 1.2, 'lowpass', 900, .5, { dest: AMB.thunder }); } setTimeout(thunder, rnd(22000, 50000)); }; setTimeout(thunder, 15000);
+  setAmb(ambName);
+}
+function setAmb(name) {
+  ambName = name;
+  const sc = AMB_SCENES[name] || AMB_SCENES.menu;
+  for (const k of ['wind', 'rain', 'water', 'fire', 'murmur', 'crows', 'owl', 'drips', 'thunder']) AMBV[k] = sc[k] || 0;
+  if (!started) return;
+  const t = now();
+  for (const k in AMB) { const g = AMB[k].gain; g.cancelScheduledValues(t); g.setValueAtTime(g.value, t); g.linearRampToValueAtTime(AMBV[k] || 0, t + 3); }
+  if (windG) { windG.gain.cancelScheduledValues(t); windG.gain.setValueAtTime(windG.gain.value, t); windG.gain.linearRampToValueAtTime(AMBV.wind, t + 3); }
+}
+// ---------- hlášky lovců (střídají se varianty, nikdy dvakrát stejná po sobě) ----------
+const VOX = { ashford: { select: 6, attack: 5, fear: 3, death: 3 } }, voxBuf = {}, voxLast = {}; let voxT = 0;
+async function voice(hero, cat, chance) {
+  if (!started || !P.sfxOn || !VOX[hero] || !VOX[hero][cat]) return;
+  if (chance != null && Math.random() > chance) return;
+  const t = performance.now(); if (t - voxT < (cat === 'death' ? 300 : 1400)) return; voxT = t;
+  const n = VOX[hero][cat], key0 = hero + cat; let i; do { i = 1 + Math.floor(Math.random() * n); } while (n > 1 && i === voxLast[key0]); voxLast[key0] = i;
+  const k = hero + '_' + cat + i;
+  try { if (!voxBuf[k]) { const r = await fetch(MUS.base + 'v_' + k + '.ogg'); if (!r.ok) return; voxBuf[k] = await ctx.decodeAudioData(await r.arrayBuffer()); } } catch (e) { return; }
+  const s = ctx.createBufferSource(), g = ctx.createGain(); g.gain.value = .9; s.buffer = voxBuf[k]; s.connect(g); g.connect(master); s.start();
+}
+
 function setSfx(on) { P.sfxOn = on; save(); if (sfxG) { sfxG.gain.setTargetAtTime(on ? .55 : 0, now(), .1); ambG.gain.setTargetAtTime(on ? .5 : 0, now(), .3); } }
 function setMusic(on) { P.musicOn = on; save(); if (musG) musG.gain.setTargetAtTime(on ? .3 : 0, now(), .4); }
-return { start, play, setSfx, setMusic, get sfxOn() { return P.sfxOn; }, get musicOn() { return P.musicOn; } };
+return { start, play, setSfx, setMusic, setScene, setTension, combat, roundBell, setAmb, voice, get stems() { return MUS.ok; }, get sfxOn() { return P.sfxOn; }, get musicOn() { return P.musicOn; } };
 })();
 if (typeof module !== 'undefined') module.exports = Sfx;
 
@@ -13451,6 +13557,7 @@ async function animInner(ev) {
     if (ev.type === 'dance') return danceAnim(ev);
     if (ev.type === 'crypt') return cryptAnim(ev);
     if (ev.type === 'reveal') { render(); await sleep(dur(260)); return; }
+    if (ev.type === 'roll' && !ev.pry && SND && SND.combat) { SND.combat(); const a = G.active; if (!ev.enemy && a && a.side === 'heroes' && a.hero) SND.voice(a.hero, 'attack', .7); }
     if (ev.type === 'roll') { if (heroView() && ev.at && !C.hexRevealed(G, ev.at)) return; if (await camTo(ev.at, 120)) await sleep(380); return rollAnim(ev); }
     if (ev.type === 'olcard') return olCardAnim(ev);
     if (ev.type === 'float') return floatAnim(ev);
@@ -13742,11 +13849,26 @@ function banner(text, enemy) {
   $('#mapover').appendChild(b);
   setTimeout(() => b.remove(), dur(1500) + 50);
 }
+// v89: zvuk – hudba ve stemech podle scénáře, prostředí, zvon kola, hlášky
+const SCEN_SND = { blackmoor: ['panstvi', 'panstvi'], hlasy: ['hrbitov', 'hrbitov'], obelisky: ['les', 'les'], ocista: ['krypta', 'krypta'], oltar: ['klaster', 'klaster'],
+  bludiste: ['les', 'zahrada'], mlyn: ['les', 'mlyn'], svitani: ['panstvi', 'svitani'], ples: ['boss', 'ples'], hreben: ['boss', 'mlha'], hon: ['boss', 'hon'], kanaly: ['boss', 'kanaly'] };
+function sndScene(G) { if (!SND || !SND.setScene) return; const sc = G && G.scen && SCEN_SND[G.scen.id] || ['menu', 'menu']; SND.setScene(sc[0]); SND.setAmb(sc[1]); SND.setTension(false); }
+function sndMenu() { if (!SND || !SND.setScene) return; SND.setScene('menu'); SND.setAmb('menu'); SND.setTension(false); }
+function bellRound(G) { const lvl = G.maxRound ? Math.min(1, G.round / G.maxRound) : .5; if (!(SND && SND.roundBell && SND.roundBell(lvl))) sfx('bell'); }
+function sndTick(G) {
+  if (!SND || !SND.setScene || !G) return;
+  SND.setTension(!G.over && G.phase !== 'setup' && G.maxRound && G.round >= G.maxRound);
+  const a = G.active, hid = a && a.side === 'heroes' && a.hero;
+  if (hid && hid !== S.voxHero) { S.voxHero = hid; const h = G.heroes.find(x => x.id === hid); if (h && !h.downed) SND.voice(hid, 'select'); }
+  if (!hid) S.voxHero = null;
+  S.voxDown = S.voxDown || {};
+  for (const h of G.heroes) { if (h.downed && !S.voxDown[h.id] && G.phase !== 'setup') SND.voice(h.id, 'death'); S.voxDown[h.id] = !!h.downed; }
+}
 async function roundAnim() {
   if (buiOn()) { // v68: jen zaklepání horních hodin a posun ručičky; na konci hry odbíjení bez posunu
     const G = S.G; S.clockHold = true; render();
     const w = $('#game .top .bclock-w'); if (w) w.classList.add('knock');
-    sfx('bell');
+    bellRound(G);
     if (G.over) { for (let i = 0; i < 3; i++) { await sleep(dur(650)); sfx('bell'); } await sleep(dur(700)); }
     else { await sleep(dur(420)); buiClockSet(G.round - 1, G.maxRound, true); await sleep(dur(1150)); }
     if (w) { w.classList.remove('knock'); w._r = G.round; }
@@ -13754,7 +13876,7 @@ async function roundAnim() {
     return;
   }
   const G = S.G; render();
-  sfx('bell');
+  bellRound(G);
   const prev = Math.max(0, G.round - 1);
   const ticks = Array.from({ length: G.maxRound }, (_, i) => { const a = ((i + 1) / G.maxRound) * Math.PI * 2 - Math.PI / 2; return `<line x1="${(50 + Math.cos(a) * 35).toFixed(1)}" y1="${(50 + Math.sin(a) * 35).toFixed(1)}" x2="${(50 + Math.cos(a) * 42).toFixed(1)}" y2="${(50 + Math.sin(a) * 42).toFixed(1)}" stroke="${i < G.round ? '#cf5b45' : '#e8dcc4'}" stroke-width="${i === G.maxRound - 1 ? 3.2 : 1.6}"/>`; }).join('');
   const box = el('div', { class: 'roundshow' }, `<svg viewBox="0 0 100 100" class="rclock"><circle cx="50" cy="50" r="46" fill="#120e10" stroke="#c9a24a" stroke-width="2.5"/>${ticks}<g class="rhand" style="transform:rotate(${(prev / G.maxRound) * 360}deg)"><line x1="50" y1="50" x2="50" y2="16" stroke="#f3cf8e" stroke-width="3" stroke-linecap="round"/></g><circle cx="50" cy="50" r="3.5" fill="#c9a24a"/></svg><div class="rtext"><span>Kolo</span><b>${G.round}</b><small>z ${G.maxRound}${G.round === G.maxRound ? ' · poslední' : ''}</small></div>`);
@@ -13775,6 +13897,7 @@ async function drainFx() {
     while (G.fx.length) {
       const e = G.fx.shift();
       if (await bossFxEv(e)) continue;
+      if (e.t === 'panic' && SND && SND.voice) SND.voice(e.hero, 'fear');
       if (e.t === 'panic') await panicAnim(e.hero);
       else if (e.t === 'shuffle') { await shuffleAnim(e.hero); const sh = G.heroes.find(x => x.id === e.hero); if (sh && !sh.escaped) floatText(sh.pos, 'Únava: +1 strach', 'dmg'); }
       else if (e.t === 'threat') await threatAnim(e);
@@ -14089,6 +14212,8 @@ function render() {
   if (!S.G) return;
   renderMap(); renderTop(); renderSide(); renderBottom(); renderModal();
   renderSetupWait(); renderTurnBanner();
+  if (S._sndG !== S.G) { S._sndG = S.G; sndScene(S.G); }
+  try { sndTick(S.G); } catch (e) { /* zvuk je nepovinný */ }
   S._lastPhase = S.G.phase;
   followActive();
 }
@@ -15577,6 +15702,7 @@ ${C.MAP.revealAll ? '<li>' + ({ mlyn: 'Celý statek je vidět', kostel: 'Celý k
 <li>Hrozba: +${C.THREAT_PER_ROUND} každé kolo a +1 za zničenou Paniku. Platíš jí návrat padlých monster zrcadly.</li></ul></details>`;
 async function startGame() {
   try { if (SND) SND.start(); } catch (e) { /* bez zvuku */ }
+  S.voxHero = null; S.voxDown = {};
   let opts = { scenario: S.scenPick || 'blackmoor' };
   if (S.mapPick) opts.mapId = S.mapPick; // jen pro testy
   if (S.play !== 'single') {
@@ -16029,6 +16155,7 @@ function campWireCommon(box) {
   if (isClient()) box.querySelectorAll('[data-campnew],[data-menu]').forEach(b => { b.disabled = true; b.textContent = 'Čeká se na hostitele'; });
 }
 function showCamp(r) {
+  sndMenu();
   const st = S.camp; if (buiOn()) { bcStyle(); b80Style(); }
   if (r) S.campReward = r;
   if (!st) return;
@@ -16354,7 +16481,7 @@ function setBeta(v, warn) {
   if (S.beta && warn) betaWarn();
   if (S.G && svg && !$('#game').hidden) { if (builtMap && builtMap !== mapKey() && builtMap.split(':')[0] === C.MAP.id) ensureMap().then(() => render()); else render(); } // v63: beta prostředí = jiná stavba mapy
 }
-function showMenu() { $('#game').hidden = true; $('#camp').hidden = true; $('#modal').hidden = true; $('#menu').hidden = false; hideSetupBar(); renderMM(); fitMenu(); }
+function showMenu() { sndMenu(); $('#game').hidden = true; $('#camp').hidden = true; $('#modal').hidden = true; $('#menu').hidden = false; hideSetupBar(); renderMM(); fitMenu(); }
 
 // ---------- online: spojení ----------
 function netReset() { if (NETS.conn) try { NETS.conn.close(); } catch (e) { /* nic */ } Object.assign(NETS, { role: null, code: null, conn: null, players: [], pending: new Map(), q: [], qRun: false, resume: null, waiting: '', curAsk: null }); }
