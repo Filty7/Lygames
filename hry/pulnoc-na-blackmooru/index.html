@@ -9858,7 +9858,7 @@ if (typeof module !== 'undefined') module.exports = Net;
 // ===================== ZVUK: procedurální WebAudio (vítr, hudba, efekty) =====================
 const Sfx = (() => {
 'use strict';
-let ctx = null, master, sfxG, musG, ambG, revIn, noiseBuf, started = false;
+let ctx = null, master, sfxG, smpG, musG, ambG, revIn, noiseBuf, started = false;
 const P = { sfxOn: true, musicOn: true };
 try { const s = JSON.parse(localStorage.getItem('blackmoor-sound') || '{}'); if (typeof s.sfxOn === 'boolean') P.sfxOn = s.sfxOn; if (typeof s.musicOn === 'boolean') P.musicOn = s.musicOn; } catch (e) { /* bez úložiště */ }
 const save = () => { try { localStorage.setItem('blackmoor-sound', JSON.stringify(P)); } catch (e) { /* nic */ } };
@@ -9876,13 +9876,14 @@ function start() {
   master = ctx.createGain(); master.gain.value = .8; master.connect(ctx.destination);
   const comp = ctx.createDynamicsCompressor(); comp.threshold.value = -18; comp.ratio.value = 4; comp.connect(master);
   sfxG = ctx.createGain(); sfxG.gain.value = P.sfxOn ? .55 : 0; const muff = ctx.createBiquadFilter(); muff.type = 'lowpass'; muff.frequency.value = 3200; muff.Q.value = .5; sfxG.connect(muff); muff.connect(comp);
-  musG = ctx.createGain(); musG.gain.value = P.musicOn ? .15 : 0; musG.connect(comp);
-  ambG = ctx.createGain(); ambG.gain.value = P.sfxOn ? .5 : 0; ambG.connect(comp);
+  musG = ctx.createGain(); musG.gain.value = P.musicOn ? .1 : 0; musG.connect(comp);
+  ambG = ctx.createGain(); ambG.gain.value = P.sfxOn ? .4 : 0; ambG.connect(comp);
+  smpG = ctx.createGain(); smpG.gain.value = P.sfxOn ? .6 : 0; smpG.connect(comp); // v92: zvuky ze souborů a hlasy (bez tlumicího filtru)
   const rev = ctx.createConvolver(); rev.buffer = impulse(4.2, 2.4);
   revIn = ctx.createGain(); revIn.gain.value = .75; revIn.connect(rev); rev.connect(comp);
   noiseBuf = ctx.createBuffer(1, ctx.sampleRate * 2, ctx.sampleRate);
   const d = noiseBuf.getChannelData(0); for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1;
-  startWind(); startAmb(); musLoad(); partyLoad();
+  startWind(); startAmb(); musLoad(); partyLoad(); smpLoad();
 }
 // ---------- stavebnice ----------
 const now = () => ctx.currentTime;
@@ -10017,10 +10018,44 @@ const R = {
   lose: t => { bell(t, 98, .12, 4, .8); bell(t + 1.6, 92.5, .1, 4, .8); tone('sawtooth', 73, t, .8, .04, 3, { lp: 300, wet: .6 }); },
 };
 const GAP = { waltz: 8000, step: 70, scurry: 90, clank: 90, glide: 120, tick: 30, click: 30, card: 40 };
+// ---------- v92: zvuky ze souborů (nové SFX s jednotnou akustikou, hlasy monster) ----------
+const SMP = {"blade": 3, "boom": 2, "card": 3, "clang": 2, "clank": 2, "click": 3, "coin": 3, "crash": 2, "crit": 2, "deny": 2, "dice": 3, "dissipate": 2, "door": 2, "fear": 3, "fire": 2, "flash": 2, "flesh": 3, "heal": 2, "housecard": 2, "hurt": 3, "lock": 2, "lose": 1, "miss": 3, "panic": 2, "play": 3, "push": 2, "salt": 2, "shot": 3, "shotgun": 2, "shuffle": 2, "spawn": 2, "spell": 3, "splash": 2, "step": 3, "threat": 2, "throw": 3, "trap": 2, "win": 2};
+const MXN = {"banshee":{"act":2,"atk":2,"die":2},"carodejnice":{"act":2,"atk":2,"die":2},"ghulove":{"act":2,"atk":2,"die":2},"grimoar":{"act":2,"atk":2,"die":2},"havrani":{"act":2,"atk":2,"die":2},"hrobnik":{"act":2,"atk":2,"die":2},"kapela":{"act":2,"atk":2,"die":2},"kostlivci":{"act":2,"atk":2,"die":2},"krysy":{"act":2,"atk":2,"die":2},"kvety":{"act":2,"atk":2,"die":2},"mury":{"act":2,"atk":2,"die":2},"obj_drevo":{"die":2},"obj_kamen":{"die":2},"obj_papir":{"die":1},"obj_sklo":{"die":2},"oci":{"act":2,"atk":2,"die":2},"panenky":{"act":2,"atk":2,"die":2},"polt":{"act":2,"atk":2,"die":2},"slimak":{"act":2,"atk":2,"die":2},"sluha":{"act":2,"atk":2,"die":2},"strasaci":{"act":2,"atk":2,"die":2},"troll":{"act":2,"atk":2,"die":2},"upir":{"act":3,"atk":3,"die":2,"ph":2},"vdova":{"act":2,"atk":2,"die":2},"vlci":{"act":2,"atk":2,"die":2},"vlkodlak":{"act":2,"atk":2,"die":2},"zalarnik":{"act":2,"atk":2,"die":2},"zbroj":{"act":2,"atk":2,"die":2}};
+const MX_ALIAS = { trollruka: 'troll', trollnoha: 'troll', trollhlava: 'troll', obel_tma: 'obj_kamen', obel_bolest: 'obj_kamen', obel_hlad: 'obj_kamen', obel_led: 'obj_sklo', zrcadlo: 'obj_sklo', kmen: 'obj_drevo' };
+const smpBuf = {}, smpLast = {}; let smpLoading = false;
+function smpLoad() {
+  if (smpLoading) return; smpLoading = true;
+  for (const [n, c] of Object.entries(SMP)) for (let i = 1; i <= c; i++) fileBuf('s_' + n + i).then(b => { if (b) (smpBuf[n] = smpBuf[n] || [])[i - 1] = b; });
+}
+const fileCache = {};
+function fileBuf(k) {
+  if (!fileCache[k]) fileCache[k] = fetch(MUS.base + k + '.ogg').then(r => r.ok ? r.arrayBuffer() : Promise.reject()).then(b => ctx.decodeAudioData(b)).catch(() => null);
+  return fileCache[k];
+}
+function playBuf(buf, gain, rate) { const s = ctx.createBufferSource(), g = ctx.createGain(); s.buffer = buf; if (rate) s.playbackRate.value = rate; g.gain.value = gain; s.connect(g); g.connect(smpG); s.start(now() + .01); }
+function pickVar(key, n) { let i; do { i = Math.floor(Math.random() * n); } while (n > 1 && i === smpLast[key]); smpLast[key] = i; return i; }
+function playSmp(name, opts) {
+  const bs = (smpBuf[name] || []).filter(Boolean); if (!bs.length) return false;
+  playBuf(bs[pickVar(name, bs.length)], (opts && opts.vol) || 1, 1 + (Math.random() - .5) * .06); return true;
+}
+// hlas / zvuk monstra: cat = act | atk | die | ph
+let mxT = 0;
+async function mx(type, cat, opts) {
+  if (!started || !P.sfxOn) return false;
+  const t0 = MX_ALIAS[type] || type, d = MXN[t0]; if (!d || !d[cat]) return false;
+  const tms = performance.now(); if (cat === 'act' && tms - mxT < 900) return false; if (cat === 'act') mxT = tms;
+  const i = 1 + pickVar('mx' + t0 + cat, d[cat]), k = t0.startsWith('obj_') ? 'mx_' + t0 + i : 'mx_' + t0 + '_' + cat + i;
+  const b = await fileBuf(k); if (!b) return false;
+  playBuf(b, (opts && opts.vol) || (cat === 'act' ? .75 : .9)); return true;
+}
+function mxHas(type, cat) { const d = MXN[MX_ALIAS[type] || type]; return !!(d && d[cat]); }
+function mxPrefetch(types) { if (!ctx) return; for (const ty of types) { const t0 = MX_ALIAS[ty] || ty, d = MXN[t0]; if (!d) continue; for (const [c, n] of Object.entries(d)) for (let i = 1; i <= n; i++) fileBuf(t0.startsWith('obj_') ? 'mx_' + t0 + i : 'mx_' + t0 + '_' + c + i); } }
 function play(name, opts) {
   if (!started || !ctx || !P.sfxOn) return;
-  const r = R[name]; if (!r) return;
+  const r = R[name]; if (!r && !SMP[name]) return;
   const tms = performance.now(); if (last[name] && tms - last[name] < (GAP[name] || 25)) return; last[name] = tms;
+  if (SMP[name] && playSmp(name, opts)) return;
+  if (!r) return;
   try { r(now() + .01, opts || {}); } catch (e) { /* nic */ }
 }
 
@@ -10197,12 +10232,12 @@ async function voice(hero, cat, chance, force) {
   const n = VOX[hero][cat], key0 = hero + cat; let i; do { i = 1 + Math.floor(Math.random() * n); } while (n > 1 && i === voxLast[key0]); voxLast[key0] = i;
   const k = hero + '_' + cat + i;
   try { if (!voxBuf[k]) { const r = await fetch(MUS.base + 'v_' + k + '.ogg'); if (!r.ok) return; voxBuf[k] = await ctx.decodeAudioData(await r.arrayBuffer()); } } catch (e) { return; }
-  const s = ctx.createBufferSource(), g = ctx.createGain(); g.gain.value = .9; s.buffer = voxBuf[k]; s.connect(g); g.connect(master); s.start();
+  const s = ctx.createBufferSource(), g = ctx.createGain(); g.gain.value = 1.35; s.buffer = voxBuf[k]; s.connect(g); g.connect(smpG); s.start();
 }
 
-function setSfx(on) { P.sfxOn = on; save(); if (sfxG) { sfxG.gain.setTargetAtTime(on ? .55 : 0, now(), .1); ambG.gain.setTargetAtTime(on ? .5 : 0, now(), .3); } }
-function setMusic(on) { P.musicOn = on; save(); if (musG) musG.gain.setTargetAtTime(on ? .15 : 0, now(), .4); }
-return { start, play, setSfx, setMusic, setScene, setTension, combat, roundBell, setAmb, voice, dance, get stems() { return MUS.ok; }, get sfxOn() { return P.sfxOn; }, get musicOn() { return P.musicOn; } };
+function setSfx(on) { P.sfxOn = on; save(); if (sfxG) { sfxG.gain.setTargetAtTime(on ? .55 : 0, now(), .1); smpG.gain.setTargetAtTime(on ? .6 : 0, now(), .1); ambG.gain.setTargetAtTime(on ? .4 : 0, now(), .3); } }
+function setMusic(on) { P.musicOn = on; save(); if (musG) musG.gain.setTargetAtTime(on ? .1 : 0, now(), .4); }
+return { start, play, setSfx, setMusic, setScene, setTension, combat, roundBell, setAmb, voice, dance, mx, mxHas, mxPrefetch, get stems() { return MUS.ok; }, get sfxOn() { return P.sfxOn; }, get musicOn() { return P.musicOn; } };
 })();
 if (typeof module !== 'undefined') module.exports = Sfx;
 
@@ -11882,10 +11917,14 @@ const BM_DEATH_KF = {
 };
 const BM_DSTYLE = { sluha: 'ghost', polt: 'ghost', kapela: 'ghost', zbroj: 'scrap', panenky: 'shatter', oci: 'pop', grimoar: 'burn', upir: 'ash', banshee: 'ghost', kostlivci: 'bones', ghulove: 'gore', hrobnik: 'gore', kvety: 'wither', mury: 'dust', strasaci: 'burn', havrani: 'dust', vlci: 'gore', carodejnice: 'ash', vlkodlak: 'gore', obel_tma: 'shatter', obel_bolest: 'scrap', obel_led: 'shatter', obel_hlad: 'gore', krysy: 'gore', slimak: 'pop', zalarnik: 'gore', troll: 'shatter', trollruka: 'gore', trollnoha: 'gore', trollhlava: 'gore' };
 const BAT = ['b...b', 'bb.bb', '.bbb.', '..b..'];
+// v92: pád monstra – jeho vlastní zvuk (hlas/efekt), jinak původní; Maškary mlčí
+const tokMask = t => /mask/.test(String(t && t.sig || ''));
+function deathSnd(key, snd, t) { if (SND && SND.mxHas && !tokMask(t) && SND.mxHas(key, 'die')) { SND.mx(key, 'die'); return; } sfx(snd); }
+function houseMine() { return NETS.role ? NETS.roles.overlord === Net.myId : S.ctl.overlord === 'human'; }
 async function bmDeath(t, key, snd) {
   const p = bFigPos(t), b = t.fig.querySelector('.tok-body'); if (!p) return;
   const { x, y } = p, h = p.h, cy = y - h * .45, st = BM_DSTYLE[key] || 'ghost', el = !!t.bmE; if (key === 'kostlivci' || key === 'hrobnik') shake(el ? .8 : .4);
-  sfx(snd); clearTimeout(t.twT); clearTimeout(t.bpT); clearTimeout(t.bwT);
+  deathSnd(key, snd, t); clearTimeout(t.twT); clearTimeout(t.bpT); clearTimeout(t.bwT);
   bmSet(t, 'die'); t.dying = true;
   b.animate([{ transform: 'translate(-1.5px,0)' }, { transform: 'translate(1.5px,0)' }, { transform: 'none' }], { duration: dur(160) });
   if (key === 'zbroj') shake(el ? 1.4 : 1); else if (key === 'upir') shake(.8);
@@ -13836,7 +13875,7 @@ async function killAnim0(ev, t) {
     particles(x, y - (t.h || 30) * .5, 10, col, 18, 10, 1.4, 900);
     await bmDeath(t, key, snd);
   } else if (!t.fig.classList.contains('fog')) {
-    sfx(snd);
+    deathSnd(key, snd, t);
     if (style === 'topple' || style === 'crumble') shake(style === 'topple' && (key === 'troll' || key === 'zbroj') ? 1.4 : .6);
     const n = style === 'shatter' || style === 'crumble' ? 22 : style === 'bats' ? 26 : 16;
     particles(x, y - (t.h || 30) * .5, n, col, 22, style === 'rise' || style === 'fade' || style === 'bats' || style === 'burnup' ? 30 : 12, 1.6, 1000);
@@ -13928,7 +13967,7 @@ function markShow(m) {
 }
 const SCEN_SND = { blackmoor: ['panstvi', 'panstvi'], hlasy: ['hrbitov', 'hrbitov'], obelisky: ['les', 'les'], ocista: ['krypta', 'krypta'], oltar: ['klaster', 'klaster'],
   bludiste: ['les', 'zahrada'], mlyn: ['les', 'mlyn'], svitani: ['panstvi', 'svitani'], ples: ['bal', 'ples'], hreben: ['boss', 'mlha'], hon: ['boss', 'hon'], kanaly: ['boss', 'kanaly'] };
-function sndScene(G) { if (!SND || !SND.setScene) return; const sc = G && G.scen && SCEN_SND[G.scen.id] || ['menu', 'menu']; SND.setScene(sc[0] === 'bal' && G.ball && G.ball.revealed ? 'bal2' : sc[0]); SND.setAmb(sc[1]); SND.setTension(false); }
+function sndScene(G) { if (!SND || !SND.setScene) return; if (G && SND.mxPrefetch) SND.mxPrefetch([...new Set([...(G.monsters || []).map(m => m.type), ...Object.keys(G.groups || {})])]); const sc = G && G.scen && SCEN_SND[G.scen.id] || ['menu', 'menu']; SND.setScene(sc[0] === 'bal' && G.ball && G.ball.revealed ? 'bal2' : sc[0]); SND.setAmb(sc[1]); SND.setTension(false); }
 function sndMenu() { if (!SND || !SND.setScene) return; SND.setScene('menu'); SND.setAmb('menu'); SND.setTension(false); }
 function bellRound(G) { const lvl = G.maxRound ? Math.min(1, G.round / G.maxRound) : .5; if (!(SND && SND.roundBell && SND.roundBell(lvl))) sfx('bell'); }
 // v91: hlášky „začátek tahu“ slyší jen hráč, který lovce ovládá; útok, strach a pád slyší všichni
@@ -13941,6 +13980,8 @@ function sndTick(G) {
   const a = G.active, hid = a && a.side === 'heroes' && a.hero;
   if (hid && hid !== S.voxHero) { S.voxHero = hid; const h = G.heroes.find(x => x.id === hid); if (h && !h.downed) voxMine(hid, 'select'); }
   if (!hid) S.voxHero = null;
+  { const mid = a && a.monster, mm = mid && G.monsters.find(x => x.uid === mid), key = mm ? mm.type + ':' + G.round : null; // v92: aktivace skupiny monster
+    if (key && key !== S.mxAct) { S.mxAct = key; if (!mm.mask && houseMine() && SND.mx && monsterShown(mm)) SND.mx(mm.type, 'act'); } }
   S.voxDown = S.voxDown || {};
   for (const h of G.heroes) { if (h.downed && !S.voxDown[h.id] && G.phase !== 'setup') SND.voice(h.id, 'death'); S.voxDown[h.id] = !!h.downed; }
 }
@@ -14188,6 +14229,7 @@ async function rollAnim(ev) {
   await sleep(dur(620));
   if (aim) aim.remove();
   { const a = S.G.active; if (!ev.pry && !ev.enemy && a && a.side === 'heroes' && a.hero && SND && SND.voice) SND.voice(a.hero, 'attack', .7); } // v91: výkřik až s nápřahem
+  if (ev.enemy && !ev.pry && SND && SND.mx) { const mm = ev.from && C.monsterAt(S.G, ev.from); if (mm && !mm.mask) SND.mx(mm.type, 'atk', { vol: .8 }); } // v92: útok monstra slyší všichni
   const bMelee = bA && !ev.pry && st.kind === 'melee'; // v61c: úder zblízka řeší bStrike (nápřah na místě, krátký výpad)
   if (bA && !bMelee) bPose(bA, ev.pry ? 'pry' : st.proj === 'flash' ? 'cast' : 'atk2', ev.pry ? 1000 : 750);
   const tip = bA && !ev.pry && st.proj !== 'flash' ? BETA_TIP[bA.id.slice(2)] : null;
@@ -14568,9 +14610,9 @@ async function bossFxEv(e) {
   switch (e.t) {
     case 'dance': { if (!(SND && SND.dance && SND.stems)) sfx('waltz'); return true; }
     case 'dust': { sfx('dissipate'); const [x, y] = P(e.at); particles(x, y - 24, 30, '#8a7e70', 22, 30, 1.6, 1200); render(); await sleep(dur(450)); return true; }
-    case 'reveal': { render(); if (SND && SND.setScene) SND.setScene('bal2'); await camTo(e.at, 120); sfx('laugh'); shake(2); screenFlash('#5a0010', 500); const [x, y] = P(e.at); particles(x, y - 30, 40, '#2a0a12', 34, 34, 1.8, 1300); banner('Hrabě z Blackmooru!', true); await sleep(dur(1100)); return true; }
-    case 'bossdown': { sfx('wail'); render(); banner('Hrabě padl… ale ještě dýchá', false); await sleep(dur(800)); return true; }
-    case 'bossphase': { sfx('laugh'); shake(1.4); const m = G.monsters.find(x => x.uid === e.uid); if (m) { const [x, y] = P(m.pos); particles(x, y - 30, 30, '#5a0a14', 26, 30, 1.6, 1000); } render(); banner(C.BALL_PHASES[e.ph].name, true); await sleep(dur(900)); return true; }
+    case 'reveal': { render(); if (SND && SND.setScene) SND.setScene('bal2'); await camTo(e.at, 120); if (!(SND && SND.mx && SND.mxHas('upir', 'act'))) sfx('laugh'); else SND.mx('upir', 'act'); shake(2); screenFlash('#5a0010', 500); const [x, y] = P(e.at); particles(x, y - 30, 40, '#2a0a12', 34, 34, 1.8, 1300); banner('Hrabě z Blackmooru!', true); await sleep(dur(1100)); return true; }
+    case 'bossdown': { if (SND && SND.mxHas && SND.mxHas('upir', 'die')) SND.mx('upir', 'die'); else sfx('wail'); render(); banner('Hrabě padl… ale ještě dýchá', false); await sleep(dur(800)); return true; }
+    case 'bossphase': { if (SND && SND.mxHas && SND.mxHas('upir', 'ph')) SND.mx('upir', 'ph'); else sfx('laugh'); shake(1.4); const m = G.monsters.find(x => x.uid === e.uid); if (m) { const [x, y] = P(m.pos); particles(x, y - 30, 30, '#5a0a14', 26, 30, 1.6, 1000); } render(); banner(C.BALL_PHASES[e.ph].name, true); await sleep(dur(900)); return true; }
     case 'comb': { sfx('throw'); render(); await sleep(dur(250)); return true; }
     case 'buried': { sfx('spell'); const [x, y] = P(e.at); particles(x, y - 10, 30, '#cfe8ff', 20, 34, 1.4, 1200); screenFlash('#dfefff', 400); await sleep(dur(600)); return true; }
     case 'wail': { render(); return true; }
