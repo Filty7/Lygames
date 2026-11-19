@@ -3859,7 +3859,7 @@ const SCENARIOS = [
     tokens: [], setup: ['buy', 'place'], locks: 0, bossName: 'Hrabě z Blackmooru',
     short: 'Najděte Hraběte mezi tanečníky a zabijte ho ve všech třech podobách.',
     blurb: 'Maškarní ples na Blackmooru. Mezi deseti tanečníky v maskách se skrývá Hrabě a každé kolo se formace na parketu promíchá.',
-    goalShort: 'Prozkoumat tanečníka stojí 2 pohyby: když je to Hrabě, odhalí se. Stopy (1 pohyb) rozpráší dva nevinné tanečníky. Hrabě má 3 podoby po 15 životech. Česnek, kolík, krucifix a dýka v místnostech mu dávají 5 dmg s výhodou.' },
+    goalShort: 'Prozkoumat tanečníka stojí 2 pohyby: když je to Hrabě, odhalí se. Stopy (2 pohyby, stůj přímo na ní) rozpráší dva nevinné tanečníky. Hrabě má 3 podoby po 15 životech. Česnek, kolík, krucifix a dýka v místnostech mu dávají 5 dmg s výhodou.' },
   { id: 'hreben', n: 10, boss: true, map: 'mlha', name: 'Hřeben Banshee', goal: 'comb', cats: ['hrbitov', 'zahrada'], maxRound: 10, bossHp: 22, wakeRound: 3,
     tokens: [], setup: ['buy', 'place'], locks: 0, bossName: 'Banshee',
     short: 'Vraťte Banshee její hřeben do pravého hrobu v mlžném lese.',
@@ -7265,7 +7265,7 @@ function stepToward(G, m, target, n, okHex) {
 
 // ---------------- Krvavý ples (Hrabě z Blackmooru) – v85 ----------------
 // Tanečníci (10, každý obrázek 2×) na začátku kola přetančí do nové formace. Prozkoumat tanečníka = 2 akce
-// (Hrabě se odhalí, jinak se nic nestane). Stopa (1 pohyb) rozpráší dva nevinné tanečníky / po odhalení
+// (Hrabě se odhalí, jinak se nic nestane). Stopa (2 pohyby, jen na jejím poli) rozpráší dva nevinné tanečníky / po odhalení
 // Maškaru s nejvíc životy. Hrabě má 3 fáze po 15 životech; po pádu leží do konce kola a vstane v další fázi.
 const BALL_CLUE_N = 2;
 const BALL_DANCERS = 10, BALL_MOVE = 4, BALL_PHASE_HP = 15, BALL_MASK_HP = 5;
@@ -7334,7 +7334,7 @@ function ballInter(G, h, points) {
   const out = [];
   if (!G.ball.revealed && points >= 2) for (const m of ballDancers(G)) if (dist(m.pos, h.pos) === 1) out.push({ kind: 'boss', act: 'unmask', cost: 2, hex: m.pos.slice(), uid: m.uid, lbl: 'Prozkoumat', want: !(G.ball.seen || []).includes(m.uid) });
   const anyLeft = G.ball.revealed ? G.monsters.some(m => m.mask) : ballDancers(G).some(m => m.uid !== G.ball.count);
-  if (points >= 1 && anyLeft) for (const cl of G.ball.clues) if (!cl.taken && dist(cl.hex, h.pos) <= 1 && zonesOf(h.pos).includes(roomOf(cl.hex))) out.push({ kind: 'boss', act: 'clue', cost: 1, hex: cl.hex.slice(), lbl: 'Prohledat', want: true });
+  if (points >= 2 && anyLeft) for (const cl of G.ball.clues) if (!cl.taken && eq(cl.hex, h.pos)) out.push({ kind: 'boss', act: 'clue', cost: 2, hex: cl.hex.slice(), lbl: 'Prohledat', want: true });
   return out;
 }
 async function ballReveal(G, m, h, ui) {
@@ -7421,7 +7421,7 @@ function ballGoals(G, h) {
   if (clues.length && (nearPar !== h || !ds.length || boss)) {
     const mine = clues.filter(c => !mates.some(o => dist(o.pos, c.hex) < dist(h.pos, c.hex)));
     const pick = (mine.length ? mine : clues).sort((a, b) => dist(a.hex, h.pos) - dist(b.hex, h.pos))[0];
-    return [pick.hex].concat(neighbors(pick.hex)).filter(x => roomOf(x) === roomOf(pick.hex) && !isBlock(x));
+    return [pick.hex]; // v91: stopu jde prohledat jen přímo na jejím poli
   }
   if (boss) return neighbors(boss.pos).filter(x => !isBlock(x) && roomOf(x));
   return ds.flatMap(m => neighbors(m.pos).filter(x => roomOf(x) && !isBlock(x)));
@@ -10083,11 +10083,11 @@ function startMusic() { nextBar = now() + .5; scheduleMusic(); setInterval(sched
 
 // =================== v89: hudba ve stemech, prostředí, hlášky ===================
 // 13 stemů jednoho motivu (D moll, 80 BPM, 20 taktů = 60 s) hraje stále spolu; scéna jen určuje, které jsou slyšet.
-const MUS = { base: (typeof window !== 'undefined' && window.BM_AUDIO) || 'audio/', stems: ['basy', 'plocha', 'sbor', 'motiv', 'celesta', 'harfa', 'klavir', 'varhany', 'zvony', 'pizz', 'tep', 'boj', 'napeti', 'w_valcik', 'w_melodie', 'w_tanec', 'w_tanec2'],
+const MUS = { base: (typeof window !== 'undefined' && window.BM_AUDIO) || 'audio/', stems: ['basy', 'plocha', 'sbor', 'motiv', 'celesta', 'harfa', 'klavir', 'varhany', 'zvony', 'pizz', 'tep', 'boj', 'napeti', 'w_valcik', 'w_melodie', 'w_tanec', 'w_temny', 'w_temna_mel', 'w_temny_boj'],
   buf: {}, g: {}, ok: false, failed: false, loading: null, t0: 0, scene: 'menu', tension: false, LEN: 60, BEAT: .75, BAR: 3, out: null, combatEnd: 0 };
 const SCENES = {
   menu: ['motiv', 'plocha', 'basy'], panstvi: ['klavir', 'harfa', 'basy'], hrbitov: ['zvony', 'sbor', 'celesta'], krypta: ['basy', 'tep', 'zvony'],
-  les: ['harfa', 'pizz', 'sbor'], klaster: ['varhany', 'sbor', 'zvony'], ples: ['harfa', 'pizz', 'motiv'], bal: ['w_valcik', 'w_melodie'], boss: ['motiv', 'basy', 'tep', 'plocha', 'sbor'],
+  les: ['harfa', 'pizz', 'sbor'], klaster: ['varhany', 'sbor', 'zvony'], ples: ['harfa', 'pizz', 'motiv'], bal: ['w_valcik', 'w_melodie'], bal2: ['w_temny', 'w_temna_mel'], boss: ['motiv', 'basy', 'tep', 'plocha', 'sbor'],
 };
 let windG = null;
 function musLoad() {
@@ -10097,8 +10097,8 @@ function musLoad() {
   return MUS.loading;
 }
 // v91: Krvavý ples – valčík; taneční stemy jen během tance (a napětí v posledním kole), boj = taneční stem
-const BAL = () => MUS.scene === 'bal';
-function musWant(k) { const sc = SCENES[MUS.scene] || SCENES.menu; if (BAL() && (k === 'w_tanec' || k === 'w_tanec2')) return MUS.dance || (k === 'w_tanec2' && MUS.tension); return sc.includes(k) || (k === 'napeti' && MUS.tension && !BAL()); }
+const BAL = () => MUS.scene === 'bal', BALX = () => MUS.scene === 'bal' || MUS.scene === 'bal2';
+function musWant(k) { const sc = SCENES[MUS.scene] || SCENES.menu; if (k === 'w_tanec') return BAL() && MUS.dance; return sc.includes(k) || (k === 'napeti' && MUS.tension && !BALX()); }
 function musStart() {
   MUS.out = ctx.createGain(); MUS.out.gain.value = 1.5; MUS.out.connect(musG);
   MUS.t0 = now() + .1;
@@ -10109,13 +10109,13 @@ function musStart() {
   }
 }
 function musRamp(k, v, sec) { const g = MUS.g[k] && MUS.g[k].gain; if (!g) return; const t = now(); g.cancelScheduledValues(t); g.setValueAtTime(g.value, t); g.linearRampToValueAtTime(v, t + sec); }
-function setScene(name) { MUS.scene = SCENES[name] ? name : 'menu'; if (name !== 'bal') MUS.dance = false; if (!MUS.ok) return; for (const k of MUS.stems) if (k !== 'boj') musRamp(k, musWant(k) ? 1 : 0, 3); partyRamp(); }
+function setScene(name) { MUS.scene = SCENES[name] ? name : 'menu'; if (name !== 'bal') MUS.dance = false; if (!MUS.ok) return; for (const k of MUS.stems) if (k !== 'boj' && k !== 'w_temny_boj') musRamp(k, musWant(k) ? 1 : 0, 3); partyRamp(); }
 // tanec: od dalšího taktu přidá dva akčnější stemy a šum večírku; po skončení vše pomalu odezní
 function dance(on) {
   if (!BAL()) return;
   MUS.dance = !!on; clearTimeout(MUS.danceT);
-  if (on) { if (MUS.ok) { const st = nextGrid(MUS.BAR / 2); for (const k of ['w_tanec', 'w_tanec2']) { const g = MUS.g[k].gain, t = now(); g.cancelScheduledValues(t); g.setValueAtTime(g.value, t); g.linearRampToValueAtTime(Math.max(g.value, .15), st); g.linearRampToValueAtTime(1, st + 1.2); } } partyRamp(); }
-  else MUS.danceT = setTimeout(() => { if (MUS.ok) { musRamp('w_tanec', 0, 5); musRamp('w_tanec2', musWant('w_tanec2') ? 1 : 0, 5); } partyRamp(); }, 2500);
+  if (on) { if (MUS.ok) { const st = nextGrid(MUS.BAR / 2); for (const k of ['w_tanec']) { const g = MUS.g[k].gain, t = now(); g.cancelScheduledValues(t); g.setValueAtTime(g.value, t); g.linearRampToValueAtTime(Math.max(g.value, .15), st); g.linearRampToValueAtTime(1, st + 1.2); } } partyRamp(); }
+  else MUS.danceT = setTimeout(() => { if (MUS.ok) { musRamp('w_tanec', 0, 5); } partyRamp(); }, 2500);
 }
 function partyRamp() { if (!MUS.party || !ctx) return; const g = MUS.party.gain, t = now(); g.cancelScheduledValues(t); g.setValueAtTime(g.value, t); g.linearRampToValueAtTime(BAL() && MUS.dance ? .32 : 0, t + (MUS.dance ? 2 : 6)); }
 function partyLoad() {
@@ -10128,7 +10128,7 @@ const nextGrid = q => { const p = musPos(); return now() + (q - (p % q)) % q; };
 // boj: přidá se od dalšího taktu, 3 takty drží, 2 takty odezní; další útok jen prodlouží
 function combat() {
   if (!MUS.ok || !P.musicOn) return;
-  const g = MUS.g[BAL() ? 'w_tanec' : 'boj'].gain, t = now();
+  const g = MUS.g[BAL() ? 'w_tanec' : MUS.scene === 'bal2' ? 'w_temny_boj' : 'boj'].gain, t = now();
   if (t < MUS.combatEnd - MUS.BAR * 2) { const hold = nextGrid(MUS.BAR) + MUS.BAR * 3; g.cancelScheduledValues(t); g.setValueAtTime(g.value, t); g.linearRampToValueAtTime(1, t + .3); g.setValueAtTime(1, hold); g.linearRampToValueAtTime(0, hold + MUS.BAR * 2); MUS.combatEnd = hold + MUS.BAR * 2; return; }
   const st = nextGrid(MUS.BAR), hold = st + MUS.BAR * 3;
   g.cancelScheduledValues(t); g.setValueAtTime(g.value, t); g.linearRampToValueAtTime(.12, st); g.linearRampToValueAtTime(1, st + MUS.BEAT); g.setValueAtTime(1, hold); g.linearRampToValueAtTime(0, hold + MUS.BAR * 2);
@@ -13327,7 +13327,6 @@ function onMapClick(ev) {
   if (m.type === 'setup') return setupClick(hit);
   if (m.type === 'move') {
     if (hit.inter !== undefined) return m.resolve(m.opts.inter[hit.inter]);
-    { const ci = m.opts.inter.find(i => i.act === 'clue' && hitList(hit).some(x => C.eq(i.hex, x))); if (ci) return m.resolve(ci); } // v91: klik na stopu ze sousedního pole = prohledat (ne vstoupit)
     const h = [hit.hex, hit.tokHex, hit.doorHex, hit.furnHex].find(x => x && m.opts.reach.has(C.K(x)));
     if (h) { sfx('click'); return m.resolve({ kind: 'walk', hex: h }); }
     const it = m.opts.inter.find(i => hitList(hit).some(x => C.eq(i.hex, x))); if (it) return m.resolve(it);
@@ -13929,7 +13928,7 @@ function markShow(m) {
 }
 const SCEN_SND = { blackmoor: ['panstvi', 'panstvi'], hlasy: ['hrbitov', 'hrbitov'], obelisky: ['les', 'les'], ocista: ['krypta', 'krypta'], oltar: ['klaster', 'klaster'],
   bludiste: ['les', 'zahrada'], mlyn: ['les', 'mlyn'], svitani: ['panstvi', 'svitani'], ples: ['bal', 'ples'], hreben: ['boss', 'mlha'], hon: ['boss', 'hon'], kanaly: ['boss', 'kanaly'] };
-function sndScene(G) { if (!SND || !SND.setScene) return; const sc = G && G.scen && SCEN_SND[G.scen.id] || ['menu', 'menu']; SND.setScene(sc[0]); SND.setAmb(sc[1]); SND.setTension(false); }
+function sndScene(G) { if (!SND || !SND.setScene) return; const sc = G && G.scen && SCEN_SND[G.scen.id] || ['menu', 'menu']; SND.setScene(sc[0] === 'bal' && G.ball && G.ball.revealed ? 'bal2' : sc[0]); SND.setAmb(sc[1]); SND.setTension(false); }
 function sndMenu() { if (!SND || !SND.setScene) return; SND.setScene('menu'); SND.setAmb('menu'); SND.setTension(false); }
 function bellRound(G) { const lvl = G.maxRound ? Math.min(1, G.round / G.maxRound) : .5; if (!(SND && SND.roundBell && SND.roundBell(lvl))) sfx('bell'); }
 // v91: hlášky „začátek tahu“ slyší jen hráč, který lovce ovládá; útok, strach a pád slyší všichni
@@ -14569,7 +14568,7 @@ async function bossFxEv(e) {
   switch (e.t) {
     case 'dance': { if (!(SND && SND.dance && SND.stems)) sfx('waltz'); return true; }
     case 'dust': { sfx('dissipate'); const [x, y] = P(e.at); particles(x, y - 24, 30, '#8a7e70', 22, 30, 1.6, 1200); render(); await sleep(dur(450)); return true; }
-    case 'reveal': { render(); await camTo(e.at, 120); sfx('laugh'); shake(2); screenFlash('#5a0010', 500); const [x, y] = P(e.at); particles(x, y - 30, 40, '#2a0a12', 34, 34, 1.8, 1300); banner('Hrabě z Blackmooru!', true); await sleep(dur(1100)); return true; }
+    case 'reveal': { render(); if (SND && SND.setScene) SND.setScene('bal2'); await camTo(e.at, 120); sfx('laugh'); shake(2); screenFlash('#5a0010', 500); const [x, y] = P(e.at); particles(x, y - 30, 40, '#2a0a12', 34, 34, 1.8, 1300); banner('Hrabě z Blackmooru!', true); await sleep(dur(1100)); return true; }
     case 'bossdown': { sfx('wail'); render(); banner('Hrabě padl… ale ještě dýchá', false); await sleep(dur(800)); return true; }
     case 'bossphase': { sfx('laugh'); shake(1.4); const m = G.monsters.find(x => x.uid === e.uid); if (m) { const [x, y] = P(m.pos); particles(x, y - 30, 30, '#5a0a14', 26, 30, 1.6, 1000); } render(); banner(C.BALL_PHASES[e.ph].name, true); await sleep(dur(900)); return true; }
     case 'comb': { sfx('throw'); render(); await sleep(dur(250)); return true; }
@@ -14595,7 +14594,7 @@ function bossQuest(G) {
     const ph = B.phase, P = C.BALL_PHASES;
     return [B.revealed ? it(`Hrabě · ${esc(P[ph].name)} <b>${boss ? (boss.down ? 'leží' : boss.hp + ' / ' + C.BALL_PHASE_HP) : '✓'}</b>${pips(ph + (boss && boss.down ? 1 : 0), 3)}`, !boss, 'Tři podoby po ' + C.BALL_PHASE_HP + ' životech. Padlý Hrabě vstane na konci kola.')
       : it(`Najděte Hraběte: <b>${ds}</b> tanečníků`, false, 'Prozkoumat tanečníka = 2 pohyby. Každé kolo se formace promíchá.'),
-      it(`Stopy: zbývá <b>${cl}</b>`, !cl, B.revealed ? (ms ? 'Stopa rozpráší dvě Maškary s nejvíc životy.' : '') : 'Stopa rozpráší dva nevinné tanečníky.'),
+      it(`Stopy: zbývá <b>${cl}</b>`, !cl, B.revealed ? (ms ? 'Stůj na stopě, prohledání = 2 pohyby. Rozpráší dvě Maškary s nejvíc životy.' : '') : 'Stůj na stopě, prohledání = 2 pohyby. Rozpráší dva nevinné tanečníky.'),
       it('Nálezy proti upírům', false, 'Česnek, kolík, krucifix a dýka: proti Hraběti 5 dmg s výhodou.')];
   }
   if (G.comb) {
@@ -15726,7 +15725,7 @@ function showBriefAgain() { if (!S.G) return; S.detail = { brief: true }; sfx('c
 // zadání misí: příběh (1 věta), cíl (1 věta), 2–3 body jak na to
 const GOAL_H = {
   ball: { story: 'Maškarní ples na Blackmooru. Mezi deseti tanečníky v maskách se skrývá Hrabě a orchestr hraje valčík do rána.', goal: 'Najděte Hraběte a zabijte ho ve všech třech podobách.',
-    how: ['Prozkoumat sousedního tanečníka stojí 2 pohyby. Pravý Hrabě se odhalí, jinak se nestane nic – pamatuj si, koho už jsi zkoušel.', 'Na začátku každého kola tanečníci přetančí do nové formace. Kdo jim stojí v cestě, odletí stranou; lovec navíc dostane 1 zranění a 1 Strach.', 'Stopy v místnostech (1 pohyb) rozpráší dva nevinné tanečníky. Po odhalení rozpráší dvě Maškary s nejvíc životy.', 'V každé místnosti je nález: česnek, kolík, krucifix a dýka dávají Hraběti 5 dmg s výhodou. Jeden nález je past, jeden hostina.', 'Hrabě má 3 podoby po 15 životech: Odhalený, Netopýří mrak (pohyb 6, únik 2) a Krvavý pán (útok na 2 pole, dvakrát). Padlý leží do konce kola.'] },
+    how: ['Prozkoumat sousedního tanečníka stojí 2 pohyby. Pravý Hrabě se odhalí, jinak se nestane nic – pamatuj si, koho už jsi zkoušel.', 'Na začátku každého kola tanečníci přetančí do nové formace. Kdo jim stojí v cestě, odletí stranou; lovec navíc dostane 1 zranění a 1 Strach.', 'Stopy v místnostech rozpráší dva nevinné tanečníky. Prohledat stopu stojí 2 pohyby a musíš stát přímo na ní. Po odhalení rozpráší dvě Maškary s nejvíc životy.', 'V každé místnosti je nález: česnek, kolík, krucifix a dýka dávají Hraběti 5 dmg s výhodou. Jeden nález je past, jeden hostina.', 'Hrabě má 3 podoby po 15 životech: Odhalený, Netopýří mrak (pohyb 6, únik 2) a Krvavý pán (útok na 2 pole, dvakrát). Padlý leží do konce kola.'] },
   comb: { story: 'Mlha nad bažinou je tak hustá, že je vidět jen na dvě pole. Jeden z vás nese hřeben Banshee a ona si pro něj jde.', goal: 'Vložte hřeben do pravého ze čtyř hrobů, nebo Banshee zabijte.',
     how: ['Nositel hřebenu cítí směr k pravému hrobu (šipka). Vložit hřeben = 1 pohyb vedle hrobu. Špatný hrob vzbudí mrtvé.', 'Hřeben jde podat sousedovi nebo hodit až na 3 pole. Od ležícího ho můžeš vzít.', 'Na konci kola Banshee dojde k nositeli a zakvílí: +2 Strach do 3 polí. Pak je kolo vidět a jde zasáhnout.', 'Kořenářka nese lucernu a vidí dál. Bludičky lákají lovce k sobě.'] },
   hunt: { story: 'Úplněk nad Černým lesem. Vlkodlak se smečkou štve lovce lesními průseky.', goal: 'Chyťte vlkodlaka dvakrát do pastí, nebo ho zabijte.',
