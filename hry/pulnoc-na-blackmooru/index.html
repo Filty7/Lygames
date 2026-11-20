@@ -2296,7 +2296,7 @@ body.bui #menupop > label, body.bui #menupop > .pop-row { align-self: center; ju
 .e10moonD{transition:opacity 3s ease}.e10dark .e10moonD{opacity:.25}.e10cover{transform:translateX(330px);transition:transform 3.2s ease-in-out}.e10dark .e10cover{transform:translateX(0)}
 .e10cl{animation:e10cl 90s linear infinite}@keyframes e10cl{from{transform:translateX(-60px)}to{transform:translateX(1500px)}}.e10fog{animation:e10fog 30s ease-in-out infinite alternate;transform-box:fill-box;transform-origin:center}@keyframes e10fog{from{transform:translateX(-50px) scale(.9)}to{transform:translateX(50px) scale(1.15)}}
 .e10beams{animation:e9sh 6s ease-in-out infinite alternate}.e10dark .heroglow{transform:scale(1.45);transition:transform 2s}.heroglow{transition:transform 2s}
-.e11grade,.e11fogs,.e11fog{pointer-events:none}.e11gl{animation:e11gl 3.2s ease-in-out infinite alternate}@keyframes e11gl{from{opacity:.35}to{opacity:1}}
+.e11grade,.e11fogs,.e11fog{pointer-events:none}.bzone{fill:#b03070;fill-opacity:.16;stroke:#ff6aa8;stroke-opacity:.75;stroke-width:1.4;stroke-dasharray:4 3;pointer-events:none;animation:bzone 2.4s ease-in-out infinite alternate}@keyframes bzone{from{fill-opacity:.1}to{fill-opacity:.24}}.e11gl{animation:e11gl 3.2s ease-in-out infinite alternate}@keyframes e11gl{from{opacity:.35}to{opacity:1}}
 .e9grade,.e9beams,.e9sky,.e9pools{pointer-events:none}.e9wfl{opacity:0}.e9pool{opacity:.8;mix-blend-mode:plus-lighter}.e9beams{mix-blend-mode:screen;animation:e9sh 7s ease-in-out infinite alternate}@keyframes e9sh{from{opacity:.75}to{opacity:1}}.e9halo{animation:e9sh 5s ease-in-out infinite alternate}
 .e9strike .e9wfl{animation:e9fl 1.5s linear}.e9strike .e9sky{animation-name:e9fls}.e9strike .e9skybg{animation-name:e9flb}.e9strike .e9beamf{animation-name:e9flr}.e9strike .e9pool{animation:e9flp 1.5s linear}
 @keyframes e9fl{0%{opacity:0}3%{opacity:calc(var(--pw) * .6)}9%{opacity:calc(var(--pw) * .08)}15%{opacity:calc(var(--pw) * .5)}35%{opacity:calc(var(--pw) * .15)}100%{opacity:0}}
@@ -4027,10 +4027,10 @@ const SCENARIOS = [
     blurb: 'Maškarní ples na Blackmooru. Mezi deseti tanečníky v maskách se skrývá Hrabě a každé kolo se formace na parketu promíchá.',
     goalShort: 'Prozkoumat tanečníka stojí 2 pohyby: když je to Hrabě, odhalí se, jinak se tanečník rozpadne v prach. Stopy (2 pohyby, stůj přímo na ní) rozpráší dva nevinné tanečníky. Hrabě má 3 podoby po 15 životech. Česnek, kolík, krucifix a dýka v místnostech mu dávají 5 dmg s výhodou.' },
   { id: 'hreben', noElite: true, noThreat: true, n: 10, boss: true, map: 'mlha', name: 'Hřeben Banshee', goal: 'comb', cats: ['hrbitov', 'zahrada'], maxRound: 10, bossHp: 22, wakeRound: 3,
-    tokens: [], setup: ['buy', 'place'], locks: 0, bossName: 'Banshee',
-    short: 'Vraťte Banshee její hřeben do pravého hrobu v mlžném lese.',
+    tokens: [], setup: ['exit', 'buy', 'place'], locks: 0, bossName: 'Banshee', emptyGrave: 'fear', escort: 0,
+    short: 'Vraťte Banshee její hřeben do pravého hrobu. Který to je, ví jen Dům.',
     blurb: 'Mlha nad bažinou je tak hustá, že je vidět jen na dvě pole. Odněkud se ozývá nářek a jeden z vás nese hřeben, pro který si přijde.',
-    goalShort: 'Nositel hřebenu cítí směr k pravému ze čtyř hrobů. Vložte hřeben do pravého hrobu (1 pohyb), nebo Banshee zabijte, když je po nářku vidět. Banshee jde vždy po nositeli. Hřeben jde podat i hodit.' },
+    goalShort: 'Dům tajně vybral pravý ze čtyř hrobů. Vložte do něj hřeben (1 pohyb vedle hrobu) – prázdný hrob dá +2 Strach. Banshee je nesmrtelná a ovládá ji Dům: na začátku kola zakřičí a útočit může jen do 2 polí od místa výkřiku, na nositele hřebenu s výhodou. Hřeben jde podat i hodit.' },
   { id: 'hon', noElite: true, noThreat: true, n: 11, boss: true, map: 'les', name: 'Divoký hon', goal: 'hunt', cats: ['chatrc', 'zahrada'], maxRound: 10, bossHp: 30, wakeRound: 3, budgetBonus: -1,
     tokens: [], setup: ['buy', 'place'], locks: 0, bossName: 'Vlkodlak',
     short: 'Chyťte vlkodlaka dvakrát do pastí, nebo ho zabijte stříbrem.',
@@ -5173,7 +5173,7 @@ function attackTargets(G, h, spec) {
   return G.monsters.filter(m => !mdef(m).object && visibleToHeroes(G, m) && targetableMonster(G, m) && canStrike(G, h.pos, m.pos, rng, thru)).map(m => attackInfo(G, h, m, spec))
     .concat(typeof objectTargets === 'function' ? objectTargets(G, h, rng).map(m => attackInfo(G, h, m, spec)) : []);
 }
-function targetableMonster(G, m) { return !(m.dormant) && !m.down && !(m.batsRound === G.round) && !m.hidden && !m.human && !isNpc(m); }
+function targetableMonster(G, m) { return !m.immortal && !(m.dormant) && !m.down && !(m.batsRound === G.round) && !m.hidden && !m.human && !isNpc(m); }
 function killMonster(G, m) {
   if (m.boss && G.ball && ballBossFall(G, m)) return;
   G.monsters = G.monsters.filter(x => x !== m);
@@ -6243,6 +6243,7 @@ function monsterReach(G, m, points, passHeroes) {
 }
 function monsterTargets(G, m) {
   const s = mstats(G, m), all = G.heroes.filter(h => !h.downed && !h.escaped && !heroInvisible(G, h) && canStrike(G, m.pos, h.pos, s.range) && !(h.cover && h.cover.round === G.round && dist(m.pos, h.pos) > h.cover.max));
+  if (G.comb && m.boss) return all.filter(h => combZoneHas(G, h.pos));
   if (m.taunt) { const th = G.heroes.find(h => h.id === m.taunt); if (th && !th.downed && !th.escaped) return all.filter(h => h.id === m.taunt); }
   // Oko domu: druhý útok na jiného lovce, pokud to jde
   if (s.eye2 && m._atkIds && m._atkIds.length) return all.filter(h => !m._atkIds.includes(h.id)); // v93: oko nikdy dvakrát na stejného lovce
@@ -6269,7 +6270,7 @@ function monsterAttackInfo(G, m, h) {
   if (d.terror && h.fear >= 2) mods.push({ label: 'teror', v: d.terror });
   if (d.swarm) { const n = Math.min(3, G.monsters.filter(o => o !== m && o.type === m.type && dist(o.pos, h.pos) === 1).length); if (n) mods.push({ label: 'smečka', v: n }); }
   const darkHere = isDark(G, m.pos) || isDark(G, h.pos);
-  const plus = (d.darkAdv && isDark(G, h.pos)) || (zonesOf(m.pos).some(r => G.darkAtk.has(r)) && isDark(G, m.pos)) || (d.packAdv && G.monsters.some(o => o !== m && o.type === m.type && dist(o.pos, h.pos) === 1));
+  const plus = (G.comb && m.boss && G.comb.holder === h.id) || (d.darkAdv && isDark(G, h.pos)) || (zonesOf(m.pos).some(r => G.darkAtk.has(r)) && isDark(G, m.pos)) || (d.packAdv && G.monsters.some(o => o !== m && o.type === m.type && dist(o.pos, h.pos) === 1));
   const minus = (s.range > 1 && dist(m.pos, h.pos) === 1) || saltAt(G, h.pos) || holyAt(h.pos) || (m.disUntil || -1) >= G.round || !!m.disNext;
   const sum = mods.reduce((a, x) => a + x.v, 0), adv = advOf(plus, minus);
   return { mods, sum, chance: chanceFor(sum, 10, adv), adv };
@@ -6943,6 +6944,7 @@ function setupStatus(G) {
   st.place = !types.length ? 'Nejdřív kup skupiny.' : unplaced.length ? 'Zbývá rozmístit: ' + unplaced.map(t => MDEF[t].name + ' ' + aliveOf(G, t) + '/' + groupSize(t)).join(', ') : null;
   st.curse = G.curse ? null : 'Vyber místnost pro Tmu.';
   if (G.scen.goal === 'maze') st.exit = G.realExit ? null : 'Vyber, která branka bude otevřená.';
+  if (G.scen.goal === 'comb') st.exit = G.comb && G.comb.real != null ? null : 'Vyber, který hrob je pravý.';
   if (G.obel) { const n = G.monsters.filter(m => mdef(m).obelisk).length, need = (G.scen.obelisks || []).length; st.obelisks = n < need ? 'Postav obelisky: ' + n + ' z ' + need + '.' : obelPoolLeft(G) > 0 ? 'Rozděl ještě ' + obelPoolLeft(G) + ' zdraví.' : null; }
   return st;
 }
@@ -7645,18 +7647,21 @@ function ballGoals(G, h) {
 }
 
 // ---------------- Hřeben Banshee (mlžný les) ----------------
-const COMB_SIGHT = 2, COMB_HERB_SIGHT = 3, COMB_WAIL = 3, COMB_STEP = 4;
+const COMB_SIGHT = 2, COMB_HERB_SIGHT = 3, COMB_WAIL = 3, COMB_STEP = 4, COMB_ZONE = 2; // v98: Banshee ovládá Dům, je nesmrtelná, útočí jen do pole svého výkřiku (poloměr 2)
 function combInit(G) {
   const B = MAP.comb;
-  G.comb = { graves: B.graves.map(x => x.slice()), real: Math.floor(rng() * B.graves.length), tried: [], holder: G.heroes[Math.floor(rng() * G.heroes.length)].id, wail: null, wails: 0, visUntil: -1 };
-  const b = makeBoss(G, 'banshee', B.start, 'Banshee', bossHpFor(G), { flying: true, ghost: true }, {});
-  b.auto = true; b.hidden = true;
-  addEscort(G, 'banshee', B.escort || B.start, 2, null, 'Plačka');
+  G.comb = { graves: B.graves.map(x => x.slice()), real: null, zone: null, tried: [], holder: G.heroes[Math.floor(rng() * G.heroes.length)].id, wail: null, wails: 0, visUntil: -1 };
+  const b = makeBoss(G, 'banshee', B.start, 'Banshee', 999, { flying: true, ghost: true }, {});
+  b.immortal = true; b.awake = true;
+  if (G.scen.escort !== 0) addEscort(G, 'banshee', B.escort || B.start, G.scen.escort || 2, null, 'Plačka');
   for (const w of B.wisps || []) G.monsters.push(makeMonster('bludicka', w, false, false));
   if (B.herb) G.monsters.push(makeMonster('korenarka', B.herb, false, false));
   log(G, 'Hřeben Banshee nese ' + G.heroes.find(h => h.id === G.comb.holder).name + '.');
 }
 const combHolder = G => G.heroes.find(h => h.id === G.comb.holder);
+// pravý hrob vybírá Dům v přípravě (tajně); bez volby náhodně
+function setRealGrave(G, i) { if (!G.comb || !G.comb.graves[i]) return 'Tohle není hrob.'; G.comb.real = i; return null; }
+const combZoneHas = (G, x) => !!(G.comb && G.comb.zone && dist(G.comb.zone, x) <= COMB_ZONE);
 function combSees(G, x) {
   if (liveHeroes(G).some(h => dist(h.pos, x) <= COMB_SIGHT)) return true;
   const k = npcOf(G, 'korenarka'); return !!(k && dist(k.pos, x) <= COMB_HERB_SIGHT);
@@ -7686,33 +7691,15 @@ async function combDo(G, h, ch, ui) {
     } else {
       G.comb.tried.push(ch.idx);
       log(G, h.name + ': tenhle hrob je prázdný. Ze tmy se ozve smích.');
-      givePanic(G, h, 'u prázdného hrobu');
+      if (G.scen.emptyGrave === 'fear') { addFear(G, h, 2); log(G, h.name + ': +2 Strach.'); } else givePanic(G, h, 'u prázdného hrobu');
       await ui.anim({ type: 'float', at: ch.hex, text: 'Prázdný hrob', cls: 'dmg' });
     }
   }
 }
-// nositel cítí směr k pravému hrobu (osm směrů)
-function combSense(G) {
-  const hd = combHolder(G); if (!hd) return null;
-  const g = G.comb.graves[G.comb.real], dx = xcOf(g) - xcOf(hd.pos), dy = (g[1] - hd.pos[1]) * 0.866;
-  return { dx, dy, d: dist(g, hd.pos) };
-}
+// v98: nositel nezná pravý hrob (vybral ho Dům)
+function combSense(G) { return null; }
 async function combRoundEnd(G, C, ui) {
-  const b = bossOf(G); if (!b) return;
   const hd = combHolder(G);
-  // Banshee se v mlze přesune k nositeli hřebenu a zakvílí
-  b.hidden = true;
-  const tgt = hd && !hd.escaped ? hd.pos : null;
-  if (tgt) { const path = stepToward(G, b, tgt, COMB_STEP, x => !!roomOf(x) && !heroAt(G, x) && !monsterAt(G, x)); for (const x of path) await ui.anim({ type: 'step', who: 'm:' + b.uid, hex: x, fast: true }); }
-  G.comb.wail = b.pos.slice(); G.comb.wails++;
-  const hit = liveHeroes(G).filter(h => dist(h.pos, b.pos) <= COMB_WAIL);
-  log(G, 'Z mlhy se ozve nářek Banshee.' + (hit.length ? '' : ' Nikdo nebyl dost blízko.'));
-  if (G.fx) G.fx.push({ t: 'wail', at: b.pos.slice(), r: COMB_WAIL });
-  await ui.anim({ type: 'wave', at: b.pos, range: COMB_WAIL, kind: 'wail' });
-  for (const h of hit) { addFear(G, h, 2); log(G, h.name + ' slyší nářek: +2 Strach.'); }
-  if (hd && !hd.downed && dist(hd.pos, b.pos) <= 1) { damageHero(G, hd, 3); log(G, 'Banshee sahá po svém hřebenu: ' + hd.name + ' −3.'); await ui.anim({ type: 'float', at: hd.pos, text: '−3', cls: 'dmg' }); }
-  // po nářku je do konce příštího tahu lovců vidět
-  b.hidden = false; G.comb.visUntil = G.round + 1;
   // bludičky: posunou se a přitáhnou lovce v dosahu 2 o pole k sobě
   for (const w of G.monsters.filter(m => m.type === 'bludicka')) {
     const c = neighbors(w.pos).filter(x => roomOf(x) && standable(G, x)); if (c.length) w.pos = pickR(c).slice();
@@ -7726,12 +7713,21 @@ async function combRoundEnd(G, C, ui) {
   const k = npcOf(G, 'korenarka');
   if (k && hd) { const p = stepToward(G, k, hd.pos, 3); if (p.length) await ui.anim({ type: 'step', who: 'm:' + k.uid, hex: k.pos }); }
 }
-function combRoundStart(G) { const b = bossOf(G); if (b && G.comb.visUntil < G.round) b.hidden = true; }
+// začátek kola: Banshee zakřičí – pole kolem ní (poloměr 2) je toto kolo jediné místo, kam může útočit
+async function combRoundStart(G, C, ui) {
+  if (G.comb.real == null) G.comb.real = Math.floor(rng() * G.comb.graves.length);
+  const b = bossOf(G); if (!b) return;
+  b.hidden = false; G.comb.zone = b.pos.slice(); G.comb.wail = b.pos.slice(); G.comb.wails++;
+  const hit = liveHeroes(G).filter(h => dist(h.pos, b.pos) <= COMB_ZONE);
+  log(G, 'Banshee zakřičí. Kolem ní se mlha zavlní – sem bude toto kolo útočit.' + (hit.length ? '' : ''));
+  if (G.fx) G.fx.push({ t: 'wail', at: b.pos.slice(), r: COMB_ZONE });
+  if (ui && ui.anim) await ui.anim({ type: 'wave', at: b.pos, range: COMB_ZONE, kind: 'wail' });
+  for (const h of hit) { addFear(G, h, 1); log(G, h.name + ' je v jejím výkřiku: +1 Strach.'); }
+}
 function combGoals(G, h) {
   const hd = combHolder(G), live = G.comb.graves.map((g, i) => ({ g, i })).filter(x => !G.comb.tried.includes(x.i));
-  if (hd === h) { const s = live.slice().sort((a, b) => (a.i === G.comb.real ? -3 : 0) + dist(a.g, h.pos) - ((b.i === G.comb.real ? -3 : 0) + dist(b.g, h.pos)))[0]; return s ? neighbors(s.g).filter(x => roomOf(x) && !isBlock(x)) : []; }
+  if (hd === h) { const s = live.slice().sort((a, b) => dist(a.g, h.pos) - dist(b.g, h.pos))[0]; return s ? neighbors(s.g).filter(x => roomOf(x) && !isBlock(x)) : []; } // nositel neví, který je pravý: nejbližší nevyzkoušený
   if (hd && hd.downed) return neighbors(hd.pos).filter(x => roomOf(x) && !isBlock(x));
-  const b = bossOf(G); if (b && !b.hidden) return neighbors(b.pos).filter(x => roomOf(x) && !isBlock(x));
   return hd ? neighbors(hd.pos).filter(x => roomOf(x) && !isBlock(x)) : [];
 }
 
@@ -7969,13 +7965,12 @@ function bossCheck(G) {
   const g = G.scen.goal;
   if (g === 'ball' && G.ball && G.ball.revealed && !bossOf(G)) { G.over = { winner: 'heroes', reason: 'Hrabě z Blackmooru padl uprostřed parketu. Orchestr dohrál a svíce zhasly.' }; return true; }
   if (g === 'hunt' && G.hunt && !bossOf(G)) { G.over = { winner: 'heroes', reason: 'Stříbro zastavilo vlkodlaka. Les ztichl a měsíc zbledl.' }; return true; }
-  if (g === 'comb' && G.comb && !bossOf(G)) { G.over = { winner: 'heroes', reason: 'Banshee se rozplynula v mlze. Hřeben zůstal lovcům.' }; return true; }
   if (g === 'sluice' && G.sew && !bossOf(G)) { G.over = { winner: 'heroes', reason: 'Obří troll padl do kanálu a proud ho odnesl.' }; return true; }
   return false;
 }
 // mlha (Banshee): monstra mimo dohled lovců nejsou vidět; neviditelná Banshee je skrytá
 function bossVisible(G, m) {
-  if (G.comb) { if (isNpc(m)) return true; if (m.hidden) return false; return combSees(G, m.pos); }
+  if (G.comb) { if (isNpc(m) || m.boss) return true; if (m.hidden) return false; return combSees(G, m.pos); }
   return null;
 }
 
@@ -7996,7 +7991,7 @@ API = {
   markMonster, markHero, heroMarked, heroInvisible, pierceArmor, isPierced, applyStatus, addPoison, addBleed, tickDots, healHero, healMonster, FIRE_DMG, FIRE_DMG_H, trapImmune, recallable, peekSpot, doSearch, nearestUnknownSpots, senseSpots, pushStep, STATUS_TXT,
   useMap, MAPS, isFence, blocksSight, OBELISK_SITES, MAP, OUTDOOR,
   LEVERS, HOLY, holyAt, FOUNTAIN, ALTAR, CANDLES, EXIT_DOORS, adjLevers, adjExits, adjCandles, setRealExit, mazeExits, isImpass, mazeLinked, frontBurning, fireAt, isBars, exitDoorAt, LEVER_COST, canStillEscape, purgeWater, candleGuarded,
-  bossGoals, isBossGoal, bossOf, ballDo, ballRoundStart, BALL_DANCES, BALL_PHASES, BALL_PHASE_HP, BALL_MASK_HP, TRAP_KINDS, laneHexes, sewWater, sewLevelOf, combSees, combSense, combHolder, onParquet, furnGone: h => FURN_GONE.has(K(h)), HUNT_CATCH, SEW_NEED, BALL_BRIDES_LOSE, BALL_BRIDE_EVERY, isNpc, rotHex,
+  bossGoals, isBossGoal, bossOf, ballDo, ballRoundStart, BALL_DANCES, BALL_PHASES, BALL_PHASE_HP, BALL_MASK_HP, TRAP_KINDS, laneHexes, sewWater, sewLevelOf, combSees, combSense, combHolder, setRealGrave, combZoneHas, COMB_ZONE, onParquet, furnGone: h => FURN_GONE.has(K(h)), HUNT_CATCH, SEW_NEED, BALL_BRIDES_LOSE, BALL_BRIDE_EVERY, isNpc, rotHex,
   _heroTurn: heroTurn, _monsterAttack: monsterAttack, _heroMove: heroMove, _checkWin: checkWin, _activateGroup: activateGroup, _endRound: endRound, _freeRespawn: freeRespawn, _damageHero: damageHero,
 };
 function syncApi() { Object.assign(API, { LEVERS, HOLY, FOUNTAIN, ALTAR, CANDLES, EXIT_DOORS, CRYPTS, MAP, COLS, ROWS, ROOM_DEFS, ROOMS, DOOR_DEFS, EXIT, EXIT_ROOM, SPOT_DEFS, FURN_DEFS, SPAWN_DEFS, MIRRORS, HERO_START, WALL_HEXES, ALL_HEXES, ROOM_HEXES, MONSTER_ROOMS, CURSE_ROOMS, LOCKABLE, SETUP_BANNED, CIRCLES, OBELISK_SITES, OUTDOOR }); }
@@ -8042,12 +8037,13 @@ function goalMap(G, goals) {
 // nebezpečí pole = očekávané zranění od bdělých monster, která na pole dosáhnou pohybem + dosahem
 let dangerCache = { key: '', map: null };
 function dangerAt(G, hex) {
-  const key = G.round + ':' + G.monsters.map(m => m.uid + '@' + m.pos).join(';');
+  const key = G.round + ':' + (G.comb && G.comb.zone ? G.comb.zone + ':' : '') + G.monsters.map(m => m.uid + '@' + m.pos).join(';');
   if (dangerCache.key !== key) dangerCache = { key, map: new Map() };
   const k = K(hex); if (dangerCache.map.has(k)) return dangerCache.map.get(k);
   let d = 0;
   for (const m of G.monsters) {
     if (MDEF[m.type].object || !C.isAwake(G, m) || m.dormant) continue;
+    if (G.comb && m.boss) { if (C.combZoneHas(G, hex)) d += (C.mstats(G, m).dmg + 1) * 1.2; continue; } // Banshee útočí jen do pole výkřiku
     const s = C.mstats(G, m), reach = Math.max(0, dist(m.pos, hex) - s.range);
     if (reach <= s.move) d += (s.dmg + s.fear * 0.5) * 0.6 * (s.attacks || 1);
   }
@@ -8321,7 +8317,7 @@ const heroBot = {
     const clBlock = G.scen.goal === 'cleanse' && G.spots.some(sp => !sp.searched && dist(sp.hex, h.pos) <= 2 && G.monsters.some(m => !MDEF[m.type].object && !m.dormant && dist(m.pos, sp.hex) <= 2 && roomOf(m.pos) === roomOf(sp.hex))) && G.monsters.some(m => C.visibleToHeroes(G, m) && dist(m.pos, h.pos) <= 4);
     if (se0 && !clBlock) return { type: 'play', uid: se0.uid, half: 'sec' };
     if (h.keys.length && dist(h.pos, C.EXIT) === 1) { const mvc = h.hand.filter(c => moveValue(c) > 0).sort((a, b) => moveValue(a) - moveValue(b))[0]; if (mvc) return { type: 'play', uid: mvc.uid, half: 'sec' }; }
-    const hurry = h.keys.length > 0 || G.exitUnlocked || !!wc || !!G.exitFound || (G.fireFront != null && G.round >= 2);
+    const hurry = h.keys.length > 0 || G.exitUnlocked || !!wc || !!G.exitFound || (G.fireFront != null && G.round >= 2) || (!!G.comb && G.comb.holder === h.id);
     if (G.scen.goal === 'cleanse') {
       const gm0 = goalMap(G, heroGoals(G, h)), here0 = gm0.has(K(h.pos)) ? gm0.get(K(h.pos)) : 99;
       const blocker = G.monsters.filter(m => !MDEF[m.type].object && C.visibleToHeroes(G, m) && G.spots.some(sp => !sp.searched && dist(sp.hex, m.pos) <= 2 && dist(sp.hex, h.pos) <= 4));
@@ -8468,9 +8464,10 @@ const heroBot = {
     const gm = goalMap(G, heroGoals(G, h));
     const here = gm.has(K(h.pos)) ? gm.get(K(h.pos)) : 999;
     const pry = opts.inter.find(i => i.kind === 'pry');
-    const urgent = h.keys.length > 0 || G.exitUnlocked || G.round >= G.maxRound - 2 || hasWater(h) || !!G.exitFound || G.fireFront != null;
+    const holder = !!G.comb && G.comb.holder === h.id;
+    const urgent = h.keys.length > 0 || G.exitUnlocked || G.round >= G.maxRound - 2 || hasWater(h) || !!G.exitFound || G.fireFront != null || holder;
     const retreat = V2.hero && typeof h._retreat === 'string' && h._retreat.startsWith(G.round + ':');
-    const dw = retreat ? 2.5 : urgent ? 0.15 : h.hp <= 4 ? 0.9 : 0.45, gw = retreat ? 0.3 : 1;
+    const dw = retreat ? 2.5 : holder ? 0.6 : urgent ? 0.15 : h.hp <= 4 ? 0.9 : 0.45, gw = retreat ? 0.3 : 1;
     // zbývá-li po pohybu akce a v ruce je útok, táhni na pole, odkud jde zaútočit
     const atkC = h.plays <= 1 && !urgent ? h.hand.filter(c => c.pri && ['attack', 'crossfire', 'grenade', 'swapatk', 'sweep'].includes(c.pri.t) && !c.cursed) : [];
     const vis = atkC.length ? G.monsters.filter(m => C.visibleToHeroes(G, m) && !m.dormant && !MDEF[m.type].object) : [];
@@ -8557,7 +8554,7 @@ function clearSetupPart(G, part) {
   else if (part === 'place') G.monsters.filter(m => !MDEF[m.type].object && !(G.groups[m.type] && G.groups[m.type].free)).slice().forEach(m => C.removeMonster(G, m.uid));
   else if (part === 'buy') { clearSetupPart(G, 'place'); Object.keys(G.groups).filter(t => !G.groups[t].free).forEach(t => C.toggleGroup(G, t)); }
   else if (part === 'curse') G.curse = null;
-  else if (part === 'exit') G.realExit = null;
+  else if (part === 'exit') { G.realExit = null; if (G.comb) G.comb.real = null; }
 }
 // rozmístění žetonů hledání: pasti blíž startu lovců (vyprázdní jim první akce), nálezy (loot) co nejhlouběji v domě,
 // scénářové žetony (svíce, relikvie, falešný klíč) náhodně uprostřed
@@ -8615,6 +8612,11 @@ function botSetupPart(G, part, pool) {
       }
     });
   } else if (part === 'curse') C.setCurse(G, C.pickR(C.CURSE_ROOMS));
+  else if (part === 'exit' && G.comb) {
+    // pravý hrob: spíš daleko od startu lovců a těžko dostupný (ostrov), s náhodou
+    const st = G.heroes[0].pos, v = G.comb.graves.map((g, i) => ({ i, v: dist(g, st) + (neighbors(g).filter(n => C.standable(G, n)).length <= 2 ? 4 : 0) + C.random() * 6 }));
+    v.sort((a, b) => b.v - a.v); C.setRealGrave(G, v[0].i);
+  }
   else if (part === 'exit' && G.scen.goal === 'maze') {
     // pravá branka: nejdál od středu (cesta), při shodě náhodně
     const gm = goalMap(G, [G.heroes[0].pos]);
@@ -8794,7 +8796,9 @@ const overlordBot = {
     const disarmed = !!m.disarmed, inSalt = C.saltAt(G, m.pos), noAtkNow = disarmed || inSalt;
     const evalHex = (hex, cost) => {
       let v = 0;
-      const tg = !disarmed && actions >= 2 && !(inSalt && C.eq(hex, m.pos)) ? hs.filter(h => C.canStrike(G, hex, h.pos, s.range)) : [];
+      const tg = !disarmed && actions >= 2 && !(inSalt && C.eq(hex, m.pos)) ? hs.filter(h => C.canStrike(G, hex, h.pos, s.range) && !(G.comb && m.boss && !C.combZoneHas(G, h.pos))) : [];
+      // v98: Banshee – kde skončí, tam příští kolo zakřičí: držet se u nositele hřebenu a stoupat mu do cesty k hrobům
+      if (G.comb && m.boss) { const hd = C.combHolder(G); if (hd && !hd.downed) { const d = dist(hd.pos, hex); v += d <= 2 ? 10 : d <= 4 ? 4 : 0; } v += interceptVal(G, hex) * 3; }
       if (tg.length) v += 40 + Math.max(...tg.map(h => self._targetScore(G, m, h))) * 3;
       else if (noAtkNow && !(inSalt && C.eq(hex, m.pos))) { const nx = hs.filter(h => C.canStrike(G, hex, h.pos, s.range)); if (nx.length) v += 12 + Math.max(...nx.map(h => self._targetScore(G, m, h))); }
       if (inSalt && C.eq(hex, m.pos)) v -= 8;
@@ -14351,7 +14355,7 @@ const STEP_DEF = {
 let STEPS = [];
 // v73: beta – zkrácené nápovědy kroků přípravy
 const STEP_SHORT = { tokens: 'Vyber žeton a klikni na nábytek s otazníkem.', locks: 'Klikni na dveře, které zamkneš.', obelisks: 'Vyber obelisk a klikni na zářící místo.', traps: 'Klikni na pole s pastí. Lovci ji neuvidí.', buy: 'Kup skupiny monster.', place: 'Vyber skupinu a klikej na pole. První figurka je elita.', exit: 'Vyber pravou branku.', curse: 'Klikni na místnost, kde bude Tma.', done: 'Pusť lovce dovnitř.' };
-function setSteps(G) { STEPS = (G.scen.setup || ['tokens', 'locks', 'buy', 'place', 'curse']).concat('done').map(id => Object.assign({ id }, STEP_DEF[id])); if (G.scen.locks != null) STEPS.forEach(x => { if (x.id === 'locks') x.help = 'Klikni na dveře, které chceš zamknout. Nejvýš ' + G.scen.locks + '. Dveře ze startovní místnosti zamknout nejde.'; }); if (G.scen.setupTraps) STEPS.forEach(x => { if (x.id === 'traps') x.help = 'Klikni na nejvýš ' + G.scen.setupTraps + ' pole, kam schováš past. Pasti nesmí sousedit a nesmí být ve startovní místnosti. Lovci je neuvidí.'; }); }
+function setSteps(G) { STEPS = (G.scen.setup || ['tokens', 'locks', 'buy', 'place', 'curse']).concat('done').map(id => Object.assign({ id }, STEP_DEF[id])); if (G.scen.locks != null) STEPS.forEach(x => { if (x.id === 'locks') x.help = 'Klikni na dveře, které chceš zamknout. Nejvýš ' + G.scen.locks + '. Dveře ze startovní místnosti zamknout nejde.'; }); if (G.scen.setupTraps) STEPS.forEach(x => { if (x.id === 'traps') x.help = 'Klikni na nejvýš ' + G.scen.setupTraps + ' pole, kam schováš past. Pasti nesmí sousedit a nesmí být ve startovní místnosti. Lovci je neuvidí.'; });  if (G.comb) STEPS.forEach(x => { if (x.id === 'exit') { x.label = 'Vyber pravý hrob'; x.help = 'Klikni na jeden ze čtyř zapomenutých hrobů. Ten bude pravý – jen tam se hřeben vrátí. Lovci to nevědí; každý prázdný hrob jim dá Paniku.'; } }); }
 function setupHighlights() {
   const G = S.G, st = STEPS[S.setup.step].id;
   if (st === 'tokens') G.spots.forEach(s => hlRing(s.hex, s.token === S.setup.tok ? 'ring-sel' : 'ring-act'));
@@ -14360,6 +14364,7 @@ function setupHighlights() {
   else if (st === 'obelisks') { C.OBELISK_SITES.forEach(h => hlHex(h, C.obeliskSites(G).some(x => C.eq(x, h)) ? 'hl-pick' : 'hl-faint')); }
   else if (st === 'traps') { [...G.traps].forEach(k => hlHex(C.unK(k), 'hl-atk')); }
   else if (st === 'curse') C.ROOM_HEXES.filter(h => C.CURSE_ROOMS.includes(C.roomOf(h)) && C.roomOf(h) !== G.curse).forEach(h => hlHex(h, 'hl-faint'));
+  else if (st === 'exit' && G.comb) G.comb.graves.forEach((g, i) => hlRing(g, G.comb.real === i ? 'ring-sel' : 'ring-act'));
   else if (st === 'exit') C.mazeExits(G).forEach(d => hlRing(d.hex, d.id === G.realExit ? 'ring-sel' : 'ring-act'));
 }
 function nextMissingToken() { const G = S.G; return C.missingTokens(G)[0] || S.setup.tok; }
@@ -14385,6 +14390,9 @@ function setupClick(hit) {
     const why = C.toggleSetupTrap(G, hit.hex); if (why) S.msg = why; else sfx('card');
   } else if (st === 'curse' && hit.hex) {
     const r = C.roomOf(hit.hex); if (C.CURSE_ROOMS.includes(r)) C.setCurse(G, r); else S.msg = 'Tuhle místnost proklít nejde.';
+  } else if (st === 'exit' && G.comb) {
+    const i = G.comb.graves.findIndex(g => hitList(hit).some(h => C.dist(h, g) === 0));
+    if (i >= 0) { C.setRealGrave(G, i); sfx('lock'); } else S.msg = 'Klikni na jeden ze zapomenutých hrobů.';
   } else if (st === 'exit') {
     const d = C.mazeExits(G).find(x => x.id === hit.door || hitList(hit).some(h => C.dist(h, x.hex) === 0));
     if (d) { C.setRealExit(G, d.id); sfx('lock'); } else S.msg = 'Klikni na branku na okraji bludiště.';
@@ -14452,6 +14460,7 @@ function bindSetupSide(root) {
   root.querySelectorAll('[data-group-sel]').forEach(b => b.addEventListener('click', () => { S.setup.group = b.dataset.groupSel; render(); }));
   root.querySelectorAll('[data-curse]').forEach(b => b.addEventListener('click', () => { C.setCurse(S.G, b.dataset.curse); render(); }));
   root.querySelectorAll('[data-realexit]').forEach(b => b.addEventListener('click', () => { C.setRealExit(S.G, b.dataset.realexit); sfx('lock'); render(); }));
+  root.querySelectorAll('[data-realgrave]').forEach(b => b.addEventListener('click', () => { C.setRealGrave(S.G, +b.dataset.realgrave); sfx('lock'); render(); }));
 }
 const lgIc = (n, c) => `<span class="lg lg-ic" style="color:${c}">${A.icon(n)}</span>`;
 function legendHTML() {
@@ -15728,6 +15737,7 @@ function bossTop(G) {
     if (env11On()) { let w = ''; for (let i = 0; i < 14; i++) { const x = hsh(i, 71) * VW, y = wy(0) + hsh(i, 72) * (VH - wy(0)), r = 70 + hsh(i, 73) * 90; w += `<ellipse class="e10fog" cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" rx="${r.toFixed(1)}" ry="${(r * .32).toFixed(1)}" fill="url(#e11wispG)" style="animation-duration:${(20 + hsh(i, 74) * 24).toFixed(1)}s;animation-delay:-${(hsh(i, 75) * 30).toFixed(1)}s"/>`; }
       o += `<g mask="url(#bfog-m)" class="e11fog"><rect x="-200" y="-200" width="${VW + 400}" height="${VH + 400}" fill="#26323a" opacity="${hv ? .82 : .5}"/><g opacity="${hv ? 1 : .8}">${w}</g></g>`; }
     else o += `<rect class="bfog" x="-200" y="-200" width="${VW + 400}" height="${VH + 400}" mask="url(#bfog-m)" opacity="${hv ? .78 : .45}"/>`;
+    if (G.comb.zone) { const zh = C.ALL_HEXES.filter(h => C.roomOf(h) && C.dist(h, G.comb.zone) <= C.COMB_ZONE); o += `<path class="bzone" d="${zh.map(h => pts(h, SIZE - 1)).join('')}"/>`; } // v98: pole výkřiku nad mlhou – sem Banshee toto kolo útočí
     G.comb.graves.forEach((g, i) => { const [x, y] = px(g), tr = G.comb.tried.includes(i); o += `<g class="bgr-top${tr ? ' tried' : ''}" transform="translate(${x},${y - 20})"><path d="M0 -9v16M-5 -4h10"/>${tr ? '<path class="x" d="M-6 -6L6 6M6 -6L-6 6"/>' : ''}</g>`; });
     const hd = C.combHolder(G);
     if (hd && !hd.escaped) {
@@ -15750,7 +15760,7 @@ function bossFX(G) {
   if (G.comb) {
     const B = G.comb;
     B.graves.forEach((g, i) => { const [x, y] = px(g), tr = B.tried.includes(i); o += `<g class="bgr${tr ? ' tried' : ''}" transform="translate(${x},${y})"><path d="${hexPts(0, 0, SIZE - 3)}"/>${tr ? '<path class="x" d="M-7 -5L7 5M7 -5L-7 5"/>' : ''}</g>`; });
-    if (B.wail && B.visUntil >= G.round) { const [x, y] = px(B.wail); o += `<ellipse class="bwail" cx="${x}" cy="${y}" rx="${WPX * 3.5}" ry="${WPX * 3.5 * KY}"/>`; }
+
   }
   if (G.hunt) {
     const H = G.hunt; if (env10On()) e10Sync(G);
@@ -15809,9 +15819,9 @@ function bossQuest(G) {
   }
   if (G.comb) {
     const B = G.comb, hd = C.combHolder(G), s = C.combSense(G), left = B.graves.length - B.tried.length;
-    return [it(`Hřeben nese <b>${hd ? esc(hd.name) : '–'}</b>${s ? ' <b>' + bDir(s.dx, s.dy) + '</b>' : ''}`, false, s ? 'Pravý hrob cítí ' + bDirWord(s.dx, s.dy) + ', ' + s.d + ' polí.' : ''),
-      it(`Hroby: zbývá <b>${left}</b> ze ${B.graves.length}${pips(B.tried.length, B.graves.length, ' bad')}`, false, 'Vložit hřeben = 1 pohyb vedle hrobu.'),
-      it('Nebo zabijte Banshee', !C.bossOf(G), 'Je vidět jen po nářku.')];
+    return [it(`Hřeben nese <b>${hd ? esc(hd.name) : '–'}</b>`, false, 'Podat sousedovi nebo hodit do 3 polí. Banshee na nositele útočí s výhodou.'),
+      it(`Hroby: zbývá <b>${left}</b> ze ${B.graves.length}${pips(B.tried.length, B.graves.length, ' bad')}`, false, 'Pravý vybral Dům. Vložit hřeben = 1 pohyb vedle hrobu, prázdný hrob +2 Strach.'),
+      it('Banshee je nesmrtelná', false, 'Útočí jen do pole výkřiku (2 pole kolem místa, kde na začátku kola zakřičela).')];
   }
   if (G.hunt) {
     const H = G.hunt, fut = H.clouds.filter(r => r >= G.round);
@@ -15984,6 +15994,7 @@ function setupTrayHTML(G, id) {
   if (id === 'buy') return `<p class="sb-info">Obsazeno <b>${C.goldUsed(G)} / ${G.budget}</b> slotů. Koupeno: ${Object.keys(G.groups).filter(t => !C.MDEF[t].object).map(t => esc(C.MDEF[t].name)).join(', ') || 'nic'}.</p><button class="btn primary" data-sb="buyopen">Otevřít nákup monster</button>`;
   if (id === 'place') return `<div class="sb-groups">${Object.keys(G.groups).filter(t => !C.MDEF[t].object).map(t => { const n = C.aliveOf(G, t), size = C.groupSize(t); return `<button class="sb-grp${S.setup.group === t ? ' sel' : ''}${n >= size ? ' done' : ''}" data-group-sel="${t}">${monPortrait(t)}<span><b>${esc(C.MDEF[t].name)}</b><small>${n} / ${size}</small></span></button>`; }).join('')}</div>`;
   if (id === 'curse') return `<p class="sb-info">${G.curse ? 'Tma: <b>' + esc(C.ROOMS[G.curse]) + '</b>. ' : ''}Klikni v mapě na místnost, kde bude Tma.</p>`;
+  if (id === 'exit' && G.comb) return `<div class="sb-groups">${G.comb.graves.map((g, i) => `<button class="sb-grp${G.comb.real === i ? ' sel done' : ''}" data-realgrave="${i}">${A.icon('cross')}<span><b>${esc(C.ROOMS[C.roomOf(g)] || 'Hrob')}</b><small>${G.comb.real === i ? 'pravý hrob' : 'prázdný'}</small></span></button>`).join('')}</div>`;
   if (id === 'exit') return `<div class="sb-groups">${C.mazeExits(G).map(d => `<button class="sb-grp${G.realExit === d.id ? ' sel done' : ''}" data-realexit="${d.id}">${A.icon('door')}<span><b>${esc(d.name)}</b><small>${G.realExit === d.id ? 'otevřená' : 'zavřená'}</small></span></button>`).join('')}</div>`;
   if (id === 'traps') return `<p class="sb-info"><b>${G.traps.size} / ${G.scen.setupTraps}</b> pastí. Klikej na pole v mapě.</p>`;
   if (id === 'obelisks') return `<div class="sb-obel">${renderSetupSide().split('<section class="panel step-body">')[1].replace('</section>', '')}</div>`;
