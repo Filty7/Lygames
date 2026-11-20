@@ -910,7 +910,7 @@ svg.bglow .hov.onfig { fill-opacity: 0; stroke-opacity: .35; filter: none; }
 #handdock::before { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: calc(var(--ch) * .8 + 20px); pointer-events: auto; }
 .dock-hand { display: flex; align-items: flex-end; padding: 26px 40px 0; transform: translateY(calc(var(--ch) * .6)); transition: transform .3s cubic-bezier(.3,.8,.3,1) .22s; min-height: 40px; }
 #handdock:hover .dock-hand, #handdock.locked .dock-hand, #handdock.force .dock-hand { transform: translateY(-12px); transition-delay: 0s; }
-body.dragging #handdock .dock-hand { transform: translateY(calc(var(--ch) * .9)) !important; transition-delay: 0s; }
+#handdock.dragging .dock-hand { transform: translateY(calc(var(--ch) * .9)) !important; transition-delay: 0s; }
 .dock-hand > .card { zoom: var(--hz, .88); /* velikost karet v ruce: tlačítka −/+ u zámku */ transform: translateY(var(--y, 0)) rotate(var(--r, 0deg)); transform-origin: 50% 130%; transition: transform .18s, box-shadow .18s, filter .2s, opacity .14s; }
 .dock-hand > .card + .card { margin-left: -28px; }
 .dock-hand.live > .card { cursor: grab; }
@@ -963,7 +963,7 @@ body.dragging #handdock .dock-hand { transform: translateY(calc(var(--ch) * .9))
 .played-in.ol .pl-who { color: #ff9a86; }
 @keyframes plIn { from { opacity: 0; transform: translateX(-60px) rotate(-6deg); } }
 .card.used-pri .c-top, .card.used-sec .c-bot { box-shadow: inset 0 0 0 2px #f3cf8e, inset 0 0 22px #e4a84f55; border-radius: 6px; }
-body.dragging { cursor: grabbing !important; } body.dragging #mapwrap, body.dragging #side { pointer-events: none; } /* v91: při tažení karty žádné najíždění nad mapou */
+#dragshield { position: fixed; inset: 0; z-index: 45; cursor: grabbing; display: none; background: transparent; } #dragshield.on { display: block; } /* v93: při tažení karty štít nad mapou – bez přepočtu stylů celé stránky */
 .card.ghost { position: fixed; z-index: 60; pointer-events: none; transform: rotate(3deg) scale(1.05); box-shadow: 0 30px 50px #000c; }
 
 /* ---------- karty Domu: stejný rám, krvavější ---------- */
@@ -3272,8 +3272,8 @@ const MDEF = {
     text: 'Dokud se poprvé nepohne, vypadá jako dekorace a nejde na něj útočit. Oheň mu neublíží.', eliteText: 'Dýňová hlava: 9♥, dosah 4. Hází hořící dýně: pole cíle a všechna sousední hoří do konce příštího kola.' },
   // ---- Půda: zmatení ----
   oci: { cat: 'puda', name: 'Bludné oči', unit: 'Bludné oko', eliteName: 'Oko domu', glyph: 'o', cost: 6, respawn: 1, eliteRespawn: 3, minions: { 2: 2, 3: 3, 4: 4 }, flying: true, markOnHit: true,
-    base: { hp: 2, move: 4, range: 4, mod: 0, dmg: 1, fear: 1, evasion: 2, armor: 0 }, elite: { hp: 5, mod: 1, dmg: 1, attacks: 2, eye2: true },
-    text: 'Létají, únik 2. Upřený pohled: zasažený lovec je do konce kola Označen (monstra +1 proti němu a ignorují jeho únik; nemůže být neviditelný).', eliteText: 'Oko domu: útočí 2× za aktivaci, pokaždé na jiného lovce (pokud to jde).' },
+    base: { hp: 2, move: 4, range: 4, mod: 0, dmg: 1, fear: 1, evasion: 2, armor: 0, attacks: 2, eye2: true }, elite: { hp: 5, mod: 1, dmg: 1, attacks: 2, eye2: true },
+    text: 'Létají, únik 2. Útočí 2× za aktivaci, ale pokaždé na jiného lovce. Upřený pohled: zasažený lovec je do konce kola Označen (monstra +1 proti němu a ignorují jeho únik; nemůže být neviditelný).', eliteText: 'Oko domu: 5♥, útok +1.' },
   grimoar: { cat: 'puda', name: 'Prokleté grimoáry', unit: 'Grimoár', eliteName: 'Kniha bez jména', glyph: 'b', cost: 12, respawn: 3, eliteRespawn: 5, minions: { 2: 1, 3: 2, 4: 3 }, flying: true, swapOnHit: true,
     base: { hp: 5, move: 3, range: 3, mod: 1, dmg: 2, fear: 0, evasion: 0, armor: 0 }, elite: { hp: 8, fear: 1, burnCard: true },
     text: 'Létá. Prohození: po každém zásahu si s lovcem prohodí místo.', eliteText: 'Kniha bez jména: 8♥, při zásahu lovec dostane 1 Strach a odhodí náhodnou kartu.' },
@@ -4399,7 +4399,7 @@ function visibleToHeroes(G, m) {
   if (G.seeAllRound === G.round) return true;
   return false;
 }
-function isAwake(G, m) { if (mdef(m).object || m.auto || m.down) return false; if ((G.scen.wakeAll || MAP.wakeAll) && G.round >= (G.scen.wakeAll || MAP.wakeAll)) return true; if (MAP.revealAll) return m.awake || G.round >= (G.scen.wakeRound || MAP.wakeRound || 1); if (MAP.wakeDist && !m.awake) return hexRevealed(G, m.pos) && m.quiet !== G.round && (roomOf(m.pos) && G.heroes.some(h => !h.escaped && (roomOf(h.pos) === roomOf(m.pos) || dist(h.pos, m.pos) <= MAP.wakeDist))); return m.awake || (hexRevealed(G, m.pos) && m.quiet !== G.round); }
+function isAwake(G, m) { if (mdef(m).object || m.auto || m.down || m.restRound === G.round) return false; if ((G.scen.wakeAll || MAP.wakeAll) && G.round >= (G.scen.wakeAll || MAP.wakeAll)) return true; if (MAP.revealAll) return m.awake || G.round >= (G.scen.wakeRound || MAP.wakeRound || 1); if (MAP.wakeDist && !m.awake) return hexRevealed(G, m.pos) && m.quiet !== G.round && (roomOf(m.pos) && G.heroes.some(h => !h.escaped && (roomOf(h.pos) === roomOf(m.pos) || dist(h.pos, m.pos) <= MAP.wakeDist))); return m.awake || (hexRevealed(G, m.pos) && m.quiet !== G.round); }
 function standable(G, h) { return !!roomOf(h) && !isBlock(h) && !heroAt(G, h) && !monsterAt(G, h) && !saltAt(G, h); }
 const obeliskIn = (G, kind, room) => !!room && G.monsters.some(m => mdef(m).obelisk === kind && roomOf(m.pos) === room);
 function isDark(G, hex) {
@@ -6070,7 +6070,7 @@ function monsterTargets(G, m) {
   const s = mstats(G, m), all = G.heroes.filter(h => !h.downed && !h.escaped && !heroInvisible(G, h) && canStrike(G, m.pos, h.pos, s.range) && !(h.cover && h.cover.round === G.round && dist(m.pos, h.pos) > h.cover.max));
   if (m.taunt) { const th = G.heroes.find(h => h.id === m.taunt); if (th && !th.downed && !th.escaped) return all.filter(h => h.id === m.taunt); }
   // Oko domu: druhý útok na jiného lovce, pokud to jde
-  if (s.eye2 && m._atkIds && m._atkIds.length) { const fresh = all.filter(h => !m._atkIds.includes(h.id)); if (fresh.length) return fresh; }
+  if (s.eye2 && m._atkIds && m._atkIds.length) return all.filter(h => !m._atkIds.includes(h.id)); // v93: oko nikdy dvakrát na stejného lovce
   return all;
 }
 const heroArmor = (G, h) => h.armorUp && h.armorUp.round === G.round ? h.armorUp.n : 0;
@@ -6234,7 +6234,9 @@ async function monsterAttack(G, m, h, C, ui) {
   if (G.monsters.includes(m)) {
     if (G.hungerHeal && G.hungerHeal === G.round + ':' + m.type && dmg > 0) m.hp = Math.min(stats(m).hp, m.hp + 1);
     if (typeof onHeroHit === 'function' && (dmg > 0 || fear > 0)) await onHeroHit(G, m, h, dmg, fear, C, ui);
-    if (s.push && !h.downed && !(h.steadyRound === G.round)) { let prev = m.pos, moved = 0; for (let i = 0; i < s.push && !h.downed; i++) { const to = pushFrom(G, prev, h, false); if (!to) break; prev = h.pos; h.pos = to; moved++; await ui.anim({ type: 'step', who: 'h:' + h.id, hex: to }); await enterFire(G, h, to, ui); } if (moved) log(G, mname(m) + ' odhazuje ' + h.name + (moved > 1 ? ' o ' + moved + ' pole.' : '.')); }
+    if (s.push && !h.downed && !(h.steadyRound === G.round)) { let prev = m.pos, moved = 0; for (let i = 0; i < s.push && !h.downed; i++) { const to = pushFrom(G, prev, h, false); if (!to) break; prev = h.pos; h.pos = to; moved++; await ui.anim({ type: 'step', who: 'h:' + h.id, hex: to }); await enterFire(G, h, to, ui); } if (moved) log(G, mname(m) + ' odhazuje ' + h.name + (moved > 1 ? ' o ' + moved + ' pole.' : '.'));
+      else { const A = toCube(m.pos), B = toCube(h.pos), to = fromCube(2 * B[0] - A[0], 2 * B[1] - A[1], 2 * B[2] - A[2]), mm = onGrid(to) && monsterAt(G, to);
+        log(G, h.name + ' nebyl odhozen: ' + (!onGrid(to) || isBlock(to) || !linkOK(h.pos, to) ? 'za ním je zeď nebo překážka.' : heroAt(G, to) ? 'za ním stojí lovec.' : mm ? 'za ním stojí ' + (isInvisible(G, mm) ? 'něco neviditelného.' : mname(mm) + '.') : saltAt(G, to) ? 'za ním je sůl.' : 'cesta je zavřená.')); } }
     if (h.thorns && h.thorns.round === G.round && G.monsters.includes(m)) await shoveLine(G, h.pos, m, h.thorns.n, ui, 0);
   }
   await spikeHit();
@@ -7172,9 +7174,8 @@ function endRound(G) {
   log(G, '=== Kolo ' + G.round + ' z ' + G.maxRound + ' ===');
 }
 async function playRound(G, C, ui) {
-  const tn = threatFor(G.round);
-  G.threat += tn; G.fx.push({ t: 'threat', n: tn });
-  log(G, 'Začátek kola: Dům +' + tn + ' Hrozba (má ' + G.threat + ').');
+  const tn = G.scen.noThreat ? 0 : threatFor(G.round); // v93: scen.noThreat – Hrozba jen z panik
+  if (tn) { G.threat += tn; G.fx.push({ t: 'threat', n: tn }); log(G, 'Začátek kola: Dům +' + tn + ' Hrozba (má ' + G.threat + ').'); }
   if (G.scen.goal === 'dawn' && G.round > 1) await freeRespawn(G, ui);
   if (isBossGoal(G)) { await bossRoundStart(G, C, ui); if (G.over || checkWin(G)) return; }
   G.heroes.forEach(h => { if (h.escaped || h.lost) h.acted = true; });
@@ -7321,9 +7322,10 @@ function ballInit(G) {
 }
 function ballBossFall(G, m) {
   if (G.ball.phase >= BALL_PHASES.length - 1) return false;
-  m.hp = 0; m.down = true; m.stunned = false;
-  log(G, 'Hrabě padá k zemi… ale ještě dýchá. Na konci kola vstane silnější.');
-  if (G.fx) G.fx.push({ t: 'bossdown', uid: m.uid, at: m.pos.slice() });
+  // v93: bez ležení – hned se promění v další podobu, ale toto kolo už nehraje
+  const ph = G.ball.phase + 1; ballSetPhase(G, m, ph); m.stunned = false; m.restRound = G.round;
+  log(G, 'Hrabě padá… a vstává jako ' + BALL_PHASES[ph].name + (ph === 1 ? ' (pohyb 6, únik 2)' : ' (dosah 2, dva útoky)') + '. Toto kolo už nehraje.');
+  if (G.fx) G.fx.push({ t: 'bossphase', ph, uid: m.uid });
   return true;
 }
 function ballSetPhase(G, b, ph) {
@@ -7343,8 +7345,9 @@ async function ballReveal(G, m, h, ui) {
   G.ball.revealed = true; G.ball.revealRound = G.round;
   const b = makeBoss(G, 'upir', pos, 'Hrabě z Blackmooru', BALL_PHASE_HP, null, Object.assign({ bats: false }, BALL_PHASES[0].ov));
   b.def = Object.assign({}, MDEF.upir, { auraCharm: 0 });
-  ballSetPhase(G, b, 0);
+  ballSetPhase(G, b, 0); b.restRound = G.round; // v93: v kole odhalení Hrabě ani Maškary nehrají
   for (const d of ballDancers(G)) {
+    d.restRound = G.round;
     d.spr = (d.spr || 'tanec1').replace('tanec', 'maska'); d.type = 'upir'; d.elite = false; d.nm = 'Maškara'; d.mask = true; d.noRespawn = true; d.awake = true;
     d.ov = { hp: BALL_MASK_HP, dmg: 1, mod: 0, drain: 0, evasion: 0, move: 4 }; d.hp = BALL_MASK_HP;
     d.def = Object.assign({}, MDEF.upir, { auraCharm: 0, darkAdv: false });
@@ -7403,13 +7406,7 @@ async function ballRoundStart(G, C, ui) {
   }
 }
 async function ballRoundEnd(G, C, ui) {
-  const boss = bossOf(G);
-  if (boss && boss.down) {
-    const ph = G.ball.phase + 1;
-    ballSetPhase(G, boss, ph);
-    log(G, 'Hrabě vstává: ' + BALL_PHASES[ph].name + (ph === 1 ? ' – roj netopýrů, pohyb 6 a únik 2.' : ' – krvavé drápy na 2 pole, dva útoky za aktivaci.'));
-    if (G.fx) G.fx.push({ t: 'bossphase', ph, uid: boss.uid });
-  }
+  // v93: fáze se mění hned při pádu (ballBossFall)
 }
 function ballGoals(G, h) {
   const boss = bossOf(G);
@@ -10966,7 +10963,7 @@ async function envFloor() {
   // dlouhý roztrhaný běhoun chodbou (mezi řadami hexů) – kamenné dlaždice zůstávají vidět nad i pod ním
   if (isShack()) { const R = RR('S'); if (R && ES('k_bear')) rug('k_bear', (wx(R.k0) + wx(R.k1)) / 2 - 6, (wy(R.y0) + wy(R.y1)) / 2 + 8, false);
     const Lr = RR('L'); if (Lr && ES('rug_s')) rug('rug_s', (wx(Lr.k0) + wx(Lr.k1)) / 2 - 10, (wy(Lr.y0) + wy(Lr.y1)) / 2 + 8, false); }
-  if (isBall() && C.MAP.ball && ES('p_med')) { const [mx, my] = px(C.MAP.ball.center); drawS('p_med', mx, my + 1); }
+  let medBox = null; if (isBall() && C.MAP.ball && ES('p_med')) { const [mx, my] = px(C.MAP.ball.center), sp = ES('p_med'); drawS('p_med', mx, my + 1, false, .9); medBox = [mx, my + 1, sp.w * EK / 2 * .97, sp.h * EK / 2 * .97]; } // v93: obrazec 90 % + obrysy hexů přes něj
   if (isAbbey()) { const Sr = RR('S'); if (Sr && ES('persian')) rug('persian', (wx(Sr.k0) + wx(Sr.k1)) / 2 - 4, (wy(Sr.y0) + wy(Sr.y1)) / 2 + 6, false); const Kr = RR('K'); if (Kr && ES('rug_s')) rug('rug_s', (wx(Kr.k0) + wx(Kr.k1)) / 2 - 8, (wy(Kr.y0) + wy(Kr.y1)) / 2 + 2, false); }
   if (isBM()) { const R = RR('C'); if (R && ES('run_m')) {
     const cy = (wy(R.y0 + 1) + wy(R.y1 - 1)) / 2 + 1, xl = wx(R.k0) + 16, xr = wx(R.k1) - 16, L = ES('run_l').w * EK, Rw = ES('run_r').w * EK, M = ES('run_m').w * EK;
@@ -10988,6 +10985,8 @@ async function envFloor() {
     envEdge(g, x, y, s - .6, 4, 5, 'rgba(240,230,230,.03)', .8); envEdge(g, x, y, s - .6, 3, 4, 'rgba(240,230,230,.025)', .8); envEdge(g, x, y, s - .6, 1, 2, 'rgba(0,0,0,.07)', .8);
     g.restore();
   }
+  if (medBox) for (const h of floorHexes) { const [x, y] = px(h); if (Math.hypot((x - medBox[0]) / (medBox[2] + SIZE), (y - medBox[1]) / (medBox[3] + SIZE)) > 1) continue;
+    g.save(); g.beginPath(); g.ellipse(medBox[0], medBox[1], medBox[2], medBox[3], 0, 0, Math.PI * 2); g.clip(); envHexPath(g, x, y, s + .4); g.strokeStyle = 'rgba(14,7,3,.55)'; g.lineWidth = 1.6; g.stroke(); envHexPath(g, x, y, s - .8); g.strokeStyle = 'rgba(255,225,170,.10)'; g.lineWidth = .8; g.stroke(); g.restore(); }
   // skvrny, praskliny, prach (stabilní podle hexu); ne pod nábytkem, ve dveřích ani na zrcadlech
   const busy = new Set([...C.FURN_DEFS.map(f => C.K(f.hex)), ...C.DOOR_DEFS.map(d => C.K(d.hex)), ...C.SPAWN_DEFS.map(sp => C.K(sp.hex))]);
   for (const h of C.ROOM_HEXES) {
@@ -13394,6 +13393,7 @@ function onMapClick(ev) {
     const p = C.respawnOptions(G).points.find(p => hitList(hit).some(x => C.eq(p.hex, x) || C.roomOf(p.hex) === C.roomOf(x))); if (p) m.resolve({ type: 'respawn', mtype: m.respawnType, point: p.id });
   }
 }
+const NO_HOVER_DETAIL = true;
 function onMapHover(ev) {
   if ((S.pan && S.pan.moved) || (S.drag && S.drag.ghost)) return;
   const hit = hitFrom(ev); if (!hit || !hit.hex || !S.G) return;
@@ -13409,6 +13409,7 @@ function onMapHover(ev) {
     else if (mm.type === 'monsterAction') ok = mm.opts.reach.has(K0) || mm.opts.targets.some(h => C.eq(h.pos, hx0));
     else if (mm.type === 'target' || mm.type === 'olPick') { const r = mm.type === 'target' ? mm.req : mm.spec, pos = a => a && (a.hex || a.pos || (a.m && a.m.pos) || (Array.isArray(a) ? a : null)); ok = (r.cands || []).some(a => { const p0 = pos(a); return p0 && C.eq(p0, hx0); }); }
     hovEl.classList.toggle('ok', ok); }
+  if (!NO_HOVER_DETAIL) {} else { setDetail(''); return; } // v93: žádné rychlé popisky při najetí na mapu (detail je v kartě po kliknutí)
   const G = S.G, m = S.mode;
   const hx = hit.tokHex || hit.hex;
   if (m && m.type === 'target' && m.req.kind === 'attack') {
@@ -13990,8 +13991,8 @@ async function roundAnim() {
     const G = S.G; S.clockHold = true; render();
     const w = $('#game .top .bclock-w'); if (w) w.classList.add('knock');
     bellRound(G);
-    if (G.over) { if (G.round >= G.maxRound) { await sleep(dur(420)); buiClockSet(G.maxRound, G.maxRound, true); await sleep(dur(1150)); } for (let i = 0; i < 3; i++) { await sleep(dur(650)); sfx('bell'); } await sleep(dur(700)); }
-    else { await sleep(dur(420)); buiClockSet(G.round - 1, G.maxRound, true); await sleep(dur(1150)); }
+    if (G.over) { for (let i = 0; i < 3; i++) { await sleep(dur(650)); sfx('bell'); } await sleep(dur(700)); }
+    else { await sleep(dur(420)); buiClockSet(G.round, G.maxRound, true); await sleep(dur(1150)); } // v93: ručička ukazuje právě hrané kolo (12 = poslední)
     if (w) { w.classList.remove('knock'); w._r = G.round; }
     S.clockHold = false;
     return;
@@ -14021,7 +14022,7 @@ async function drainFx() {
       if ((e.t === 'panic' || e.t === 'fear') && SND && SND.voice) { SND.voice(e.hero, 'fear', null, true); if (G.fx.some(x => x.t === 'fear' || x.t === 'panic')) await sleep(650); }
       if (e.t === 'fear') continue;
       if (e.t === 'panic') await panicAnim(e.hero);
-      else if (e.t === 'shuffle') { await shuffleAnim(e.hero); const sh = G.heroes.find(x => x.id === e.hero); if (sh && !sh.escaped) floatText(sh.pos, 'Únava: +1 strach', 'dmg'); }
+      else if (e.t === 'shuffle') { await shuffleAnim(e.hero); const sh = G.heroes.find(x => x.id === e.hero); if (sh && !sh.escaped) floatText(sh.pos, 'Únava: +1 strach', 'fear'); }
       else if (e.t === 'threat') await threatAnim(e);
       else if (e.t === 'mirrorbreak') { sfx('crash'); shake(1.6); const [x, y] = px(e.at); particles(x, y - 30, 22, '#d8e8f4', 26, 18, 1.4, 900); render(); await sleep(dur(500)); }
       else if (e.t === 'summon') { sfx('spell'); const [x, y] = px(e.at); particles(x, y - 10, 16, '#c890ff', 14, 30, 1.3, 1100); await sleep(dur(300)); }
@@ -14475,11 +14476,14 @@ function initPanZoom() {
     const fx = (wrap.scrollLeft - S.padX + mx) / svg.clientWidth, fy = (wrap.scrollTop - S.padY + my) / svg.clientHeight;
     const z = Math.min(3, Math.max(1, (S.zoomT || S.zoom) * (e.deltaY < 0 ? 1.12 : 0.89)));
     if (z === (S.zoomT || S.zoom)) return;
-    // v72: nejvýš jedno přepočítání mapy za snímek (kolečko/touchpad posílá víc událostí najednou)
-    if (!S.zoomT) S.zoomP = { fx, fy, mx, my }; S.zoomT = z; perfMark('zoom');
-    if (S.zoomRaf) return;
-    S.zoomRaf = requestAnimationFrame(() => { S.zoomRaf = 0; const P = S.zoomP; S.zoom = S.zoomT; S.zoomT = 0; applyZoom(false);
-      wrap.scrollLeft = S.padX + P.fx * svg.clientWidth - P.mx; wrap.scrollTop = S.padY + P.fy * svg.clientHeight - P.my; });
+    // v93: během točení kolečkem jen CSS zvětšení (bez přerastrování mapy = bez blikání); skutečná velikost až po zastavení
+    if (!S.zoomT) S.zoomP = { fx, fy, mx, my, ox: wrap.scrollLeft - S.padX + mx, oy: wrap.scrollTop - S.padY + my }; S.zoomT = z; perfMark('zoom');
+    const k = S.zoomT / S.zoom, P0 = S.zoomP, tf = `scale(${k})`, to = `${P0.ox}px ${P0.oy}px`;
+    for (const el of [svg, fxSvg]) if (el) { el.style.transformOrigin = to; el.style.transform = tf; }
+    clearTimeout(S.zoomTm);
+    S.zoomTm = setTimeout(() => { const P = S.zoomP; S.zoom = S.zoomT; S.zoomT = 0;
+      for (const el of [svg, fxSvg]) if (el) { el.style.transform = ''; el.style.transformOrigin = ''; }
+      applyZoom(false); wrap.scrollLeft = S.padX + P.fx * svg.clientWidth - P.mx; wrap.scrollTop = S.padY + P.fy * svg.clientHeight - P.my; }, 160);
   }, { passive: false });
   // v90: prostřední tlačítko = znamení (zablokujeme i automatické posouvání prohlížeče)
   wrap.addEventListener('mousedown', e => { if (e.button !== 1) return; e.preventDefault(); if (e.target.closest('svg')) markPlace(e); });
@@ -14527,7 +14531,7 @@ function buiApply(G) {
     if (!on && dock && lk && lk.parentNode !== dock) { dock.appendChild(lk); dock.appendChild(sz); } }
   if (!on) { const mp = $('#game > .popwrap.bmenu'); if (mp) { mp.classList.remove('bmenu'); $('#game .top').appendChild(mp); } ['#bquest', '#bsnow'].forEach(k => { const e = $(k); if (e) e.remove(); }); return; }
   bcStyle();
-  const ck = $('#game .top .clock'); if (ck) { let w = ck.querySelector('.bclock-w'); if (!w) { w = el('div', { class: 'bclock-w' }); ck.appendChild(w); } if (w._k !== G.maxRound) { w._k = G.maxRound; w.innerHTML = buiClockSVG(G); w._r = null; } if (!S.clockHold && w._r !== G.round) { w._r = G.round; buiClockSet(G.round - 1 + (G.phase === 'over' ? 1 : 0), G.maxRound, false); } }
+  const ck = $('#game .top .clock'); if (ck) { let w = ck.querySelector('.bclock-w'); if (!w) { w = el('div', { class: 'bclock-w' }); ck.appendChild(w); } if (w._k !== G.maxRound) { w._k = G.maxRound; w.innerHTML = buiClockSVG(G); w._r = null; } if (!S.clockHold && w._r !== G.round) { w._r = G.round; buiClockSet(G.round, G.maxRound, false); } }
   // Menu do pravého horního rohu
   { const mp = $('#menubtn') && $('#menubtn').closest('.popwrap'), top = $('#game .top'); if (mp && mp.parentNode === top) { mp.classList.add('bmenu'); $('#game').appendChild(mp); } }
   let os = $('#olstats'); if (!os) { os = el('div', { id: 'olstats' }); $('#game .top .threat').after(os); }
@@ -15054,7 +15058,7 @@ function ballDetailHTML() {
   const ph = P.map((p, i) => `<div class="bph${i === cur ? ' cur' : ''}${i < cur ? ' done' : ''}"><div class="bph-f">${bmFull(p.spr)}</div><p class="eyebrow">${i + 1}. podoba</p><h4>${esc(p.name)}</h4><div class="bph-st">${st(p)}</div></div>`).join('');
   const dn = [1, 2, 3, 4, 5].map(i => `<div class="bdn">${bmFull((B && B.revealed ? 'maska' : 'tanec') + i)}</div>`).join('');
   return `<div class="dialog wide mdet bdet"><p class="eyebrow">Boss · Krvavý ples</p><h2>Hrabě z Blackmooru</h2>
-    <p class="muted">Tři podoby po ${C.BALL_PHASE_HP} životech. Když padne, leží do konce kola a pak vstane v další podobě. Proti Hraběti dávají česnek, kolík, krucifix a dýka 5 dmg s výhodou.</p>
+    <p class="muted">Tři podoby po ${C.BALL_PHASE_HP} životech. Když padne, hned vstane v další podobě, ale do konce kola už nehraje. V kole odhalení nehraje Hrabě ani Maškary. Proti Hraběti dávají česnek, kolík, krucifix a dýka 5 dmg s výhodou.</p>
     <div class="bph-row">${ph}</div>
     <h3 class="bdn-h">${B && B.revealed ? 'Maškary' : 'Tanečníci'}</h3>
     <p class="sm">${B && B.revealed ? 'Bývalí tanečníci v jeho družině: ' + C.BALL_MASK_HP + ' životů, 1 dmg, pohyb 4. Stopa rozpráší dvě s nejvíc životy.' : 'Deset tanečníků, mezi nimi Hrabě. Na začátku kola přetančí do nové formace (pohyb až 4). Prozkoumat = 2 pohyby.'}</p>
@@ -15617,9 +15621,13 @@ function bindHand(root) {
       if (m.type === 'target' && m.req.kind === 'hand') { const c = m.req.cands.find(x => x.uid === uidC); if (c) m.resolve(c); return; }
       if (m.type !== 'heroAction' && !(m.type === 'chooseHero' && zoneHero())) return;
       ev.preventDefault();
-      S.drag = { uid: uidC, x0: ev.clientX, y0: ev.clientY, el: cEl, ghost: null, half: null };
+      S.drag = { uid: uidC, x0: ev.clientX, y0: ev.clientY, el: cEl, ghost: null, half: null }; perfMark('karta: stisk');
     });
   });
+}
+function dragShield(on) {
+  let sh = document.getElementById('dragshield'); if (!sh) { sh = el('div', { id: 'dragshield' }); document.body.appendChild(sh); }
+  sh.classList.toggle('on', on); const hd = $('#handdock'); if (hd) hd.classList.toggle('dragging', on);
 }
 function renderZones() {
   const z = $('#zones'); if (!z) return;
@@ -15648,8 +15656,9 @@ document.addEventListener('pointermove', ev => {
     d.ghost = d.el.cloneNode(true); d.ghost.classList.add('ghost'); d.ghost.classList.remove('can', 'cant'); d.ghost.style.width = d.el.offsetWidth + 'px'; d.ghost.style.height = d.el.offsetHeight + 'px'; d.ghost.style.left = '0px'; d.ghost.style.top = '0px'; d.ghost.style.transform = `translate3d(${(ev.clientX / Z() - d.el.offsetWidth / 2).toFixed(1)}px,${(ev.clientY / Z() - d.el.offsetHeight / 2).toFixed(1)}px,0) rotate(3deg) scale(1.05)`;
     d.dx = d.el.offsetWidth / 2; d.dy = d.el.offsetHeight / 2;
     (buiOn() ? $("#bottom") : document.body).appendChild(d.ghost); d.el.classList.add('lifted'); sfx('card');
-    S.selected = null; document.body.classList.add('dragging'); renderZones();
+    S.selected = null; dragShield(true); renderZones();
   }
+  perfMark(d.t0 && performance.now() - d.t0 > 400 ? 'karta: tažení' : 'karta: začátek tažení'); if (!d.t0) d.t0 = performance.now();
   // v80: plynulejší tažení – poloha jen přes transform a nejvýš jednou za snímek
   d.px = ev.clientX; d.py = ev.clientY;
   if (!d.raf) d.raf = requestAnimationFrame(() => { d.raf = 0; if (!d.ghost) return; d.ghost.style.transform = `translate3d(${(d.px / Z() - d.dx).toFixed(1)}px,${(d.py / Z() - d.dy).toFixed(1)}px,0) rotate(3deg) scale(1.05)`; });
@@ -15669,9 +15678,9 @@ document.addEventListener('pointermove', ev => {
   }
 });
 document.addEventListener('pointerup', () => {
-  const d = S.drag; if (!d) return; S.drag = null; if (d.raf) cancelAnimationFrame(d.raf);
+  const d = S.drag; if (!d) return; S.drag = null; if (d.raf) cancelAnimationFrame(d.raf); perfMark(d.ghost ? 'karta: puštění' : 'karta: výběr kliknutím');
   if (d.ghost) {
-    d.ghost.remove(); d.el.classList.remove('lifted'); document.body.classList.remove('dragging');
+    d.ghost.remove(); d.el.classList.remove('lifted'); dragShield(false);
     const half = d.half; renderZones();
     if (half && d.ol) tryPlayOl(d.uid);
     else if (half && S.mode && S.mode.type === 'heroAction') tryPlay(d.uid, half); else if (!(half && playFromPick(d.uid, half))) render();
@@ -15767,7 +15776,7 @@ function showBriefAgain() { if (!S.G) return; S.detail = { brief: true }; sfx('c
 // zadání misí: příběh (1 věta), cíl (1 věta), 2–3 body jak na to
 const GOAL_H = {
   ball: { story: 'Maškarní ples na Blackmooru. Mezi deseti tanečníky v maskách se skrývá Hrabě a orchestr hraje valčík do rána.', goal: 'Najděte Hraběte a zabijte ho ve všech třech podobách.',
-    how: ['Prozkoumat sousedního tanečníka stojí 2 pohyby. Pravý Hrabě se odhalí, jinak se nestane nic – pamatuj si, koho už jsi zkoušel.', 'Na začátku každého kola tanečníci přetančí do nové formace. Kdo jim stojí v cestě, odletí stranou; lovec navíc dostane 1 zranění a 1 Strach.', 'Stopy v místnostech rozpráší dva nevinné tanečníky. Prohledat stopu stojí 2 pohyby a musíš stát přímo na ní. Po odhalení rozpráší dvě Maškary s nejvíc životy.', 'V každé místnosti je nález: česnek, kolík, krucifix a dýka dávají Hraběti 5 dmg s výhodou. Jeden nález je past, jeden hostina.', 'Hrabě má 3 podoby po 15 životech: Odhalený, Netopýří mrak (pohyb 6, únik 2) a Krvavý pán (útok na 2 pole, dvakrát). Padlý leží do konce kola.'] },
+    how: ['Prozkoumat sousedního tanečníka stojí 2 pohyby. Pravý Hrabě se odhalí, jinak se nestane nic – pamatuj si, koho už jsi zkoušel.', 'Na začátku každého kola tanečníci přetančí do nové formace. Kdo jim stojí v cestě, odletí stranou; lovec navíc dostane 1 zranění a 1 Strach.', 'Stopy v místnostech rozpráší dva nevinné tanečníky. Prohledat stopu stojí 2 pohyby a musíš stát přímo na ní. Po odhalení rozpráší dvě Maškary s nejvíc životy.', 'V každé místnosti je nález: česnek, kolík, krucifix a dýka dávají Hraběti 5 dmg s výhodou. Jeden nález je past, jeden hostina.', 'Hrabě má 3 podoby po 15 životech: Odhalený, Netopýří mrak (pohyb 6, únik 2) a Krvavý pán (útok na 2 pole, dvakrát). Když padne, hned vstane v další podobě, ale do konce kola už nehraje. V kole odhalení Hrabě ani Maškary nehrají.'] },
   comb: { story: 'Mlha nad bažinou je tak hustá, že je vidět jen na dvě pole. Jeden z vás nese hřeben Banshee a ona si pro něj jde.', goal: 'Vložte hřeben do pravého ze čtyř hrobů, nebo Banshee zabijte.',
     how: ['Nositel hřebenu cítí směr k pravému hrobu (šipka). Vložit hřeben = 1 pohyb vedle hrobu. Špatný hrob vzbudí mrtvé.', 'Hřeben jde podat sousedovi nebo hodit až na 3 pole. Od ležícího ho můžeš vzít.', 'Na konci kola Banshee dojde k nositeli a zakvílí: +2 Strach do 3 polí. Pak je kolo vidět a jde zasáhnout.', 'Kořenářka nese lucernu a vidí dál. Bludičky lákají lovce k sobě.'] },
   hunt: { story: 'Úplněk nad Černým lesem. Vlkodlak se smečkou štve lovce lesními průseky.', goal: 'Chyťte vlkodlaka dvakrát do pastí, nebo ho zabijte.',
