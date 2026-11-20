@@ -4030,7 +4030,7 @@ const SCENARIOS = [
     tokens: [], setup: ['exit', 'buy', 'place'], locks: 0, bossName: 'Banshee', emptyGrave: 'fear', escort: 0,
     short: 'Vraťte Banshee její hřeben do pravého hrobu. Který to je, ví jen Dům.',
     blurb: 'Mlha nad bažinou je tak hustá, že je vidět jen na dvě pole. Odněkud se ozývá nářek a jeden z vás nese hřeben, pro který si přijde.',
-    goalShort: 'Dům tajně vybral pravý ze čtyř hrobů. Vložte do něj hřeben (1 pohyb vedle hrobu) – prázdný hrob dá +2 Strach. Banshee je nesmrtelná a ovládá ji Dům: na začátku kola zakřičí a útočit může jen do 2 polí od místa výkřiku, na nositele hřebenu s výhodou. Hřeben jde podat i hodit.' },
+    goalShort: 'Dům tajně vybral pravý ze čtyř hrobů. Vložte do něj hřeben (1 pohyb vedle hrobu) – prázdný hrob dá +2 Strach. Banshee je nesmrtelná a ovládá ji Dům: na začátku kola zakřičí (kdo je do 3 polí, +2 Strach) a útočit může jen do 3 polí od místa výkřiku, na nositele hřebenu s výhodou. Hřeben jde podat i hodit.' },
   { id: 'hon', noElite: true, noThreat: true, n: 11, boss: true, map: 'les', name: 'Divoký hon', goal: 'hunt', cats: ['chatrc', 'zahrada'], maxRound: 10, bossHp: 30, wakeRound: 3, budgetBonus: -1,
     tokens: [], setup: ['buy', 'place'], locks: 0, bossName: 'Vlkodlak',
     short: 'Chyťte vlkodlaka dvakrát do pastí, nebo ho zabijte stříbrem.',
@@ -7647,7 +7647,7 @@ function ballGoals(G, h) {
 }
 
 // ---------------- Hřeben Banshee (mlžný les) ----------------
-const COMB_SIGHT = 2, COMB_HERB_SIGHT = 3, COMB_WAIL = 3, COMB_STEP = 4, COMB_ZONE = 2; // v98: Banshee ovládá Dům, je nesmrtelná, útočí jen do pole svého výkřiku (poloměr 2)
+const COMB_SIGHT = 2, COMB_HERB_SIGHT = 3, COMB_WAIL = 3, COMB_STEP = 4, COMB_ZONE = 3; // v98b: 7 polí napříč, aby se pole nedalo přeběhnout jedním tahem; v98: Banshee ovládá Dům, je nesmrtelná, útočí jen do pole svého výkřiku (poloměr 2)
 function combInit(G) {
   const B = MAP.comb;
   G.comb = { graves: B.graves.map(x => x.slice()), real: null, zone: null, tried: [], holder: G.heroes[Math.floor(rng() * G.heroes.length)].id, wail: null, wails: 0, visUntil: -1 };
@@ -7723,7 +7723,7 @@ async function combRoundStart(G, C, ui) {
   log(G, 'Banshee zakřičí. Kolem ní se mlha zavlní – sem bude toto kolo útočit.' + (hit.length ? '' : ''));
   if (G.fx) G.fx.push({ t: 'wail', at: b.pos.slice(), r: combZoneR(G) });
   if (ui && ui.anim) await ui.anim({ type: 'wave', at: b.pos, range: combZoneR(G), kind: 'wail' });
-  for (const h of hit) { addFear(G, h, 1); log(G, h.name + ' je v jejím výkřiku: +1 Strach.'); }
+  for (const h of hit) { addFear(G, h, 2); log(G, h.name + ' je v jejím výkřiku: +2 Strach.'); }
 }
 function combGoals(G, h) {
   const hd = combHolder(G), live = G.comb.graves.map((g, i) => ({ g, i })).filter(x => !G.comb.tried.includes(x.i));
@@ -15832,7 +15832,7 @@ function bossQuest(G) {
     const B = G.comb, hd = C.combHolder(G), s = C.combSense(G), left = B.graves.length - B.tried.length;
     return [it(`Hřeben nese <b>${hd ? esc(hd.name) : '–'}</b>`, false, 'Podat sousedovi nebo hodit do 3 polí. Banshee na nositele útočí s výhodou.'),
       it(`Hroby: zbývá <b>${left}</b> ze ${B.graves.length}${pips(B.tried.length, B.graves.length, ' bad')}`, false, 'Pravý vybral Dům. Vložit hřeben = 1 pohyb vedle hrobu, prázdný hrob +2 Strach.'),
-      it('Banshee je nesmrtelná', false, 'Útočí jen do pole výkřiku (2 pole kolem místa, kde na začátku kola zakřičela).')];
+      it('Banshee je nesmrtelná', false, 'Na začátku kola zakřičí: kdo je do 3 polí, +2 Strach. Útočí jen do tohoto pole výkřiku.')];
   }
   if (G.hunt) {
     const H = G.hunt, fut = H.clouds.filter(r => r >= G.round);
