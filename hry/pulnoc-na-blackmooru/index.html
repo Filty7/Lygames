@@ -211,7 +211,7 @@ body.busy svg.map .flick, body.busy .tok-idle, body.busy .mir-eye, body.busy .li
 .tok.indark .tok-face { filter: brightness(.55) saturate(.6); }
 .tok.hero.indark .tok-face { filter: brightness(.75) saturate(.75); }
 .tok.ghostly .tok-face { opacity: .85; }
-.tok.inv .tok-face { opacity: .35; }
+.tok.inv .tok-face { opacity: .62; } /* v98: neviditelní (z pohledu Domu) – lépe čitelní */
 .tok.fog, .lab.fog, .tok.gone, .lab.gone { opacity: 0; pointer-events: none; }
 .tok.fog .tok-hit, .tok.gone .tok-hit { pointer-events: none; }
 .tok.hurt .tok-face { filter: brightness(1.7) sepia(1) saturate(6) hue-rotate(-40deg); }
@@ -2296,7 +2296,7 @@ body.bui #menupop > label, body.bui #menupop > .pop-row { align-self: center; ju
 .e10moonD{transition:opacity 3s ease}.e10dark .e10moonD{opacity:.25}.e10cover{transform:translateX(330px);transition:transform 3.2s ease-in-out}.e10dark .e10cover{transform:translateX(0)}
 .e10cl{animation:e10cl 90s linear infinite}@keyframes e10cl{from{transform:translateX(-60px)}to{transform:translateX(1500px)}}.e10fog{animation:e10fog 30s ease-in-out infinite alternate;transform-box:fill-box;transform-origin:center}@keyframes e10fog{from{transform:translateX(-50px) scale(.9)}to{transform:translateX(50px) scale(1.15)}}
 .e10beams{animation:e9sh 6s ease-in-out infinite alternate}.e10dark .heroglow{transform:scale(1.45);transition:transform 2s}.heroglow{transition:transform 2s}
-.e11grade,.e11fogs,.e11fog{pointer-events:none}.bzone{fill:#b03070;fill-opacity:.16;stroke:#ff6aa8;stroke-opacity:.75;stroke-width:1.4;stroke-dasharray:4 3;pointer-events:none;animation:bzone 2.4s ease-in-out infinite alternate}@keyframes bzone{from{fill-opacity:.1}to{fill-opacity:.24}}.e11gl{animation:e11gl 3.2s ease-in-out infinite alternate}@keyframes e11gl{from{opacity:.35}to{opacity:1}}
+.e11grade,.e11fogs,.e11fog{pointer-events:none}.bzone{fill:#cfeeff;fill-opacity:.07;stroke:#d8f4ff;stroke-opacity:.38;stroke-width:1;stroke-dasharray:3 3;pointer-events:none;animation:bzone 3s ease-in-out infinite alternate}@keyframes bzone{from{fill-opacity:.04;stroke-opacity:.28}to{fill-opacity:.12;stroke-opacity:.48}}.e11gl{animation:e11gl 3.2s ease-in-out infinite alternate}@keyframes e11gl{from{opacity:.35}to{opacity:1}}
 .e9grade,.e9beams,.e9sky,.e9pools{pointer-events:none}.e9wfl{opacity:0}.e9pool{opacity:.8;mix-blend-mode:plus-lighter}.e9beams{mix-blend-mode:screen;animation:e9sh 7s ease-in-out infinite alternate}@keyframes e9sh{from{opacity:.75}to{opacity:1}}.e9halo{animation:e9sh 5s ease-in-out infinite alternate}
 .e9strike .e9wfl{animation:e9fl 1.5s linear}.e9strike .e9sky{animation-name:e9fls}.e9strike .e9skybg{animation-name:e9flb}.e9strike .e9beamf{animation-name:e9flr}.e9strike .e9pool{animation:e9flp 1.5s linear}
 @keyframes e9fl{0%{opacity:0}3%{opacity:calc(var(--pw) * .6)}9%{opacity:calc(var(--pw) * .08)}15%{opacity:calc(var(--pw) * .5)}35%{opacity:calc(var(--pw) * .15)}100%{opacity:0}}
