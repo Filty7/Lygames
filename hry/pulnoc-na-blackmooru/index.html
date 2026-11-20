@@ -17019,8 +17019,8 @@ const BRIEF_S = {
 };
 // v93: výjimky bossfightu – vidí je lovci i Dům
 const BOSS_EXC = () => { const sc = S.G && S.G.scen; if (!sc || !(sc.noElite || sc.noThreat)) return ''; const L = [];
-  if (sc.noElite) L.push('Skupiny monster nemají elitu (každá je o jednu figurku menší). Boss zůstává v plné síle.');
-  if (sc.noThreat) L.push('Dům nedostává Hrozbu na začátku kola. Hrozbu získává jen za zničené Paniky, takže padlá monstra vrací jen z nich.');
+  if (sc.noElite) L.push('Skupiny monster nemají elitní monstrum.');
+  if (sc.noThreat) L.push('Dům nedostává na začátku kola Hrozbu.');
   return `<div class="bb-exc"><span>Výjimka bossfightu</span><ul>${L.map(x => `<li>${x}</li>`).join('')}</ul></div>`; };
 const briefB = (sub, goal, tips) => `<div class="bbrief"><p class="bb-story">${sub}</p><div class="bb-goal"><span>Cíl</span>${goal}</div>${BOSS_EXC()}${tips.length ? `<ul class="bb-tips">${tips.map(t => `<li>${t}</li>`).join('')}</ul>` : ''}</div>`;
 const BRIEF_H = () => { const b = buiOn() && BRIEF_S[S.G.scen.goal]; if (b) return briefB(b[0], b[1], b[2]) + RULES_H(); return BRIEF_H0(); };
