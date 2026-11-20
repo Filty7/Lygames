@@ -2281,6 +2281,11 @@ body.bui #menupop > label, body.bui #menupop > .pop-row { align-self: center; ju
 @keyframes mkRing { 0% { transform: scale(.35); opacity: .95; } 100% { transform: scale(1.7); opacity: 0; } }
 @keyframes mkSig { 0% { transform: translateY(-26px); opacity: 0; } 14% { transform: translateY(2px); opacity: 1; } 22% { transform: translateY(0); } 40% { transform: translateY(-3px); } 58% { transform: translateY(0); } 76% { transform: translateY(-3px); opacity: 1; } 100% { transform: translateY(-8px); opacity: 0; } }
 @media (prefers-reduced-motion: reduce) { .mark .mk-ring { display: none; } .mark .mk-sig { animation: mkHex 3.2s linear forwards; } }
+
+/* v93: výjimka bossfightu v briefingu */
+.bb-exc { margin: 10px 0; padding: 8px 12px; border: 1px solid #8a2a2a; border-left: 4px solid #c0392b; border-radius: 6px; background: #2a0e0ecc; color: #f2dcc8; font-size: 13px; line-height: 1.4; text-align: left; }
+.bb-exc > span { display: block; font: 400 15px var(--f-disp); color: #ff9a7a; letter-spacing: .03em; margin-bottom: 2px; }
+.bb-exc ul { margin: 0; padding-left: 18px; }
 </style>
 
 <div id="menu">
@@ -3855,22 +3860,22 @@ const SCENARIOS = [
     goalShort: 'Vydržet do konce 9. kola a mít aspoň jednu z pěti svící hořící. Monstra svíce zhášejí, lovci je znovu zapalují.' },
 
   // ---- v82: boss fighty (v kampani po 4. a 8. scénáři, vybírá strana, která prohrává) ----
-  { id: 'ples', n: 9, boss: true, map: 'tanecnice', name: 'Krvavý ples', goal: 'ball', cats: ['sal', 'puda'], maxRound: 12, bossHp: 15,
+  { id: 'ples', noElite: true, noThreat: true, n: 9, boss: true, map: 'tanecnice', name: 'Krvavý ples', goal: 'ball', cats: ['sal', 'puda'], maxRound: 12, bossHp: 15,
     tokens: [], setup: ['buy', 'place'], locks: 0, bossName: 'Hrabě z Blackmooru',
     short: 'Najděte Hraběte mezi tanečníky a zabijte ho ve všech třech podobách.',
     blurb: 'Maškarní ples na Blackmooru. Mezi deseti tanečníky v maskách se skrývá Hrabě a každé kolo se formace na parketu promíchá.',
     goalShort: 'Prozkoumat tanečníka stojí 2 pohyby: když je to Hrabě, odhalí se. Stopy (2 pohyby, stůj přímo na ní) rozpráší dva nevinné tanečníky. Hrabě má 3 podoby po 15 životech. Česnek, kolík, krucifix a dýka v místnostech mu dávají 5 dmg s výhodou.' },
-  { id: 'hreben', n: 10, boss: true, map: 'mlha', name: 'Hřeben Banshee', goal: 'comb', cats: ['hrbitov', 'zahrada'], maxRound: 10, bossHp: 22, wakeRound: 3,
+  { id: 'hreben', noElite: true, noThreat: true, n: 10, boss: true, map: 'mlha', name: 'Hřeben Banshee', goal: 'comb', cats: ['hrbitov', 'zahrada'], maxRound: 10, bossHp: 22, wakeRound: 3,
     tokens: [], setup: ['buy', 'place'], locks: 0, bossName: 'Banshee',
     short: 'Vraťte Banshee její hřeben do pravého hrobu v mlžném lese.',
     blurb: 'Mlha nad bažinou je tak hustá, že je vidět jen na dvě pole. Odněkud se ozývá nářek a jeden z vás nese hřeben, pro který si přijde.',
     goalShort: 'Nositel hřebenu cítí směr k pravému ze čtyř hrobů. Vložte hřeben do pravého hrobu (1 pohyb), nebo Banshee zabijte, když je po nářku vidět. Banshee jde vždy po nositeli. Hřeben jde podat i hodit.' },
-  { id: 'hon', n: 11, boss: true, map: 'les', name: 'Divoký hon', goal: 'hunt', cats: ['chatrc', 'zahrada'], maxRound: 10, bossHp: 30, wakeRound: 3, budgetBonus: -1,
+  { id: 'hon', noElite: true, noThreat: true, n: 11, boss: true, map: 'les', name: 'Divoký hon', goal: 'hunt', cats: ['chatrc', 'zahrada'], maxRound: 10, bossHp: 30, wakeRound: 3, budgetBonus: -1,
     tokens: [], setup: ['buy', 'place'], locks: 0, bossName: 'Vlkodlak',
     short: 'Chyťte vlkodlaka dvakrát do pastí, nebo ho zabijte stříbrem.',
     blurb: 'Úplněk nad Černým lesem. Vlkodlak se smečkou štve lovce lesními průseky a jen mraky ho na chvíli promění zpátky v člověka.',
     goalShort: 'Dům každé kolo ohlásí průsek, kterým poletí hon. Nastražte pasti (2 pohyb) a chyťte do nich vlkodlaka dvakrát – hon, vyplašený jelen nebo hajný v lidské podobě za mraky. Nebo ho zabijte; stříbro z hájovny mu zastaví regeneraci.' },
-  { id: 'kanaly', n: 12, boss: true, map: 'kanaly', name: 'Zatopené kanály', goal: 'sluice', cats: ['kobka', 'chatrc'], maxRound: 10, bossHp: 28, budgetBonus: -1,
+  { id: 'kanaly', noElite: true, noThreat: true, n: 12, boss: true, map: 'kanaly', name: 'Zatopené kanály', goal: 'sluice', cats: ['kobka', 'chatrc'], maxRound: 10, bossHp: 28, budgetBonus: -1,
     tokens: [], setup: ['buy', 'place'], locks: 0, bossName: 'Obří troll',
     short: 'Zavřete tři stavidla dřív, než voda zaplaví výlez.',
     blurb: 'Kanály pod Blackmoorem po průtrži. Voda stoupá, proud strhává všechno k trollímu doupěti a Obří troll stavidla rve zpátky.',
@@ -4068,8 +4073,10 @@ let GRP_UP = {};
 function setGrpUp(u) { GRP_UP = u || {}; }
 const grpUp = t => (GRP_UP && GRP_UP[t]) || {};
 // Elita navíc (kampaň): +1 elita k základní sestavě (skupina je o 1 větší)
-const groupSize = t => 1 + MDEF[t].minions[NH] + (MDEF[t].lieutenant || MDEF[t].object ? 0 : (grpUp(t).plus || 0) + (grpUp(t).elite || 0));
-const maxElites = t => MDEF[t].lieutenant ? 0 : 1 + (grpUp(t).elite || 0);
+// v93: bossfight bez elit – skupiny (kromě bosse) nemají elitu a jsou o ni menší
+let NOELITE = false; const noEl = t => NOELITE && !MDEF[t].boss && !MDEF[t].lieutenant && !MDEF[t].object;
+const groupSize = t => 1 + MDEF[t].minions[NH] + (MDEF[t].lieutenant || MDEF[t].object ? 0 : (grpUp(t).plus || 0) + (grpUp(t).elite || 0)) - (noEl(t) ? 1 : 0);
+const maxElites = t => noEl(t) ? 0 : MDEF[t].lieutenant ? 0 : 1 + (grpUp(t).elite || 0);
 const eliteFull = (G, t) => G.monsters.filter(m => m.type === t && m.elite).length >= maxElites(t);
 const stats = m => { const o = Object.assign({}, MDEF[m.type].base, m.elite ? (MDEF[m.type].elite || {}) : {}, m.ov || {}); const u = grpUp(m.type).hp; if (u && o.hp && !MDEF[m.type].object) o.hp += u * D.grpHpPer(m.type); return o; };
 const mdef = m => m.def || MDEF[m.type];
@@ -4251,7 +4258,7 @@ function newGame(opts) {
   const scen = SCENARIOS.find(x => x.id === o.scenario) || SCENARIOS[0];
   // Zelené bludiště: mapa se generuje ze seedu, který je součástí id mapy (online, odveta i uložená hra mají stejnou mapu)
   const mapId = o.mapId || (scen.mapGen ? scen.mapGen + ':' + (o.mazeSeed != null ? o.mazeSeed : 1 + Math.floor(rng() * 999999)) : scen.mapAlt ? (o.mirror === false ? scen.map : o.mirror === true ? scen.mapAlt : (rng() < 0.5 ? scen.map : scen.mapAlt)) : scen.map || 'blackmoor');
-  useMap(mapId); setGrpUp(o.grpUp);
+  useMap(mapId); setGrpUp(o.grpUp); NOELITE = !!scen.noElite;
   const G = {
     mapId,
     round: 1, maxRound: 12, phase: 'setup', over: null, budget: (o.budget || scen.slots || GOLD) + (scen.budgetBonus || 0), scen, olUp: Object.assign({}, o.olUp || {}),
@@ -4347,6 +4354,7 @@ function rehydrate(G) {
   if (G.ol) for (const p of ['deck', 'hand', 'discard']) { const before = (G.ol[p] || []).length; G.ol[p] = (G.ol[p] || []).filter(c => c && OL_CARDS[c.id]); rep.ol += G.ol[p].length; rep.unknown += before - G.ol[p].length; }
   // parametry scénáře
   syncGone(G);
+  NOELITE = !!(G.scen && G.scen.noElite);
   if (G.scen) { G.maxRound = G.scen.maxRound || G.maxRound || 12; if (G.scen.goal === 'cleanse' && !G.scen.need) G.scen = Object.assign({}, G.scen, { need: G.spots.length }); }
   return rep;
 }
@@ -15830,15 +15838,20 @@ const BRIEF_S = {
   fire: ['Mlýn hoří a plameny se ženou k řece.', 'Dostaňte dva lovce přes brod vpravo.', ['Oheň postupuje každé kolo doprava.']],
   dawn: ['Poslední noc v kostele sv. Rocha.', 'Vydržte do svítání s aspoň jednou hořící svící.', ['Svíci, u které stojí lovec, monstrum nezhasne.']],
 };
-const briefB = (sub, goal, tips) => `<div class="bbrief"><p class="bb-story">${sub}</p><div class="bb-goal"><span>Cíl</span>${goal}</div>${tips.length ? `<ul class="bb-tips">${tips.map(t => `<li>${t}</li>`).join('')}</ul>` : ''}</div>`;
+// v93: výjimky bossfightu – vidí je lovci i Dům
+const BOSS_EXC = () => { const sc = S.G && S.G.scen; if (!sc || !(sc.noElite || sc.noThreat)) return ''; const L = [];
+  if (sc.noElite) L.push('Skupiny monster nemají elitu (každá je o jednu figurku menší). Boss zůstává v plné síle.');
+  if (sc.noThreat) L.push('Dům nedostává Hrozbu na začátku kola. Hrozbu získává jen za zničené Paniky, takže padlá monstra vrací jen z nich.');
+  return `<div class="bb-exc"><span>Výjimka bossfightu</span><ul>${L.map(x => `<li>${x}</li>`).join('')}</ul></div>`; };
+const briefB = (sub, goal, tips) => `<div class="bbrief"><p class="bb-story">${sub}</p><div class="bb-goal"><span>Cíl</span>${goal}</div>${BOSS_EXC()}${tips.length ? `<ul class="bb-tips">${tips.map(t => `<li>${t}</li>`).join('')}</ul>` : ''}</div>`;
 const BRIEF_H = () => { const b = buiOn() && BRIEF_S[S.G.scen.goal]; if (b) return briefB(b[0], b[1], b[2]) + RULES_H(); return BRIEF_H0(); };
 const BRIEF_O = () => { const b = buiOn() && BRIEF_S[S.G.scen.goal]; if (b) return briefB(b[0] + ' Ty jsi Dům.', GOAL_O[S.G.scen.goal].split('. ')[0].replace(/\.$/, '') + '.', ['Příprava: vyber monstra, rozmísti je a schovej žetony.', 'Karty Domu hraješ po tahu každého lovce.', 'Vyhráváš i tehdy, když všichni lovci leží.']); return BRIEF_O0(); };
-const BRIEF_H0 = () => { const g = GOAL_H[S.G.scen.goal]; return `<p>${g.story}</p><p class="bgoal"><b>Cíl:</b> ${g.goal}</p><ul>${g.how.map(x => `<li>${x}</li>`).join('')}</ul>${RULES_H()}`; };
-const BRIEF_O0 = () => `<p>${GOAL_H[S.G.scen.goal].story} Ty jsi Dům.</p><p class="bgoal"><b>Cíl:</b> ${GOAL_O[S.G.scen.goal]} Vyhráváš i tehdy, když všichni lovci leží.</p>
+const BRIEF_H0 = () => { const g = GOAL_H[S.G.scen.goal]; return `<p>${g.story}</p><p class="bgoal"><b>Cíl:</b> ${g.goal}</p>${BOSS_EXC()}<ul>${g.how.map(x => `<li>${x}</li>`).join('')}</ul>${RULES_H()}`; };
+const BRIEF_O0 = () => `<p>${GOAL_H[S.G.scen.goal].story} Ty jsi Dům.</p><p class="bgoal"><b>Cíl:</b> ${GOAL_O[S.G.scen.goal]} Vyhráváš i tehdy, když všichni lovci leží.</p>${BOSS_EXC()}
 <ul><li>Příprava: vyber ${S.G ? S.G.budget : C.GOLD} sloty skupin monster (poloboss zabere 2) (${S.G.scen.cats.filter(c => c !== 'boss').map(c => C.CATS[c]).join(', ')}), rozmísti je, schovej žetony${S.G.scen.goal === 'maze' ? ', tajně vyber pravou branku' : ''}${S.G.scen.locks ? ', zamkni až ' + S.G.scen.locks + ' dveře' : ''}${S.G.obel ? ', postav ' + S.G.scen.obelisks.length + ' obelisky a rozděl jim ' + S.G.obel.pool + ' zdraví' : ''}${S.G.scen.setupTraps ? ', nastraž až ' + S.G.scen.setupTraps + ' pasti' : ''} a prokleji místnost.</li>
 ${C.MAP.revealAll ? '<li>' + ({ mlyn: 'Celý statek je vidět', kostel: 'Celý kostel je vidět' }[C.MAP.id] || 'Celý hřbitov je vidět') + '. Monstra ' + ((C.MAP.wakeRound || 1) > 1 ? 'se probudí ve ' + C.MAP.wakeRound + '. kole' : 'jsou vzhůru od začátku') + '.</li>' : C.MAP.wakeDist ? '<li>Monstra spí, dokud k nim lovec nepřijde na ' + C.MAP.wakeDist + ' polí nebo do jejich místnosti (nebo na ně nezaútočí).</li>' : '<li>Monstra spí, dokud lovci neotevřou jejich místnost.</li>'}</ul>
 <details class="brules"><summary>Základní pravidla Domu</summary><ul><li>Karty Domu hraješ po tahu každého lovce a na konci kola, reakce kdykoli. Lížeš jednu za kolo.</li>
-<li>Hrozba: +${C.THREAT_PER_ROUND} každé kolo a +1 za zničenou Paniku. Platíš jí návrat padlých monster zrcadly.</li></ul></details>`;
+<li>Hrozba: ${S.G && S.G.scen.noThreat ? 'v tomto bossfightu jen' : '+' + C.THREAT_PER_ROUND + ' každé kolo a'} +1 za zničenou Paniku. Platíš jí návrat padlých monster zrcadly.</li></ul></details>`;
 async function startGame() {
   try { if (SND) SND.start(); } catch (e) { /* bez zvuku */ }
   S.voxHero = null; S.voxDown = {};
