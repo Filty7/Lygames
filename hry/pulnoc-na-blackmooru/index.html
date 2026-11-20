@@ -2192,6 +2192,34 @@ body.bui #modal .bend-d.h h2 { color: #123a66; } body.bui #modal .bend-d.o h2 { 
 .bshop .shop-items { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
 .bshop .sellzone .i80 { height: 18px; }
 .bshop .ci-b { display: flex; gap: 6px; flex-wrap: wrap; }
+/* v96: kompaktní obchod – dlaždice v řádku, pevný panel karet (nic neposkakuje), tlačítka a štítky v našem stylu */
+.bshop .bs-side .si { display: grid; grid-template-columns: 40px minmax(0, 1fr) auto; grid-template-rows: auto auto; align-items: center; gap: 1px 8px; padding: 5px 8px; border: 1px solid #4a3a28; border-radius: 0; background: linear-gradient(#1a130cf0, #0d0907f0); box-shadow: inset 0 0 0 1px #000; cursor: pointer; transition: border-color .12s, filter .12s; }
+.bshop .bs-side .si:hover, .bshop .bs-side .si.sel { border-color: #c09050; filter: brightness(1.12); }
+.bshop .bs-side .si.t3 { border-color: #7a5a2a; } .bshop .bs-side .si.t2 { border-color: #3a4a62; }
+.bshop .bs-side .si .si-ic { grid-row: 1 / 3; width: 40px; height: 40px; border-radius: 2px; box-shadow: inset 0 0 0 1px #5a4024; }
+.bshop .bs-side .si .si-ic .iart { width: 32px; height: 32px; }
+.bshop .bs-side .si-tx { grid-column: 2; grid-row: 1 / 3; } .bshop .bs-side .si-tx b { font: 600 13.5px/1.15 var(--f-body); color: #f0e2c4; } .bshop .bs-side .si-tx small { font-size: 11px; color: #a8987c; }
+.bshop .bs-side .shop-items { grid-template-columns: 1fr; gap: 5px; }
+.bshop .bs-side .si-act { grid-column: 3; grid-row: 1 / 3; display: flex; flex-direction: row; align-items: center; gap: 10px; }
+.bshop .bs-side .si-tx b { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.bcamp .cp-foot .btn.ghost { background: none; border: 9px solid transparent; border-image: var(--bu-btn) 18 fill / 9px / 0 stretch; border-radius: 0; color: #b8a488; font: 400 17px var(--f-disp); padding: 1px 10px; filter: drop-shadow(0 3px 5px #000d); } .bcamp .cp-foot .btn.ghost:hover { color: #f0dcb8; }
+.bshop .bs-side .si-p { margin: 0; font: 800 17px var(--f-num); color: #ffd890; display: inline-flex; gap: 2px; align-items: center; } .bshop .bs-side .si-p.poor { color: #7a6a5a; }
+.bshop .bs-side .si-who { grid-column: 1 / -1; display: flex; gap: 4px; align-items: center; font-size: 12px; color: #c8b490; }
+.bshop .bbtn.primary { color: #ffe070; text-shadow: 0 0 8px #ffc02088, 0 1px 0 #000; } .bshop .bbtn:disabled { opacity: .45; filter: grayscale(.6); }
+.bshop .cp-det { height: 232px; min-height: 0; flex: none; overflow: hidden; }
+.bshop .cp-det .si-cards { flex-wrap: nowrap; } .bshop .cp-det .amulet-card { zoom: .8; } .bshop .cp-det .si-cards .card { zoom: .52; }
+.bshop .det-empty { min-height: 0; height: 100%; } .bshop .det-empty p { color: #a8987c; } .bshop .det-empty b { font: 400 19px var(--f-disp); color: #e8d0a0; }
+.bshop .sellzone.bsell { margin-left: auto; display: inline-flex; align-items: center; gap: 5px; border: 7px solid transparent; border-image: var(--bu-btn) 18 fill / 7px / 0 stretch; border-radius: 0; background: none; padding: 0 6px; color: #e8d0a0; font: 400 15px var(--f-disp); filter: drop-shadow(0 2px 4px #000c); }
+.bshop .sellzone.bsell b { font: 800 15px var(--f-num); color: #ffd890; } .bshop .sellzone.bsell .i80 { height: 20px; }
+.bshop .sellzone.bsell.over, .bshop .sellzone.bsell:hover { color: #fff0c8; filter: drop-shadow(0 0 8px #ffc06099) drop-shadow(0 2px 4px #000c); }
+.bshop .bs-ab .card { zoom: .46; }
+/* v96: horní lišta kampaně – pořadí scénářů a skóre jako dřevěné štítky */
+.bcamp .cp-prog span { border-radius: 0; border: 0; background: linear-gradient(#1c140de8, #0c0806e8); box-shadow: inset 0 0 0 1px #4a3420, 0 2px 5px #000c; color: #b8a080; font: 400 14px var(--f-disp); padding: 3px 11px; letter-spacing: .02em; }
+.bcamp .cp-prog span.cur { color: #ffe0a0; box-shadow: inset 0 0 0 1px #c09050, 0 0 10px #ffb04a44, 0 2px 5px #000c; }
+.bcamp .cp-prog span.done { color: #ff9a88; box-shadow: inset 0 0 0 1px #7a2a20, 0 2px 5px #000c; } .bcamp .cp-prog span.done.won { color: #a8d4ff; box-shadow: inset 0 0 0 1px #2a5a8a, 0 2px 5px #000c; }
+.bcamp .cp-score { border: 10px solid transparent; border-image: var(--bu-btn) 18 fill / 10px / 0 stretch; border-radius: 0; background: none; padding: 0 10px; font: 400 21px 'BM Fraktur', var(--f-disp); filter: drop-shadow(0 4px 8px #000e); }
+.bcamp .cp-score .h { color: #a8d4ff; } .bcamp .cp-score .o { color: #ff9a88; } .bcamp .cp-score i { color: #8a7458; } .bcamp .cp-score b { color: #fff0d0; text-shadow: 0 2px 0 #000; font-size: 22px; }
+.bcamp .cp-score .ic { display: none; }
 @media (max-width: 1500px) { .bs-main { grid-template-columns: 300px 1fr 400px; } .bsc-grid { grid-template-columns: repeat(4, 260px); } }
 
 /* v80: herní menu uprostřed obrazovky v betě */
@@ -2255,6 +2283,16 @@ body.bui #menupop > label, body.bui #menupop > .pop-row { align-self: center; ju
 .dkinfo rect{fill:#08060c;fill-opacity:.62;stroke:#9a8ac8;stroke-opacity:.5}.dkinfo .dk-n{font:800 9px var(--f-num);fill:#d8ccff;letter-spacing:.06em}.dkinfo .dk-t{font:600 7.4px var(--f-num);fill:#e8e2f4}
 .dkinfo{pointer-events:none}
 .pill-gold .pry-bg{fill:#1a1204;stroke:#e8c070;filter:drop-shadow(0 0 4px #c89030)}.pill-gold .pry-in{fill:#4a3410;stroke:#1a1004}.pill-gold:hover .pry-in{fill:#6a4a18}.pill-gold text{stroke:#1a1004}.e8smoke,.e8grade{pointer-events:none}.e8f{opacity:0;animation:e8ff .56s linear infinite}.e8f1{animation-delay:calc(var(--ph) - .14s)}.e8f2{animation-delay:calc(var(--ph) - .28s)}.e8f3{animation-delay:calc(var(--ph) - .42s)}.e8f0{animation-delay:var(--ph)}@keyframes e8ff{0%,24.9%{opacity:1}25%,100%{opacity:0}}
+#loadspin{position:fixed;right:22px;bottom:18px;z-index:200;display:flex;align-items:center;gap:8px;padding:6px 14px 6px 8px;background:linear-gradient(90deg,#0c0806ee,#1a120cdd);border:1px solid #5a4024;border-radius:3px;box-shadow:0 6px 18px #000c,inset 0 0 0 1px #000;color:#e8d0a0;font:400 15px 'BM Gotisch',var(--f-disp);letter-spacing:.1em;opacity:0;transform:translateY(8px);pointer-events:none;transition:opacity .25s,transform .25s}
+#loadspin.on{opacity:1;transform:none}
+#loadspin .ls-ring{width:34px;height:34px;animation:lsrot 2.4s linear infinite;will-change:transform;filter:drop-shadow(0 0 4px #c9a24a66)}
+#loadspin .ls-fl{position:absolute;left:21px;top:16px;width:6px;height:9px;border-radius:50% 50% 45% 45%/60% 60% 40% 40%;background:radial-gradient(circle at 50% 70%,#fff4c0,#ffb030 55%,#c84010);box-shadow:0 0 8px #ffa030;animation:lsfl .35s ease-in-out infinite alternate;will-change:transform}
+@keyframes lsrot{to{transform:rotate(360deg)}}@keyframes lsfl{from{transform:scale(.85,1)}to{transform:scale(1.1,1.15) translateY(-1px)}}
+.alphawarn .bconfirm{position:relative;isolation:isolate;max-width:460px;text-align:center;background:none;border:0;box-shadow:none;padding:30px 40px 24px;color:#2c1c10;filter:drop-shadow(0 18px 40px #000e)}
+.alphawarn .bconfirm::before{content:"";position:absolute;inset:0;z-index:-1;border:30px solid transparent;border-image:var(--bu-paper) 70 fill / 30px / 0 stretch;filter:sepia(.75) saturate(1.3) brightness(2.6) contrast(.85)}
+.alphawarn .bconfirm h3{color:#3a1208!important}.alphawarn .bconfirm .muted{color:#4a3220;font:italic 16px var(--f-body)}
+.alphawarn .bconfirm .btn{background:none!important;border:9px solid transparent!important;border-image:var(--bu-btn) 18 fill / 9px / 0 stretch!important;border-radius:0!important;color:#ecdab8!important;font:400 18px/1 var(--f-disp)!important;padding:3px 16px!important;box-shadow:none!important;filter:drop-shadow(0 3px 5px #000d)}
+.alphawarn .bconfirm .btn.primary{color:#ffe070!important}.alphawarn .bconfirm h3{font:400 24px/1.1 'BM Fraktur',var(--f-disp);margin:4px 0 8px}.alphawarn .bconfirm .bf-eb{font:500 15px 'BM Gotisch',var(--f-disp);letter-spacing:.14em;color:#c86a4a;margin:0}.alphawarn .dlg-btns{justify-content:center;gap:12px}
 .findpop{position:fixed;inset:0;z-index:90;display:grid;place-items:center;background:radial-gradient(ellipse at center,#000a,#000d)}
 .findpop .bfind{position:relative;isolation:isolate;width:min(500px,92vw);padding:30px 40px 24px;color:#2c1c10;text-align:center;filter:drop-shadow(0 18px 40px #000e);animation:bfin .32s cubic-bezier(.2,1.4,.4,1) both}
 .findpop .bfind::before{content:"";position:absolute;inset:0;z-index:-1;border:30px solid transparent;border-image:var(--bu-paper) 70 fill / 30px / 0 stretch;filter:sepia(.75) saturate(1.3) brightness(2.6) contrast(.85)}
@@ -2365,7 +2403,7 @@ body.bui #menupop > label, body.bui #menupop > .pop-row { align-self: center; ju
       <h2 class="bmp-h bui-only">Menu</h2>
       <label>Rychlost <select id="speedsel"><option value="1.6">pomalu</option><option value="1" selected>normálně</option><option value="0.4">rychle</option></select></label>
       <label class="chk"><input type="checkbox" id="follow" checked> Kamera sleduje</label>
-      <label class="chk"><input type="checkbox" id="betachk"> Beta grafika</label>
+      <label class="chk"><input type="checkbox" id="betachk"> Nová grafika</label>
       <div class="pop-row"><button class="btn icon" id="sndbtn" aria-label="Zvuky"></button><span>Zvuky</span><button class="btn icon" id="musbtn" aria-label="Hudba"></button><span>Hudba</span></div>
       <button class="btn sm bui-only" id="fsbtn2">Celá obrazovka</button>
       <button class="btn sm bui-only" id="keysbtn">Ovládání</button>
@@ -10461,7 +10499,7 @@ const S = { padX: 0, padY: 0,
   decals: [], doorState: {}, pileView: null,
 };
 // v61b: beta grafika (nové sprity lovců) – čistě vizuální, jen u tohoto klienta; uloženo v localStorage
-S.beta = (() => { try { return localStorage.getItem('blackmoor.beta') === '1'; } catch (e) { return false; } })();
+S.beta = (() => { try { return localStorage.getItem('blackmoor.gfx') !== 'alpha'; } catch (e) { return true; } })(); // v96: nová grafika je výchozí
 
 // ---------- geometrie a projekce ----------
 // Půdorys: x = šířka hexu × xc, y = 1.5 × SIZE × řada. Obraz: y se stlačí (KY), zdi rostou nahoru.
@@ -10843,7 +10881,7 @@ function buildWalls() {
       const st = 1 / 6;
       for (let y = y0; y < y1 - 1e-6; y += st) {
         const ya = y, yb = Math.min(y + st, y1);
-        const env = envOn(), hh = SIZE * KY / ROWH - .02; // v63c: beta = otvor přes celý hex
+        const env = envOn() || env8On(), hh = SIZE * KY / ROWH - .02; // v63c: beta = otvor přes celý hex
         if (holes.some(r => env ? yb > r - hh + 1e-6 && ya < r + hh - 1e-6 : yb > r - .5 + 1e-6 && ya < r + .17 - 1e-6)) continue;
         const low = holes.some(r => ya >= r + (env ? hh : .17) - 1e-6 && ya < r + 1.5);
         const ym = (ya + yb) / 2; // v85: střed úseku (plovoucí součet kroků 1/6 občas minul hranici místnosti → úsek bez místnosti byl vidět i v mlze)
@@ -11958,7 +11996,7 @@ async function e8Floor() {
   }
   // brod: voda pod poli brodu a kameny dál do řeky
   for (const d of C.DOOR_DEFS.filter(d => d.ford)) { const [x, y] = px(d.hex); g.save(); envHexPath(g, x, y, s); g.clip(); patFill('o_f_river', x - s, y - s, 2 * s, 2 * s, .05); g.restore(); }
-  { const st = ES('o_ford'), im = I.o_ford; if (st && im) for (const d of C.DOOR_DEFS.filter(d => d.ford)) { const [x, y] = px(d.hex); for (const [dx, dy, k] of [[30, 3, .9], [56, -2, .75]]) { const w = st.w * EK * k, h = st.h * EK * k; g.drawImage(im, x + dx - w / 2, y + dy - h / 2, w, h); } } }
+  { const st = ES('o_ford'), im = I.o_ford; if (st && im) for (const d of C.DOOR_DEFS.filter(d => d.ford)) { const [x, y] = px(d.hex); for (const [dx, dy, k] of [[30, 6, .9], [56, 2, .75]]) { const w = st.w * EK * k, h = st.h * EK * k; g.drawImage(im, x + dx - w / 2, y + dy - h / 2, w, h); } } }
   // mělčina u brodu: tmavá voda přes pole
   for (const f of C.FURN_DEFS.filter(f => f.icon === 'water')) { const [x, y] = px(f.hex); g.save(); envHexPath(g, x, y, s); g.clip(); patFill('o_f_river', x - s, y - s, 2 * s, 2 * s, .1); g.restore(); }
   const drawS = (n, cx, cy, flip, a = 1, sc = 1) => { const im = I[n], sp = ES(n); if (!im || !sp) return; g.save(); g.globalAlpha = a; g.translate(cx, cy); if (flip) g.scale(-1, 1); g.drawImage(im, -sp.w * EK * sc / 2, -sp.h * EK * sc / 2, sp.w * EK * sc, sp.h * EK * sc); g.restore(); };
@@ -12008,7 +12046,7 @@ function e8FenceV(k, ya, yb) {
 }
 function e8DoorVariants(d) {
   const [x, y] = px(d.hex);
-  if (d.ford) { const yb = y + 6, sc = WPX * 1.25 / (ES('o_ford').w * EK), v = envImg('o_ford', x + 2, yb, sc) + `<ellipse cx="${x}" cy="${y}" rx="22" ry="12" fill="url(#ag-cold)" opacity=".35"/>`; return { closed: v, open: v, locked: v, z: y - 8 }; }
+  if (d.ford) { const yb = y + 11, sc = WPX * 1.25 / (ES('o_ford').w * EK), v = envImg('o_ford', x + 2, yb, sc) + `<ellipse cx="${x}" cy="${y}" rx="22" ry="12" fill="url(#ag-cold)" opacity=".35"/>`; return { closed: v, open: v, locked: v, z: y - 8 }; }
   if (d.gate) {
     if (isVertDoor(d)) { const bot = y + SIZE * KY / 2, sc = WPX * .9 / (ES('o_gate').w * EK); return { closed: envImg('o_gate', x, bot, sc), open: envImg('o_gateopen', x, bot, sc), locked: envImg('o_gate', x, bot, sc), z: y + SIZE * KY - .4 }; }
     const yb = y + TW / 2 + .5, sc = (WPX + 6) / (ES('o_gate').w * EK);
@@ -12050,10 +12088,10 @@ function e8NorthDecor(R, xa, xb, yb) {
 const e8Flame = (pre, sc, dx, dy, ph) => `<g class="e8fl" style="--ph:${(-ph).toFixed(2)}s">` + [0, 1, 2, 3].map(i => `<g class="e8f e8f${i}">${envImg(pre + i, dx, dy, sc)}</g>`).join('') + '</g>';
 function e8FireHex(h, front) {
   const r = hsh(h[0] * 5 + 1, h[1] * 3 + 2), r2 = hsh(h[0] * 11 + 3, h[1] * 7 + 5), ph = r * .56, blk = C.isBlock(h);
-  if (front) return `<ellipse cx="0" cy="-2" rx="22" ry="12" fill="url(#ag-warm)" opacity=".85"/>` + e8Flame('o_fw', .78, (r - .5) * 8, 7, ph + .2) + e8Flame('o_fl', blk ? .85 : 1.08, (r2 - .5) * 6, 4, ph);
+  if (front) return bFireSVG(h[0] * 7 + h[1] * 13); // v96c: stejný oheň jako u schopností (strašák, dynamit…)
   let s = blk ? '' : envImg('o_ch_patch', (r - .5) * 6, 6, .9);
   if (!blk && r2 < .35) { const D = ['o_ch_planks', 'o_ch_beam', 'o_ch_ash', 'o_ch_hay', 'o_ch_rafters', 'o_ch_barrel', 'o_ch_sacks']; s += envImg(D[Math.floor(r * 97) % D.length], (r2 - .2) * 10, 6, .75); }
-  if (r < .2) s += e8Flame('o_fw', .38, (r2 - .5) * 10, 5, ph);
+  if (r < .2) s += `<g transform="translate(${((r2 - .5) * 10).toFixed(1)} 2) scale(.5)">${bFireSVG(h[0] * 3 + h[1] * 17)}</g>`;
   else if (r2 > .8) s += `<circle cx="${((r - .5) * 10).toFixed(1)}" cy="2" r="2" fill="#ff8a2a" opacity=".7" class="cflick"/>`;
   return s;
 }
@@ -12176,11 +12214,23 @@ function itemPic(id, fallbackIc) {
   return A.icon(fallbackIc || ITEM_IC[id] || 'star');
 }
 let builtMap = null, mapListeners = false;
+// v96: načítací znak vpravo dole (točí se na kompozitoru – běží i když hlavní vlákno počítá)
+let loadN = 0;
+function loadSpin(on) {
+  loadN = Math.max(0, loadN + (on ? 1 : -1));
+  let e = document.getElementById('loadspin');
+  if (!e) { e = el('div', { id: 'loadspin', 'aria-live': 'polite' }, `<svg viewBox="-20 -20 40 40" class="ls-ring"><circle r="15" fill="none" stroke="#c9a24a" stroke-width="1.2" stroke-dasharray="2 3.2" opacity=".75"/><circle r="11" fill="none" stroke="#8a2414" stroke-width="1"/>${[0, 1, 2, 3, 4].map(i => { const a = i / 5 * Math.PI * 2 - Math.PI / 2, b = (i + 2) / 5 * Math.PI * 2 - Math.PI / 2; return `<path d="M${(Math.cos(a) * 11).toFixed(2)} ${(Math.sin(a) * 11).toFixed(2)}L${(Math.cos(b) * 11).toFixed(2)} ${(Math.sin(b) * 11).toFixed(2)}" stroke="#c9a24a" stroke-width=".9"/>`; }).join('')}</svg><span class="ls-fl"></span><b>Načítání…</b>`); document.body.appendChild(e); }
+  e.classList.toggle('on', loadN > 0);
+}
+const nextPaint = () => new Promise(r => requestAnimationFrame(() => setTimeout(r, 0)));
 async function ensureMap() {
   if (builtMap === mapKey()) return;
-  const wrap = $('#mapwrap'); if (svg && svg.parentNode) svg.remove(); if (fxSvg) { fxSvg.remove(); fxSvg = null; }
-  toks.forEach(t => { t.fig.remove(); t.lab.remove(); if (t.glow) t.glow.remove(); if (t.hg) t.hg.remove(); }); toks.clear();
-  await buildMap();
+  loadSpin(true); await nextPaint();
+  try {
+    const wrap = $('#mapwrap'); if (svg && svg.parentNode) svg.remove(); if (fxSvg) { fxSvg.remove(); fxSvg = null; }
+    toks.forEach(t => { t.fig.remove(); t.lab.remove(); if (t.glow) t.glow.remove(); if (t.hg) t.hg.remove(); }); toks.clear();
+    await buildMap();
+  } finally { loadSpin(false); }
 }
 async function buildMap() {
   calcView(); builtMap = mapKey();
@@ -12280,7 +12330,7 @@ function ensureTok(id, kind, ent) {
 // Snímky se hledají podle hrdiny + pózy (betaFrame). Póza = idle, walk1/2, atk1 (nápřah), atk2 (úder/výstřel), cast, hurt, pry, loot, down.
 // Výměna výbavy (zatím ne): sem se zapojí snímky podle předmětu v ruce, např. BetaArt.heroes[id].f[pose + ':' + itemId]
 // s pádem na výchozí snímek; volající už posílají id hrdiny a pózu, takže stačí rozšířit tuto funkci.
-const BETA_KEY = 'blackmoor.beta';
+const BETA_KEY = 'blackmoor.gfx';
 const betaOn = () => !!(S.beta && typeof BetaArt !== 'undefined' && BetaArt.heroes);
 function betaFrame(id, pose) { const H = BetaArt.heroes[id]; return H ? (H.f[pose] || H.f.idle) : ''; }
 // konec zbraně ve snímku atk2 (jednotky mapy od chodidel; x pro pohled doprava) – odtud letí výstřel / kouzlo
@@ -15668,7 +15718,7 @@ function topHTML(s, c) {
   };
   const self = s => {
     if (s.selfDmg) x('heart', 'tobě', '−' + s.selfDmg, 'c-dmg');
-    if (s.selfFear && s.t !== 'rally') x('panic', 'strach tobě', '+' + s.selfFear, 'c-fear');
+    if (s.selfFear && s.t !== 'rally' && s.t !== 'react') x('panic', 'strach tobě', '+' + s.selfFear, 'c-fear');
   };
   const atk = (s) => { DMG(s.dmgDist ? '' : s.dmg, s.dmgDist ? 'zranění = vzdálenost' : undefined); MOD(s.mod); statuses(s); if (s.uncapped) N.push('Bez stropu.'); if (s.vsBoss) { L.push(LN_('drop', 'proti Hraběti', s.vsBoss.dmg, 'c-dmg')); L.push(LN_('die', 'proti Hraběti, s výhodou', (s.vsBoss.mod >= 0 ? '+' : '') + s.vsBoss.mod, 'c-pos')); } };
   switch (s.t) {
@@ -16647,7 +16697,7 @@ const shopTileHTML = (st, id, buyFor, heroes) => {
   const who = buyFor === id ? `<div class="si-who"><span>Komu?</span>${(heroes || C.HEROES).filter(h => !e.hero || e.hero === h.id).map(h => `<button class="si-hero" data-buy="${id}" data-for="${h.id}" style="--c:${HERO_COLORS[h.id]}" aria-label="Koupit pro: ${esc(h.name)}">${heroPortrait(h.id)}<small>${esc(h.name.split(' ')[0])}</small></button>`).join('')}<button class="si-hero chest" data-buy="${id}" data-for="" aria-label="Koupit do truhly">${A.icon('deck')}<small>Truhla</small></button></div>` : '';
   return `<div class="si t${e.tier}${sel ? ' sel' : ''}${buyFor === id ? ' buying' : ''}" data-si="${id}" tabindex="0" aria-label="${esc(e.name)}, ${p} esence">
     <span class="si-ic art">${itemPic(id)}</span><div class="si-tx"><b>${esc(e.name)}</b><small>${A.icon(SLOT_IC[e.slot])}${esc(C.SLOTS[e.slot])} · <i class="ib-tier t${e.tier}">${['startovní', 'běžný', 'vzácný', 'mocný', 'legendární'][e.tier]}</i>${e.hero ? ' · jen ' + esc(C.HEROES.find(h => h.id === e.hero).name.split(' ')[0]) : ''}</small></div>
-    <div class="si-act"><span class="si-p${poor ? ' poor' : ''}">${p}${A.icon('star')}</span>${buyFor === id ? '' : `<button class="btn primary sm" data-pick="${id}" ${poor ? 'disabled' : ''}>Koupit</button>`}</div>${who}</div>`;
+    <div class="si-act"><span class="si-p${poor ? ' poor' : ''}">${p}${A.icon('star')}</span>${buyFor === id ? '' : `<button class="${buiOn() ? 'bbtn sm primary' : 'btn primary sm'}" data-pick="${id}" ${poor ? 'disabled' : ''}>Koupit</button>`}</div>${who}</div>`;
 };
 // detail předmětu: náhled z obchodu (najetí / klik) nebo vlastní předmět lovce (klik ve výbavě / batohu)
 function campDetHTML(st, hoverId) {
@@ -16685,7 +16735,7 @@ function campHeroesB(st) {
   const up = `<section class="bs-col bs-up"><h3>Vylepšení karet <span class="bs-xpb">${i80('xp')}<b>${hs.xp}</b> xp</span></h3><p class="bs-hint">Každá schopnost je karta v balíčku lovce. Vylepšení ji natrvalo nahradí silnější verzí – vyber si jednu ze dvou cest.</p>${abil}</section>`;
   const shopH = `<section class="cp-shop"><div class="cp-h"><h3>${i80('scale', 'bs-scale')}Obchod</h3><span class="ess">${i80('ess')} <b>${st.esence}</b> esence</span><button class="bbtn sm" data-reroll ${st.rerolled || st.esence < 1 ? 'disabled' : ''}>Nová nabídka · 1</button></div>
     <div class="shop-items">${shop.map(id => shopTileHTML(st, id, buyFor, list)).join('') || '<p class="muted">Nabídka je vyprodaná.</p>'}</div></section>`;
-  const chest = `<section class="cp-chest" data-drop='{"where":"chest"}'><div class="cp-h"><h3>Truhla</h3><span class="muted sm">${st.chest.length || 'prázdná'}</span><div class="sellzone" data-drop='{"where":"sell"}'>${i80('ess')} Prodat sem · +1</div></div>${st.chest.length ? `<div class="chest">${st.chest.map((id, i) => `<div class="ci" draggable="true" data-src='{"where":"chest","idx":${i}}'><span class="si-ic art">${itemPic(id)}</span><b>${esc(C.EQUIP[id].name)}</b><div class="ci-b"><button class="bbtn sm" data-equip="${id}" data-for="${h.id}">Nasadit: ${esc(h.name.split(' ')[0])}</button><button class="bbtn sm" data-sell="${id}">Prodat · +1</button></div></div>`).join('')}</div>` : '<p class="muted sm">Sem padá nahrazená výbava.</p>'}</section>`;
+  const chest = `<section class="cp-chest" data-drop='{"where":"chest"}'><div class="cp-h"><h3>Truhla</h3><span class="muted sm">${st.chest.length || 'prázdná'}</span><div class="sellzone bsell" data-drop='{"where":"sell"}'>${i80('ess')}<span>Prodat sem</span><b>+1</b></div></div>${st.chest.length ? `<div class="chest">${st.chest.map((id, i) => `<div class="ci" draggable="true" data-src='{"where":"chest","idx":${i}}'><span class="si-ic art">${itemPic(id)}</span><b>${esc(C.EQUIP[id].name)}</b><div class="ci-b"><button class="bbtn sm" data-equip="${id}" data-for="${h.id}">Nasadit: ${esc(h.name.split(' ')[0])}</button><button class="bbtn sm" data-sell="${id}">Prodat · +1</button></div></div>`).join('')}</div>` : '<p class="muted sm">Sem padá nahrazená výbava.</p>'}</section>`;
   return `<div class="bshop">${tabs}<div class="bs-main">${gear}${up}<aside class="bs-col bs-side">${shopH}<section class="cp-det">${campDetHTML(st)}</section>${chest}</aside></div></div>`;
 }
 function campHeroesHTML(st) {
@@ -16838,7 +16888,7 @@ function showCampPick() {
     ${campRewardsHTML(S.campReward)}
     <section class="bpick ${side === 'heroes' ? 'h' : 'o'}"><div class="bpick-who"><i class="be-sym ${side === 'heroes' ? 'bit bit-lucerna2' : 'hsig-dum'}"></i><div><p class="bpick-eb">Další scénář vybírá vítěz</p><h2>${side === 'heroes' ? 'Vybírají lovci' : 'Vybírá Dům'}${who !== 'bot' && who !== 'ty' ? ' <small>(' + esc(who) + ')</small>' : ''}</h2><p>${me ? (side === 'heroes' ? 'Klikni na scénář, kam lovci vyrazí dál.' : 'Klikni na scénář, kam Dům lovce zavede.') : 'Počkej na jejich volbu.'}</p></div></div>${scenTableHTML(st, me)}</section>
     <footer class="cp-foot"><p>Odehraný scénář už vybrat nejde. Obchod a vylepšení přijdou po výběru.</p><button class="bbtn" data-menu>Do menu</button></footer></div>`;
-    stripTitles(box); box.querySelectorAll('[data-pickscen]').forEach(b => b.addEventListener('click', () => campPick(b.dataset.pickscen))); campWireCommon(box); return;
+    stripTitles(box); box.querySelectorAll('[data-pickscen]').forEach(b => b.addEventListener('click', () => campPick(b.dataset.pickscen))); campWireCommon(box); fitCamp(); return;
   }
   box.innerHTML = `<div class="camp-wrap">${campHeadHTML(st, 'Výběr dalšího scénáře')}
     ${campRewardsHTML(S.campReward)}
@@ -16875,6 +16925,13 @@ function showCampEnd() {
   stripTitles(box);
   campWireCommon(box);
 }
+// v96: obrazovka kampaně se vejde na výšku okna (16:9 bez posuvníku) – případně se celá zmenší
+function fitCamp() {
+  const box = $('#camp'), w = box && box.querySelector('.bcamp'); if (!w || box.hidden) return;
+  w.style.zoom = ''; const need = w.scrollHeight + 8, have = box.clientHeight;
+  if (need > have) w.style.zoom = String(Math.max(.62, have / need).toFixed(3));
+}
+window.addEventListener('resize', () => { if (S.camp) fitCamp(); });
 function showCampShop() {
   const st = S.camp, box = $('#camp');
   if (!S.campTab) S.campTab = NETS.role ? (myRoles().some(k => k !== 'overlord') ? 'h' : 'o') : S.ctl.heroes === 'human' ? 'h' : 'o';
@@ -16951,6 +17008,7 @@ function showCampShop() {
   if (isClient()) box.querySelectorAll('[data-next],[data-campnew],[data-menu]').forEach(b => { b.disabled = true; b.textContent = 'Čeká se na hostitele'; });
   box.querySelectorAll('[data-campnew]').forEach(b => b.addEventListener('click', () => { Camp.clear(); S.camp = null; box.hidden = true; $('#menu').hidden = false; refreshMenu(); }));
   box.querySelectorAll('[data-menu]').forEach(b => b.addEventListener('click', () => { const pv = $('#treepv'); if (pv) pv.hidden = true; box.hidden = true; $('#menu').hidden = false; refreshMenu(); }));
+  fitCamp();
 }
 const campMenuLine = st => { const sc = st.score || { heroes: 0, ol: 0 }, nx = Camp.scenById(st.next); return 'odehráno ' + Camp.playedN(st) + ' z ' + Camp.LEN + ' · Lovci ' + sc.heroes + ' : ' + sc.ol + ' Dům' + (nx ? ' · další: ' + nx.name : ' · čeká se na výběr scénáře'); };
 function refreshMenu() {
@@ -17021,7 +17079,7 @@ function renderMM() {
     h = `<button class="mm-back" data-mm="main">← zpět</button><h2>Načíst hru</h2>${row(SAVE_SP, sp, 'Hra pro jednoho')}${row(SAVE_MP, mp, 'Online hra (načte hostitel)')}${!sp && !mp ? '<p class="mm-note">Nic uloženého. Hra se ukládá sama na začátku každého kola.</p>' : ''}${crow(CAMP_KEY_SP, cSp, 'Kampaň pro jednoho')}${crow(CAMP_KEY_MP, cMp, 'Online kampaň')}
       <button class="mm-btn" data-upload>${A.icon('deck')}<span>Nahrát uložení ze souboru<small>Soubor .json stažený ze hry (i od jiného hráče)</small></span></button>${NETS.err ? `<p class="mm-err">${esc(NETS.err)}</p>` : ''}<p class="mm-note">Ukládá se vždy stav na začátku kola. Online hru načte hostitel a ostatní se připojí kódem. Stažený soubor je záloha: přenese hru i na jiný počítač.</p>`;
   } else if (MM === 'settings') {
-    h = `<button class="mm-back" data-mm="main">← zpět</button><h2>Nastavení</h2><div class="opt mm-settings"><span>Zvuk</span><div class="mm-snd-row"><button class="mm-ico" data-sndset="mus">${A.icon('music')}<span></span></button><button class="mm-ico" data-sndset="sfx">${A.icon('speaker')}<span></span></button></div></div><div class="opt mm-settings"><span>Rychlost animací</span><div class="seg" id="mm-speed">${[['1.6', 'Pomalu'], ['1', 'Normálně'], ['0.4', 'Rychle']].map(([v, l]) => `<button data-v="${v}" aria-pressed="${String(S.speed) === v}">${l}</button>`).join('')}</div></div><div class="opt mm-settings"><span>Celá obrazovka</span><div class="seg" id="mm-fs">${[['1', 'Zapnuto'], ['0', 'Vypnuto']].map(([v, l]) => `<button data-v="${v}" aria-pressed="${(fsPref() ? '1' : '0') === v}">${l}</button>`).join('')}</div></div><div class="opt mm-settings"><span>Efekty prostředí <em>(při sekání zvol Úsporné)</em></span><div class="seg" id="mm-fx">${[['full', 'Plné'], ['low', 'Úsporné'], ['off', 'Vypnuté']].map(([v, l]) => `<button data-v="${v}" aria-pressed="${fxMode() === v}">${l}</button>`).join('')}</div></div><div class="opt mm-settings"><span>Ukazatel FPS</span><div class="seg" id="mm-fps">${[['1', 'Zapnuto'], ['0', 'Vypnuto']].map(([v, l]) => `<button data-v="${v}" aria-pressed="${(S.fpsOn ? '1' : '0') === v}">${l}</button>`).join('')}</div></div><div class="opt mm-settings"><span>Beta grafika <em>(nové figurky lovců)</em></span><div class="seg" id="mm-beta">${[['0', 'Vypnuto'], ['1', 'Zapnuto']].map(([v, l]) => `<button data-v="${v}" aria-pressed="${(S.beta ? '1' : '0') === v}">${l}</button>`).join('')}</div></div>`;
+    h = `<button class="mm-back" data-mm="main">← zpět</button><h2>Nastavení</h2><div class="opt mm-settings"><span>Zvuk</span><div class="mm-snd-row"><button class="mm-ico" data-sndset="mus">${A.icon('music')}<span></span></button><button class="mm-ico" data-sndset="sfx">${A.icon('speaker')}<span></span></button></div></div><div class="opt mm-settings"><span>Rychlost animací</span><div class="seg" id="mm-speed">${[['1.6', 'Pomalu'], ['1', 'Normálně'], ['0.4', 'Rychle']].map(([v, l]) => `<button data-v="${v}" aria-pressed="${String(S.speed) === v}">${l}</button>`).join('')}</div></div><div class="opt mm-settings"><span>Celá obrazovka</span><div class="seg" id="mm-fs">${[['1', 'Zapnuto'], ['0', 'Vypnuto']].map(([v, l]) => `<button data-v="${v}" aria-pressed="${(fsPref() ? '1' : '0') === v}">${l}</button>`).join('')}</div></div><div class="opt mm-settings"><span>Efekty prostředí <em>(při sekání zvol Úsporné)</em></span><div class="seg" id="mm-fx">${[['full', 'Plné'], ['low', 'Úsporné'], ['off', 'Vypnuté']].map(([v, l]) => `<button data-v="${v}" aria-pressed="${fxMode() === v}">${l}</button>`).join('')}</div></div><div class="opt mm-settings"><span>Ukazatel FPS</span><div class="seg" id="mm-fps">${[['1', 'Zapnuto'], ['0', 'Vypnuto']].map(([v, l]) => `<button data-v="${v}" aria-pressed="${(S.fpsOn ? '1' : '0') === v}">${l}</button>`).join('')}</div></div><div class="opt mm-settings"><span>Grafika</span><div class="seg" id="mm-beta">${[['1', 'Nová'], ['0', 'Pracovní']].map(([v, l]) => `<button data-v="${v}" aria-pressed="${(S.beta ? '1' : '0') === v}">${l}</button>`).join('')}</div></div>`;
   }
   box.innerHTML = h;
   const fr = $('#mainmenu'); if (fr) fr.classList.toggle('sub', MM !== 'main');
@@ -17042,7 +17100,7 @@ function renderMM() {
   { const x = $('#mm-fps'); if (x) x.querySelectorAll('button').forEach(b => b.addEventListener('click', () => { S.fpsOn = b.dataset.v === '1'; try { localStorage.setItem('bm_fps', S.fpsOn ? '1' : '0'); } catch (e) {} const e = $('#fpsm'); if (e && !S.fpsOn) e.remove(); renderMM(); })); }
   const fsel = $('#mm-fs'); if (fsel) fsel.querySelectorAll('button').forEach(b => b.addEventListener('click', () => { fsSet(b.dataset.v === '1'); renderMM(); }));
   { const mm = $('#mainmenu'), on = !!(S.beta && typeof BetaCards !== 'undefined' && BetaCards.ui && BetaCards.ui.menu); if (mm) { mm.classList.toggle('bmm', on); const tt = mm.querySelector('.mm-title'); if (tt && !(on && tt.querySelector('.mt-pix'))) { if (!tt.dataset.h0) tt.dataset.h0 = tt.innerHTML; const want = on ? '<span class="mt-a">Půlnoc na</span><span class="mt-b"><span class="mt-cap">B</span>lac<span class="mt-k">k</span>mooru</span><i class="mt-drip d1"></i><i class="mt-drip d2"></i><i class="mt-drip d3"></i>' : tt.dataset.h0; if (tt.innerHTML !== want) tt.innerHTML = want; } if (on) { bcStyle(); mmGrunge(mm); if (!mm.querySelector('.mm-win')) mm.insertAdjacentHTML('beforeend', '<i class="mm-cl c1" aria-hidden="true"></i><i class="mm-cl c2" aria-hidden="true"></i><i class="mm-cl c3" aria-hidden="true"></i><i class="mm-win" aria-hidden="true"></i><i class="mm-crow r" aria-hidden="true"></i><i class="mm-crow l" aria-hidden="true"></i><i class="mm-fog2" aria-hidden="true"></i><i class="mm-fog2 f2" aria-hidden="true"></i>'); } } }
-  const bsel = $('#mm-beta'); if (bsel) bsel.querySelectorAll('button').forEach(b => b.addEventListener('click', () => { const v = b.dataset.v === '1'; if (v !== !!S.beta) setBeta(v, true); renderMM(); }));
+  const bsel = $('#mm-beta'); if (bsel) bsel.querySelectorAll('button').forEach(b => b.addEventListener('click', () => { const v = b.dataset.v === '1'; if (v !== !!S.beta) setBeta(v, true); }));
 }
 // v69c: špína, krev a rozpad písma názvu (generuje se jednou do textur)
 function mmGrunge(mm) {
@@ -17133,12 +17191,23 @@ function betaWarn() {
   const w = el('div', { class: 'betawarn', role: 'dialog', 'aria-modal': 'true' }, `<div class="dialog"><p>Tato grafika je stále ve fázi testování.</p><button class="btn primary" id="betaok">OK</button></div>`);
   document.body.appendChild(w); const ok = w.querySelector('#betaok'); ok.addEventListener('click', () => w.remove()); ok.focus();
 }
-function setBeta(v, warn) {
-  S.beta = !!v; lsSet(BETA_KEY, S.beta ? '1' : '0');
+// v96: přepnutí na pracovní (alfa) grafiku chce potvrzení
+function alphaConfirm() {
+  return new Promise(res => {
+    const w = el('div', { class: 'betawarn alphawarn', role: 'dialog', 'aria-modal': 'true' }, `<div class="dialog bconfirm"><p class="bf-eb">Grafika</p><h3>Opravdu chcete pracovní grafiku?</h3><p class="muted">Doporučuje se pouze pokud se hra seká.</p><div class="dlg-btns"><button class="btn" data-v="0">Ne</button><button class="btn primary" data-v="1">Ano</button></div></div>`);
+    document.body.appendChild(w);
+    w.querySelectorAll('button').forEach(b => b.addEventListener('click', () => { w.remove(); res(b.dataset.v === '1'); }));
+    w.querySelector('button').focus();
+  });
+}
+async function setBeta(v, warn) {
+  if (!v && warn && S.beta && !(await alphaConfirm())) { const cb = $('#betachk'); if (cb) cb.checked = true; renderMMIfOpen(); return; }
+  S.beta = !!v; lsSet(BETA_KEY, S.beta ? 'beta' : 'alpha');
   const cb = $('#betachk'); if (cb) cb.checked = S.beta;
-  if (S.beta && warn) betaWarn();
+  renderMMIfOpen();
   if (S.G && svg && !$('#game').hidden) { if (builtMap && builtMap !== mapKey() && builtMap.split(':')[0] === C.MAP.id) ensureMap().then(() => render()); else render(); } // v63: beta prostředí = jiná stavba mapy
 }
+function renderMMIfOpen() { const m = $('#menu'); if (m && !m.hidden && typeof renderMM === 'function') renderMM(); }
 function showMenu() { sndMenu(); $('#game').hidden = true; $('#camp').hidden = true; $('#modal').hidden = true; $('#menu').hidden = false; hideSetupBar(); renderMM(); fitMenu(); }
 
 // ---------- online: spojení ----------
