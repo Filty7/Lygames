@@ -1490,6 +1490,15 @@ button.pd-cell { cursor: default; } .pd-cell.full { cursor: pointer; border-styl
 .cp-olgrid .grp-b { display: flex; gap: 6px; align-items: center; min-width: 0; } .cp-olgrid .grp-b b { font-size: 12.5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; } .cp-olgrid .grp-b .grp-cat { margin: 0; flex: none; }
 .cp-olgrid .grp.nx { border-color: #5a4630; }
 .cp-olgrid .grp-btns { grid-column: 1 / -1; flex-direction: row; gap: 3px; }
+.grp-up .grp-hint { margin: 2px 0 0; min-height: 0; padding-top: 0; }
+.gup-list { display: grid; gap: 6px; margin-top: 6px; }
+.gup { display: grid; grid-template-columns: minmax(0, 1fr) auto auto; gap: 10px; align-items: center; padding: 7px 10px; border: 1px solid #6a2a20; background: linear-gradient(#200a08e8, #120504e8); box-shadow: inset 0 0 0 1px #000; }
+.gup.has { border-color: #a8442a; box-shadow: inset 0 0 18px #c0301a22, inset 0 0 0 1px #000; }
+.gup-b b { display: block; font: 400 19px var(--f-disp); color: #ffc0b0; } .gup-b small { font: 400 12.5px var(--f-body); color: #c8a090; }
+.gup-pips { display: flex; gap: 4px; } .gup-pips i { width: 12px; height: 12px; transform: rotate(45deg); border: 1px solid #8a3a28; background: #1a0806; } .gup-pips i.on { background: #e05a3a; box-shadow: 0 0 8px #ff5a3a; }
+.gup-max { font: 400 15px var(--f-disp); color: #8a6a5a; padding: 0 10px; }
+.gup .ic { width: 14px; height: 14px; vertical-align: -2px; }
+.gup-next { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; margin-top: 10px; font: 400 13px var(--f-body); color: #c8a090; } .gup-t .mport, .gup-t svg { width: 30px; height: 30px; }
 .gb { flex: 1; font: 600 11px/1.25 var(--f-body); padding: 1px 4px; border-radius: 4px; border: 1px solid var(--line-2); background: #141118; color: var(--muted); cursor: pointer; white-space: nowrap; }
 .gb i { font-style: normal; opacity: .75; } .gb.can { border-color: #b07a34; color: var(--candle-2); background: #22180c; } .gb.can:hover { background: #3a2810; }
 .gb.got { box-shadow: inset 0 -2px 0 #f3cf6e; } .gb[aria-disabled="true"] { cursor: not-allowed; opacity: .6; }
@@ -8762,7 +8771,7 @@ const equipList = eq => [...new Set(HSLOTS.map(s => eq[s]).filter(Boolean))];
 // v2: Dům má temnou esenci (klíč ol.gold) a vylepšení skupin monster (ol.gold, ol.grp), lovci si nesou nezahrané nálezy (heroes[id].loot)
 // v3: pořadí scénářů volí vítěz předchozího: played [id] (v pořadí odehrání), next (id vybraného, null = čeká se na výběr),
 //     picker ('heroes'|'ol' = kdo vybírá / vybíral), pickedBy (kdo vybral: 'bot' nebo jméno hráče), score { heroes, ol }
-const VER = 3;
+const VER = 4; // v4: vylepšení monster platí pro všechny skupiny (ol.gup), staré po skupinách se refundují
 const FIRST = 'blackmoor'; // první scénář kampaně je vždy Půlnoc na Blackmooru
 // v82: kampaň = intro + 3 scénáře + boss + 3 scénáře + boss (9 her); boss fight vybírá strana, která prohrává na body (remíza: lovci)
 const LEN = 9, BOSS_SLOTS = [4, 8];
@@ -8770,7 +8779,7 @@ const isBossSlot = st => BOSS_SLOTS.includes((st.played || []).length);
 const scenById = id => D.SCENARIOS.find(sc => sc.id === id) || null;
 function fresh() {
   const st = { v: VER, played: [], next: FIRST, picker: null, pickedBy: null, score: { heroes: 0, ol: 0 }, esence: 0, chest: [], history: [], streak: { heroes: 0, ol: 0 }, shop: null, rerolled: false, rewarded: null,
-    heroes: {}, ol: { xp: 0, gold: 0, up: {}, grp: {} } };
+    heroes: {}, ol: { xp: 0, gold: 0, up: {}, gup: { hp: 0, plus: 0, elite: 0 } } };
   for (const h of D.HEROES) st.heroes[h.id] = { xp: 0, abil: {}, equip: startEquip(h.id), bag: [], loot: [] };
   return st;
 }
@@ -8794,11 +8803,18 @@ function migrate(st) {
     if (st.lastReward) { st.lastReward.id = D.SCENARIOS[st.lastReward.scen] ? D.SCENARIOS[st.lastReward.scen].id : null; st.lastReward.n = st.lastReward.scen + 1; st.lastReward.score = Object.assign({}, st.score); }
     delete st.scen; st.v = 3;
   }
+  if (st.v === 3) {
+    // v4: dřívější vylepšení jednotlivých skupin (ol.grp) se vrací Domu jako temná esence
+    let back = 0; const OLD = { hp: 1, plus: 2, elite: 3 };
+    for (const g of Object.values((st.ol && st.ol.grp) || {})) for (const k of Object.keys(OLD)) back += (g[k] || 0) * OLD[k];
+    st.ol.gold = (st.ol.gold || 0) + back; st.ol.grp = {}; st.ol.gup = { hp: 0, plus: 0, elite: 0 }; if (back) st.ol.refund = back;
+    delete st.ol.core; st.v = 4;
+  }
   if (st.v !== VER) return null;
   st.played = (st.played || []).filter(scenById); st.history = st.history || []; st.score = st.score || scoreOf(st.history);
   if (st.next && (!scenById(st.next) || st.played.includes(st.next))) st.next = null;
   if (!st.played.length && !st.next) st.next = FIRST;
-  st.ol.gold = st.ol.gold || 0; st.ol.grp = st.ol.grp || {}; st.ol.up = st.ol.up || {}; st.streak = st.streak || { heroes: 0, ol: 0 };
+  st.ol.gold = st.ol.gold || 0; st.ol.gup = Object.assign({ hp: 0, plus: 0, elite: 0 }, st.ol.gup || {}); delete st.ol.grp; st.ol.up = st.ol.up || {}; st.streak = st.streak || { heroes: 0, ol: 0 };
   // v60: všechno jsou id → po načtení platí aktuální data; neznámá (vyřazená) id zahodíme, chybějící lovce doplníme
   const okItem = x => !!(x && D.EQUIP[x]);
   st.chest = (st.chest || []).filter(okItem);
@@ -8813,7 +8829,6 @@ function migrate(st) {
     for (const k of Object.keys(hs.abil)) { const a = ab.find(x => x.key === k); if (!a || !a.tree[hs.abil[k]]) delete hs.abil[k]; }
   }
   for (const k of Object.keys(st.ol.up)) if (!D.OL_CARDS[k] || (st.ol.up[k] && !(D.OL_VAR[k] && D.OL_VAR[k][st.ol.up[k]]))) delete st.ol.up[k];
-  for (const t of Object.keys(st.ol.grp)) if (!D.MDEF[t]) delete st.ol.grp[t];
   return st;
 }
 function load() { try { const s = localStorage.getItem(KEY); if (!s) return null; return migrate(JSON.parse(s)); } catch (e) { return null; } }
@@ -8822,7 +8837,7 @@ function clear() { try { localStorage.removeItem(KEY); } catch (e) { /* nic */ }
 function gameOpts(st) {
   const loadouts = {};
   for (const h of D.HEROES) loadouts[h.id] = { equip: equipList(st.heroes[h.id].equip), abil: Object.assign({}, st.heroes[h.id].abil), loot: (st.heroes[h.id].loot || []).slice() };
-  return { scenario: st.next || FIRST, loadouts, olUp: Object.assign({}, st.ol.up), grpUp: JSON.parse(JSON.stringify(st.ol.grp || {})) };
+  return { scenario: st.next || FIRST, loadouts, olUp: Object.assign({}, st.ol.up), grpUp: grpMap(st) };
 }
 // odměny za dohraný scénář; vrací souhrn pro obrazovku
 function applyResult(st, G) {
@@ -8916,62 +8931,36 @@ function upgradeOl(st, id, to) {
   const c = upCost(cur); if (st.ol.xp < c) return 'Málo zkušeností.';
   st.ol.xp -= c; st.ol.up[id] = to; save(st); return null;
 }
-// vylepšení skupin monster za temnou esenci Domu (v kódu ol.gold) (platí, kdykoli Dům skupinu nasadí)
+// vylepšení monster za temnou esenci Domu (v kódu ol.gold) – v4: platí pro VŠECHNY skupiny, cena podle úrovně
 const COMP = { heroEss: 2, heroXp: 1, olXp: 1, olGold: 1 };
 const GRP_UPS = [
-  { k: 'hp', name: 'Zocelení', cost: 1, max: 2, text: '+1 zdraví všem figurkám skupiny.' },
-  { k: 'plus', name: 'Posila', cost: 2, max: 2, text: '+1 přisluhovač v základní sestavě skupiny.' },
-  { k: 'elite', name: 'Elita navíc', cost: 3, max: 1, text: '+1 elita navíc k základní sestavě skupiny.' },
+  { k: 'hp', name: 'Zocelení', costs: [2, 3], max: 2, text: '+zdraví všem figurkám všech skupin.' },
+  { k: 'plus', name: 'Posila', costs: [4, 5], max: 2, text: '+1 přisluhovač v základní sestavě každé skupiny.' },
+  { k: 'elite', name: 'Elita navíc', costs: [5], max: 1, text: '+1 elita navíc v každé skupině.' },
 ];
 const upgradableGroups = () => Object.keys(D.MDEF).filter(t => { const d = D.MDEF[t]; return !d.object && !d.hidden && !d.part && !d.lieutenant && !d.boss && !d.obelisk; });
 // skupiny, které se dají nasadit ve zbývajících (neodehraných) scénářích kampaně
 const remaining = st => D.SCENARIOS.filter(sc => !(st.played || []).includes(sc.id));
 const groupsFor = st => { const cats = new Set(remaining(st).flatMap(sc => sc.cats || [])); return upgradableGroups().filter(t => cats.has(D.MDEF[t].cat)); };
-function grpCan(st, type, k) {
+const gupOf = st => Object.assign({ hp: 0, plus: 0, elite: 0 }, (st.ol && st.ol.gup) || {});
+// pro hru: stejné vylepšení pro každou skupinu (jádro hry pracuje po typech)
+function grpMap(st) { const g = gupOf(st); if (!g.hp && !g.plus && !g.elite) return {}; return Object.fromEntries(upgradableGroups().map(t => [t, Object.assign({}, g)])); }
+const grpCost = (st, k) => { const u = GRP_UPS.find(x => x.k === k); if (!u) return null; const n = gupOf(st)[k] || 0; return n >= u.max ? null : u.costs[n]; };
+function grpCan(st, k) {
   const u = GRP_UPS.find(x => x.k === k); if (!u) return 'Neznámé vylepšení.';
-  if (!upgradableGroups().includes(type)) return 'Tuhle skupinu vylepšit nejde.';
-  const cur = ((st.ol.grp || {})[type] || {})[k] || 0;
-  if (cur >= u.max) return 'Už je na maximu.';
-  if ((st.ol.gold || 0) < u.cost) return 'Málo temné esence.';
+  const c = grpCost(st, k); if (c == null) return 'Už je na maximu.';
+  if ((st.ol.gold || 0) < c) return 'Málo temné esence.';
   return null;
 }
-function buyGroupUp(st, type, k) {
-  const why = grpCan(st, type, k); if (why) return why;
-  const u = GRP_UPS.find(x => x.k === k);
-  st.ol.gold -= u.cost; st.ol.grp = st.ol.grp || {}; const g = st.ol.grp[type] = st.ol.grp[type] || {}; g[k] = (g[k] || 0) + 1;
+function buyGroupUp(st, k) {
+  const why = grpCan(st, k); if (why) return why;
+  const c = grpCost(st, k); st.ol.gold -= c; st.ol.gup = gupOf(st); st.ol.gup[k] = (st.ol.gup[k] || 0) + 1;
   save(st); return null;
 }
-// bot Domu: staví si „jádro“ 2–3 skupin, které se hodí do nejvíc zbývajících scénářů (a do dalšího scénáře),
-// a soustředí do nich temnou esenci (posila > elita navíc > zocelení)
-function botCore(st) {
-  const rem = remaining(st), sc = scenById(st.next);
-  const fit = t => rem.filter(x => (x.cats || []).includes(D.MDEF[t].cat)).length + (sc && (sc.cats || []).includes(D.MDEF[t].cat) ? 3 : 0);
-  const inv = t => { const g = (st.ol.grp || {})[t] || {}; return (g.hp || 0) + 2 * (g.plus || 0) + 3 * (g.elite || 0); };
-  const all = groupsFor(st); if (!all.length) return [];
-  st.ol.core = (st.ol.core || []).filter(t => all.includes(t));
-  const val = t => fit(t) * 2 + inv(t) + (st.ol.core.includes(t) ? 2 : 0) + (D.MDEF[t].cost || 0) / 10;
-  st.ol.core = all.slice().sort((a, b) => val(b) - val(a) || (rnd() < 0.5 ? -1 : 1)).slice(0, 3);
-  return st.ol.core;
-}
+// bot Domu: kupuje posilu > elitu > zocelení, kdykoli na ně má
 function botGold(st) {
-  const sc = scenById(st.next);
-  let order;
-  if (sc) {
-    // vylepšuj tu sestavu, kterou bot v dalším scénáři opravdu nasadí (nejsilnější kombinace jeho prostředí, s ohledem na dosavadní vylepšení)
-    const cands = groupsFor(st).filter(t => (sc.cats || []).includes(D.MDEF[t].cat));
-    const slots = (sc.slots || 3) + (sc.budgetBonus || 0);
-    const best = D.bestCombos(cands, slots, st.ol.grp || {})[0];
-    order = best ? best.types.slice() : [];
-    // přednost skupinám, které se hodí i do dalších zbývajících scénářů
-    const core = botCore(st); order.sort((a, b) => (core.includes(b) ? 1 : 0) - (core.includes(a) ? 1 : 0));
-  } else order = botCore(st);
-  if (!order.length) return;
   let guard = 0;
-  while (guard++ < 12 && (st.ol.gold || 0) > 0) {
-    let done = false;
-    for (const k of ['plus', 'elite', 'hp']) { for (const t of order) if (!grpCan(st, t, k)) { buyGroupUp(st, t, k); done = true; break; } if (done) break; }
-    if (!done) break;
-  }
+  while (guard++ < 8) { const k = ['plus', 'elite', 'hp'].find(x => !grpCan(st, x)); if (!k) break; buyGroupUp(st, k); }
 }
 // bot Domu: karty vylepšuje cíleně – drží si 4 oblíbené karty a ty prohlubuje do konce stromu
 function botOlCards(st) {
@@ -9038,7 +9027,7 @@ function botUpgrade(st, side) {
   }
 }
 
-return { VER, FIRST, LEN, BOSS_SLOTS, isBossSlot, scenById, remaining, available, pick, botPick, playedN, winner, scoreOf, migrate, COMP, GRP_UPS, upgradableGroups, groupsFor, grpCan, buyGroupUp, botGold, KEY, setKey, BAG, moveItem, sellFrom, HSLOTS, SLOT_NAME, fresh, load, save, clear, gameOpts, applyResult, rollShop, reroll, buy, price, equipFromChest, toChest, sell, nextVariants, upCost, upgradeHero, upgradeOl, nextScenario, finished, botShop, botUpgrade, equipList, startEquip, placeItem };
+return { VER, FIRST, LEN, BOSS_SLOTS, isBossSlot, scenById, remaining, available, pick, botPick, playedN, winner, scoreOf, migrate, COMP, GRP_UPS, upgradableGroups, groupsFor, grpCan, grpCost, gupOf, grpMap, buyGroupUp, botGold, KEY, setKey, BAG, moveItem, sellFrom, HSLOTS, SLOT_NAME, fresh, load, save, clear, gameOpts, applyResult, rollShop, reroll, buy, price, equipFromChest, toChest, sell, nextVariants, upCost, upgradeHero, upgradeOl, nextScenario, finished, botShop, botUpgrade, equipList, startEquip, placeItem };
 })();
 if (typeof module !== 'undefined') module.exports = Camp;
 
@@ -16750,15 +16739,16 @@ function campHeroesHTML(st) {
   const chest = `<section class="cp-chest" data-drop='{"where":"chest"}'><div class="cp-h"><h3>Truhla</h3><span class="muted sm">${st.chest.length || 'prázdná'}</span><div class="sellzone" data-drop='{"where":"sell"}'>${A.icon('star')} Prodat sem · +1</div></div>${st.chest.length ? `<div class="chest">${st.chest.map((id, i) => `<div class="ci" draggable="true" data-src='{"where":"chest","idx":${i}}'><span class="si-ic art">${itemPic(id)}</span><b>${esc(C.EQUIP[id].name)}</b><div class="ci-b">${C.HEROES.map(h => `<button class="si-hero mini" data-equip="${id}" data-for="${h.id}" style="--c:${HERO_COLORS[h.id]}" aria-label="Vybavit: ${esc(h.name)}">${heroPortrait(h.id)}</button>`).join('')}<button class="btn sm ghost" data-sell="${id}">Prodat +1</button></div></div>`).join('')}</div>` : '<p class="muted sm">Sem padá nahrazená výbava. Předměty jde přetahovat mezi výbavou, batohem a truhlou.</p>'}</section>`;
   return `<div class="cp-hgrid">${party}<aside class="cp-side">${shopH}<section class="cp-det">${campDetHTML(st)}</section>${chest}</aside></div>`;
 }
-// vylepšení skupin monster za temnou esenci Domu
+// v96: vylepšení monster za temnou esenci Domu – platí pro všechny skupiny
 function campGrpHTML(st) {
-  const types = Camp.groupsFor(st), gold = st.ol.gold || 0;
-  if (!types.length) return '';
-  const nextCats = new Set((Camp.scenById(st.next) || {}).cats || []);
-  const legend = `Vylepšení platí natrvalo. ${Camp.GRP_UPS.map(u => `<b>${esc(u.name)}</b> ${u.cost}`).join(' · ')} ${A.icon('crown')} · ★ = prostředí dalšího scénáře`;
-  return `<section class="grp-up"><div class="cp-h"><h3>Skupiny monster</h3><span class="ess gold">${A.icon('crown')} <b>${gold}</b> temné esence</span></div>
-    <div class="grp-list">${types.sort((a, b) => (nextCats.has(C.MDEF[b].cat) ? 1 : 0) - (nextCats.has(C.MDEF[a].cat) ? 1 : 0)).map(t => { const g = (st.ol.grp || {})[t] || {}, nx = nextCats.has(C.MDEF[t].cat); return `<div class="grp${Object.keys(g).length ? ' has' : ''}${nx ? ' nx' : ''}">${monPortrait(t)}<div class="grp-b"><b>${nx ? '★ ' : ''}${esc(C.MDEF[t].name)}</b><span class="grp-cat${nx ? ' next' : ''}">${esc(C.CATS[C.MDEF[t].cat] || C.MDEF[t].cat)}</span></div><div class="grp-btns">${Camp.GRP_UPS.map(u => { const why = Camp.grpCan(st, t, u.k), n = g[u.k] || 0; return `<button class="gb${why ? '' : ' can'}${n ? ' got' : ''}" data-grpup="${t}|${u.k}" ${why ? 'aria-disabled="true"' : ''} data-hint="${esc(C.MDEF[t].name + ' · ' + u.name + ': ' + grpUpText(t, u) + ' (' + u.cost + ' temné esence, máš ' + n + '/' + u.max + ').' + (why ? ' ' + why : ''))}">${esc(u.name)} <i>${n}/${u.max}</i></button>`; }).join('')}</div></div>`; }).join('')}</div>
-    <p class="grp-hint" data-hint0="${esc(legend.replace(/<[^>]+>/g, ''))}">${legend}</p></section>`;
+  const gold = st.ol.gold || 0, g = Camp.gupOf(st), nx = Camp.scenById(st.next);
+  const nextT = nx ? Camp.groupsFor(st).filter(t => (nx.cats || []).includes(C.MDEF[t].cat)) : [];
+  const row = u => { const n = g[u.k] || 0, cost = Camp.grpCost(st, u.k), why = Camp.grpCan(st, u.k);
+    return `<div class="gup${n ? ' has' : ''}"><div class="gup-b"><b>${esc(u.name)}</b><small>${esc(u.text)}</small></div><span class="gup-pips">${Array.from({ length: u.max }, (_, i) => `<i class="${i < n ? 'on' : ''}"></i>`).join('')}</span>${cost == null ? '<span class="gup-max">max</span>' : `<button class="${buiOn() ? 'bbtn sm' : 'btn sm'}${why ? '' : ' primary'}" data-gup="${u.k}" ${why ? 'aria-disabled="true"' : ''} data-hint="${esc(u.name + ': ' + u.text + ' Cena ' + cost + ' temné esence.' + (why ? ' ' + why : ''))}">${cost} ${A.icon('crown')}</button>`}</div>`; };
+  return `<section class="grp-up"><div class="cp-h"><h3>Monstra Domu</h3><span class="ess gold">${A.icon('crown')} <b>${gold}</b> temné esence</span></div>
+    <p class="grp-hint" data-hint0="Vylepšení platí natrvalo pro všechny skupiny monster.">Vylepšení platí natrvalo pro všechny skupiny monster.</p>
+    <div class="gup-list">${Camp.GRP_UPS.map(row).join('')}</div>
+    ${nextT.length ? `<div class="gup-next"><span>Skupiny pro další scénář:</span>${nextT.map(t => `<span class="gup-t" title="${esc(C.MDEF[t].name)}">${monPortrait(t)}</span>`).join('')}</div>` : ''}</section>`;
 }
 const grpUpText = (t, u) => u.k === 'hp' ? '+' + C.D.grpHpPer(t) + ' zdraví všem figurkám' : u.text;
 const grpBadge = (t, g) => [g.hp ? '+' + g.hp * C.D.grpHpPer(t) + ' zdraví' : '', g.plus ? '+' + g.plus + ' přisluhovač' + (g.plus > 1 ? 'i' : '') : '', g.elite ? '+' + g.elite + ' elita' : ''].filter(Boolean).join(' · ');
@@ -16948,7 +16938,7 @@ function showCampShop() {
     ${bu ? '' : campRewardsHTML(S.campReward)}
     <div class="cp-navrow"><nav class="cp-tabs">${tabsOk.includes('h') ? `<button data-tab="h" class="tb-h" aria-pressed="${S.campTab === 'h'}">Lovci: obchod a výbava</button>` : ''}${tabsOk.includes('o') ? `<button data-tab="o" class="tb-o" aria-pressed="${S.campTab === 'o'}">Dům: monstra a karty</button>` : ''}</nav>${nextBar}</div>
     <div class="cp-body">${S.campTab === 'h' ? campHeroesHTML(st) : campOlHTML(st)}</div>
-    <footer class="cp-foot"><p>${S.campTab === 'h' ? (bu ? 'Esence je společná pro všechny lovce, xp má každý svoje.' : 'Předměty jde <b>přetahovat</b> mezi výbavou, batohem a truhlou. Klik na výbavu ukáže její karty.') : 'Vylepšení Domu platí po celou kampaň.'}</p><button class="${bu ? 'bbtn primary' : 'btn primary'}" data-next>Hrát scénář ${Camp.playedN(st) + 1} z ${C.SCENARIOS.length}</button>${isClient() ? '' : `<button class="${bu ? 'bbtn' : 'btn'}" data-campsave>Uložit</button>`}<button class="${bu ? 'bbtn' : 'btn ghost'}" data-menu>Do menu</button></footer></div>`;
+    <footer class="cp-foot"><p>${S.campTab === 'h' ? (bu ? 'Esence je společná pro všechny lovce, xp má každý svoje.' : 'Předměty jde <b>přetahovat</b> mezi výbavou, batohem a truhlou. Klik na výbavu ukáže její karty.') : 'Vylepšení Domu platí po celou kampaň.'}</p><button class="${bu ? 'bbtn primary' : 'btn primary'}" data-next>Hrát scénář ${Camp.playedN(st) + 1} z ${Camp.LEN}</button>${isClient() ? '' : `<button class="${bu ? 'bbtn' : 'btn'}" data-campsave>Uložit</button>`}<button class="${bu ? 'bbtn' : 'btn ghost'}" data-menu>Do menu</button></footer></div>`;
   stripTitles(box);
   const re = () => showCamp();
   campDlButton(box);
@@ -16992,7 +16982,8 @@ function showCampShop() {
   wireDet();
   box.querySelectorAll('[data-up]').forEach(b => b.addEventListener('click', () => { const [hid, key] = b.dataset.up.split('|'); const w = campDo('upgradeHero', hid, key, b.dataset.v); sfx(w ? 'deny' : 'coin'); re(); }));
   box.querySelectorAll('[data-olup]').forEach(b => b.addEventListener('click', () => { const w = campDo('upgradeOl', b.dataset.olup, b.dataset.v); sfx(w ? 'deny' : 'coin'); re(); }));
-  box.querySelectorAll('[data-grpup]').forEach(b => b.addEventListener('click', () => { if (b.getAttribute('aria-disabled') === 'true') { sfx('deny'); return; } const [t, k] = b.dataset.grpup.split('|'); const w = campDo('buyGroupUp', t, k); sfx(w ? 'deny' : 'coin'); re(); }));
+  box.querySelectorAll('[data-gup]').forEach(b => b.addEventListener('click', () => { if (b.getAttribute('aria-disabled') === 'true') { sfx('deny'); return; } const w = campDo('buyGroupUp', b.dataset.gup); sfx(w ? 'deny' : 'coin'); re(); }));
+  if (S.camp && S.camp.ol && S.camp.ol.refund) { toast('Vylepšení monster teď platí pro všechny skupiny. Dům dostal zpět ' + S.camp.ol.refund + ' temné esence.'); delete S.camp.ol.refund; Camp.save(S.camp); }
   // náhled karty uzlu stromu při najetí
   box.querySelectorAll('[data-pv]').forEach(b => b.addEventListener('mouseenter', () => {
     const v = b.dataset.pv, row = b.closest('.ab-row'), olu = b.closest('.olu'); let html = '';
