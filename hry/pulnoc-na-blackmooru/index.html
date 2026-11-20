@@ -8952,8 +8952,8 @@ function upgradeOl(st, id, to) {
 const COMP = { heroEss: 2, heroXp: 1, olXp: 1, olGold: 1 };
 const GRP_UPS = [
   { k: 'hp', name: 'Zocelení', costs: [2, 3], max: 2, text: '+zdraví všem figurkám všech skupin.' },
-  { k: 'plus', name: 'Posila', costs: [5], max: 1, text: '+1 přisluhovač v základní sestavě každé skupiny.' },
-  { k: 'elite', name: 'Elita navíc', costs: [6], max: 1, text: '+1 elita navíc v každé skupině.' },
+  { k: 'plus', name: 'Posila', costs: [5, 7], max: 2, text: '+1 přisluhovač v základní sestavě každé skupiny.' },
+  { k: 'elite', name: 'Elita navíc', costs: [7], max: 1, text: '+1 elita navíc v každé skupině.' },
 ];
 const upgradableGroups = () => Object.keys(D.MDEF).filter(t => { const d = D.MDEF[t]; return !d.object && !d.hidden && !d.part && !d.lieutenant && !d.boss && !d.obelisk; });
 // skupiny, které se dají nasadit ve zbývajících (neodehraných) scénářích kampaně
