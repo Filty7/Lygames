@@ -2286,6 +2286,11 @@ body.bui #menupop > label, body.bui #menupop > .pop-row { align-self: center; ju
 .bb-exc { margin: 10px 0; padding: 8px 12px; border: 1px solid #8a2a2a; border-left: 4px solid #c0392b; border-radius: 6px; background: #2a0e0ecc; color: #f2dcc8; font-size: 13px; line-height: 1.4; text-align: left; }
 .bb-exc > span { display: block; font: 400 15px var(--f-disp); color: #ff9a7a; letter-spacing: .03em; margin-bottom: 2px; }
 .bb-exc ul { margin: 0; padding-left: 18px; }
+
+/* v94: kašna a oltář vidět i v mlze (tlumeně) */
+.furn.landmark { filter: brightness(.62) saturate(.7) drop-shadow(0 0 6px #e8c07a55); }
+.lm-lbl { font: 400 11px var(--f-disp); fill: #d8b878; opacity: .8; paint-order: stroke; stroke: #030204; stroke-width: 3px; letter-spacing: .04em; }
+.furn.landmark { filter: brightness(.75) saturate(.75) drop-shadow(0 0 6px #e8c07a66) !important; }
 </style>
 
 <div id="menu">
@@ -10366,6 +10371,7 @@ function view() {
 }
 const heroView = () => view() === 'heroes';
 const roomVisible = r => !heroView() || S.G.revealed.has(r);
+const fogLandmarks = () => [C.MAP.fountain, C.MAP.altar].filter(Boolean);
 const monsterShown = m => heroView() ? C.visibleToHeroes(S.G, m) : true;
 // vizuál Tmy podle varianty Zhasnutí: mráz (modrá + sníh), dusivá (zelený kouř), bolestná (rudé jiskry), hluboká (fialová čerň)
 const DARK_STYLE = { A: ['frost', 'MRÁZ'], AA: ['frost', 'LEDOVÁ NOC'], AB: ['frost', 'OČI VE TMĚ'], B: ['smoke', 'DUSIVÁ TMA'], BA: ['blood', 'BOLESTNÁ TMA'], BB: ['deep', 'HLUBOKÁ TMA'] };
@@ -10456,7 +10462,7 @@ const DEFS2 = `
 <linearGradient id="ag-glass" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#2c4660"/><stop offset=".6" stop-color="#16243a"/><stop offset="1" stop-color="#0e1626"/></linearGradient>
 <linearGradient id="ag-moon" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#a8c8ff" stop-opacity=".22"/><stop offset="1" stop-color="#a8c8ff" stop-opacity="0"/></linearGradient>
 <radialGradient id="ag-vign" cx=".5" cy=".5" r=".75"><stop offset=".55" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".55"/></radialGradient>
-<radialGradient id="ag-dark" cx=".5" cy=".5" r=".7"><stop offset="0" stop-color="#03040a" stop-opacity=".5"/><stop offset="1" stop-color="#03040a" stop-opacity=".78"/></radialGradient>
+<radialGradient id="lmglow" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#3a2a18" stop-opacity=".55"/><stop offset="1" stop-color="#3a2a18" stop-opacity="0"/></radialGradient><radialGradient id="ag-dark" cx=".5" cy=".5" r=".7"><stop offset="0" stop-color="#03040a" stop-opacity=".5"/><stop offset="1" stop-color="#03040a" stop-opacity=".78"/></radialGradient>
 <radialGradient id="ag-dark-frost" cx=".5" cy=".5" r=".7"><stop offset="0" stop-color="#0a1a34" stop-opacity=".5"/><stop offset="1" stop-color="#040a1a" stop-opacity=".8"/></radialGradient>
 <radialGradient id="ag-dark-smoke" cx=".5" cy=".5" r=".7"><stop offset="0" stop-color="#101a0a" stop-opacity=".55"/><stop offset="1" stop-color="#060a04" stop-opacity=".82"/></radialGradient>
 <radialGradient id="ag-dark-blood" cx=".5" cy=".5" r=".7"><stop offset="0" stop-color="#2a0608" stop-opacity=".5"/><stop offset="1" stop-color="#0c0204" stop-opacity=".82"/></radialGradient>
@@ -12731,6 +12737,8 @@ function renderMap() {
   if (svg.classList.contains('benvmap')) gFloor.querySelectorAll('[data-room]').forEach(n => n.classList.toggle('off', !roomVisible(n.dataset.room) || roomDark(G, n.dataset.room))); // v63c: světla na podlaze
   gDecor.querySelectorAll('[data-room]').forEach(n => n.classList.toggle('fogged', !roomVisible(n.dataset.room)));
   for (const sp of G.spots) if (sp.sensed && !roomVisible(C.roomOf(sp.hex))) { const f = gDepth.querySelector(`.furn[data-k="${C.K(sp.hex)}"]`); if (f) f.classList.remove('fogged'); }
+  // v94: cíle scénáře (kašna, oltář) jsou vidět i v mlze, ať lovci vědí, kam jít
+  for (const lh of fogLandmarks()) if (!roomVisible(C.roomOf(lh))) gDepth.querySelectorAll(`.furn[data-k="${C.K(lh)}"]`).forEach(f => { f.classList.remove('fogged'); f.classList.add('landmark'); });
   for (const d of G.doors) {
     const g = gDepth.querySelector(`[data-door="${d.id}"]`); if (!g) continue;
     g.classList.remove('closed', 'open', 'locked'); g.classList.add(d.state === 'arch' ? 'open' : d.state === 'bars' || d.state === 'shut' ? 'closed' : d.state === 'fake' ? 'locked' : d.state);
@@ -12755,6 +12763,7 @@ function renderMap() {
   // v60: podlaha východu a dveří mimo obdélník místnosti (spodní zeď) se v mlze nesmí prozradit
   if (C.MAP.exit && !roomVisible(C.EXIT_ROOM)) { const [x, y] = px(C.EXIT); ov += `<path d="${hexPts(x, y, SIZE + 3)}" fill="#030204"/><rect x="${x - WPX}" y="${y - 6}" width="${WPX * 2}" height="${TW + 14}" fill="#030204"/>`; }
   for (const d of G.doors) if (!d.rooms.some(roomVisible)) ov += `<path d="${pts(d.hex, SIZE + 2)}" fill="#030204"/>`;
+  for (const lh of fogLandmarks()) if (!roomVisible(C.roomOf(lh))) { const [lx, ly] = px(lh); ov += `<ellipse cx="${lx}" cy="${ly}" rx="${SIZE * 1.3}" ry="${SIZE * 0.95}" fill="url(#lmglow)"/><text x="${lx}" y="${ly + SIZE * KY + 14}" text-anchor="middle" class="lm-lbl">${C.eq(lh, C.MAP.altar) ? 'Krvavý oltář' : 'Svěcená kašna'}</text>`; }
   for (const sp of G.spots) if (sp.sensed && !roomVisible(C.roomOf(sp.hex))) ov += `<path d="${pts(sp.hex, SIZE - 1)}" fill="#241e1a" stroke="#f3cf8e" stroke-opacity=".6" stroke-width="1" stroke-dasharray="2 2"/>`;
   for (const d of G.doors) if (d.rooms.some(r => roomVisible(r) && roomDark(G, r)) && d.rooms.some(roomVisible)) ov += `<path d="${pts(d.hex, SIZE - .5)}" fill="#03040a" opacity=".62"/>`;
   if (envOn()) for (const d of G.doors) { const dd = C.DOOR_DEFS.find(x => x.id === d.id); if (!dd || !dd.arch || !d.rooms.some(roomVisible)) continue; const [x, y] = px(d.hex); ov += `<g class="barch"><path d="${hexPts(x, y, SIZE - 1.5)}" fill="#c8d4e8" opacity=".07"/><ellipse cx="${x}" cy="${y}" rx="${(WPX * .62).toFixed(1)}" ry="${(SIZE * KY * 1.05).toFixed(1)}" fill="url(#ag-cold)" opacity=".75"/></g>`; }
