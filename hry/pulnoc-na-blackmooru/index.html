@@ -2298,7 +2298,7 @@ body.bui #menupop > label, body.bui #menupop > .pop-row { align-self: center; ju
 .btrap.on path{fill:#c8a060;fill-opacity:.1;stroke:#e8c890;stroke-opacity:.55;stroke-width:1;stroke-dasharray:3 2}.bpush{fill:none;stroke:#f0d8a0;stroke-width:1.6;stroke-opacity:.75;stroke-dasharray:4 3;stroke-linecap:round;pointer-events:none}.bpush-from{fill:#f0d8a0;fill-opacity:.7;pointer-events:none}
 .morph-agony{animation:morphA 1.1s ease-in-out}@keyframes morphA{0%{transform:none;filter:none}12%{transform:translate(-1.5px,0) scale(1.06,.92);filter:brightness(.6) sepia(1) hue-rotate(-30deg) saturate(3)}24%{transform:translate(1.5px,-1px) scale(.94,1.08)}36%{transform:translate(-2px,1px) scale(1.08,.9);filter:brightness(1.6)}48%{transform:translate(2px,0) scale(.92,1.1);filter:brightness(.5) sepia(1) hue-rotate(-30deg) saturate(3)}62%{transform:translate(-1px,0) scale(1.05,.95)}78%{transform:scale(.97,1.04);filter:brightness(1.3)}100%{transform:none;filter:none}}
 .morph-relief{animation:morphR .9s ease-out}@keyframes morphR{0%{transform:scale(.96,1.02);filter:none}40%{transform:translateY(-3px) scale(1.04,1.06);filter:brightness(1.5) drop-shadow(0 0 4px #cfe0ff)}100%{transform:none;filter:none}}
-.room-lbl{display:none}
+.room-lbl{display:none}.e10zone{fill:none;stroke:#e8f0ff;stroke-opacity:.22;stroke-width:1.1;stroke-dasharray:1.5 3;stroke-linecap:round;pointer-events:none}
 .e11grade,.e11fogs,.e11fog{pointer-events:none}.bzone{fill:none;stroke:#d8f4ff;stroke-opacity:.5;stroke-width:1.2;stroke-dasharray:3 3;stroke-linecap:round;pointer-events:none;animation:bzone 3s ease-in-out infinite alternate}@keyframes bzone{from{stroke-opacity:.32}to{stroke-opacity:.62}}.e11gl{animation:e11gl 3.2s ease-in-out infinite alternate}@keyframes e11gl{from{opacity:.35}to{opacity:1}}
 .e9grade,.e9beams,.e9sky,.e9pools{pointer-events:none}.e9wfl{opacity:0}.e9pool{opacity:.8;mix-blend-mode:plus-lighter}.e9beams{mix-blend-mode:screen;animation:e9sh 7s ease-in-out infinite alternate}@keyframes e9sh{from{opacity:.75}to{opacity:1}}.e9halo{animation:e9sh 5s ease-in-out infinite alternate}
 .e9strike .e9wfl{animation:e9fl 1.5s linear}.e9strike .e9sky{animation-name:e9fls}.e9strike .e9skybg{animation-name:e9flb}.e9strike .e9beamf{animation-name:e9flr}.e9strike .e9pool{animation:e9flp 1.5s linear}
@@ -3288,31 +3288,24 @@ MAPS.mlha = {
   ],
   heroStart: [[1, 2], [2, 2], [1, 3]], startRoom: 'A', setupBanned: ['A'],
 };
-// Divoký hon – v99: kruhová paseka kolem velké hájovny uprostřed (hájovna = prázdné místo mezi čtyřmi částmi lesa),
-// čtyři výseče lesa oddělené řídkým houštím s mnoha průchody, živelně rozházené stromy (pevně vygenerováno, bez slepých cest)
+// Divoký hon – v99b: kulatá paseka kolem velké hájovny; místnosti nemají obdélníkový tvar (cells) a nejsou mezi nimi zdi,
+// čtyři výseče kolem hájovny se liší jen podlahou (a Tmou). Za hájovnou se dá chodit. Pevně vygenerováno, bez slepých cest.
 MAPS.les = (() => {
-  const F = [['1,1','block','Hustý les','tree'],['2,1','block','Hustý les','tree'],['3,1','block','Hustý les','tree'],['4,1','block','Hustý les','tree'],['5,1','block','Hustý les','tree'],['6,1','block','Hustý les','tree'],['15,1','block','Hustý les','tree'],['16,1','block','Hustý les','tree'],['17,1','block','Hustý les','tree'],['18,1','block','Hustý les','tree'],['19,1','block','Hustý les','tree'],['1,2','block','Hustý les','tree'],['2,2','block','Hustý les','tree'],['3,2','block','Hustý les','tree'],['4,2','block','Hustý les','tree'],['5,2','block','Hustý les','tree'],['17,2','block','Hustý les','tree'],['18,2','block','Hustý les','tree'],['19,2','block','Hustý les','tree'],['20,2','block','Hustý les','tree'],['1,3','block','Hustý les','tree'],['18,3','block','Hustý les','tree'],['19,3','block','Hustý les','tree'],['1,4','block','Hustý les','tree'],['19,4','block','Hustý les','tree'],['20,4','block','Hustý les','tree'],['19,5','block','Hustý les','tree'],['1,6','block','Hustý les','tree'],['19,6','block','Hustý les','tree'],['20,6','block','Hustý les','tree'],['1,7','block','Hustý les','tree'],['19,7','block','Hustý les','tree'],['1,8','block','Hustý les','tree'],['20,8','block','Hustý les','tree'],['20,10','block','Hustý les','tree'],['1,12','block','Hustý les','tree'],['2,12','block','Hustý les','tree'],['20,12','block','Hustý les','tree'],['1,13','block','Hustý les','tree'],['2,13','block','Hustý les','tree'],['3,13','block','Hustý les','tree'],['17,13','block','Hustý les','tree'],['18,13','block','Hustý les','tree'],['19,13','block','Hustý les','tree'],['1,14','block','Hustý les','tree'],['2,14','block','Hustý les','tree'],['3,14','block','Hustý les','tree'],['4,14','block','Hustý les','tree'],['16,14','block','Hustý les','tree'],['17,14','block','Hustý les','tree'],['18,14','block','Hustý les','tree'],['19,14','block','Hustý les','tree'],['20,14','block','Hustý les','tree'],['1,15','block','Hustý les','tree'],['2,15','block','Hustý les','tree'],['3,15','block','Hustý les','tree'],['4,15','block','Hustý les','tree'],['5,15','block','Hustý les','tree'],['12,15','block','Hustý les','tree'],['15,15','block','Hustý les','tree'],['16,15','block','Hustý les','tree'],['17,15','block','Hustý les','tree'],['18,15','block','Hustý les','tree'],['19,15','block','Hustý les','tree'],['10,1','block','Bříza','tree'],['11,1','block','Smrk','tree'],['6,2','block','Bříza','tree'],['7,2','block','Smrk','tree'],['11,2','block','Bříza','tree'],['12,2','block','Smrk','tree'],['16,2','block','Bříza','tree'],['7,3','block','Bříza','tree'],['16,3','block','Smrk','tree'],['11,4','block','Smrk','tree'],['17,5','block','Smrk','tree'],['18,5','rough','Houští','bush'],['16,6','block','Smrk','tree'],['17,6','block','Buk','tree'],['2,7','block','Smrk','tree'],['16,7','rough','Houští','bush'],['2,8','block','Bříza','tree'],['3,8','block','Smrk','tree'],['14,9','rough','Houští','bush'],['19,9','block','Smrk','tree'],['9,12','block','Smrk','tree'],['4,13','block','Buk','tree'],['5,14','block','Buk','tree'],['11,14','block','Smrk','tree'],['11,15','rough','Houští','bush'],['13,15','rough','Houští','bush'],['9,4','block','Hranice dříví','logs'],['12,12','block','Kozlík s pilou','sawhorse'],['14,7','block','Sud na dešťovku','barrel'],['6,9','block','Špalek se sekerou','stump'],['3,4','block','Posed','seat'],['18,8','block','Krmelec','trough']];
+  const F = [['1,10','block','Buk','tree'],['2,10','block','Smrk','tree'],['3,3','block','Smrk','tree'],['4,2','rough','Houští','bush'],['4,7','block','Smrk','tree'],['5,9','rough','Houští','bush'],['5,10','block','Smrk','tree'],['6,6','rough','Houští','bush'],['6,10','block','Buk','tree'],['7,10','block','Smrk','tree'],['7,11','block','Buk','tree'],['7,12','block','Smrk','tree'],['8,9','rough','Houští','bush'],['9,1','block','Smrk','tree'],['10,1','block','Bříza','tree'],['10,9','block','Buk','tree'],['10,13','block','Smrk','tree'],['11,8','block','Smrk','tree'],['11,12','block','Bříza','tree'],['12,7','rough','Houští','bush'],['12,9','block','Smrk','tree'],['12,11','block','Buk','tree'],['13,4','block','Bříza','tree'],['13,6','block','Smrk','tree'],['13,7','block','Buk','tree'],['13,8','block','Smrk','tree'],['13,10','block','Smrk','tree'],['15,8','block','Smrk','tree'],['16,4','block','Smrk','tree'],['7,8','block','Hranice dříví','logs'],['11,7','block','Sud na dešťovku','barrel'],['16,9','block','Posed','seat'],['6,13','block','Krmelec','trough'],['1,5','block','Kozlík s pilou','sawhorse'],['11,1','block','Špalek se sekerou','stump']];
   const furn = F.map(([k, kind, name, icon]) => ({ hex: k.split(',').map(Number), kind, name, icon }));
-  const doors = [[13, 1], [13, 3], [7, 13], [7, 15], [2, 5], [3, 5], [5, 5], [6, 5], [14, 11], [15, 11], [17, 11], [18, 11]].map((h, i) => ({ id: 'p' + i, hex: h, rooms: [], name: 'Průchod', arch: true, path: true }));
-  const rooms = [
-    { id: 'N', name: 'Sever', k0: 0, k1: 13, y0: 0, y1: 5, floor: 'grass', wall: 'fence', outdoor: true },
-    { id: 'E', name: 'Východ', k0: 13, k1: 20, y0: 0, y1: 11, floor: 'grass', wall: 'fence', outdoor: true },
-    { id: 'S', name: 'Jih', k0: 7, k1: 20, y0: 11, y1: 16, floor: 'grass', wall: 'fence', outdoor: true },
-    { id: 'W', name: 'Západ', k0: 0, k1: 7, y0: 5, y1: 16, floor: 'grass', wall: 'fence', outdoor: true },
-  ];
-  // dveře spojují místnosti, které sousedí přes dané pole
-  const xc = h => h[0] + .5 * (h[1] & 1), inR = (h, R) => xc(h) >= R.k0 + .5 && xc(h) <= R.k1 + .5 && h[1] >= R.y0 && h[1] <= R.y1;
-  doors.forEach(d => { d.rooms = rooms.filter(R => inR(d.hex, R)).map(R => R.id); });
+  const full = { k0: 0, k1: 18, y0: 0, y1: 14, floor: 'grass', wall: 'fence', outdoor: true };
   return {
-    id: 'les', name: 'Černý les za úplňku', cols: 21, rows: 17, theme: 'yard', revealAll: true, wakeRound: 1, noRoomNames: true,
-    rooms, doors,
-    lodge: { k0: 7, k1: 13, y0: 5, y1: 11 },
-    hunt: { wolf: [15, 8], traps: [[16, 9], [14, 13], [9, 14], [6, 12], [4, 7], [9, 2], [15, 4]] },
+    id: 'les', name: 'Černý les za úplňku', cols: 19, rows: 15, theme: 'yard', revealAll: true, wakeRound: 1, noRoomNames: true,
+    rooms: [Object.assign({ id: 'N', name: 'Sever' }, full), Object.assign({ id: 'E', name: 'Východ' }, full), Object.assign({ id: 'S', name: 'Jih' }, full), Object.assign({ id: 'W', name: 'Západ' }, full)],
+    cells: {"12,4":"N","4,9":"W","5,1":"N","5,10":"S","8,9":"S","11,5":"E","2,11":"W","13,8":"E","15,5":"E","6,2":"N","7,1":"N","6,11":"S","7,10":"S","4,2":"N","3,6":"W","5,3":"N","8,2":"N","9,1":"N","5,12":"S","8,11":"S","9,10":"S","11,7":"E","2,4":"N","1,8":"W","13,10":"E","6,4":"N","15,7":"E","7,3":"N","16,6":"E","6,13":"S","7,12":"S","3,8":"W","5,5":"W","14,8":"E","17,7":"E","9,3":"N","9,12":"S","11,9":"E","13,3":"N","1,10":"W","13,12":"S","6,6":"W","15,9":"E","16,8":"E","12,13":"S","3,10":"W","5,7":"W","14,10":"E","11,2":"N","13,5":"E","15,2":"N","15,11":"E","16,10":"E","12,6":"E","3,3":"N","14,3":"N","3,12":"W","5,9":"W","4,11":"S","14,12":"E","11,4":"N","1,5":"W","13,7":"E","6,1":"N","15,4":"E","7,9":"S","12,8":"E","3,5":"W","5,2":"N","4,4":"N","14,5":"E","5,11":"S","4,13":"S","9,9":"S","10,1":"N","8,13":"S","10,10":"S","1,7":"W","13,9":"E","2,6":"W","15,6":"E","7,2":"N","16,5":"E","7,11":"S","12,1":"N","12,10":"S","3,7":"W","5,4":"N","4,6":"W","14,7":"E","9,2":"N","5,13":"S","10,3":"N","13,2":"N","10,12":"S","1,9":"W","11,11":"S","2,8":"W","13,11":"E","7,4":"N","16,7":"E","6,8":"W","12,3":"N","12,12":"S","3,9":"W","5,6":"W","4,8":"W","14,9":"E","13,4":"N","11,13":"S","2,10":"W","16,9":"E","6,10":"S","12,5":"E","3,2":"N","14,2":"N","3,11":"W","14,11":"E","4,10":"W","8,1":"N","8,10":"S","2,3":"N","6,3":"N","6,12":"S","12,7":"E","3,4":"N","14,4":"E","4,3":"N","4,12":"S","17,6":"E","8,3":"N","8,12":"S","10,9":"S","1,6":"W","9,11":"S","2,5":"W","11,8":"E","16,4":"E","15,8":"E","6,5":"N","7,13":"S","12,9":"E","14,6":"E","4,5":"W","17,8":"E","10,2":"N","11,1":"N","10,11":"S","9,13":"S","11,10":"S","2,7":"W","13,13":"S","15,10":"E","6,7":"W","7,6":"W","12,2":"N","12,11":"S","4,7":"W","5,8":"W","11,3":"N","10,13":"S","11,12":"S","2,9":"W","13,6":"E","15,3":"N","6,9":"S","7,8":"W"},
+    doors: [],
+    lodge: { x: 9.0, y: 9.4, sc: 0.92, hexes: [[7, 5], [7, 7], [8, 4], [8, 5], [8, 6], [8, 7], [8, 8], [9, 4], [9, 5], [9, 6], [9, 7], [9, 8], [10, 4], [10, 5], [10, 6], [10, 7], [10, 8], [11, 6]] },
+    hunt: { wolf: [15, 6], traps: [[4, 5], [7, 2], [11, 3], [16, 7], [14, 11], [9, 12], [3, 11]] },
     exit: null,
-    spots: [{ id: 's1', name: 'Hranice dříví', hex: [9, 4], icon: 'logs', existing: true }, { id: 's2', name: 'Kozlík s pilou', hex: [12, 12], icon: 'sawhorse', existing: true }, { id: 's3', name: 'Sud na dešťovku', hex: [14, 7], icon: 'barrel', existing: true }, { id: 's4', name: 'Špalek se sekerou', hex: [6, 9], icon: 'stump', existing: true }, { id: 's5', name: 'Posed', hex: [3, 4], icon: 'seat', existing: true }, { id: 's6', name: 'Krmelec', hex: [18, 8], icon: 'trough', existing: true }],
+    spots: [{ id: 's1', name: 'Hranice dříví', hex: [7, 8], icon: 'logs', existing: true }, { id: 's2', name: 'Sud na dešťovku', hex: [11, 7], icon: 'barrel', existing: true }, { id: 's3', name: 'Posed', hex: [16, 9], icon: 'seat', existing: true }, { id: 's4', name: 'Krmelec', hex: [6, 13], icon: 'trough', existing: true }, { id: 's5', name: 'Kozlík s pilou', hex: [1, 5], icon: 'sawhorse', existing: true }, { id: 's6', name: 'Špalek se sekerou', hex: [11, 1], icon: 'stump', existing: true }],
     furn,
-    spawns: [{ id: 'r1', hex: [9, 1], kind: 'grave', name: 'Doupě' }, { id: 'r2', hex: [17, 7], kind: 'grave', name: 'Doupě' }, { id: 'r3', hex: [9, 15], kind: 'grave', name: 'Doupě' }],
-    heroStart: [[2, 10], [3, 10], [3, 11]], startRoom: 'W', setupBanned: ['W'],
+    spawns: [{ id: 'r1', hex: [15, 3], kind: 'grave', name: 'Doupě' }, { id: 'r2', hex: [17, 7], kind: 'grave', name: 'Doupě' }, { id: 'r3', hex: [13, 13], kind: 'grave', name: 'Doupě' }],
+    heroStart: [[2, 7], [2, 8], [3, 8]], startRoom: 'W', setupBanned: ['W'],
   };
 })();
 // Zatopené kanály – tři stoky (řada 1: horní chodník = hladina 2, řada 2: kanál, řada 3: dolní chodník = hladina 1), proud teče na západ
@@ -4152,10 +4145,12 @@ function useMap(id) {
   for (let r = 0; r < ROWS; r++) for (let c = 0; c < COLS; c++) {
     const x = xcOf([c, r]);
     for (const R of ROOM_DEFS) {
-      if (x > R.k0 + 0.5 && x < R.k1 + 0.5 && r > R.y0 && r < R.y1) ROOM_OF.set(K([c, r]), R.id);
+      if (!M.cells && x > R.k0 + 0.5 && x < R.k1 + 0.5 && r > R.y0 && r < R.y1) ROOM_OF.set(K([c, r]), R.id);
       if (x >= R.k0 + 0.5 && x <= R.k1 + 0.5 && r >= R.y0 && r <= R.y1) HOUSE.add(K([c, r]));
     }
   }
+  // v99: místnosti libovolného tvaru (M.cells: 'c,r' → id); mezi nimi nejsou zdi, jen vnější okraj obdélníku
+  if (M.cells) for (const [k, id] of Object.entries(M.cells)) ROOM_OF.set(k, id);
   DOOR_DEFS = M.doors.map(d => Object.assign({}, d, { hex: d.hex.slice() }));
   DOOR_OF = new Map(DOOR_DEFS.map(d => [K(d.hex), d]));
   EXIT = M.exit ? M.exit.slice() : NOWHERE; EXIT_ROOM = M.exitRoom || null;
@@ -4176,7 +4171,7 @@ function useMap(id) {
   LOCKABLE = DOOR_DEFS.filter(d => !d.arch && !d.noLock).map(d => d.id);
   WALL_ZONES = new Map(); FENCE_HEXES = new Set();
   ALL_HEXES = []; for (let r = 0; r < ROWS; r++) for (let c = 0; c < COLS; c++) if (isPlayable([c, r])) ALL_HEXES.push([c, r]);
-  for (const k of HOUSE) { const h = unK(k); if (isPlayable(h)) continue; const x = xcOf(h), zs = ROOM_DEFS.filter(R => x >= R.k0 + 0.5 && x <= R.k1 + 0.5 && h[1] >= R.y0 && h[1] <= R.y1).map(R => R.id); const nearRoom = neighbors(h).some(n => zs.includes(roomOf(n))); if (zs.length && nearRoom) { WALL_ZONES.set(k, zs); if (zs.every(z => OUTDOOR.has(z))) FENCE_HEXES.add(k); } }
+  for (const k of HOUSE) { const h = unK(k); if (isPlayable(h)) continue; if (M.cells && ROOM_DEFS.every(R => { const x = xcOf(h); return x > R.k0 + 0.5 && x < R.k1 + 0.5 && h[1] > R.y0 && h[1] < R.y1; })) continue; const x = xcOf(h), zs = ROOM_DEFS.filter(R => x >= R.k0 + 0.5 && x <= R.k1 + 0.5 && h[1] >= R.y0 && h[1] <= R.y1).map(R => R.id); const nearRoom = neighbors(h).some(n => zs.includes(roomOf(n))); if (zs.length && nearRoom) { WALL_ZONES.set(k, zs); if (zs.every(z => OUTDOOR.has(z))) FENCE_HEXES.add(k); } }
   WALL_HEXES = [...WALL_ZONES.keys()].map(unK);
   ROOM_HEXES = ALL_HEXES.filter(h => roomOf(h));
   CIRCLES = computeCircles(M.circleRooms || []);
@@ -4194,7 +4189,7 @@ function useMap(id) {
 function linkOK(a, b) {
   if (!isPlayable(a) || !isPlayable(b)) return false;
   const ra = roomOf(a), rb = roomOf(b);
-  if (ra && rb) return ra === rb;
+  if (ra && rb) return ra === rb || !!MAP.cells;
   if (ra) return zonesOf(b).includes(ra);
   if (rb) return zonesOf(a).includes(rb);
   return false;
@@ -11894,7 +11889,9 @@ async function e2Floor() {
     const gr = g.createRadialGradient(x, y, 2, x, y, SIZE); gr.addColorStop(0, 'rgba(150,90,220,.32)'); gr.addColorStop(1, 'rgba(90,40,160,0)'); g.fillStyle = gr; g.fillRect(x - SIZE, y - SIZE, 2 * SIZE, 2 * SIZE);
     envSigil(g, x, y, sd); g.save(); g.globalCompositeOperation = 'lighter'; g.globalAlpha = .8; envSigil(g, x, y, sd); g.restore();
     drawS((sp.hex[0] + sp.hex[1]) % 2 ? 'y_hole1' : 'y_hole2', x, y + .5, sp.hex[0] % 2 === 1, 1, .8); }
-  return `<image href="${cv.toDataURL()}" x="0" y="0" width="${VW}" height="${VH}" class="px"/>` + `<path d="${C.FURN_DEFS.filter(f => f.kind === 'rough').map(f => pts(f.hex, SIZE - 3)).join('')}" fill="none" stroke="#e8e8f0" stroke-opacity=".14" stroke-width=".9" stroke-dasharray="2 2"/>`;
+  // hranice místností: jemná tečkovaná čára (místnosti jsou kvůli Tmě a rozmístění skupin)
+  const zones = C.ROOM_DEFS.map(R => `<path class="e10zone" d="${hexOutline(C.ROOM_HEXES.filter(h => C.roomOf(h) === R.id), SIZE - 1.2)}"/>`).join('');
+  return `<image href="${cv.toDataURL()}" x="0" y="0" width="${VW}" height="${VH}" class="px"/>` + zones + `<path d="${C.FURN_DEFS.filter(f => f.kind === 'rough').map(f => pts(f.hex, SIZE - 3)).join('')}" fill="none" stroke="#e8e8f0" stroke-opacity=".14" stroke-width=".9" stroke-dasharray="2 2"/>`;
 }
 // vysoká hřbitovní zeď s námrazou (textura už má zasněženou římsu s rampouchy)
 function e2WallH(xa, xb, row, h) {
@@ -12013,7 +12010,9 @@ async function e7Floor() {
   for (const sp of C.SPAWN_DEFS) { const [x, y] = px(sp.hex), sd = sp.hex[0] * 613 + sp.hex[1] * 211 + 5;
     const gr = g.createRadialGradient(x, y, 2, x, y, SIZE); gr.addColorStop(0, 'rgba(150,90,220,.28)'); gr.addColorStop(1, 'rgba(90,40,160,0)'); g.fillStyle = gr; g.fillRect(x - SIZE, y - SIZE, 2 * SIZE, 2 * SIZE);
     envSigil(g, x, y, sd); g.save(); g.globalCompositeOperation = 'lighter'; g.globalAlpha = .7; envSigil(g, x, y, sd); g.restore(); }
-  return `<image href="${cv.toDataURL()}" x="0" y="0" width="${VW}" height="${VH}" class="px"/>` + `<path d="${C.FURN_DEFS.filter(f => f.kind === 'rough').map(f => pts(f.hex, SIZE - 3)).join('')}" fill="none" stroke="#dce6f0" stroke-opacity=".14" stroke-width=".9" stroke-dasharray="2 2"/>`;
+  // hranice místností: jemná tečkovaná čára (místnosti jsou kvůli Tmě a rozmístění skupin)
+  const zones = C.ROOM_DEFS.map(R => `<path class="e10zone" d="${hexOutline(C.ROOM_HEXES.filter(h => C.roomOf(h) === R.id), SIZE - 1.2)}"/>`).join('');
+  return `<image href="${cv.toDataURL()}" x="0" y="0" width="${VW}" height="${VH}" class="px"/>` + zones + `<path d="${C.FURN_DEFS.filter(f => f.kind === 'rough').map(f => pts(f.hex, SIZE - 3)).join('')}" fill="none" stroke="#dce6f0" stroke-opacity=".14" stroke-width=".9" stroke-dasharray="2 2"/>`;
 }
 // ploty: SVG vzorky (levné, navazují přes úseky)
 function e7Defs(defs) {
@@ -12157,7 +12156,9 @@ async function e8Floor() {
     g.fillStyle = 'rgba(0,0,0,.7)'; g.beginPath(); g.ellipse(x, y + 1, 9, 5, 0, 0, 7); g.fill();
     const gr = g.createRadialGradient(x, y, 2, x, y, SIZE); gr.addColorStop(0, 'rgba(150,90,220,.26)'); gr.addColorStop(1, 'rgba(90,40,160,0)'); g.fillStyle = gr; g.fillRect(x - SIZE, y - SIZE, 2 * SIZE, 2 * SIZE);
     envSigil(g, x, y, sd); g.save(); g.globalCompositeOperation = 'lighter'; g.globalAlpha = .7; envSigil(g, x, y, sd); g.restore(); }
-  return `<image href="${cv.toDataURL()}" x="0" y="0" width="${VW}" height="${VH}" class="px"/>` + `<path d="${C.FURN_DEFS.filter(f => f.kind === 'rough').map(f => pts(f.hex, SIZE - 3)).join('')}" fill="none" stroke="#f0e0c8" stroke-opacity=".14" stroke-width=".9" stroke-dasharray="2 2"/>`;
+  // hranice místností: jemná tečkovaná čára (místnosti jsou kvůli Tmě a rozmístění skupin)
+  const zones = C.ROOM_DEFS.map(R => `<path class="e10zone" d="${hexOutline(C.ROOM_HEXES.filter(h => C.roomOf(h) === R.id), SIZE - 1.2)}"/>`).join('');
+  return `<image href="${cv.toDataURL()}" x="0" y="0" width="${VW}" height="${VH}" class="px"/>` + zones + `<path d="${C.FURN_DEFS.filter(f => f.kind === 'rough').map(f => pts(f.hex, SIZE - 3)).join('')}" fill="none" stroke="#f0e0c8" stroke-opacity=".14" stroke-width=".9" stroke-dasharray="2 2"/>`;
 }
 // stěny: textura (hrázděné zdivo / prkna) z plátna, vršek = trám
 function e8WallH(xa, xb, row, h, roomId) {
@@ -12338,7 +12339,9 @@ async function e9Floor() {
       pools += `<g class="e9pool" style="--c:${w.c};--o:${op}"><image class="px" href="${e9PoolImg(w.n) || sp.u}" x="${(cx - ww / 2).toFixed(1)}" y="${(cy - hh / 2).toFixed(1)}" width="${ww.toFixed(1)}" height="${hh.toFixed(1)}" transform="translate(0 ${(2 * cy).toFixed(1)}) scale(1 -1)" preserveAspectRatio="none" opacity="${op}"/></g>`;
     }
   }
-  return `<image href="${cv.toDataURL()}" x="0" y="0" width="${VW}" height="${VH}" class="px"/>` + `<path d="${C.FURN_DEFS.filter(f => f.kind === 'rough').map(f => pts(f.hex, SIZE - 3)).join('')}" fill="none" stroke="#e0e0ff" stroke-opacity=".14" stroke-width=".9" stroke-dasharray="2 2"/>`
+  // hranice místností: jemná tečkovaná čára (místnosti jsou kvůli Tmě a rozmístění skupin)
+  const zones = C.ROOM_DEFS.map(R => `<path class="e10zone" d="${hexOutline(C.ROOM_HEXES.filter(h => C.roomOf(h) === R.id), SIZE - 1.2)}"/>`).join('');
+  return `<image href="${cv.toDataURL()}" x="0" y="0" width="${VW}" height="${VH}" class="px"/>` + zones + `<path d="${C.FURN_DEFS.filter(f => f.kind === 'rough').map(f => pts(f.hex, SIZE - 3)).join('')}" fill="none" stroke="#e0e0ff" stroke-opacity=".14" stroke-width=".9" stroke-dasharray="2 2"/>`
     + `<defs><filter id="e9poolB" x="-20%" y="-20%" width="140%" height="140%" color-interpolation-filters="sRGB"><feGaussianBlur stdDeviation="1.6"/></filter></defs><g class="e9pools">${pools}</g>`;
 }
 const E9_SL = .28;
@@ -12480,22 +12483,21 @@ function e9Storm() {
 }
 // ---------- v98: beta prostředí bosse Divoký hon (BetaEnv10): Černý les, úplněk × mraky ----------
 const env10On = () => betaOn() && !!C.MAP && C.MAP.id === 'les' && typeof BetaEnv10 !== 'undefined' && typeof BetaEnv !== 'undefined' && typeof BetaEnv3 !== 'undefined' && typeof BetaEnv8 !== 'undefined';
-const E10_FLOOR = { N: 'n_f_needle', E: 'n_f_moss', S: 'n_f_leaf', W: 'n_f_moss' };
+const E10_FLOOR = { N: 'n_f_needle', E: 'n_f_den', S: 'n_f_leaf', W: 'n_f_moss' };
 const E10_MSC = { n_f_moss: .55, n_f_needle: .55, n_f_leaf: .5, n_f_brook: .5, n_f_mud: .55, n_f_den: .55 };
 const E10_TINT = { N: 'rgba(0,6,8,.12)', S: 'rgba(14,8,2,.08)' };
 const E10_MOON = () => [VW / 2, 70]; // v99: měsíc nahoře uprostřed jako dominanta; stíny padají od něj
-const e10Lodge = () => C.MAP && C.MAP.lodge; // prázdné místo uprostřed = hájovna
-const e10InLodgeX = (x, row) => { const L = e10Lodge(); return !!L && (row === L.y0 || row === L.y1) && x > wx(L.k0) - 6 && x < wx(L.k1) + 6; };
+const e10Lodge = () => C.MAP && C.MAP.lodge; // hájovna uprostřed: { x, y (kotva spritu v hex jednotkách), sc, hexes (neprůchozí půdorys) }
+// pole uvnitř mapy, která nejsou paseka ani hájovna = hustý les na okraji (jen kulisa)
+const e10Edge = () => { const L = e10Lodge(), lk = new Set(((L && L.hexes) || []).map(C.K)), out = []; for (let r = 1; r < C.ROWS - 1; r++) for (let c = 0; c < C.COLS; c++) { const h = [c, r], x = C.xcOf(h); if (x <= .5 || x >= C.COLS - .5 || C.roomOf(h) || lk.has(C.K(h))) continue; out.push(h); } return out; };
 const e10Mat = (h, r) => E10_FLOOR[r] || 'n_f_moss';
 async function e10Floor() {
   const I = await envLoad(), K = 2, cv = document.createElement('canvas');
   cv.width = Math.ceil(VW * K); cv.height = Math.ceil(VH * K);
   const g = cv.getContext('2d'); g.imageSmoothingEnabled = false; g.setTransform(K, 0, 0, K, 0, 0);
   const patFill = (m, x, y, w, h, dark) => { const im = I[m]; if (!im || !im.width) return; const p = g.createPattern(im, 'repeat'), sc = E10_MSC[m] || .5; p.setTransform(new DOMMatrix([EK * sc * 2, 0, 0, EK * sc * 2 * KY, 0, 0])); g.fillStyle = p; g.fillRect(x, y, w, h); if (dark) { g.fillStyle = `rgba(2,4,6,${dark})`; g.fillRect(x, y, w, h); } };
-  patFill('n_f_needle', 0, wy(0) - 8, VW, VH, .6);
-  for (const R of C.ROOM_DEFS) { const x0 = wx(R.k0), y0 = wy(R.y0) - 2, w = wx(R.k1) - x0, h = wy(R.y1) - wy(R.y0) + 4; patFill(E10_FLOOR[R.id], x0, y0, w, h, .45); }
-  { const L = e10Lodge(); if (L) patFill('n_f_mud', wx(L.k0), wy(L.y0), wx(L.k1) - wx(L.k0), wy(L.y1) - wy(L.y0), .4); }
-  const edge = new Set(C.FURN_DEFS.filter(f => f.name === 'Hustý les').map(f => C.K(f.hex)));
+  patFill('n_f_needle', 0, wy(0) - 8, VW, VH, .62);
+  const edge = new Set();
   const floorHexes = C.ROOM_HEXES.concat(C.DOOR_DEFS.map(d => d.hex)).filter(h => !edge.has(C.K(h))).slice().sort((a, b) => a[1] - b[1]);
   const s = SIZE - 1.4;
   for (const h of floorHexes) {
@@ -12514,7 +12516,7 @@ async function e10Floor() {
     envEdge(g, x, y, si, 0, 1, 'rgba(0,2,4,.42)', 1); envEdge(g, x, y, si, 1, 2, 'rgba(0,2,4,.5)', 1); envEdge(g, x, y, si, 2, 3, 'rgba(0,2,4,.32)', 1);
   }
   // hustý les na okraji: tmavé podrostové pole bez hran
-  for (const k of edge) { const [x, y] = px(C.unK(k)); const gr = g.createRadialGradient(x, y, 2, x, y, SIZE * 1.3); gr.addColorStop(0, 'rgba(2,6,4,.75)'); gr.addColorStop(1, 'rgba(2,6,4,0)'); g.fillStyle = gr; g.fillRect(x - SIZE * 1.4, y - SIZE * 1.4, SIZE * 2.8, SIZE * 2.8); }
+  for (const h of e10Edge()) { const [x, y] = px(h); const gr = g.createRadialGradient(x, y, 2, x, y, SIZE * 1.3); gr.addColorStop(0, 'rgba(2,6,4,.75)'); gr.addColorStop(1, 'rgba(2,6,4,0)'); g.fillStyle = gr; g.fillRect(x - SIZE * 1.4, y - SIZE * 1.4, SIZE * 2.8, SIZE * 2.8); }
   const drawS = (n, cx, cy, flip, a = 1, sc = 1) => { const im = I[n], sp = ES(n); if (!im || !sp) return; g.save(); g.globalAlpha = a; g.translate(cx, cy); if (flip) g.scale(-1, 1); g.drawImage(im, -sp.w * EK * sc / 2, -sp.h * EK * sc / 2, sp.w * EK * sc, sp.h * EK * sc); g.restore(); };
   const busy = new Set([...C.FURN_DEFS.map(f => C.K(f.hex)), ...C.DOOR_DEFS.map(d => C.K(d.hex)), ...C.SPAWN_DEFS.map(sp => C.K(sp.hex))]);
   for (const h of C.ROOM_HEXES) { if (busy.has(C.K(h))) continue; const rnd = envRng(h[0] * 7919 + h[1] * 104729 + 13); if (rnd() > .22) continue;
@@ -12529,7 +12531,9 @@ async function e10Floor() {
     sh += `<ellipse cx="${cx.toFixed(1)}" cy="${cy.toFixed(1)}" rx="${L * .6}" ry="9" transform="rotate(${(ang * .5 - 45).toFixed(1)} ${cx.toFixed(1)} ${cy.toFixed(1)})" fill="#01040a" fill-opacity=".38"/>`; }
   for (const h of C.ROOM_HEXES) { if (busy.has(C.K(h))) continue; const rnd = envRng(h[0] * 31 + h[1] * 17 + 7); if (rnd() > .28) continue; const [x, y] = px(h);
     dap += `<ellipse cx="${(x + (rnd() - .5) * 14).toFixed(1)}" cy="${(y + (rnd() - .5) * 6).toFixed(1)}" rx="${(8 + rnd() * 14).toFixed(1)}" ry="${(4 + rnd() * 6).toFixed(1)}" fill="url(#e10dapG)"/>`; }
-  return `<image href="${cv.toDataURL()}" x="0" y="0" width="${VW}" height="${VH}" class="px"/>` + `<path d="${C.FURN_DEFS.filter(f => f.kind === 'rough').map(f => pts(f.hex, SIZE - 3)).join('')}" fill="none" stroke="#e0f0e0" stroke-opacity=".14" stroke-width=".9" stroke-dasharray="2 2"/>`
+  // hranice místností: jemná tečkovaná čára (místnosti jsou kvůli Tmě a rozmístění skupin)
+  const zones = C.ROOM_DEFS.map(R => `<path class="e10zone" d="${hexOutline(C.ROOM_HEXES.filter(h => C.roomOf(h) === R.id), SIZE - 1.2)}"/>`).join('');
+  return `<image href="${cv.toDataURL()}" x="0" y="0" width="${VW}" height="${VH}" class="px"/>` + zones + `<path d="${C.FURN_DEFS.filter(f => f.kind === 'rough').map(f => pts(f.hex, SIZE - 3)).join('')}" fill="none" stroke="#e0f0e0" stroke-opacity=".14" stroke-width=".9" stroke-dasharray="2 2"/>`
     + `<defs><radialGradient id="e10dapG"><stop offset="0" stop-color="#cfe2ff" stop-opacity=".45"/><stop offset="1" stop-color="#9ab8e8" stop-opacity="0"/></radialGradient></defs>`
     + `<g class="e10moonL e10shadows">${sh}</g><g class="e10moonL e10dap">${dap}</g>`;
 }
@@ -12549,13 +12553,12 @@ function e10WallV(k, ya, yb, f = 1) { return e10FenceV(k, ya, yb); }
 // hranice mezi výsečemi lesa: řídké nízké houští (ostružiní, kapradí); kolem hájovny nic – tu kreslí sprite hájovny
 function e10FenceH(xa, xb, row) {
   const yb = wy(row) + TW / 2 + 1; let s = '';
-  const L = e10Lodge(), segs = L && (row === L.y0 || row === L.y1) ? [[xa, Math.min(xb, wx(L.k0))], [Math.max(xa, wx(L.k1)), xb]].filter(([a, b]) => b - a > 4) : [[xa, xb]];
+  const segs = [[xa, xb]];
   for (const [a, b] of segs) { s += `<rect x="${a.toFixed(1)}" y="${(yb - 5).toFixed(1)}" width="${(b - a).toFixed(1)}" height="5" fill="#0a1208" opacity=".55"/>`;
     for (let x = a + 4; x < b - 2; x += 13) { const r = hsh(Math.round(x), row * 7 + 3); s += envImg(r < .45 ? 'n_bramble' : r < .85 ? 'n_fern' : 'n_stump', x, yb + 1, r < .85 ? .55 + r * .25 : .5); } }
   return s;
 }
 function e10FenceV(k, ya, yb) {
-  const L = e10Lodge(); if (L && (k === L.k0 || k === L.k1) && ya >= L.y0 - .01 && yb <= L.y1 + .01) return '';
   const X = wx(k), top = wy(ya), bot = wy(yb) + TW / 2; let s = `<path d="M${X} ${(top - 4).toFixed(1)}V${bot.toFixed(1)}" stroke="#0a1208" stroke-width="4" opacity=".6"/>`;
   if (Math.round(ya * 6) % 3 === 0) { const r = hsh(Math.round(ya * 6), k * 5 + 1); s += envImg(r < .5 ? 'n_fern' : 'n_bramble', X + (r - .5) * 3, bot, .45 + r * .15); }
   return s;
@@ -12583,7 +12586,7 @@ function e10Lights() {
   defs.insertAdjacentHTML('beforeend', `<radialGradient id="e10moonG" cx="${mx}" cy="${my}" r="${VW * .75}" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#dfeaff" stop-opacity=".16"/><stop offset=".45" stop-color="#9ab8f0" stop-opacity=".07"/><stop offset="1" stop-color="#3a5a9a" stop-opacity="0"/></radialGradient>
     <radialGradient id="e10fogG"><stop offset="0" stop-color="#9aa8b8" stop-opacity=".3"/><stop offset=".6" stop-color="#6a7a8c" stop-opacity=".12"/><stop offset="1" stop-color="#4a5a6a" stop-opacity="0"/></radialGradient>
     <radialGradient id="e10halo"><stop offset="0" stop-color="#f4f8ff" stop-opacity=".5"/><stop offset=".4" stop-color="#b8ccff" stop-opacity=".16"/><stop offset="1" stop-color="#8aa0d8" stop-opacity="0"/></radialGradient>
-    <linearGradient id="e10beam" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#e4eeff" stop-opacity="0"/><stop offset=".22" stop-color="#e4eeff" stop-opacity=".17"/><stop offset=".65" stop-color="#b8ccf4" stop-opacity=".06"/><stop offset="1" stop-color="#b8ccf4" stop-opacity="0"/></linearGradient>
+    <linearGradient id="e10beam" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#e4eeff" stop-opacity="0"/><stop offset=".22" stop-color="#e4eeff" stop-opacity=".12"/><stop offset=".65" stop-color="#b8ccf4" stop-opacity=".045"/><stop offset="1" stop-color="#b8ccf4" stop-opacity="0"/></linearGradient>
     <linearGradient id="e10skyG" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#0a1428"/><stop offset="1" stop-color="#16243a"/></linearGradient>
     <linearGradient id="e10skyC" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#05080e"/><stop offset="1" stop-color="#0c121c"/></linearGradient>`);
   const gr = sv('g', { class: 'e10grade' }, `<g class="e10cloudL"><rect x="-50" y="-50" width="${VW + 100}" height="${VH + 100}" fill="#02050e" opacity=".55"/></g>`); gLight.before(gr);
@@ -12603,8 +12606,11 @@ function e10Lights() {
   sk.push(`<g class="e10cover">${[[-150, 40, 'n_cloud5', 1.6], [-30, 62, 'n_cloud3', 1.5], [90, 46, 'n_cloud2', 1.5], [10, 18, 'n_cloud1', 1.4], [-260, 30, 'n_cloud2', 1.3], [230, 34, 'n_cloud5', 1.3], [-400, 56, 'n_cloud4', 1.2], [380, 60, 'n_cloud3', 1.2]].map(([dx, y, n, s]) => envImg(n, mx + dx, y + 30, s)).join('')}</g>`);
   gBg.insertAdjacentHTML('beforeend', `<g class="e10sky">${sk.join('')}</g>`);
   // hájovna uprostřed paseky (prázdné místo mezi výsečemi), teplá okna a lucerna
-  const L = e10Lodge(); if (L && ES('n_lodge2')) { const x = (wx(L.k0) + wx(L.k1)) / 2, y = wy(L.y1) - 4;
-    gDecor.insertAdjacentHTML('afterbegin', envImg('n_lodge2', x, y, .92));
+  // hustý les na okraji paseky: stromy řazené do hloubky s figurkami
+  for (const h of e10Edge()) { const [x, y] = px(h), r = hsh(h[0] * 3 + 1, h[1] * 5 + 2), n = r < .07 ? 'n_deadpine' : r < .22 ? 'n_beech' : r < .6 ? 'n_spruce1' : 'n_spruce2';
+    depthAdd(sv('g', { class: 'furn benv e10edge', transform: `translate(${(x + (hsh(h[1], h[0]) - .5) * 8).toFixed(1)},${y.toFixed(1)})` }, envImg(n, 0, envFurnDy(n), .95 + hsh(h[0], h[1] + 9) * .25)), y); }
+  const L = e10Lodge(); if (L && ES('n_lodge2')) { const x = PADX + WPX * L.x, y = TOP + ROWH * L.y;
+    gDecor.insertAdjacentHTML('afterbegin', envImg('n_lodge2', x, y, L.sc));
     gLight.insertAdjacentHTML('afterbegin', `<g class="lit"><ellipse cx="${x + 20}" cy="${y - 50}" rx="110" ry="60" fill="url(#ag-warm)" opacity=".55"/></g>`); }
   e10Sync(S.G, true);
 }
@@ -12659,7 +12665,9 @@ async function e11Floor() {
     const gr = g.createRadialGradient(x, y, 2, x, y, SIZE); gr.addColorStop(0, 'rgba(120,200,190,.22)'); gr.addColorStop(1, 'rgba(60,120,140,0)'); g.fillStyle = gr; g.fillRect(x - SIZE, y - SIZE, 2 * SIZE, 2 * SIZE);
     envSigil(g, x, y, sd); g.save(); g.globalCompositeOperation = 'lighter'; g.globalAlpha = .6; envSigil(g, x, y, sd); g.restore(); }
   const mR = wx(Math.max(...C.ROOM_DEFS.map(r => r.k1))); patFill('s_f_peat', mR, wy(0) - 8, VW - mR, VH, .45);
-  return `<image href="${cv.toDataURL()}" x="0" y="0" width="${VW}" height="${VH}" class="px"/>` + `<path d="${C.FURN_DEFS.filter(f => f.kind === 'rough').map(f => pts(f.hex, SIZE - 3)).join('')}" fill="none" stroke="#e0f0e8" stroke-opacity=".14" stroke-width=".9" stroke-dasharray="2 2"/>`;
+  // hranice místností: jemná tečkovaná čára (místnosti jsou kvůli Tmě a rozmístění skupin)
+  const zones = C.ROOM_DEFS.map(R => `<path class="e10zone" d="${hexOutline(C.ROOM_HEXES.filter(h => C.roomOf(h) === R.id), SIZE - 1.2)}"/>`).join('');
+  return `<image href="${cv.toDataURL()}" x="0" y="0" width="${VW}" height="${VH}" class="px"/>` + zones + `<path d="${C.FURN_DEFS.filter(f => f.kind === 'rough').map(f => pts(f.hex, SIZE - 3)).join('')}" fill="none" stroke="#e0f0e8" stroke-opacity=".14" stroke-width=".9" stroke-dasharray="2 2"/>`;
 }
 function e11WallH(xa, xb, row, h, roomId) {
   const I = envImgs, K = 2, H0 = row === 0 ? 60 : h, yb = wy(row) + TW / 2, top = yb - H0, W = Math.max(1, Math.round((xb - xa) * K)), Hh = Math.ceil((yb - top + 1) * K);
@@ -12840,6 +12848,7 @@ async function buildMap() {
   const defs = sv('defs'); svg.appendChild(defs);
   if (!document.getElementById('gdefs')) { const gd = sv('svg', { id: 'gdefs', 'aria-hidden': 'true', width: 0, height: 0, style: 'position:absolute;width:0;height:0;overflow:hidden' }); gd.innerHTML = '<defs>' + A.DEFS + DEFS2 + '</defs>'; document.body.insertBefore(gd, document.body.firstChild); }
   Pix.setDefs(A.DEFS + DEFS2);
+  if (C.MAP.cells) for (const R of C.ROOM_DEFS) defs.insertAdjacentHTML('beforeend', `<clipPath id="cclip-${R.id}"><path d="${C.ROOM_HEXES.filter(h => C.roomOf(h) === R.id).map(h => pts(h, SIZE + .6)).join('')}"/></clipPath>`);
   for (const R of C.ROOM_DEFS) defs.insertAdjacentHTML('beforeend', `<clipPath id="clip-${R.id}"><rect x="${wx(R.k0)}" y="${wy(R.y0)}" width="${wx(R.k1) - wx(R.k0)}" height="${wy(R.y1) - wy(R.y0) + 3}"/></clipPath>`);
   const mk = cls => sv('g', { class: cls });
   gBg = mk('l-bg'); gFloor = mk('l-floor'); gDecor = mk('l-decor'); gDecal = mk('l-decal'); gLight = mk('l-light'); gOver = mk('l-over'); gHl = mk('l-hl'); gDepth = mk('l-depth'); gTop = mk('l-top'); gFx = mk('l-fx');
@@ -13882,7 +13891,7 @@ function renderMap() {
   for (const R of C.ROOM_DEFS) {
     const r = R.id, x0 = wx(R.k0), y0 = wy(R.y0), w = wx(R.k1) - x0, hh = wy(R.y1) - y0;
     if (!roomVisible(r)) { const top = R.y0 === 0 ? y0 - HN - 12 : y0 - 2; ov += `<rect x="${x0 - 4}" y="${top}" width="${w + 8}" height="${hh + y0 - top + 5}" fill="#030204"/>`; continue; }
-    if (roomDark(G, r)) ov += darkRoomFX(G, r, x0, y0, w, hh);
+    if (roomDark(G, r)) ov += C.MAP.cells ? `<g clip-path="url(#cclip-${r})">${darkRoomFX(G, r, x0, y0, w, hh)}</g>` : darkRoomFX(G, r, x0, y0, w, hh);
   }
   // v60: podlaha východu a dveří mimo obdélník místnosti (spodní zeď) se v mlze nesmí prozradit
   if (C.MAP.exit && !roomVisible(C.EXIT_ROOM)) { const [x, y] = px(C.EXIT); ov += `<path d="${hexPts(x, y, SIZE + 3)}" fill="#030204"/><rect x="${x - WPX}" y="${y - 6}" width="${WPX * 2}" height="${TW + 14}" fill="#030204"/>`; }
