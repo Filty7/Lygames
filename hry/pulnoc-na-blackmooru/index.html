@@ -3233,48 +3233,57 @@ MAPS.tanecnice = {
 };
 // Hřeben Banshee – mlžný les a bažiny (celá mapa je venku; mlhu kreslí UI)
 MAPS.mlha = {
+  // v98: černé jezero uprostřed s ostrůvkem (hrob na ostrově, vede k němu jediná lávka), kolem nepravidelné části lesa různých velikostí
   id: 'mlha', name: 'Mlžný les', cols: 20, rows: 15, theme: 'yard', revealAll: true, wakeRound: 1,
   rooms: [
-    { id: 'A', name: 'Okraj lesa', k0: 0, k1: 7, y0: 0, y1: 5, floor: 'grass', wall: 'fence', outdoor: true },
-    { id: 'B', name: 'Bažina', k0: 7, k1: 13, y0: 0, y1: 5, floor: 'dirt', wall: 'fence', outdoor: true },
-    { id: 'C', name: 'Staré pohřebiště', k0: 13, k1: 18, y0: 0, y1: 5, floor: 'grass', wall: 'fence', outdoor: true },
-    { id: 'D', name: 'Mlžná mýtina', k0: 0, k1: 7, y0: 5, y1: 10, floor: 'grass', wall: 'fence', outdoor: true },
-    { id: 'E', name: 'Černé jezírko', k0: 7, k1: 13, y0: 5, y1: 10, floor: 'dirt', wall: 'fence', outdoor: true },
-    { id: 'F', name: 'Kapradí', k0: 13, k1: 18, y0: 5, y1: 10, floor: 'grass', wall: 'fence', outdoor: true },
-    { id: 'H', name: 'Polámaný les', k0: 0, k1: 7, y0: 10, y1: 14, floor: 'dirt', wall: 'fence', outdoor: true },
-    { id: 'I', name: 'Rašeliniště', k0: 7, k1: 13, y0: 10, y1: 14, floor: 'dirt', wall: 'fence', outdoor: true },
-    { id: 'J', name: 'Lesní kaple', k0: 13, k1: 18, y0: 10, y1: 14, floor: 'flag', wall: 'fence', outdoor: true },
+    { id: 'A', name: 'Okraj lesa', k0: 0, k1: 5, y0: 0, y1: 6, floor: 'grass', wall: 'fence', outdoor: true },
+    { id: 'B', name: 'Bažina', k0: 5, k1: 13, y0: 0, y1: 3, floor: 'dirt', wall: 'fence', outdoor: true },
+    { id: 'C', name: 'Staré pohřebiště', k0: 13, k1: 18, y0: 0, y1: 6, floor: 'grass', wall: 'fence', outdoor: true },
+    { id: 'E', name: 'Černé jezero', k0: 5, k1: 13, y0: 3, y1: 10, floor: 'dirt', wall: 'fence', outdoor: true },
+    { id: 'D', name: 'Kamenný kruh', k0: 0, k1: 5, y0: 6, y1: 14, floor: 'grass', wall: 'fence', outdoor: true },
+    { id: 'F', name: 'Kapradí', k0: 13, k1: 18, y0: 6, y1: 10, floor: 'grass', wall: 'fence', outdoor: true },
+    { id: 'I', name: 'Rašeliniště', k0: 5, k1: 11, y0: 10, y1: 14, floor: 'dirt', wall: 'fence', outdoor: true },
+    { id: 'J', name: 'Lesní kaple', k0: 11, k1: 18, y0: 10, y1: 14, floor: 'flag', wall: 'fence', outdoor: true },
   ],
   doors: [
-    { id: 'g1', hex: [7, 1], rooms: ['A', 'B'], name: 'Průchod', gate: true }, { id: 'g2', hex: [7, 3], rooms: ['A', 'B'], name: 'Průchod', gate: true },
-    { id: 'g3', hex: [13, 3], rooms: ['B', 'C'], name: 'Průchod', gate: true }, { id: 'g4', hex: [7, 7], rooms: ['D', 'E'], name: 'Průchod', gate: true },
-    { id: 'g5', hex: [13, 7], rooms: ['E', 'F'], name: 'Průchod', gate: true }, { id: 'g6', hex: [7, 11], rooms: ['H', 'I'], name: 'Průchod', gate: true },
-    { id: 'g7', hex: [13, 11], rooms: ['I', 'J'], name: 'Průchod', gate: true }, { id: 'g8', hex: [3, 5], rooms: ['A', 'D'], name: 'Průchod', gate: true },
-    { id: 'g9', hex: [10, 5], rooms: ['B', 'E'], name: 'Průchod', gate: true }, { id: 'g10', hex: [15, 5], rooms: ['C', 'F'], name: 'Průchod', gate: true },
-    { id: 'g11', hex: [3, 10], rooms: ['D', 'H'], name: 'Průchod', gate: true }, { id: 'g12', hex: [10, 10], rooms: ['E', 'I'], name: 'Průchod', gate: true },
-    { id: 'g13', hex: [15, 10], rooms: ['F', 'J'], name: 'Průchod', gate: true },
+    { id: 'g1', hex: [5, 1], rooms: ['A', 'B'], name: 'Průchod', gate: true }, { id: 'g2', hex: [2, 6], rooms: ['A', 'D'], name: 'Průchod', gate: true },
+    { id: 'g3', hex: [13, 1], rooms: ['B', 'C'], name: 'Průchod', gate: true }, { id: 'g4', hex: [7, 3], rooms: ['B', 'E'], name: 'Průchod', gate: true },
+    { id: 'g5', hex: [13, 5], rooms: ['C', 'E'], name: 'Průchod', gate: true }, { id: 'g6', hex: [15, 6], rooms: ['C', 'F'], name: 'Průchod', gate: true },
+    { id: 'g7', hex: [13, 7], rooms: ['E', 'F'], name: 'Průchod', gate: true }, { id: 'g8', hex: [5, 7], rooms: ['D', 'E'], name: 'Průchod', gate: true },
+    { id: 'g9', hex: [5, 13], rooms: ['D', 'I'], name: 'Průchod', gate: true }, { id: 'g10', hex: [8, 10], rooms: ['E', 'I'], name: 'Průchod', gate: true },
+    { id: 'g11', hex: [16, 10], rooms: ['F', 'J'], name: 'Průchod', gate: true }, { id: 'g12', hex: [11, 11], rooms: ['I', 'J'], name: 'Průchod', gate: true },
   ],
-  comb: { graves: [[11, 2], [16, 3], [10, 12], [16, 12]], start: [10, 7], escort: [9, 8], wisps: [[4, 7], [16, 7], [9, 12]], herb: [3, 3] },
+  comb: { graves: [[9, 6], [16, 2], [2, 11], [16, 12]], start: [6, 8], escort: [7, 8], wisps: [[3, 8], [15, 8], [9, 13]], herb: [3, 3], walk: [[11, 6], [12, 6]] },
   exit: null, spots: [],
   furn: [
-    { hex: [11, 2], kind: 'low', name: 'Zapomenutý hrob', icon: 'gravecross' }, { hex: [16, 3], kind: 'low', name: 'Zapomenutý hrob', icon: 'gravecross' },
-    { hex: [10, 12], kind: 'low', name: 'Zapomenutý hrob', icon: 'gravecross' }, { hex: [16, 12], kind: 'low', name: 'Zapomenutý hrob', icon: 'gravecross' },
-    { hex: [1, 1], kind: 'block', name: 'Smrk', icon: 'tree' }, { hex: [5, 2], kind: 'block', name: 'Buk', icon: 'tree' }, { hex: [5, 4], kind: 'rough', name: 'Kapradí', icon: 'bush' },
-    { hex: [8, 2], kind: 'rough', name: 'Bahno', icon: 'water' }, { hex: [9, 3], kind: 'rough', name: 'Bahno', icon: 'water' }, { hex: [12, 1], kind: 'block', name: 'Suchý strom', icon: 'deadtree' },
-    { hex: [14, 1], kind: 'block', name: 'Smrk', icon: 'tree' }, { hex: [17, 1], kind: 'low', name: 'Náhrobek', icon: 'gravestone' }, { hex: [14, 4], kind: 'low', name: 'Náhrobek', icon: 'gravestone' },
-    { hex: [1, 6], kind: 'block', name: 'Dub', icon: 'tree' }, { hex: [5, 8], kind: 'rough', name: 'Kapradí', icon: 'bush' }, { hex: [2, 9], kind: 'block', name: 'Smrk', icon: 'tree' },
-    { hex: [9, 6], kind: 'rough', name: 'Bahno', icon: 'water' }, { hex: [11, 7], kind: 'rough', name: 'Černá voda', icon: 'water' }, { hex: [11, 8], kind: 'rough', name: 'Černá voda', icon: 'water' }, { hex: [8, 9], kind: 'block', name: 'Suchý strom', icon: 'deadtree' },
-    { hex: [14, 6], kind: 'rough', name: 'Kapradí', icon: 'bush' }, { hex: [17, 7], kind: 'block', name: 'Buk', icon: 'tree' }, { hex: [15, 9], kind: 'rough', name: 'Kapradí', icon: 'bush' },
-    { hex: [2, 11], kind: 'rough', name: 'Polámané větve', icon: 'logs' }, { hex: [5, 12], kind: 'block', name: 'Vývrat', icon: 'stump' }, { hex: [1, 13], kind: 'block', name: 'Smrk', icon: 'tree' },
-    { hex: [8, 11], kind: 'rough', name: 'Rašelina', icon: 'water' }, { hex: [12, 13], kind: 'rough', name: 'Rašelina', icon: 'water' },
-    { hex: [17, 11], kind: 'block', name: 'Kříž', icon: 'bigcross' }, { hex: [14, 13], kind: 'rough', name: 'Lavice', icon: 'bench' },
+    // hroby (jeden je pravý)
+    { hex: [9, 6], kind: 'low', name: 'Zapomenutý hrob', icon: 'gravecross' }, { hex: [16, 2], kind: 'low', name: 'Zapomenutý hrob', icon: 'gravecross' },
+    { hex: [2, 11], kind: 'low', name: 'Zapomenutý hrob', icon: 'gravecross' }, { hex: [16, 12], kind: 'low', name: 'Zapomenutý hrob', icon: 'gravecross' },
+    // Černé jezero: hluboká voda kolem ostrůvku, jediná lávka od východu
+    ...[[8, 5], [9, 5], [10, 5], [11, 5], [7, 6], [8, 6], [8, 7], [9, 7], [10, 7], [11, 7], [9, 4], [10, 8], [7, 7]].map(h => ({ hex: h, kind: 'block', name: 'Hluboká voda', icon: 'water' })),
+    { hex: [6, 4], kind: 'block', name: 'Suchý strom', icon: 'deadtree' }, { hex: [12, 9], kind: 'block', name: 'Suchý strom', icon: 'deadtree' }, { hex: [6, 9], kind: 'rough', name: 'Rákosí', icon: 'water' }, { hex: [11, 4], kind: 'rough', name: 'Rákosí', icon: 'water' },
+    // okraj lesa
+    { hex: [1, 1], kind: 'block', name: 'Smrk', icon: 'tree' }, { hex: [4, 1], kind: 'block', name: 'Smrk', icon: 'tree' }, { hex: [1, 5], kind: 'block', name: 'Buk', icon: 'tree' }, { hex: [3, 4], kind: 'rough', name: 'Kapradí', icon: 'bush' },
+    // bažina: bahno a rákosí v úzkém pruhu
+    { hex: [7, 1], kind: 'rough', name: 'Bahno', icon: 'water' }, { hex: [8, 2], kind: 'rough', name: 'Bahno', icon: 'water' }, { hex: [9, 1], kind: 'rough', name: 'Bahno', icon: 'water' }, { hex: [11, 1], kind: 'block', name: 'Suchý strom', icon: 'deadtree' }, { hex: [12, 2], kind: 'rough', name: 'Bahno', icon: 'water' },
+    // pohřebiště
+    { hex: [14, 1], kind: 'low', name: 'Náhrobek', icon: 'gravestone' }, { hex: [17, 1], kind: 'low', name: 'Náhrobek', icon: 'gravestone' }, { hex: [14, 3], kind: 'low', name: 'Náhrobek', icon: 'gravestone' }, { hex: [17, 4], kind: 'block', name: 'Smrk', icon: 'tree' }, { hex: [15, 4], kind: 'low', name: 'Náhrobek', icon: 'gravestone' },
+    // kamenný kruh kolem hrobu
+    { hex: [1, 9], kind: 'block', name: 'Menhir', icon: 'stump' }, { hex: [3, 9], kind: 'block', name: 'Menhir', icon: 'stump' }, { hex: [1, 13], kind: 'block', name: 'Menhir', icon: 'stump' }, { hex: [3, 13], kind: 'block', name: 'Menhir', icon: 'stump' }, { hex: [4, 11], kind: 'block', name: 'Menhir', icon: 'stump' },
+    { hex: [1, 7], kind: 'block', name: 'Dub', icon: 'tree' }, { hex: [4, 7], kind: 'rough', name: 'Kapradí', icon: 'bush' },
+    // kapradí
+    { hex: [14, 7], kind: 'rough', name: 'Kapradí', icon: 'bush' }, { hex: [16, 8], kind: 'rough', name: 'Kapradí', icon: 'bush' }, { hex: [17, 7], kind: 'block', name: 'Buk', icon: 'tree' },
+    // rašeliniště
+    { hex: [6, 11], kind: 'rough', name: 'Rašelina', icon: 'water' }, { hex: [7, 12], kind: 'rough', name: 'Rašelina', icon: 'water' }, { hex: [9, 11], kind: 'rough', name: 'Rašelina', icon: 'water' }, { hex: [6, 13], kind: 'rough', name: 'Polámané větve', icon: 'logs' }, { hex: [10, 13], kind: 'block', name: 'Vývrat', icon: 'stump' },
+    // lesní kaple
+    { hex: [17, 11], kind: 'block', name: 'Kříž', icon: 'bigcross' }, { hex: [14, 13], kind: 'rough', name: 'Lavice', icon: 'bench' }, { hex: [13, 11], kind: 'rough', name: 'Lavice', icon: 'bench' },
   ],
   spawns: [
-    { id: 'r1', hex: [9, 1], kind: 'grave', name: 'Mokřad' },
+    { id: 'r1', hex: [10, 1], kind: 'grave', name: 'Mokřad' },
     { id: 'r2', hex: [17, 8], kind: 'grave', name: 'Mokřad' },
-    { id: 'r3', hex: [11, 11], kind: 'grave', name: 'Mokřad' },
+    { id: 'r3', hex: [8, 12], kind: 'grave', name: 'Mokřad' },
   ],
-  heroStart: [[2, 2], [3, 2], [2, 3]], startRoom: 'A', setupBanned: ['A'],
+  heroStart: [[1, 2], [2, 2], [1, 3]], startRoom: 'A', setupBanned: ['A'],
 };
 // Divoký hon – les s průseky (liché řádky 1–11 jsou průseky napříč mapou, branky na nich jsou otevřené)
 MAPS.les = (() => {
@@ -12601,7 +12610,7 @@ const env11On = () => betaOn() && !!C.MAP && C.MAP.id === 'mlha' && typeof BetaE
 const E11_FLOOR = { A: 's_f_meadow', B: 's_f_mud', C: 's_f_meadow', D: 's_f_meadow', E: 's_f_mud', F: 'n_f_moss', H: 's_f_branch', I: 's_f_peat', J: 's_f_flag' };
 const E11_MSC = { s_f_meadow: .55, s_f_mud: .55, s_f_peat: .55, s_f_pond: .55, s_f_flag: .5, s_f_branch: .55, n_f_moss: .55 };
 const E11_WALL = { A: 's_w_fog', B: 's_w_reeds', C: 's_w_wall' };
-const e11Mat = (h, r) => { const f = C.FURN_DEFS.find(f => f.icon === 'water' && C.eq(f.hex, h)); if (f) return /Černá/.test(f.name) ? 's_f_pond' : /Rašel/.test(f.name) ? 's_f_peat' : 's_f_mud'; return E11_FLOOR[r] || 's_f_meadow'; };
+const e11Mat = (h, r) => { const f = C.FURN_DEFS.find(f => f.icon === 'water' && C.eq(f.hex, h)); if (f) return /Černá|Hlubok/.test(f.name) ? 's_f_pond' : /Rašel/.test(f.name) ? 's_f_peat' : 's_f_mud'; return E11_FLOOR[r] || 's_f_meadow'; };
 async function e11Floor() {
   const I = await envLoad(), K = 2, cv = document.createElement('canvas');
   cv.width = Math.ceil(VW * K); cv.height = Math.ceil(VH * K);
@@ -12613,7 +12622,8 @@ async function e11Floor() {
   const s = SIZE - 1.4;
   for (const h of floorHexes) {
     const r = C.roomOf(h) || (C.DOOR_DEFS.find(d => C.eq(d.hex, h)) || { rooms: ['A'] }).rooms[0], rnd = envRng(h[0] * 131 + h[1] * 977 + 53), [x, y] = px(h);
-    const m = e11Mat(h, r), im = I[m]; if (!im) continue; const wet = C.FURN_DEFS.some(f => f.icon === 'water' && C.eq(f.hex, h));
+    const m = e11Mat(h, r), im = I[m]; if (!im) continue; const wf = C.FURN_DEFS.find(f => f.icon === 'water' && C.eq(f.hex, h)), wet = !!wf, deep = wet && /Hlubok/.test(wf.name);
+    if (deep) { g.save(); envHexPath(g, x, y + 1.5, s + 3.2); g.clip(); patFill('s_f_pond', x - s - 4, y - s - 4, 2 * s + 8, 2 * s + 8, 0); const gr = g.createRadialGradient(x - 4, y - 3, 1, x, y, s + 4); gr.addColorStop(0, 'rgba(160,190,200,.18)'); gr.addColorStop(1, 'rgba(0,0,0,.15)'); g.fillStyle = gr; g.fillRect(x - s - 4, y - s - 4, 2 * s + 8, 2 * s + 8); if (rnd() < .5) { g.strokeStyle = 'rgba(190,215,220,.3)'; g.lineWidth = .7; g.beginPath(); g.ellipse(x + (rnd() - .5) * 12, y + (rnd() - .5) * 5, 4 + rnd() * 4, 1.4, 0, 0, 7); g.stroke(); } g.restore(); continue; }
     const av = envAvg[m] || [40, 44, 36];
     if (!wet) { envHexPath(g, x, y + 2.4, s); g.fillStyle = `rgb(${av.map(v => Math.round(v * .3)).join(',')})`; g.fill(); }
     g.save(); envHexPath(g, x, y + (wet ? 1.5 : 0), s); g.clip();
@@ -12629,7 +12639,9 @@ async function e11Floor() {
   const busy = new Set([...C.FURN_DEFS.map(f => C.K(f.hex)), ...C.DOOR_DEFS.map(d => C.K(d.hex)), ...C.SPAWN_DEFS.map(sp => C.K(sp.hex))]);
   for (const h of C.ROOM_HEXES) { if (busy.has(C.K(h))) continue; const rnd = envRng(h[0] * 7919 + h[1] * 104729 + 17); if (rnd() > .2) continue;
     const r = C.roomOf(h), L = r === 'C' || r === 'J' ? ['d_crack2', 'd_pebbles', 'd_leaves'] : ['d_puddle', 'd_leaves', 'd_pebbles'], n = L[Math.floor(rnd() * L.length)], [x, y] = px(h); drawS(n, x + (rnd() - .5) * 12, y + (rnd() - .5) * 6, rnd() < .5, n === 'd_puddle' ? .5 : .6); }
-  for (const [h, n] of [[[16, 1], 's_slab'], [[15, 2], 'y_gs_broken'], [[15, 12], 's_slab']]) if (!busy.has(C.K(h))) { const [x, y] = px(h); drawS(n, x, y, false, .9, .8); }
+  for (const [h, n] of [[[16, 4], 's_slab'], [[15, 2], 'y_gs_broken'], [[15, 12], 's_slab']]) if (!busy.has(C.K(h))) { const [x, y] = px(h); drawS(n, x, y, false, .9, .8); }
+  // lávka na ostrov: prkna přes vodu
+  { const pl = I.k_f_plank; for (const h of (C.MAP.comb && C.MAP.comb.walk) || []) { const [x, y] = px(h); g.save(); envHexPath(g, x, y + 1.5, s); g.clip(); patFill('s_f_pond', x - s, y - s, 2 * s, 2 * s, 0); if (pl) { g.translate(x, y); g.rotate(.08); for (let i = -2; i <= 2; i++) { g.drawImage(pl, 0, 0, pl.width, pl.height / 5, -s, i * 4.6 - 2, 2 * s, 4); g.fillStyle = 'rgba(0,0,0,.45)'; g.fillRect(-s, i * 4.6 + 2, 2 * s, .7); } } g.restore(); } }
   for (const R of C.ROOM_DEFS) { const x0 = wx(R.k0), x1 = wx(R.k1), y0 = wy(R.y0), y1 = wy(R.y1);
     g.save(); g.beginPath(); g.rect(x0, y0 - 4, x1 - x0, y1 - y0 + 6); g.clip();
     const gr = g.createLinearGradient(0, y0, 0, y0 + 20); gr.addColorStop(0, 'rgba(0,2,2,.5)'); gr.addColorStop(1, 'rgba(0,2,2,0)'); g.fillStyle = gr; g.fillRect(x0, y0 - 4, x1 - x0, 24); g.restore(); }
@@ -12669,7 +12681,8 @@ function e11FurnName(f) {
   if (f.icon === 'tree') return /Dub/.test(f.name) ? 'y_t_oak' : /Buk/.test(f.name) ? 'n_beech' : hs < .5 ? 'n_spruce1' : 'n_spruce2';
   if (f.icon === 'deadtree') return hs < .5 ? 's_deadtree' : 'm_deadtree';
   if (f.icon === 'gravestone') return hs < .5 ? 'y_gs_celt' : 'y_gs_slate';
-  if (f.icon === 'water') return hs < .45 ? 's_reeds' : '';
+  if (f.icon === 'water') return /Rákos/.test(f.name) ? 's_reeds' : /Hlubok/.test(f.name) ? (hs < .18 ? 's_reeds' : '') : hs < .45 ? 's_reeds' : '';
+  if (/Menhir/.test(f.name)) return hs < .7 ? 'n_menhir' : 'n_boulders';
   return { bush: 'n_fern', logs: 's_branches', stump: 's_uproot', bigcross: 's_cross', bench: 's_bench' }[f.icon] || null;
 }
 function e11Furn(f) {
