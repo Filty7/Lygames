@@ -2296,7 +2296,7 @@ body.bui #menupop > label, body.bui #menupop > .pop-row { align-self: center; ju
 .e10moonD{transition:opacity 3s ease}.e10dark .e10moonD{opacity:.25}.e10cover{transform:translateX(330px);transition:transform 3.2s ease-in-out}.e10dark .e10cover{transform:translateX(0)}
 .e10cl{animation:e10cl 90s linear infinite}@keyframes e10cl{from{transform:translateX(-60px)}to{transform:translateX(1500px)}}.e10fog{animation:e10fog 30s ease-in-out infinite alternate;transform-box:fill-box;transform-origin:center}@keyframes e10fog{from{transform:translateX(-50px) scale(.9)}to{transform:translateX(50px) scale(1.15)}}
 .e10beams{animation:e9sh 6s ease-in-out infinite alternate}.e10dark .heroglow{transform:scale(1.45);transition:transform 2s}.heroglow{transition:transform 2s}
-.e11grade,.e11fogs,.e11fog{pointer-events:none}.bzone{fill:#cfeeff;fill-opacity:.07;stroke:#d8f4ff;stroke-opacity:.38;stroke-width:1;stroke-dasharray:3 3;pointer-events:none;animation:bzone 3s ease-in-out infinite alternate}@keyframes bzone{from{fill-opacity:.04;stroke-opacity:.28}to{fill-opacity:.12;stroke-opacity:.48}}.e11gl{animation:e11gl 3.2s ease-in-out infinite alternate}@keyframes e11gl{from{opacity:.35}to{opacity:1}}
+.e11grade,.e11fogs,.e11fog{pointer-events:none}.bzone{fill:none;stroke:#d8f4ff;stroke-opacity:.5;stroke-width:1.2;stroke-dasharray:3 3;stroke-linecap:round;pointer-events:none;animation:bzone 3s ease-in-out infinite alternate}@keyframes bzone{from{stroke-opacity:.32}to{stroke-opacity:.62}}.e11gl{animation:e11gl 3.2s ease-in-out infinite alternate}@keyframes e11gl{from{opacity:.35}to{opacity:1}}
 .e9grade,.e9beams,.e9sky,.e9pools{pointer-events:none}.e9wfl{opacity:0}.e9pool{opacity:.8;mix-blend-mode:plus-lighter}.e9beams{mix-blend-mode:screen;animation:e9sh 7s ease-in-out infinite alternate}@keyframes e9sh{from{opacity:.75}to{opacity:1}}.e9halo{animation:e9sh 5s ease-in-out infinite alternate}
 .e9strike .e9wfl{animation:e9fl 1.5s linear}.e9strike .e9sky{animation-name:e9fls}.e9strike .e9skybg{animation-name:e9flb}.e9strike .e9beamf{animation-name:e9flr}.e9strike .e9pool{animation:e9flp 1.5s linear}
 @keyframes e9fl{0%{opacity:0}3%{opacity:calc(var(--pw) * .6)}9%{opacity:calc(var(--pw) * .08)}15%{opacity:calc(var(--pw) * .5)}35%{opacity:calc(var(--pw) * .15)}100%{opacity:0}}
@@ -7661,7 +7661,8 @@ function combInit(G) {
 const combHolder = G => G.heroes.find(h => h.id === G.comb.holder);
 // pravý hrob vybírá Dům v přípravě (tajně); bez volby náhodně
 function setRealGrave(G, i) { if (!G.comb || !G.comb.graves[i]) return 'Tohle není hrob.'; G.comb.real = i; return null; }
-const combZoneHas = (G, x) => !!(G.comb && G.comb.zone && dist(G.comb.zone, x) <= COMB_ZONE);
+const combZoneR = G => (G.scen && G.scen.zone) || COMB_ZONE;
+const combZoneHas = (G, x) => !!(G.comb && G.comb.zone && dist(G.comb.zone, x) <= combZoneR(G));
 function combSees(G, x) {
   if (liveHeroes(G).some(h => dist(h.pos, x) <= COMB_SIGHT)) return true;
   const k = npcOf(G, 'korenarka'); return !!(k && dist(k.pos, x) <= COMB_HERB_SIGHT);
@@ -7718,10 +7719,10 @@ async function combRoundStart(G, C, ui) {
   if (G.comb.real == null) G.comb.real = Math.floor(rng() * G.comb.graves.length);
   const b = bossOf(G); if (!b) return;
   b.hidden = false; G.comb.zone = b.pos.slice(); G.comb.wail = b.pos.slice(); G.comb.wails++;
-  const hit = liveHeroes(G).filter(h => dist(h.pos, b.pos) <= COMB_ZONE);
+  const hit = liveHeroes(G).filter(h => dist(h.pos, b.pos) <= combZoneR(G));
   log(G, 'Banshee zakřičí. Kolem ní se mlha zavlní – sem bude toto kolo útočit.' + (hit.length ? '' : ''));
-  if (G.fx) G.fx.push({ t: 'wail', at: b.pos.slice(), r: COMB_ZONE });
-  if (ui && ui.anim) await ui.anim({ type: 'wave', at: b.pos, range: COMB_ZONE, kind: 'wail' });
+  if (G.fx) G.fx.push({ t: 'wail', at: b.pos.slice(), r: combZoneR(G) });
+  if (ui && ui.anim) await ui.anim({ type: 'wave', at: b.pos, range: combZoneR(G), kind: 'wail' });
   for (const h of hit) { addFear(G, h, 1); log(G, h.name + ' je v jejím výkřiku: +1 Strach.'); }
 }
 function combGoals(G, h) {
@@ -7991,7 +7992,7 @@ API = {
   markMonster, markHero, heroMarked, heroInvisible, pierceArmor, isPierced, applyStatus, addPoison, addBleed, tickDots, healHero, healMonster, FIRE_DMG, FIRE_DMG_H, trapImmune, recallable, peekSpot, doSearch, nearestUnknownSpots, senseSpots, pushStep, STATUS_TXT,
   useMap, MAPS, isFence, blocksSight, OBELISK_SITES, MAP, OUTDOOR,
   LEVERS, HOLY, holyAt, FOUNTAIN, ALTAR, CANDLES, EXIT_DOORS, adjLevers, adjExits, adjCandles, setRealExit, mazeExits, isImpass, mazeLinked, frontBurning, fireAt, isBars, exitDoorAt, LEVER_COST, canStillEscape, purgeWater, candleGuarded,
-  bossGoals, isBossGoal, bossOf, ballDo, ballRoundStart, BALL_DANCES, BALL_PHASES, BALL_PHASE_HP, BALL_MASK_HP, TRAP_KINDS, laneHexes, sewWater, sewLevelOf, combSees, combSense, combHolder, setRealGrave, combZoneHas, COMB_ZONE, onParquet, furnGone: h => FURN_GONE.has(K(h)), HUNT_CATCH, SEW_NEED, BALL_BRIDES_LOSE, BALL_BRIDE_EVERY, isNpc, rotHex,
+  bossGoals, isBossGoal, bossOf, ballDo, ballRoundStart, BALL_DANCES, BALL_PHASES, BALL_PHASE_HP, BALL_MASK_HP, TRAP_KINDS, laneHexes, sewWater, sewLevelOf, combSees, combSense, combHolder, setRealGrave, combZoneHas, combZoneR, COMB_ZONE, onParquet, furnGone: h => FURN_GONE.has(K(h)), HUNT_CATCH, SEW_NEED, BALL_BRIDES_LOSE, BALL_BRIDE_EVERY, isNpc, rotHex,
   _heroTurn: heroTurn, _monsterAttack: monsterAttack, _heroMove: heroMove, _checkWin: checkWin, _activateGroup: activateGroup, _endRound: endRound, _freeRespawn: freeRespawn, _damageHero: damageHero,
 };
 function syncApi() { Object.assign(API, { LEVERS, HOLY, FOUNTAIN, ALTAR, CANDLES, EXIT_DOORS, CRYPTS, MAP, COLS, ROWS, ROOM_DEFS, ROOMS, DOOR_DEFS, EXIT, EXIT_ROOM, SPOT_DEFS, FURN_DEFS, SPAWN_DEFS, MIRRORS, HERO_START, WALL_HEXES, ALL_HEXES, ROOM_HEXES, MONSTER_ROOMS, CURSE_ROOMS, LOCKABLE, SETUP_BANNED, CIRCLES, OBELISK_SITES, OUTDOOR }); }
@@ -15737,7 +15738,7 @@ function bossTop(G) {
     if (env11On()) { let w = ''; for (let i = 0; i < 14; i++) { const x = hsh(i, 71) * VW, y = wy(0) + hsh(i, 72) * (VH - wy(0)), r = 70 + hsh(i, 73) * 90; w += `<ellipse class="e10fog" cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" rx="${r.toFixed(1)}" ry="${(r * .32).toFixed(1)}" fill="url(#e11wispG)" style="animation-duration:${(20 + hsh(i, 74) * 24).toFixed(1)}s;animation-delay:-${(hsh(i, 75) * 30).toFixed(1)}s"/>`; }
       o += `<g mask="url(#bfog-m)" class="e11fog"><rect x="-200" y="-200" width="${VW + 400}" height="${VH + 400}" fill="#26323a" opacity="${hv ? .82 : .5}"/><g opacity="${hv ? 1 : .8}">${w}</g></g>`; }
     else o += `<rect class="bfog" x="-200" y="-200" width="${VW + 400}" height="${VH + 400}" mask="url(#bfog-m)" opacity="${hv ? .78 : .45}"/>`;
-    if (G.comb.zone) { const zh = C.ALL_HEXES.filter(h => C.roomOf(h) && C.dist(h, G.comb.zone) <= C.COMB_ZONE); o += `<path class="bzone" d="${zh.map(h => pts(h, SIZE - 1)).join('')}"/>`; } // v98: pole výkřiku nad mlhou – sem Banshee toto kolo útočí
+    if (G.comb.zone) { const R = C.combZoneR(G), z = G.comb.zone, zh = []; for (let r = z[1] - R - 1; r <= z[1] + R + 1; r++) for (let c = z[0] - R - 1; c <= z[0] + R + 1; c++) if (C.dist([c, r], z) <= R) zh.push([c, r]); o += `<path class="bzone" d="${hexOutline(zh)}"/>`; } // v98: pole výkřiku nad mlhou – sem Banshee toto kolo útočí
     G.comb.graves.forEach((g, i) => { const [x, y] = px(g), tr = G.comb.tried.includes(i); o += `<g class="bgr-top${tr ? ' tried' : ''}" transform="translate(${x},${y - 20})"><path d="M0 -9v16M-5 -4h10"/>${tr ? '<path class="x" d="M-6 -6L6 6M6 -6L-6 6"/>' : ''}</g>`; });
     const hd = C.combHolder(G);
     if (hd && !hd.escaped) {
@@ -15748,6 +15749,16 @@ function bossTop(G) {
     }
   }
   if (gBoss._s !== o) { gBoss._s = o; gBoss.innerHTML = o; }
+}
+// obrys sjednocení hexů (jen vnější hrany) – pro pole výkřiku Banshee
+function hexOutline(list, s = SIZE - .5) {
+  const inSet = new Set(list.map(h => C.K(h))); let d = '';
+  for (const h of list) {
+    const [x, y] = px(h), V = i => { const a = Math.PI / 180 * (60 * i - 30); return [x + s * Math.cos(a), y + s * Math.sin(a) * KY]; };
+    const dirs = C.neighbors(h).filter(n => inSet.has(C.K(n))).map(n => { const [nx, ny] = px(n); return Math.round(((Math.atan2((ny - y) / KY, nx - x) * 180 / Math.PI) + 360) % 360 / 60) % 6; });
+    for (let i = 0; i < 6; i++) { if (dirs.includes(i)) continue; const [ax, ay] = V(i), [bx, by] = V(i + 1); d += `M${ax.toFixed(1)} ${ay.toFixed(1)}L${bx.toFixed(1)} ${by.toFixed(1)}`; }
+  }
+  return d;
 }
 const liveHeroesUI = G => G.heroes.filter(h => !h.escaped && !h.downed);
 // vrstva pod figurkami
