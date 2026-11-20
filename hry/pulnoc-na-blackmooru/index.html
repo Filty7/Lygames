@@ -11889,8 +11889,7 @@ async function e2Floor() {
     const gr = g.createRadialGradient(x, y, 2, x, y, SIZE); gr.addColorStop(0, 'rgba(150,90,220,.32)'); gr.addColorStop(1, 'rgba(90,40,160,0)'); g.fillStyle = gr; g.fillRect(x - SIZE, y - SIZE, 2 * SIZE, 2 * SIZE);
     envSigil(g, x, y, sd); g.save(); g.globalCompositeOperation = 'lighter'; g.globalAlpha = .8; envSigil(g, x, y, sd); g.restore();
     drawS((sp.hex[0] + sp.hex[1]) % 2 ? 'y_hole1' : 'y_hole2', x, y + .5, sp.hex[0] % 2 === 1, 1, .8); }
-  // hranice místností: jemná tečkovaná čára (místnosti jsou kvůli Tmě a rozmístění skupin)
-  const zones = C.ROOM_DEFS.map(R => `<path class="e10zone" d="${hexOutline(C.ROOM_HEXES.filter(h => C.roomOf(h) === R.id), SIZE - 1.2)}"/>`).join('');
+  const zones = '';
   return `<image href="${cv.toDataURL()}" x="0" y="0" width="${VW}" height="${VH}" class="px"/>` + zones + `<path d="${C.FURN_DEFS.filter(f => f.kind === 'rough').map(f => pts(f.hex, SIZE - 3)).join('')}" fill="none" stroke="#e8e8f0" stroke-opacity=".14" stroke-width=".9" stroke-dasharray="2 2"/>`;
 }
 // vysoká hřbitovní zeď s námrazou (textura už má zasněženou římsu s rampouchy)
@@ -12010,8 +12009,7 @@ async function e7Floor() {
   for (const sp of C.SPAWN_DEFS) { const [x, y] = px(sp.hex), sd = sp.hex[0] * 613 + sp.hex[1] * 211 + 5;
     const gr = g.createRadialGradient(x, y, 2, x, y, SIZE); gr.addColorStop(0, 'rgba(150,90,220,.28)'); gr.addColorStop(1, 'rgba(90,40,160,0)'); g.fillStyle = gr; g.fillRect(x - SIZE, y - SIZE, 2 * SIZE, 2 * SIZE);
     envSigil(g, x, y, sd); g.save(); g.globalCompositeOperation = 'lighter'; g.globalAlpha = .7; envSigil(g, x, y, sd); g.restore(); }
-  // hranice místností: jemná tečkovaná čára (místnosti jsou kvůli Tmě a rozmístění skupin)
-  const zones = C.ROOM_DEFS.map(R => `<path class="e10zone" d="${hexOutline(C.ROOM_HEXES.filter(h => C.roomOf(h) === R.id), SIZE - 1.2)}"/>`).join('');
+  const zones = '';
   return `<image href="${cv.toDataURL()}" x="0" y="0" width="${VW}" height="${VH}" class="px"/>` + zones + `<path d="${C.FURN_DEFS.filter(f => f.kind === 'rough').map(f => pts(f.hex, SIZE - 3)).join('')}" fill="none" stroke="#dce6f0" stroke-opacity=".14" stroke-width=".9" stroke-dasharray="2 2"/>`;
 }
 // ploty: SVG vzorky (levné, navazují přes úseky)
@@ -12156,8 +12154,7 @@ async function e8Floor() {
     g.fillStyle = 'rgba(0,0,0,.7)'; g.beginPath(); g.ellipse(x, y + 1, 9, 5, 0, 0, 7); g.fill();
     const gr = g.createRadialGradient(x, y, 2, x, y, SIZE); gr.addColorStop(0, 'rgba(150,90,220,.26)'); gr.addColorStop(1, 'rgba(90,40,160,0)'); g.fillStyle = gr; g.fillRect(x - SIZE, y - SIZE, 2 * SIZE, 2 * SIZE);
     envSigil(g, x, y, sd); g.save(); g.globalCompositeOperation = 'lighter'; g.globalAlpha = .7; envSigil(g, x, y, sd); g.restore(); }
-  // hranice místností: jemná tečkovaná čára (místnosti jsou kvůli Tmě a rozmístění skupin)
-  const zones = C.ROOM_DEFS.map(R => `<path class="e10zone" d="${hexOutline(C.ROOM_HEXES.filter(h => C.roomOf(h) === R.id), SIZE - 1.2)}"/>`).join('');
+  const zones = '';
   return `<image href="${cv.toDataURL()}" x="0" y="0" width="${VW}" height="${VH}" class="px"/>` + zones + `<path d="${C.FURN_DEFS.filter(f => f.kind === 'rough').map(f => pts(f.hex, SIZE - 3)).join('')}" fill="none" stroke="#f0e0c8" stroke-opacity=".14" stroke-width=".9" stroke-dasharray="2 2"/>`;
 }
 // stěny: textura (hrázděné zdivo / prkna) z plátna, vršek = trám
@@ -12339,8 +12336,7 @@ async function e9Floor() {
       pools += `<g class="e9pool" style="--c:${w.c};--o:${op}"><image class="px" href="${e9PoolImg(w.n) || sp.u}" x="${(cx - ww / 2).toFixed(1)}" y="${(cy - hh / 2).toFixed(1)}" width="${ww.toFixed(1)}" height="${hh.toFixed(1)}" transform="translate(0 ${(2 * cy).toFixed(1)}) scale(1 -1)" preserveAspectRatio="none" opacity="${op}"/></g>`;
     }
   }
-  // hranice místností: jemná tečkovaná čára (místnosti jsou kvůli Tmě a rozmístění skupin)
-  const zones = C.ROOM_DEFS.map(R => `<path class="e10zone" d="${hexOutline(C.ROOM_HEXES.filter(h => C.roomOf(h) === R.id), SIZE - 1.2)}"/>`).join('');
+  const zones = '';
   return `<image href="${cv.toDataURL()}" x="0" y="0" width="${VW}" height="${VH}" class="px"/>` + zones + `<path d="${C.FURN_DEFS.filter(f => f.kind === 'rough').map(f => pts(f.hex, SIZE - 3)).join('')}" fill="none" stroke="#e0e0ff" stroke-opacity=".14" stroke-width=".9" stroke-dasharray="2 2"/>`
     + `<defs><filter id="e9poolB" x="-20%" y="-20%" width="140%" height="140%" color-interpolation-filters="sRGB"><feGaussianBlur stdDeviation="1.6"/></filter></defs><g class="e9pools">${pools}</g>`;
 }
@@ -12531,8 +12527,19 @@ async function e10Floor() {
     sh += `<ellipse cx="${cx.toFixed(1)}" cy="${cy.toFixed(1)}" rx="${L * .6}" ry="9" transform="rotate(${(ang * .5 - 45).toFixed(1)} ${cx.toFixed(1)} ${cy.toFixed(1)})" fill="#01040a" fill-opacity=".38"/>`; }
   for (const h of C.ROOM_HEXES) { if (busy.has(C.K(h))) continue; const rnd = envRng(h[0] * 31 + h[1] * 17 + 7); if (rnd() > .28) continue; const [x, y] = px(h);
     dap += `<ellipse cx="${(x + (rnd() - .5) * 14).toFixed(1)}" cy="${(y + (rnd() - .5) * 6).toFixed(1)}" rx="${(8 + rnd() * 14).toFixed(1)}" ry="${(4 + rnd() * 6).toFixed(1)}" fill="url(#e10dapG)"/>`; }
-  // hranice místností: jemná tečkovaná čára (místnosti jsou kvůli Tmě a rozmístění skupin)
-  const zones = C.ROOM_DEFS.map(R => `<path class="e10zone" d="${hexOutline(C.ROOM_HEXES.filter(h => C.roomOf(h) === R.id), SIZE - 1.2)}"/>`).join('');
+  // hranice místností: rozsypané jehličí na zemi (místnosti jsou kvůli Tmě a rozmístění skupin)
+  if (C.MAP.cells) { const NC = ['#8a5a2a', '#a8703a', '#6e4420', '#b8884a', '#5a3a1c'];
+    for (const h of C.ROOM_HEXES) { const r = C.roomOf(h), [x, y] = px(h);
+      for (const n of C.neighbors(h)) { const rn = C.roomOf(n); if (!rn || rn === r || C.K(n) < C.K(h)) continue;
+        const [nx, ny] = px(n), cs = [0, 1, 2, 3, 4, 5].map(i => { const a = Math.PI / 180 * (60 * i - 30); return [x + SIZE * Math.cos(a), y + SIZE * Math.sin(a) * KY]; }).sort((a, b) => Math.hypot(a[0] - nx, a[1] - ny) - Math.hypot(b[0] - nx, b[1] - ny)).slice(0, 2);
+        const rnd = envRng(h[0] * 73 + h[1] * 191 + n[0] * 7 + n[1] * 13), [[ax, ay], [bx, by]] = cs, nrm = [ny - y, -(nx - x)], nl = Math.hypot(...nrm) || 1;
+        for (let i = 0; i < 22; i++) { const t = rnd(), off = (rnd() - .5) * 8, cx = ax + (bx - ax) * t + (nx - x) / nl * off * 0 + nrm[0] / nl * 0, cy = ay + (by - ay) * t;
+          const jx = (nx - x) / Math.hypot(nx - x, ny - y) * off, jy = (ny - y) / Math.hypot(nx - x, ny - y) * off * KY, L = 3 + rnd() * 3.2, an = rnd() * Math.PI;
+          g.strokeStyle = NC[Math.floor(rnd() * NC.length)]; g.globalAlpha = .55 + rnd() * .4; g.lineWidth = .8; g.beginPath();
+          g.moveTo(cx + jx - Math.cos(an) * L / 2, cy + jy - Math.sin(an) * L / 2 * KY); g.lineTo(cx + jx + Math.cos(an) * L / 2, cy + jy + Math.sin(an) * L / 2 * KY); g.stroke();
+          if (rnd() < .25) { g.fillStyle = '#3a2412'; g.fillRect(cx + jx + (rnd() - .5) * 3, cy + jy, 1, 1); } }
+        g.globalAlpha = 1; } } }
+  const zones = '';
   return `<image href="${cv.toDataURL()}" x="0" y="0" width="${VW}" height="${VH}" class="px"/>` + zones + `<path d="${C.FURN_DEFS.filter(f => f.kind === 'rough').map(f => pts(f.hex, SIZE - 3)).join('')}" fill="none" stroke="#e0f0e0" stroke-opacity=".14" stroke-width=".9" stroke-dasharray="2 2"/>`
     + `<defs><radialGradient id="e10dapG"><stop offset="0" stop-color="#cfe2ff" stop-opacity=".45"/><stop offset="1" stop-color="#9ab8e8" stop-opacity="0"/></radialGradient></defs>`
     + `<g class="e10moonL e10shadows">${sh}</g><g class="e10moonL e10dap">${dap}</g>`;
@@ -12665,8 +12672,7 @@ async function e11Floor() {
     const gr = g.createRadialGradient(x, y, 2, x, y, SIZE); gr.addColorStop(0, 'rgba(120,200,190,.22)'); gr.addColorStop(1, 'rgba(60,120,140,0)'); g.fillStyle = gr; g.fillRect(x - SIZE, y - SIZE, 2 * SIZE, 2 * SIZE);
     envSigil(g, x, y, sd); g.save(); g.globalCompositeOperation = 'lighter'; g.globalAlpha = .6; envSigil(g, x, y, sd); g.restore(); }
   const mR = wx(Math.max(...C.ROOM_DEFS.map(r => r.k1))); patFill('s_f_peat', mR, wy(0) - 8, VW - mR, VH, .45);
-  // hranice místností: jemná tečkovaná čára (místnosti jsou kvůli Tmě a rozmístění skupin)
-  const zones = C.ROOM_DEFS.map(R => `<path class="e10zone" d="${hexOutline(C.ROOM_HEXES.filter(h => C.roomOf(h) === R.id), SIZE - 1.2)}"/>`).join('');
+  const zones = '';
   return `<image href="${cv.toDataURL()}" x="0" y="0" width="${VW}" height="${VH}" class="px"/>` + zones + `<path d="${C.FURN_DEFS.filter(f => f.kind === 'rough').map(f => pts(f.hex, SIZE - 3)).join('')}" fill="none" stroke="#e0f0e8" stroke-opacity=".14" stroke-width=".9" stroke-dasharray="2 2"/>`;
 }
 function e11WallH(xa, xb, row, h, roomId) {
