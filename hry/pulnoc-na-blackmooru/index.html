@@ -2298,7 +2298,7 @@ body.bui #menupop > label, body.bui #menupop > .pop-row { align-self: center; ju
 .btrap.on path{fill:#c8a060;fill-opacity:.1;stroke:#e8c890;stroke-opacity:.55;stroke-width:1;stroke-dasharray:3 2}.bpush{fill:none;stroke:#f0d8a0;stroke-width:1.6;stroke-opacity:.75;stroke-dasharray:4 3;stroke-linecap:round;pointer-events:none}.bpush-from{fill:#f0d8a0;fill-opacity:.7;pointer-events:none}
 .morph-agony{animation:morphA 1.1s ease-in-out}@keyframes morphA{0%{transform:none;filter:none}12%{transform:translate(-1.5px,0) scale(1.06,.92);filter:brightness(.6) sepia(1) hue-rotate(-30deg) saturate(3)}24%{transform:translate(1.5px,-1px) scale(.94,1.08)}36%{transform:translate(-2px,1px) scale(1.08,.9);filter:brightness(1.6)}48%{transform:translate(2px,0) scale(.92,1.1);filter:brightness(.5) sepia(1) hue-rotate(-30deg) saturate(3)}62%{transform:translate(-1px,0) scale(1.05,.95)}78%{transform:scale(.97,1.04);filter:brightness(1.3)}100%{transform:none;filter:none}}
 .morph-relief{animation:morphR .9s ease-out}@keyframes morphR{0%{transform:scale(.96,1.02);filter:none}40%{transform:translateY(-3px) scale(1.04,1.06);filter:brightness(1.5) drop-shadow(0 0 4px #cfe0ff)}100%{transform:none;filter:none}}
-.room-lbl{display:none}.e10zone{fill:none;stroke:#e8f0ff;stroke-opacity:.22;stroke-width:1.1;stroke-dasharray:1.5 3;stroke-linecap:round;pointer-events:none}
+.room-lbl{display:none}.e10over{fill:#2a3a1c;fill-opacity:.42;stroke:#e6f0d4;stroke-opacity:.5;stroke-width:1;pointer-events:none}.mdet .md-ab{margin:.4em 0 0;padding-left:1.1em;font-size:13px;line-height:1.45}.mdet .md-ab li{margin:.15em 0}.e10zone{fill:none;stroke:#e8f0ff;stroke-opacity:.22;stroke-width:1.1;stroke-dasharray:1.5 3;stroke-linecap:round;pointer-events:none}
 .e11grade,.e11fogs,.e11fog{pointer-events:none}.bzone{fill:none;stroke:#d8f4ff;stroke-opacity:.5;stroke-width:1.2;stroke-dasharray:3 3;stroke-linecap:round;pointer-events:none;animation:bzone 3s ease-in-out infinite alternate}@keyframes bzone{from{stroke-opacity:.32}to{stroke-opacity:.62}}.e11gl{animation:e11gl 3.2s ease-in-out infinite alternate}@keyframes e11gl{from{opacity:.35}to{opacity:1}}
 .e9grade,.e9beams,.e9sky,.e9pools{pointer-events:none}.e9wfl{opacity:0}.e9pool{opacity:.8;mix-blend-mode:plus-lighter}.e9beams{mix-blend-mode:screen;animation:e9sh 7s ease-in-out infinite alternate}@keyframes e9sh{from{opacity:.75}to{opacity:1}}.e9halo{animation:e9sh 5s ease-in-out infinite alternate}
 .e9strike .e9wfl{animation:e9fl 1.5s linear}.e9strike .e9sky{animation-name:e9fls}.e9strike .e9skybg{animation-name:e9flb}.e9strike .e9beamf{animation-name:e9flr}.e9strike .e9pool{animation:e9flp 1.5s linear}
@@ -3300,7 +3300,7 @@ MAPS.les = (() => {
     cells: {"12,4":"N","4,9":"W","5,1":"N","5,10":"S","8,9":"S","11,5":"E","2,11":"W","13,8":"E","15,5":"E","6,2":"N","7,1":"N","6,11":"S","7,10":"S","4,2":"N","3,6":"W","5,3":"N","8,2":"N","9,1":"N","5,12":"S","8,11":"S","9,10":"S","11,7":"E","2,4":"N","1,8":"W","13,10":"E","6,4":"N","15,7":"E","7,3":"N","16,6":"E","6,13":"S","7,12":"S","3,8":"W","5,5":"W","14,8":"E","17,7":"E","9,3":"N","9,12":"S","11,9":"E","13,3":"N","1,10":"W","13,12":"S","6,6":"W","15,9":"E","16,8":"E","12,13":"S","3,10":"W","5,7":"W","14,10":"E","11,2":"N","13,5":"E","15,2":"N","15,11":"E","16,10":"E","12,6":"E","3,3":"N","14,3":"N","3,12":"W","5,9":"W","4,11":"S","14,12":"E","11,4":"N","1,5":"W","13,7":"E","6,1":"N","15,4":"E","7,9":"S","12,8":"E","3,5":"W","5,2":"N","4,4":"N","14,5":"E","5,11":"S","4,13":"S","9,9":"S","10,1":"N","8,13":"S","10,10":"S","1,7":"W","13,9":"E","2,6":"W","15,6":"E","7,2":"N","16,5":"E","7,11":"S","12,1":"N","12,10":"S","3,7":"W","5,4":"N","4,6":"W","14,7":"E","9,2":"N","5,13":"S","10,3":"N","13,2":"N","10,12":"S","1,9":"W","11,11":"S","2,8":"W","13,11":"E","7,4":"N","16,7":"E","6,8":"W","12,3":"N","12,12":"S","3,9":"W","5,6":"W","4,8":"W","14,9":"E","13,4":"N","11,13":"S","2,10":"W","16,9":"E","6,10":"S","12,5":"E","3,2":"N","14,2":"N","3,11":"W","14,11":"E","4,10":"W","8,1":"N","8,10":"S","2,3":"N","6,3":"N","6,12":"S","12,7":"E","3,4":"N","14,4":"E","4,3":"N","4,12":"S","17,6":"E","8,3":"N","8,12":"S","10,9":"S","1,6":"W","9,11":"S","2,5":"W","11,8":"E","16,4":"E","15,8":"E","6,5":"N","7,13":"S","12,9":"E","14,6":"E","4,5":"W","17,8":"E","10,2":"N","11,1":"N","10,11":"S","9,13":"S","11,10":"S","2,7":"W","13,13":"S","15,10":"E","6,7":"W","7,6":"W","12,2":"N","12,11":"S","4,7":"W","5,8":"W","11,3":"N","10,13":"S","11,12":"S","2,9":"W","13,6":"E","15,3":"N","6,9":"S","7,8":"W"},
     doors: [],
     lodge: { x: 9.0, y: 9.4, sc: 0.92, hexes: [[7, 5], [7, 7], [8, 4], [8, 5], [8, 6], [8, 7], [8, 8], [9, 4], [9, 5], [9, 6], [9, 7], [9, 8], [10, 4], [10, 5], [10, 6], [10, 7], [10, 8], [11, 6]] },
-    hunt: { wolf: [15, 6], traps: [[4, 5], [7, 2], [11, 3], [16, 7], [14, 11], [9, 12], [3, 11]] },
+    hunt: { wolf: [6, 3], traps: [[4, 5], [7, 2], [11, 3], [16, 7], [14, 11], [9, 12], [3, 11]] },
     exit: null,
     spots: [{ id: 's1', name: 'Hranice dříví', hex: [7, 8], icon: 'logs', existing: true }, { id: 's2', name: 'Sud na dešťovku', hex: [11, 7], icon: 'barrel', existing: true }, { id: 's3', name: 'Posed', hex: [16, 9], icon: 'seat', existing: true }, { id: 's4', name: 'Krmelec', hex: [6, 13], icon: 'trough', existing: true }, { id: 's5', name: 'Kozlík s pilou', hex: [1, 5], icon: 'sawhorse', existing: true }, { id: 's6', name: 'Špalek se sekerou', hex: [11, 1], icon: 'stump', existing: true }],
     furn,
@@ -4024,7 +4024,7 @@ const SCENARIOS = [
     short: 'Vraťte Banshee její hřeben do pravého hrobu. Který to je, ví jen Dům.',
     blurb: 'Mlha nad bažinou je tak hustá, že je vidět jen na dvě pole. Odněkud se ozývá nářek a jeden z vás nese hřeben, pro který si přijde.',
     goalShort: 'Dům tajně vybral pravý ze čtyř hrobů. Vložte do něj hřeben (1 pohyb vedle hrobu) – prázdný hrob dá +2 Strach. Banshee je nesmrtelná a ovládá ji Dům: na začátku kola zakřičí (kdo je do 3 polí, +2 Strach) a útočit může jen do 3 polí od místa výkřiku, na nositele hřebenu s výhodou. Hřeben jde podat i hodit.' },
-  { id: 'hon', noElite: true, noThreat: true, n: 11, boss: true, map: 'les', name: 'Divoký hon', goal: 'hunt', cats: ['chatrc', 'zahrada'], maxRound: 12, bossHp: 45, wakeRound: 1, budgetBonus: -1,
+  { id: 'hon', noElite: true, noThreat: true, n: 11, boss: true, map: 'les', name: 'Divoký hon', goal: 'hunt', cats: ['chatrc', 'zahrada'], maxRound: 12, bossHp: 45, wakeRound: 1, budgetBonus: 0,
     tokens: ['loot', 'loot', 'loot', 'trap', 'trap'], setup: ['tokens', 'exit', 'buy', 'place'], locks: 0, bossName: 'Vlkodlak',
     short: 'Natlačte prokletého hajného třikrát do pastí, nebo zabijte vlkodlaka.',
     blurb: 'Úplněk nad Černým lesem. Vlkodlak krouží kolem staré hájovny. Když ho krev přejde, nebo když měsíc zajdou mraky, je z něj zase jen hajný – a toho se dá dostat do pasti.',
@@ -4320,7 +4320,7 @@ function describe0(s) {
     case 'charge': return 'Náraz: až ' + s.n + ' polí v přímce k prvnímu monstru, útok ' + s.dmg + ' dmg ' + sgn(s.mod) + ', zásah ho odstrčí o ' + s.push + ' (narazí-li, je omráčen)';
     case 'swapatk': return 'Útok na sousední monstrum, ' + s.dmg + ' dmg ' + sgn(s.mod) + '; pak si s ním prohoď místo';
     case 'crossfire': return 'Útok dosah ' + s.range + ', ' + s.dmg + ' dmg ' + sgn(s.mod) + '. Křížová palba: stojíš-li mezi dvěma monstry v jedné přímce, zaútočíš na obě s +' + s.cross + (s.stun ? ' a zásah omráčí' : '');
-    case 'rootarea': return 'Pole do ' + s.range + ' ve výhledu a všechna kolem něj: všechny figurky na nich (i lovci) jsou přišpendlené (bez hodu)';
+    case 'rootarea': return 'Pole do ' + s.range + ' (i přes překážky) a všechna kolem něj: všechny figurky na nich (i lovci) jsou přišpendlené (bez hodu)';
     case 'pulse': return 'Monstra do ' + s.range + ' utrží ' + s.dmg + ' (bez hodu, armor neplatí); lovci do ' + s.range + ' (i ty) vyléčí ' + s.heal + (s.cost2 ? '. Stojí 2 akce: odhoď ještě 1 kartu' : '');
     case 'haste': return 'Do konce kola +' + s.n + ' ke každému pohybu a pohybuješ se skrz nepřátele' + (s.evade ? '; únik ' + s.evade : '') + (s.draw ? '; lízni ' + s.draw : '') + (s.hook ? '; hned se přitáhni lankem k monstru do ' + s.hook + (s.hookStun ? ' a omráč ho' : '') : '');
     case 'search': return s.range > 1 ? 'Prohledej místo do ' + s.range + ' polí' : 'Prohledej sousední místo';
@@ -4383,10 +4383,10 @@ function describe0(s) {
     case 'dash': return s.n + ' pohyb skrz nepřátele, pak lízni ' + s.draw + ' kartu';
     case 'blind': return 'Monstra do ' + s.range + ' ve výhledu v příští aktivaci nemohou útočit';
     case 'rally': return 'Lovci do ' + s.range + ' (i ty): Strach −' + s.fear + ' a +' + s.mod + ' k útokům' + (s.dmg ? ' a +' + s.dmg + ' dmg' : '') + ' do konce kola' + (s.seeAll ? '; všichni vidí neviditelné' : '') + (s.noEv ? '; monstra v dosahu ztrácí únik' : '') + (s.ghostDmg ? ', +' + s.ghostDmg + ' dmg proti duchům' : '') + (s.draw ? '; každý lízne ' + s.draw : '') + (s.peekAny ? '; zjisti obsah jednoho místa kdekoli' : '') + (s.extraPlay ? '; jeden lovec má příště 4 zahrání' : '') + (s.selfFear ? '; ty +' + s.selfFear + ' Strach' : '');
-    case 'fire': return (s.light ? 'Zruš Tmu; ' : '') + 'Oheň na ' + s.len + ' sousedící pole do dosahu ' + s.range + ' (výhled). Kdo na něm stojí (i lovci), hned utrží ' + FIRE_DMG + '; znovu při vstupu a na konci tahu v ohni. Do konce příštího kola';
+    case 'fire': return (s.light ? 'Zruš Tmu; ' : '') + 'Oheň na ' + s.len + ' sousedící pole do dosahu ' + s.range + ' (obloukem, i přes překážky). Kdo na něm stojí (i lovci), hned utrží ' + FIRE_DMG + '; znovu při vstupu a na konci tahu v ohni. Do konce příštího kola';
     case 'shove': return (s.all ? 'Odstrč všechna sousední monstra' : 'Odstrč sousední monstrum') + ' o ' + s.n + ' pole. Narazí-li, je omráčené a utrží ' + (s.collide || 1) + ' dmg';
     case 'light': return 'Zruš Tmu v místnosti a lízni 1 kartu';
-    case 'grenade': return 'Hoď do dosahu ' + s.range + ' (potřebuješ výhled, monstra ho neblokují): cíl ' + s.dmg + ' dmg, sousední pole ' + s.splash + ' dmg, i lovci. ' + sgn(s.mod) + ', hod pro každého';
+    case 'grenade': return 'Hoď do dosahu ' + s.range + ' (obloukem, i přes překážky): cíl ' + s.dmg + ' dmg, sousední pole ' + s.splash + ' dmg, i lovci. ' + sgn(s.mod) + ', hod pro každého';
     case 'lightmove': return 'Natrvalo zruš Tmu v místnosti a ' + s.n + ' pohyb';
     case 'cleanse': return (s.range === 1 && !s.all ? 'Lovec do 1 (i ty)' : 'Lovci do ' + s.range + ' (i ty)') + ': Strach −' + s.n + (s.heal ? ', vyléčí ' + s.heal : '');
     case 'discipline': return 'Vyhoď Paniku z ruky mimo hru a lízni 1';
@@ -4632,17 +4632,17 @@ const evadeOf = (G, h) => h.evade && (h.evade.round === G.round || h.evade.long)
 const weakOf = (G, m) => m.weak && m.weak.round === G.round ? m.weak.n : 0;
 const buffOf = (G, h) => h.buff && h.buff.round === G.round ? h.buff : null;
 const isGhostly = m => !!(mdef(m).ghost || mdef(m).flying);
-function weaken(G, m, n) { m.weak = { round: G.round, n: Math.max(n, weakOf(G, m)) }; }
+function weaken(G, m, n) { if (G.hunt && m && m.boss) return; m.weak = { round: G.round, n: Math.max(n, weakOf(G, m)) }; }
 
 // ---------- sdílené stavy a efekty (v56, globální pravidla) ----------
 // Označení: platí do konce AKTUÁLNÍHO kola; +1 k útoku všem lovcům, ignoruje únik, ruší neviditelnost.
-function markMonster(G, m) { if (!m || mdef(m).object) return; m.markedUntil = G.round; m.visibleRound = G.round; }
+function markMonster(G, m) { if (!m || mdef(m).object || (G.hunt && m.boss)) return; m.markedUntil = G.round; m.visibleRound = G.round; }
 // lovec označený monstrem: monstra +1 k útoku, ignorují jeho únik, nemůže být neviditelný
 function markHero(G, h) { if (!h) return; h.markRound = G.round; }
 const heroMarked = (G, h) => h.markRound === G.round;
 const heroInvisible = (G, h) => !!h.invis && !heroMarked(G, h);
 // ignor armoru jako stav na monstru (negativní stav, ikonka) do konce kola
-function pierceArmor(G, m) { if (m && !mdef(m).object) m.pierceRound = G.round; }
+function pierceArmor(G, m) { if (G.hunt && m && m.boss) return; if (m && !mdef(m).object) m.pierceRound = G.round; }
 const isPierced = (G, m) => m.pierceRound === G.round;
 // je figurka právě na tahu / v aktivaci?
 const isActiveFig = (G, f) => !!(G.active && (f.def ? G.active.hero === f.id : G.active.monster === f.uid));
@@ -4660,7 +4660,7 @@ function applyStatus(G, f, kind) {
     else if (kind === 'stun') f.stunNext = G.round + (now ? 1 : f.acted ? 1 : 0); // lovec: příští tah o 1 zahrání méně
     return;
   }
-  if (mdef(f).object) return;
+  if (mdef(f).object || (G.hunt && f.boss)) return; // v99b: vlkodlak je imunní vůči stavům
   if (kind === 'root') f.rooted = true;
   else if (kind === 'stun') f.stunned = true;
   else if (kind === 'disarm') f.disarmed = true;
@@ -4668,8 +4668,8 @@ function applyStatus(G, f, kind) {
 }
 const STATUS_TXT = { root: 'Přišpendlen', stun: 'Omráčen', disarm: 'Odzbrojen', disNext: 'Nevýhoda' };
 // jed: stackuje se; krvácení: stackuje se. Tikají na začátku tahu lovce / aktivace monstra.
-function addPoison(G, f, n) { if (!f || (!f.def && mdef(f).object)) return; const k = n === true || n == null ? 1 : n; if (k > 0) f.poison = (f.poison || 0) + k; }
-function addBleed(G, f, n) { if (!f || (!f.def && mdef(f).object)) return; const k = n === true || n == null ? 1 : n; if (k > 0) f.bleed = (f.bleed || 0) + k; }
+function addPoison(G, f, n) { if (!f || (!f.def && mdef(f).object) || (G.hunt && f.boss)) return; const k = n === true || n == null ? 1 : n; if (k > 0) f.poison = (f.poison || 0) + k; }
+function addBleed(G, f, n) { if (!f || (!f.def && mdef(f).object) || (G.hunt && f.boss)) return; const k = n === true || n == null ? 1 : n; if (k > 0) f.bleed = (f.bleed || 0) + k; }
 // začátek tahu/aktivace: X zranění za jed (pak jed −1) a X za krvácení (pak krvácení +1). Vrací true, když figurka padla.
 async function tickDots(G, f, ui) {
   const isH = !!f.def, red = isH && hasPassive(G, f, 'koren') ? 1 : 0, parts = [];
@@ -5098,7 +5098,7 @@ async function heroMove(G, h, points, C, ui, phase) {
       else if (ch.kind === 'search') await doSearch(G, h, ch.spot, C, ui);
       else if (ch.kind === 'unlock') { await tryUnlock(G, h, ui); if (h.escaped) points = 0; }
       else if (ch.kind === 'lever') await pullLever(G, h, ch.lever, ui);
-      else if (ch.kind === 'boss') { await bossAct(G, h, ch, ui); if (G.over) points = 0; }
+      else if (ch.kind === 'boss') { await bossAct(G, h, ch, ui, C); if (G.over) points = 0; }
       else if (ch.kind === 'give') { ch.target.keys.push(...h.keys); h.keys = []; log(G, h.name + ' předává klíč: ' + ch.target.name + '.'); }
       else if (ch.kind === 'take') { h.keys.push(...ch.target.keys); ch.target.keys = []; log(G, h.name + ' bere klíč ležícímu spolubojovníkovi.'); }
     }
@@ -5349,10 +5349,10 @@ function peekSpot(G, h, sp) {
 function proofTargets(G, h, range) { return G.monsters.filter(m => hexRevealed(G, m.pos) && (visibleToHeroes(G, m) || dist(m.pos, h.pos) <= 1) && dist(m.pos, h.pos) <= range && los(G, h.pos, m.pos)); }
 // granát: potřebuje výhled přes zdi a dveře, monstra ale výhled neblokují (letí nad nimi)
 function grenadeTargets(G, h, range) {
-  return G.monsters.filter(m => visibleToHeroes(G, m) && dist(h.pos, m.pos) <= range && los(G, h.pos, m.pos, true));
+  return G.monsters.filter(m => visibleToHeroes(G, m) && dist(h.pos, m.pos) <= range); // v99b: balistický hod přes překážky
 }
 const blindTargets = (G, h, range) => G.monsters.filter(m => visibleToHeroes(G, m) && dist(m.pos, h.pos) <= range && los(G, h.pos, m.pos));
-const fireStart = (G, h, range) => areaHexes(G).filter(x => hexRevealed(G, x) && !isBlock(x) && dist(x, h.pos) <= range && los(G, h.pos, x, true));
+const fireStart = (G, h, range) => areaHexes(G).filter(x => hexRevealed(G, x) && !isBlock(x) && dist(x, h.pos) <= range); // v99b: balistická karta
 const chainNext = (chosen, G) => (G ? areaHexes(G) : ROOM_HEXES).filter(x => !isBlock(x) && !chosen.some(c => eq(c, x)) && chosen.some(c => dist(c, x) === 1 && linkOK(c, x)));
 const healTargets = (G, h, range) => G.heroes.filter(o => !o.escaped && !o.lost && (o.downed || o.hp < o.maxHp || (o.bleed || 0) > 0) && dist(o.pos, h.pos) <= range);
 
@@ -5401,7 +5401,7 @@ function crossPairs(G, h, range) {
   }
   return out;
 }
-const rootAreaHexes = (G, h, range) => ROOM_HEXES.filter(x => hexRevealed(G, x) && dist(x, h.pos) <= range && los(G, h.pos, x, true));
+const rootAreaHexes = (G, h, range) => ROOM_HEXES.filter(x => hexRevealed(G, x) && dist(x, h.pos) <= range); // v99b: balistická karta – výhled nepotřebuje
 const pulseMonsters = (G, h, range) => G.monsters.filter(m => !mdef(m).object && visibleToHeroes(G, m) && dist(m.pos, h.pos) <= range);
 const hookTargets = (G, h, range) => G.monsters.filter(m => visibleToHeroes(G, m) && dist(m.pos, h.pos) <= range && dist(m.pos, h.pos) > 1 && los(G, h.pos, m.pos) && neighbors(m.pos).some(x => standable(G, x) && linkOK(x, m.pos)));
 const adjMonsters = (G, h) => G.monsters.filter(m => visibleToHeroes(G, m) && canStrike(G, h.pos, m.pos, 1));
@@ -5491,7 +5491,7 @@ function cannotPlay(G, h, card, half) {
     case 'blind': return blindTargets(G, h, s.range).length ? null : 'Žádné monstrum do ' + s.range + ' polí ve výhledu.';
     case 'fire': return fireStart(G, h, s.range).length ? null : 'Není kam hodit oheň.';
     case 'shove': return adjMonsters(G, h).length ? null : 'Vedle tebe není žádné monstrum.';
-    case 'grenade': return grenadeTargets(G, h, s.range).length ? null : 'Žádné viditelné monstrum do vzdálenosti ' + s.range + ' ve výhledu.';
+    case 'grenade': return grenadeTargets(G, h, s.range).length ? null : 'Žádné viditelné monstrum do vzdálenosti ' + s.range + '.';
     default: return null;
   }
 }
@@ -5989,7 +5989,7 @@ async function resolveCard(G, h, card, half, C, ui) {
       if (p) { h.hand = h.hand.filter(c => c !== p); h.removed.push(p); log(G, h.name + ' vyhazuje Paniku mimo hru.'); }
       draw(G, h, 1); return true;
     }
-    case 'sense': { const cands = s.range ? senseSpots(G, h, s.range) : nearestUnknownSpots(G, h); const sp = cands.length === 1 ? cands[0] : await pick('spot', cands, { prompt: 'Který žeton vycítit?' }); if (!sp) return false; peekSpot(G, h, sp); return true; }
+    case 'sense': { const cands = s.range ? senseSpots(G, h, s.range) : nearestUnknownSpots(G, h); const sp = s.range && cands.length > 1 ? await pick('spot', cands, { prompt: 'Který žeton vycítit?' }) : cands[Math.floor(rng() * cands.length)]; /* v99b: nejbližší při shodě náhodně, bez volby */ if (!sp) return false; peekSpot(G, h, sp); return true; }
     case 'reveal': {
       for (const m of G.monsters) if (dist(m.pos, h.pos) <= s.range && hexRevealed(G, m.pos)) { m.noEvRound = G.round; m.visibleRound = G.round; }
       if (s.ally) G.heroes.filter(o => !o.escaped && !o.downed && dist(o.pos, h.pos) <= s.ally).forEach(o => { const b = o.buff && o.buff.round === G.round ? o.buff : { mod: 0, dmg: 0 }; o.buff = { round: G.round, mod: Math.max(b.mod, 1), dmg: b.dmg }; });
@@ -6488,7 +6488,7 @@ async function activateGroup(G, type, C, ui, single, mode) {
         }
         if (md.moveOnly && md.attackAfter) md.moveOnly = false;
       }
-      else if (a.type === 'attack') { const h = opts.targets.find(x => x.id === a.hero); if (!h) continue; await monsterAttack(G, m, h, C, ui); attacks++; m._atkN = attacks;
+      else if (a.type === 'attack') { const h = opts.targets.find(x => x.id === a.hero); if (!h) continue; await monsterAttack(G, m, h, C, ui); if (G.hunt && m.boss) for (const o of liveHeroes(G).filter(o => o !== h && !o.downed && dist(o.pos, h.pos) === 1)) { if (G.over) break; log(G, mname(m) + ' se ohání i po ' + o.name + '.'); await monsterAttack(G, m, o, C, ui); } attacks++; m._atkN = attacks;
         // v72: útok ukončí aktivaci (zbylý pohyb propadá), pokud už nemůže znovu útočit ani použít schopnost
         if (attacks >= (mstats(G, m).attacks || 1) && !monsterSpecials(G, m, used).length) { actions = 0; checkWin(G); continue; } }
       else if (opts.specials.some(x => x.id === a.type)) { used.add(a.type); await doSpecial(G, m, a.type, C, ui); }
@@ -7790,7 +7790,7 @@ async function huntRoundStart(G, C, ui) {
   if (G.fx) G.fx.push({ t: 'huntsky', cloud });
 }
 async function huntRoundEnd(G, C, ui) {
-  const H = G.hunt, w = bossOf(G); if (!w || G.over) return;
+  const H = G.hunt, w = bossOf(G); huntCleanse(G); if (!w || G.over) return;
   if (!H.human && !H.dealt) {
     H.back = G.round + 2;
     huntSetForm(G, true, 'calm');
@@ -7800,8 +7800,10 @@ async function huntRoundEnd(G, C, ui) {
   }
 }
 // po tahu každého lovce: vlkodlak má 1 akci (jen v podobě vlka)
+// vlkodlak (i hajný) je imunní vůči stavům: omráčení, ukotvení, odzbrojení, oslabení, nevýhoda, provokace, krvácení, jed
+function huntCleanse(G) { const w = G.hunt && bossOf(G); if (!w) return; w.stunned = false; w.rooted = false; w.disarmed = false; w.disNext = false; w.taunt = null; w.weak = null; w.bleed = 0; w.poison = 0; w.markedUntil = 0; w.pierceRound = 0; }
 async function huntWolfAct(G, C, ui) {
-  const H = G.hunt, w = bossOf(G); if (!H || !w || H.human || G.over || w.down) return;
+  const H = G.hunt, w = bossOf(G); huntCleanse(G); if (!H || !w || H.human || G.over || w.down) return;
   if (!liveHeroes(G).length) return;
   G.phase = 'overlord';
   await activateGroup(G, w.type, C, ui, true, { only: [w], actions: 1 });
@@ -7818,19 +7820,21 @@ function huntPushDests(G, h, w) {
   return huntLine(G, h.pos, w).map((hex, i) => ({ n: i + 1, hex, trap: huntTrapAt(G, hex) }));
 }
 function huntInter(G, h, points) {
+  // v99b: jedna akce „Odstrčit · 2“ u hajného; cíl (1–3 pole v přímce) si lovec vybere až po aktivaci, jako pohyb
   const out = [], w = bossOf(G);
-  if (points >= HUNT_PUSH_COST && w && w.human) {
-    const tdist = x => Math.min(99, ...G.hunt.traps.filter(t => t.armed).map(t => dist(t.hex, x))), d0 = tdist(w.pos);
-    const ds = huntPushDests(G, h, w).map(d => Object.assign(d, { td: d.trap ? 0 : tdist(d.hex) })).sort((a, b) => a.td - b.td);
-    for (const d of ds) out.push({ kind: 'boss', act: 'push', cost: HUNT_PUSH_COST, hex: d.hex, n: d.n, lbl: 'Odstrčit hajného o ' + d.n + (d.trap ? ' do pasti' : '') + ' · ' + HUNT_PUSH_COST, want: d.trap || d.td < d0 });
-  }
+  if (w && w.human && huntPushDests(G, h, w).length) { const dis = points < HUNT_PUSH_COST; out.push({ kind: 'boss', act: 'push', cost: HUNT_PUSH_COST, hex: w.pos.slice(), lbl: 'Odstrčit · ' + HUNT_PUSH_COST, want: !dis && huntPushWant(G, h, w), disabled: dis }); }
   return out;
 }
-async function huntDo(G, h, ch, ui) {
+const huntTrapDist = (G, x) => Math.min(99, ...G.hunt.traps.filter(t => t.armed).map(t => dist(t.hex, x)));
+function huntPushWant(G, h, w) { const d0 = huntTrapDist(G, w.pos); return huntPushDests(G, h, w).some(d => d.trap || huntTrapDist(G, d.hex) < d0); }
+async function huntDo(G, h, ch, ui, C) {
   const w = bossOf(G);
   if (ch.act === 'push' && w && w.human) {
-    log(G, h.name + ' odstrkuje hajného.');
-    await shoveLine(G, h.pos, w, ch.n, ui, 0);
+    const ds = huntPushDests(G, h, w); if (!ds.length) return;
+    const x = await C.H.chooseTarget(G, h, { kind: 'hex', cands: ds.map(d => d.hex), prompt: 'Kam hajného odstrčíš? (1–' + HUNT_PUSH + ' pole v přímce)', optional: false, huntPush: true, m: w });
+    const d = ds.find(dd => x && eq(dd.hex, x)) || ds[0];
+    log(G, h.name + ' odstrkuje hajného o ' + d.n + (d.n === 1 ? ' pole.' : ' pole.'));
+    await shoveLine(G, h.pos, w, d.n, ui, 0);
   }
 }
 // zásah do pasti při posunu monstra (odstrčení kartou i akcí)
@@ -7942,7 +7946,7 @@ const BOSS_IMPL = {
 const bossImpl = G => G && G.scen && BOSS_IMPL[G.scen.goal];
 function bossInit(G) { FURN_GONE.clear(); const b = bossImpl(G); if (b) b.init(G); }
 function bossInter(G, h, points) { const b = bossImpl(G); return b && b.inter && !h.downed ? b.inter(G, h, points) : []; }
-async function bossAct(G, h, ch, ui) { const b = bossImpl(G); if (b && b.act) await b.act(G, h, ch, ui); checkWin(G); }
+async function bossAct(G, h, ch, ui, C) { const b = bossImpl(G); if (b && b.act) await b.act(G, h, ch, ui, C); checkWin(G); }
 async function bossRoundStart(G, C, ui) { const b = bossImpl(G); if (b && b.start) await b.start(G, C, ui); }
 async function bossRoundEnd(G, C, ui) { const b = bossImpl(G); if (b && b.end && !G.over) await b.end(G, C, ui); checkWin(G); }
 function bossGoals(G, h) { const b = bossImpl(G); return b && b.goals ? b.goals(G, h) : null; }
@@ -8091,6 +8095,16 @@ function lockValue(G, d) {
 }
 function bestLock(G, cands) { let best = null, bv = -1e9; for (const d of cands) { const v = lockValue(G, d); if (v > bv) { bv = v; best = d; } } return { d: best, v: bv }; }
 // zachycení: pole leží na cestě lovce k jeho cíli (blokuje ho)
+// v99b: jak moc pole překáží lovcům v odstrčení hajného do pasti (pole, odkud by strkali, nebo pole na dráze)
+function huntBlockVal(G, hex) {
+  const w = C.bossOf(G); if (!w || !w.human) return 0;
+  const tr = G.hunt.traps.filter(t => t.armed); let v = 0;
+  for (const n of C.neighbors(w.pos)) { if (!C.roomOf(n) || C.isBlock(n)) continue; const L = C.huntLine(G, n, w); if (!L.length) continue;
+    const tdNow = Math.min(99, ...tr.map(t => dist(t.hex, w.pos))), tdEnd = Math.min(99, ...tr.map(t => dist(t.hex, L[L.length - 1])));
+    if (tdEnd >= tdNow) continue; const k = tr.some(t => C.eq(t.hex, L[L.length - 1])) ? 1 : .5;
+    if (C.eq(n, hex)) v += k; else if (L.some(x => C.eq(x, hex))) v += k * .8; }
+  return v;
+}
 function interceptVal(G, hex) {
   let v = 0;
   for (const h of aliveHeroesB(G)) {
@@ -8503,7 +8517,11 @@ const heroBot = {
       return c.slice().sort((a, b) => dist(a.pos, h.pos) - dist(b.pos, h.pos) || (b.elite - a.elite))[0];
       case 'olcard': return c[0];
       case 'choice': return 'boost';
-      case 'hex': if (req.throwOver || (req.spec && req.spec.t === 'nudge')) {
+      case 'hex': if (req.huntPush) { // v99b: hajného do pasti, jinak co nejblíž k ní
+        const tr = G.hunt.traps.filter(t => t.armed), td = x => tr.some(t => C.eq(t.hex, x)) ? -1 : Math.min(99, ...tr.map(t => dist(t.hex, x)));
+        return c.slice().sort((a, b) => td(a) - td(b))[0];
+      }
+      if (req.throwOver || (req.spec && req.spec.t === 'nudge')) {
         const bad = x => (G.fire.some(f => C.eq(f.hex, x)) ? 3 : 0) + (C.saltAt(G, x) ? 2 : 0) - G.monsters.filter(o => !MDEF[o.type].object && dist(o.pos, x) === 1).length * 0.5;
         return c.slice().sort((a, b) => bad(b) - bad(a))[0];
       } else { const ms = G.monsters.filter(m => C.visibleToHeroes(G, m)); const sc = req.area === 'root' ? x => -ms.filter(m => !MDEF[m.type].object && dist(m.pos, x) <= 1).length : x => Math.min(99, ...ms.map(m => dist(m.pos, x))) + (req.area === 'fire' && G.heroes.some(o => C.eq(o.pos, x)) ? 50 : 0); return c.slice().sort((a, b) => sc(a) - sc(b))[0]; }
@@ -8792,7 +8810,12 @@ const overlordBot = {
       let v = 0;
       const tg = !disarmed && actions >= 2 && !(inSalt && C.eq(hex, m.pos)) ? hs.filter(h => C.canStrike(G, hex, h.pos, s.range) && !(G.comb && m.boss && !C.combZoneHas(G, h.pos))) : [];
       // v98: Banshee – kde skončí, tam příští kolo zakřičí: držet se u nositele hřebenu a stoupat mu do cesty k hrobům
-      if (G.hunt && m.boss && C.huntTrapAt(G, hex)) v -= 6; // v99: na pasti by se v lidské podobě hned chytil
+      if (G.hunt && m.boss) { // v99b: vlk se drží dál od pastí a u lovce, který už hrál (ten mu před další akcí neuteče)
+        const td = Math.min(9, ...G.hunt.traps.filter(t => t.armed).map(t => dist(t.hex, hex)));
+        if (td === 0) v -= 8; else if (td <= 3) v -= (4 - td) * 2;
+        for (const h of hs) { const d = dist(h.pos, hex); if (d === 1 && C.linkOK(hex, h.pos)) v += h.acted ? 14 : 5; else if (d <= 3) v += h.acted ? 3 : 1; }
+      }
+      if (G.hunt && !m.boss && G.hunt.human) v += huntBlockVal(G, hex) * 6; // v99b: monstra stojí v cestě odstrčení hajného
       if (G.comb && m.boss) { const hd = C.combHolder(G); if (hd && !hd.downed) { const d = dist(hd.pos, hex); v += d <= 2 ? 10 : d <= 4 ? 4 : 0; } v += interceptVal(G, hex) * 3; }
       if (tg.length) v += 40 + Math.max(...tg.map(h => self._targetScore(G, m, h))) * 3;
       else if (noAtkNow && !(inSalt && C.eq(hex, m.pos))) { const nx = hs.filter(h => C.canStrike(G, hex, h.pos, s.range)); if (nx.length) v += 12 + Math.max(...nx.map(h => self._targetScore(G, m, h))); }
@@ -10461,7 +10484,7 @@ const AMBV = {}; let ambBus = null, ambName = 'menu'; const AMB = {};
 const AMB_SCENES = {
   menu: { wind: .9 }, panstvi: { wind: .8, rain: .5, fire: .25 }, hrbitov: { wind: 1, crows: .8, owl: .6 }, les: { wind: 1, crows: .6, owl: .5 },
   krypta: { wind: .25, drips: .9, water: .3 }, klaster: { wind: .7, rain: .9, thunder: .7 }, zahrada: { wind: .9, crows: .7 }, mlyn: { wind: .6, fire: 1 },
-  svitani: { wind: .95, rain: .9, thunder: 1, gust: 1 }, ples: { wind: .3, murmur: .45, fire: .2 }, mlha: { wind: .7, owl: .8, crows: .4 }, hon: { wind: 1, owl: .5, crows: .2, thunder: .4, gust: 1 }, hon_mrak: { wind: .45, rain: .75, owl: .9, thunder: .6 }, kanaly: { water: 1, drips: .8, wind: .15 },
+  svitani: { wind: .95, rain: .9, thunder: 1, gust: 1 }, ples: { wind: .3, murmur: .45, fire: .2 }, mlha: { wind: .7, owl: .8, crows: .4 }, hon: { wind: .9, owl: .5, crows: .2, gust: .8 }, hon_mrak: { wind: .65, owl: .75, gust: .5 }, kanaly: { water: 1, drips: .8, wind: .15 },
 };
 function startAmb() {
   ambBus = ctx.createGain(); ambBus.gain.value = 1; ambBus.connect(ambG);
@@ -12590,13 +12613,13 @@ function e10Furn(f) {
 // světla a obloha: dva stavy bez animací – úplněk (stříbrné světlo, stíny, paprsky od měsíce) a zamračeno (tma, mlha, měsíc sotva prosvítá)
 function e10Lights() {
   const defs = svg.querySelector('defs'), [mx, my] = E10_MOON();
-  defs.insertAdjacentHTML('beforeend', `<radialGradient id="e10moonG" cx="${mx}" cy="${my}" r="${VW * .75}" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#dfeaff" stop-opacity=".16"/><stop offset=".45" stop-color="#9ab8f0" stop-opacity=".07"/><stop offset="1" stop-color="#3a5a9a" stop-opacity="0"/></radialGradient>
+  defs.insertAdjacentHTML('beforeend', `<radialGradient id="e10moonG" cx="${mx}" cy="${my}" r="${VW * .75}" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#dfeaff" stop-opacity=".09"/><stop offset=".45" stop-color="#9ab8f0" stop-opacity=".04"/><stop offset="1" stop-color="#3a5a9a" stop-opacity="0"/></radialGradient>
     <radialGradient id="e10fogG"><stop offset="0" stop-color="#9aa8b8" stop-opacity=".3"/><stop offset=".6" stop-color="#6a7a8c" stop-opacity=".12"/><stop offset="1" stop-color="#4a5a6a" stop-opacity="0"/></radialGradient>
     <radialGradient id="e10halo"><stop offset="0" stop-color="#f4f8ff" stop-opacity=".5"/><stop offset=".4" stop-color="#b8ccff" stop-opacity=".16"/><stop offset="1" stop-color="#8aa0d8" stop-opacity="0"/></radialGradient>
-    <linearGradient id="e10beam" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#e4eeff" stop-opacity="0"/><stop offset=".22" stop-color="#e4eeff" stop-opacity=".12"/><stop offset=".65" stop-color="#b8ccf4" stop-opacity=".045"/><stop offset="1" stop-color="#b8ccf4" stop-opacity="0"/></linearGradient>
+    <linearGradient id="e10beam" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#e4eeff" stop-opacity="0"/><stop offset=".22" stop-color="#e4eeff" stop-opacity=".06"/><stop offset=".65" stop-color="#b8ccf4" stop-opacity=".022"/><stop offset="1" stop-color="#b8ccf4" stop-opacity="0"/></linearGradient>
     <linearGradient id="e10skyG" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#0a1428"/><stop offset="1" stop-color="#16243a"/></linearGradient>
     <linearGradient id="e10skyC" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#05080e"/><stop offset="1" stop-color="#0c121c"/></linearGradient>`);
-  const gr = sv('g', { class: 'e10grade' }, `<g class="e10cloudL"><rect x="-50" y="-50" width="${VW + 100}" height="${VH + 100}" fill="#02050e" opacity=".55"/></g>`); gLight.before(gr);
+  const gr = sv('g', { class: 'e10grade' }, `<g class="e10cloudL"><rect x="-50" y="-50" width="${VW + 100}" height="${VH + 100}" fill="#02050e" opacity=".3"/></g>`); gLight.before(gr);
   // paprsky měsíce: vějíř od měsíce dolů; začínají za hradbou lesa průhledně, takže nemají uříznutý konec
   let beams = ''; const y0 = wy(0) - 40;
   for (let i = 0; i < 7; i++) { const t = (i - 3) / 3, spread = (hsh(i, 9) - .5) * .12, ang = t * .5 + spread, L = (VH - y0) * (.85 + hsh(i, 2) * .2), w0 = 6 + hsh(i, 4) * 6, w1 = 46 + hsh(i, 5) * 40, op = (.55 + hsh(i, 6) * .45).toFixed(2);
@@ -12617,7 +12640,10 @@ function e10Lights() {
   for (const h of e10Edge()) { const [x, y] = px(h), r = hsh(h[0] * 3 + 1, h[1] * 5 + 2), n = r < .07 ? 'n_deadpine' : r < .22 ? 'n_beech' : r < .6 ? 'n_spruce1' : 'n_spruce2';
     depthAdd(sv('g', { class: 'furn benv e10edge', transform: `translate(${(x + (hsh(h[1], h[0]) - .5) * 8).toFixed(1)},${y.toFixed(1)})` }, envImg(n, 0, envFurnDy(n), .95 + hsh(h[0], h[1] + 9) * .25)), y); }
   const L = e10Lodge(); if (L && ES('n_lodge2')) { const x = PADX + WPX * L.x, y = TOP + ROWH * L.y;
-    gDecor.insertAdjacentHTML('afterbegin', envImg('n_lodge2', x, y, L.sc));
+    // průchozí pole, přes která přesahuje sprite hájovny (střecha, komín, dvorek): obrys nad hájovnou, ať je jasné, kam se dá jít
+    const sp = ES('n_lodge2'), w2 = sp.w * EK * L.sc / 2, top = y - sp.h * EK * L.sc * .8, bot = y + sp.h * EK * L.sc * .2;
+    const over = C.ROOM_HEXES.filter(h => { const [hx, hy] = px(h); return hx > x - w2 - 4 && hx < x + w2 + 4 && hy > top - 4 && hy < bot + 10; });
+    gDecor.insertAdjacentHTML('afterbegin', envImg('n_lodge2', x, y, L.sc) + `<path class="e10over" d="${over.map(h => pts(h, SIZE - 2)).join('')}"/>`);
     gLight.insertAdjacentHTML('afterbegin', `<g class="lit"><ellipse cx="${x + 20}" cy="${y - 50}" rx="110" ry="60" fill="url(#ag-warm)" opacity=".55"/></g>`); }
   e10Sync(S.G, true);
 }
@@ -13426,7 +13452,7 @@ function bMuzzle(x, y, big, dir) {
   for (let i = 0; i < (big ? 7 : 4); i++) { const s = bR(1.5, 3); bMote(x + dir * bR(2, 8), y + bR(-2, 2), `<rect x="${-s}" y="${-s}" width="${s * 2}" height="${s * 2}" fill="${i % 2 ? '#6a6670' : '#8a8690'}" opacity=".8"/>`, dir * bR(2, 8), -bR(6, 16), bR(800, 1300), 60 + i * 40, [.6, 1.8]); }
 }
 function bImpact(x, y, col, n = 6, glow) { if (glow) bGlow(x, y, 9, 9, glow, 380, 1, 'screen'); for (let i = 0; i < n; i++) bMote(x, y, `<rect x="-.6" y="-.6" width="1.2" height="1.2" fill="${col}"/>`, bR(-9, 9), bR(-9, 5), bR(250, 450), i * 10); }
-const B_ARC = new Set(['salt', 'water', 'dynamite', 'lantern', 'furniture', 'dirt', 'pumpkin', 'dagger']);
+const B_ARC = new Set(['holyvial', 'salt', 'water', 'dynamite', 'lantern', 'furniture', 'dirt', 'pumpkin', 'dagger']);
 async function bProjectile(from, to, kind, hit, liftA = 30, liftB = 26, ox = 0) {
   bDefs();
   const [ax1, ay0] = px(from), ax = ax1 + ox, [bx0, by0] = px(to), ay = ay0 - liftA;
@@ -13461,6 +13487,19 @@ async function bProjectile(from, to, kind, hit, liftA = 30, liftB = 26, ox = 0) 
     case 'water': {
       await bFly(ax, ay, bx, by, { ms: base * 1.5, arc, every: 40, body: bPix(['.b.', 'bwb', 'bbb', '.b.'], { b: '#6ab8e0', w: '#e0f6ff' }, 1), trail: (x, y) => mote(x, y, '#9fd8f0', 1, 0, 4, 300) });
       bImpact(bx, by, '#bfe8ff', 9); return;
+    }
+    case 'holyvial': { // v99b: svěcená voda – lahvička v oblouku, roztříští se, modrobílý gejzír, zlatý kříž a jiskry stoupající vzhůru
+      await bFly(ax, ay, bx, by, { ms: base * 1.4, arc: arc * 1.2, spin: 2, every: 34, body: bPix(['.c.', '.g.', 'gwg', 'gbg', 'gbg', '.g.'], { c: '#8a6a3a', g: '#cfe8f4', w: '#ffffff', b: '#7ac4f0' }, .95), trail: (x, y) => mote(x, y, Math.random() < .5 ? '#bfe6ff' : '#ffe9a8', .9, 0, 2, 380) });
+      sfx('splash'); bRing(bx, by, 12, '#bfe8ff', 420, 1.4); bRing(bx, by, 6, '#ffe8a0', 300, 1);
+      for (let i = 0; i < 14; i++) { const a = Math.PI * 2 * i / 14; bMote(bx, by, `<rect x="-.7" y="-.7" width="1.4" height="1.4" fill="${i % 2 ? '#9fd8ff' : '#ffffff'}"/>`, Math.cos(a) * bR(8, 14), Math.sin(a) * bR(4, 8) - 3, bR(320, 520), i * 8); }
+      if (hit) { bMote(bx, by - 4, `<path d="M-.8 -5h1.6v3.2h3v1.6h-3v5.2h-1.6v-5.2h-3v-1.6h3z" fill="#ffe08a"/>`, 0, -12, 700, 60, 1.2); for (let i = 0; i < 8; i++) bMote(bx + bR(-6, 6), by, `<rect x="-.5" y="-.5" width="1" height="1" fill="#ffe9a8"/>`, bR(-2, 2), bR(-18, -10), bR(500, 800), 80 + i * 40); }
+      return;
+    }
+    case 'silver': { // v99b: stříbrná kulka – oslnivě bílá stopa, třpyt a stříbrný kruh při zásahu
+      bMuzzle(ax, ay, false, dir);
+      await bFly(ax, ay, bx, by, { ms: Math.max(140, dist * .9), orient: true, every: 12, body: `<path d="M-14 -.5h14v1h-14z" fill="#e8f2ff" opacity=".6"/><rect x="-3.5" y="-.8" width="4.5" height="1.6" fill="#ffffff"/><rect x=".5" y="-.5" width="1" height="1" fill="#c8d8f0"/>`, trail: (x, y) => mote(x, y, Math.random() < .6 ? '#ffffff' : '#bcd4f4', .8, bR(-2, 2), bR(-2, 2), 420) });
+      if (hit) { bImpact(bx, by, '#ffffff', 12); bRing(bx, by, 9, '#e8f2ff', 380, 1.6); bRing(bx, by, 15, '#a8c4ec', 520, .8); }
+      return;
     }
     case 'flash': return; // kamera: záblesk řeší fxCamFlash u lovce
     case 'dagger': await bFly(ax, ay, bx, by, { ms: base * 1.2, arc: arc * .4, spin: 3, body: bPix(BP.dagger, { b: '#6a4a2a', g: '#d0a040', s: '#c8d0d8', w: '#ffffff' }, .9) }); if (hit) bImpact(bx, by, '#e8eef4', 5); return;
@@ -13536,7 +13575,7 @@ async function bProjectile(from, to, kind, hit, liftA = 30, liftB = 26, ox = 0) 
   }
 }
 // beta: druh střely lovce podle předmětu karty, monstra podle typu
-const B_HERO_PROJ = { revolver: 'bullet', derringer: 'bullet', puska: 'rifle', brokovnice: 'pellets', kamera: 'flash', sul: 'salt', kyvadlo: 'violet', voda: 'water', dyka: 'dagger', jed: 'dart', harpuna: 'harpoon', breviar: 'holy', lebka: 'skullwail', zvonek: 'chime', lucerna2: 'bluefire' };
+const B_HERO_PROJ = { voda: 'holyvial', loot_voda: 'holyvial', loot_kulka: 'silver', revolver: 'bullet', derringer: 'bullet', puska: 'rifle', brokovnice: 'pellets', kamera: 'flash', sul: 'salt', kyvadlo: 'violet', voda: 'water', dyka: 'dagger', jed: 'dart', harpuna: 'harpoon', breviar: 'holy', lebka: 'skullwail', zvonek: 'chime', lucerna2: 'bluefire' };
 const B_MON_PROJ = { polt: 'furniture', zalarnik: 'chain', hrobnik: 'dirt', banshee: 'scream', kvety: 'thorns', strasaci: 'pumpkin', oci: 'eyebeam', grimoar: 'pages', kapela: 'notes', carodejnice: 'curse', vlkodlak: 'rifle', vdova: 'tear' };
 const B_MON_SND = { zalarnik: 'clank', hrobnik: 'throw', kvety: 'throw', strasaci: 'fire', oci: 'spell', grimoar: 'spell', carodejnice: 'spell', vlkodlak: 'shot', banshee: 'wail', kapela: 'ghost' };
 function bAttackStyle(ev, st) {
@@ -13843,11 +13882,12 @@ function badgesFor(kind, ent) {
     if (C.isInvisible(G, ent) && !C.visibleToHeroes(G, ent) && !heroView()) b.push(BADGE('eyeoff', '#d6b8f4', '', 'b-inv'));
     if (ent.down) b.push(BADGE('zzz', '#ff8a8a', '', 'b-zzz'));
     else if (!C.isAwake(G, ent) && G.phase !== 'setup' && !C.MDEF[ent.type].npc && !(G.hunt && ent.boss)) b.push(BADGE('zzz', '#a8b4d0', '', 'b-zzz'));
-    else if (ent.actedRound === G.round && !(G.active && G.active.monster === ent.uid)) b.push(BADGE('hourglass', '#a59b8f', '', 'b-done'));
+    else if (ent.actedRound === G.round && !(G.active && G.active.monster === ent.uid) && !(G.hunt && ent.boss)) b.push(BADGE('hourglass', '#a59b8f', '', 'b-done'));
+    if (G.hunt && ent.boss && !ent.human && G.hunt.dealt && G.phase !== 'setup') b.push(BADGE('jaws', '#ff7a5a', '', 'b-fangs')); // v99: už zranil – do konce kola zůstane vlkem
   }
   return b;
 }
-const ALWAYS = new Set(['b-haste', 'b-plus', 'b-mom', 'b-anchor', 'b-cover', 'b-water', 'b-veil', 'b-noheal', 'b-less', 'b-poison', 'b-bleed', 'b-mark', 'b-pierce', 'b-grab', 'b-peck', 'b-grief', 'b-dormant', 'b-bats', 'b-frenzy', 'b-stun', 'b-root', 'b-dis', 'b-taunt', 'b-done', 'b-zzz', 'b-key', 'b-key b-keys', 'b-inv', 'b-ev', 'b-ar', 'b-adv', 'b-disadv', 'b-weak', 'b-shaken']);
+const ALWAYS = new Set(['b-fangs', 'b-haste', 'b-plus', 'b-mom', 'b-anchor', 'b-cover', 'b-water', 'b-veil', 'b-noheal', 'b-less', 'b-poison', 'b-bleed', 'b-mark', 'b-pierce', 'b-grab', 'b-peck', 'b-grief', 'b-dormant', 'b-bats', 'b-frenzy', 'b-stun', 'b-root', 'b-dis', 'b-taunt', 'b-done', 'b-zzz', 'b-key', 'b-key b-keys', 'b-inv', 'b-ev', 'b-ar', 'b-adv', 'b-disadv', 'b-weak', 'b-shaken']);
 function renderBadges(t, list) {
   const key = list.map(x => x.ic + x.txt).join('|') + '@' + t.h;
   if (t.bkey === key) return; t.bkey = key;
@@ -13972,7 +14012,7 @@ function renderMap() {
     t.fig.classList.toggle('fog', !shown); t.lab.classList.toggle('fog', !shown);
     t.fig.classList.toggle('inv', C.isInvisible(G, m) && !C.visibleToHeroes(G, m) && !heroView());
     t.fig.classList.toggle('ghostly', !!C.MDEF[m.type].invisible);
-    t.fig.classList.toggle('done', m.actedRound === G.round && !(G.active && G.active.monster === m.uid));
+    t.fig.classList.toggle('done', m.actedRound === G.round && !(G.active && G.active.monster === m.uid) && !(G.hunt && m.boss));
     t.fig.classList.toggle('active', !!(G.active && G.active.monster === m.uid)); t.lab.classList.toggle('act', !!(G.active && G.active.monster === m.uid));
     t.fig.classList.toggle('sleeping', !C.isAwake(G, m) && G.phase !== 'setup' && !(G.hunt && m.boss));
     t.fig.classList.toggle('indark', roomDark(G, C.roomOf(m.pos)) && hv);
@@ -14325,11 +14365,11 @@ function renderHighlights0() {
   if (m.type === 'move' || m.type === 'monsterAction') {
     hlArea([...m.opts.reach.keys()].map(C.unK), m.type === 'move' ? 'a-move' : 'a-mmove');
     if (m.type === 'monsterAction' && m.opts.switchTo) G.monsters.filter(o => m.opts.switchTo.includes(o.uid)).forEach(o => hlRing(o.pos, 'ring-act'));
-    if (m.opts.inter) m.opts.inter.forEach((it, i) => { hlRing(it.hex, 'ring-act'); if (it.kind === 'pry' && betaOn()) hlPry(it.hex, { 'data-inter': i }); else if (it.kind === 'boss' && betaOn()) hlPlaque(it.hex, it.lbl, { 'data-inter': i }, it.act === 'unmask' ? 'mask' : 'search', it.disabled ? it.cost : 0); else hlPill(it.hex, (it.lbl || INTER_LBL[it.kind]) + (it.disabled ? ' · ' + it.cost : ''), it.disabled ? 'pill-act pill-dis' : 'pill-act', { 'data-inter': i }, -2); });
+    if (m.opts.inter) m.opts.inter.forEach((it, i) => { hlRing(it.hex, 'ring-act'); if (it.kind === 'pry' && betaOn()) hlPry(it.hex, { 'data-inter': i }); else if (it.kind === 'boss' && betaOn()) hlPlaque(it.hex, it.lbl, { 'data-inter': i }, it.act === 'unmask' ? 'mask' : it.act === 'push' ? 'push' : 'search', it.disabled ? it.cost : 0); else hlPill(it.hex, (it.lbl || INTER_LBL[it.kind]) + (it.disabled ? ' · ' + it.cost : ''), it.disabled ? 'pill-act pill-dis' : 'pill-act', { 'data-inter': i }, -2); });
     if (m.opts.targets) m.opts.targets.forEach(h => { const i = C.monsterAttackInfo(G, m.monster, h); hlRing(h.pos, 'ring-atk'); hlPill(h.pos, Math.round(i.chance * 100) + ' %', 'pill-atk' + (i.adv > 0 ? ' adv' : i.adv < 0 ? ' dis' : ''), { 'data-k': C.K(h.pos) }, liftOf(h.pos) + 12); });
   } else if (m.type === 'target') {
     const r = m.req, rng = r.spec && (r.spec.range || r.spec.move) && m.hero && !['hand', 'discard', 'spot'].includes(r.kind) ? (r.spec.range || 1) : 0;
-    if (rng > 1 && !r.chain) hlArea(rangeHexes(m.hero.pos, rng, r.kind === 'hero' || r.kind === 'door' ? null : r.spec.t === 'grenade' ? 'over' : 'los'), r.kind === 'hero' || r.kind === 'door' ? 'a-ally' : 'a-range');
+    if (rng > 1 && !r.chain) hlArea(rangeHexes(m.hero.pos, rng, r.kind === 'hero' || r.kind === 'door' ? null : ['grenade', 'rootarea', 'fire', 'htrap', 'raise'].includes(r.spec.t) || (r.spec.t === 'heal' && !r.spec.all && !r.spec.self) ? null : 'los'), r.kind === 'hero' || r.kind === 'door' ? 'a-ally' : 'a-range');
     if (r.kind === 'attack') r.cands.forEach(t => { hlRing(t.m.pos, 'ring-atk'); hlPill(t.m.pos, Math.round(t.chance * 100) + ' %', 'pill-atk' + (t.adv > 0 ? ' adv' : t.adv < 0 ? ' dis' : ''), { 'data-k': C.K(t.m.pos) }, liftOf(t.m.pos) + 12); });
     else if (r.kind === 'spot') r.cands.forEach(s => { hlRing(s.hex, 'ring-act'); const f = gDepth.querySelector(`.furn[data-k="${C.K(s.hex)}"]`); if (f) f.classList.add('cand'); });
     else if (r.kind === 'hex') r.cands.forEach(h => hlHex(h, 'hl-pick'));
@@ -15274,6 +15314,7 @@ const FIND_K = { trap: 'trap', key: 'key', fake: 'key' };
 async function findPopup(e) {
   const G = S.G; if (!betaOn() || typeof BetaFind === 'undefined' || !heroMine(e.hero) || S.ctl.heroes !== 'human' && !NETS.role) return;
   const h = G.heroes.find(x => x.id === e.hero), t = e.token, D = C.D, k = !t ? 'empty' : FIND_K[t] || 'loot';
+  if (k === 'empty') return; // v99b: prázdné místo bez vyskakovacího okna (stačí plovoucí text v mapě)
   let card = e.loot || (t === 'water' ? D.WATER : t === 'lantern' ? D.LANTERN : t === 'hammer' ? D.HAMMER : null);
   const eb = { empty: 'Nic', trap: 'Past!', key: 'Klíč', loot: 'Nález' }[k];
   const title = k === 'empty' ? 'Tady nic není' : k === 'trap' ? 'Sklapla past' : k === 'key' ? 'Starý klíč' : card ? card.name : (C.TOKENS[t] || 'Nález');
@@ -15303,6 +15344,16 @@ async function peekPopup(e) {
   let cards = [];
   if (e.loot) cards = [e.loot]; else if (t === 'water') cards = [D.WATER]; else if (t === 'lantern') cards = [D.LANTERN]; else if (t === 'hammer') cards = [D.HAMMER];
   const what = e.loot ? e.loot.name : t === 'fake' || t === 'key' ? 'Klíč (pravý, nebo falešný?)' : t ? (C.TOKENS[t] || t) : 'Nic';
+  const h = G.heroes.find(x => x.id === e.hero);
+  // v99b: stejné okno jako při nálezu (ilustrace, karta, popis), jen s „Vycítěno“ – obsah zůstává na místě, dokud ho někdo neprohledá
+  if (betaOn() && typeof BetaFind !== 'undefined') {
+    const k = !t ? 'empty' : FIND_K[t] || 'loot';
+    const txt = !t ? 'Nic tu není. Prohledávat to místo nemá cenu.' : k === 'trap' ? 'Kdo to místo prohledá, spustí past.' : k === 'key' ? 'Je pravý, nebo falešný? To ukáže až zámek.' : 'Leží to tam a čeká. Získá to ten, kdo místo prohledá.';
+    const box = el('div', { class: 'findpop peek k-' + k }, `<div class="bfind${cards.length ? ' hc' : ''}"><p class="bf-eb">Vycítěno</p><h3>${esc(what)}</h3><div class="bf-art" style="background-image:url(${BetaFind[k]})"></div>${cards.length ? `<div class="peek-cards">${cards.map(c => cardHTML(Object.assign({ uid: 0 }, c))).join('')}</div>` : ''}<p class="bf-txt"><b>${esc(h ? h.name : 'Lovec')}</b> · ${esc(sp.name)}<br>${esc(txt)}</p><div class="dlg-btns"><button class="btn primary">Rozumím</button></div></div>`);
+    sfx('card'); document.body.appendChild(box); stripTitles(box);
+    await new Promise(r => { box.querySelector('button').addEventListener('click', r); box.addEventListener('click', ev => { if (ev.target === box) r(); }); });
+    box.remove(); return;
+  }
   const box = el('div', { class: 'peekpop' }, `<div class="dialog"><p class="eyebrow">Vycítěno</p><h3>${esc(sp.name)}: ${esc(what)}</h3>${cards.length ? `<div class="peek-cards">${cards.map(c => cardHTML(Object.assign({ uid: 0 }, c))).join('')}</div>` : t === 'trap' ? '<p>Kdo to místo prohledá, spustí past.</p>' : !t ? '<p>Prázdné.</p>' : ''}<div class="dlg-btns"><button class="btn primary">Rozumím</button></div></div>`);
   document.body.appendChild(box); stripTitles(box);
   await new Promise(r => { box.querySelector('button').addEventListener('click', r); box.addEventListener('click', ev => { if (ev.target === box) r(); }); });
@@ -15344,7 +15395,8 @@ function attackStyle(ev) {
   if (item === 'kamera') return { kind: 'proj', proj: 'flash', snd: 'flash' };
   if (item === 'sul') return { kind: 'proj', proj: 'salt', snd: 'salt' };
   if (item === 'kyvadlo') return { kind: 'proj', proj: 'violet', snd: 'spell' };
-  if (item === 'voda') return { kind: 'proj', proj: 'water', snd: 'splash' };
+  if (item === 'voda' || item === 'loot_voda') return { kind: 'proj', proj: 'water', snd: 'splash' };
+  if (item === 'loot_kulka') return { kind: 'proj', proj: 'bullet', snd: 'shot' };
   if (item === 'savle') return { kind: 'melee', fx: 'slash', snd: 'blade' };
   return ranged ? { kind: 'proj', proj: 'bullet', snd: 'shot' } : { kind: 'melee', fx: 'slash', snd: 'blade' };
 }
@@ -15801,11 +15853,7 @@ function bossFX(G) {
     // v99: pasti (vidí je všichni); při přípravě je kreslí kroužky výběru
     if (G.phase !== 'setup') for (const t of H.traps) { if (!t.armed) continue; const [x, y] = px(t.hex);
       o += `<g class="btrap on" transform="translate(${x},${y})"><path d="${hexPts(0, 0, SIZE - 3)}"/>${env10On() && ES('n_stakes') ? envImg('n_stakes', 0, 8, .85) : '<text y="4" text-anchor="middle">⟋</text>'}</g>`; }
-    // hajný: kam ho jde odstrčit – přímky z okolních polí, které končí v pasti
     const w = C.bossOf(G);
-    if (w && H.human && G.phase !== 'setup') { const lines = [];
-      for (const n of C.neighbors(w.pos)) { if (!C.roomOf(n) || C.isBlock(n)) continue; const L = C.huntLine(G, n, w); if (L.length && C.huntTrapAt(G, L[L.length - 1])) lines.push([n, L]); }
-      for (const [n, L] of lines) { const pts = [w.pos].concat(L).map(px); o += `<path class="bpush" d="M${pts.map(p => p[0].toFixed(1) + ' ' + p[1].toFixed(1)).join('L')}"/>`; const [x, y] = px(n); o += `<circle class="bpush-from" cx="${x}" cy="${y}" r="4"/>`; } }
   }
   if (G.sew) {
     const S2 = G.sew, wet = C.ALL_HEXES.filter(h => C.roomOf(h) && C.sewWater(G, h) && roomVisible(C.roomOf(h)));
@@ -15865,7 +15913,7 @@ function bossQuest(G) {
   }
   if (G.hunt) {
     const H = G.hunt, fut = C.HUNT_CLOUDS.filter(r => r >= G.round), w = C.bossOf(G);
-    return [it(`Chyceno <b>${H.catches}</b> / ${C.HUNT_CATCH}${pips(H.catches, C.HUNT_CATCH)}`, H.catches >= C.HUNT_CATCH, 'Hajného odstrčíš ze sousedního pole o 1–3 v přímce (2 pohyb).'),
+    return [it(`Chyceno <b>${H.catches}</b> / ${C.HUNT_CATCH}${pips(H.catches, C.HUNT_CATCH)}`, H.catches >= C.HUNT_CATCH, 'Stoupni si k hajnému a dej Odstrčit (2 pohyb), pak vyber, kam v přímce (1–3 pole) poletí.'),
       it(H.human ? '<b>Hajný</b>: Dům ho teď neovládá' : (H.dealt ? 'Vlkodlak dnes <b>zranil</b>' : 'Vlkodlak dnes <b>nikoho nezranil</b>'), false, H.human ? 'Ve vlka se vrátí v ' + Math.max(H.back, G.round + 1) + '. kole' + (C.HUNT_CLOUDS.includes(Math.max(H.back, G.round + 1)) ? ' (mraky, tak později)' : '') + '.' : 'Když nikoho nezraní, na konci kola se promění v hajného.'),
       it('Mraky zakryjí měsíc', false, fut.length ? 'V kole ' + fut.join(', ') + ' je celé kolo hajným.' : 'Už žádné mraky.'),
       it('Nebo zabijte vlkodlaka', !w, w ? w.hp + ' ♥' : '')];
@@ -16285,8 +16333,21 @@ function ballDetailHTML() {
     <div class="bdn-row">${dn}</div>
     <div class="dlg-btns"><button class="btn primary" id="detclose">Zavřít</button></div></div>`;
 }
+// v99b: detail vlkodlaka v Divokém honu – jen pravidla tohoto scénáře
+function huntDetailHTML() {
+  const G = S.G, w = C.bossOf(G), H = G.hunt, st = C.stats(w), t = w.type;
+  const li = (b, x) => `<li><b>${b}</b> ${x}</li>`;
+  return `<div class="dialog wide mdet"><p class="eyebrow">Boss · Divoký hon</p><h2>${esc(w.human ? 'Prokletý hajný' : 'Vlkodlak')}</h2>
+    <p class="muted">${w.hp} / ${st.hp} ♥ · ${w.human ? 'teď člověk – Dům ho neovládá' : 'teď vlk – ovládá ho Dům'} · chycen ${H.catches} / ${C.HUNT_CATCH}</p>
+    <div class="md-half el"><div class="md-p">${monPortrait(t, true)}</div><div class="md-b"><p class="eyebrow">vlk</p><h3>Vlkodlak</h3>${statRow(st, true, t)}
+      <ul class="md-ab">${li('1 akce po tahu každého lovce:', 'pohyb ' + st.move + ', útok, nebo vytí.')}${li('Útok:', 'zasáhne cíl a samostatným hodem i každého lovce, který s cílem sousedí.')}${li('Vytí (1× za kolo):', 'lovci do 3 polí mají Strach těsně pod Panikou.')}${li('Pasti:', 'jako vlk jimi projde bez následků.')}${li('Imunní', 'vůči stavům (omráčení, ukotvení, odzbrojení, oslabení, nevýhoda…).')}</ul></div></div>
+    <div class="md-half"><div class="md-p">${monPortrait(t, false)}</div><div class="md-b"><p class="eyebrow">člověk</p><h3>Prokletý hajný</h3>
+      <ul class="md-ab">${li('Proměna:', 'když vlkodlak za celé kolo nikoho nezraní, na konci kola se promění v hajného a celé další kolo ho Dům neovládá. V kolech ' + C.HUNT_CLOUDS.join(', ') + ' (mraky) je hajným celé kolo.')}${li('Odstrčit (2 pohyb):', 'ze sousedního pole, v přímém směru o 1–' + C.HUNT_PUSH + ' pole; skrz figurky a překážky neprojde.')}${li('Past:', 'skončí-li v pasti (i když se na ní promění), je chycen a past zmizí. ' + C.HUNT_CATCH + '× chycen = výhra lovců.')}${li('Imunní', 'vůči stavům i v lidské podobě.')}</ul></div></div>
+    <div class="dlg-btns"><button class="btn primary" id="detclose">Zavřít</button></div></div>`;
+}
 function monDetailHTML(t) {
   if (S.G && S.G.ball && (t === 'upir' || t === 'tanecnik')) return ballDetailHTML();
+  if (S.G && S.G.hunt && C.bossOf(S.G) && C.bossOf(S.G).type === t) return huntDetailHTML();
   const d = C.MDEF[t], G = S.G;
   const half = elite => { const st = C.stats({ type: t, elite }); return `<div class="md-half${elite ? ' el' : ''}"><div class="md-p">${monPortrait(t, elite)}</div><div class="md-b"><p class="eyebrow">${elite ? (d.lieutenant ? 'poručík' : '★ elita') : d.lieutenant ? 'poručík' : 'přisluhovač'}</p><h3>${esc(elite ? d.eliteName : d.unit)}</h3>${S.G && S.G.grpUp && S.G.grpUp[t] && !elite ? `<p class="grp-chip">Vylepšeno: ${esc(grpBadge(t, S.G.grpUp[t]))}</p>` : ''}<div class="ms-st big">${statRow(st, elite, t)}</div>${elite ? (d.eliteAbil && d.eliteAbil.length ? '<p class="mab-h">Navíc u elity</p>' : '') + abilHTML(d.eliteAbil, d.eliteText) : abilHTML(d.abil, d.text)}</div></div>`; };
   return `<div class="dialog wide mdet"><p class="eyebrow">Skupina monster</p><h2>${esc(d.name)}</h2>
