@@ -4274,7 +4274,7 @@ let NOELITE = false; const noEl = t => NOELITE && !MDEF[t].boss && !MDEF[t].lieu
 const groupSize = t => 1 + MDEF[t].minions[NH] + (MDEF[t].lieutenant || MDEF[t].object ? 0 : (grpUp(t).plus || 0) + (grpUp(t).elite || 0)) - (noEl(t) ? 1 : 0);
 const maxElites = t => noEl(t) ? 0 : MDEF[t].lieutenant ? 0 : 1 + (grpUp(t).elite || 0);
 const eliteFull = (G, t) => G.monsters.filter(m => m.type === t && m.elite).length >= maxElites(t);
-const stats = m => { const o = Object.assign({}, MDEF[m.type].base, m.elite ? (MDEF[m.type].elite || {}) : {}, m.ov || {}); const u = grpUp(m.type).hp; if (u && o.hp && !MDEF[m.type].object) o.hp += u * D.grpHpPer(m.type); return o; };
+const stats = m => { const o = Object.assign({}, MDEF[m.type].base, m.elite ? (MDEF[m.type].elite || {}) : {}, m.ov || {}); const g = grpUp(m.type), u = g.hp; if (o.hp && !MDEF[m.type].object) { if (u) o.hp += u * D.grpHpPer(m.type); o.hp += (m.elite ? g.hpE : g.hpN) || 0; } return o; };
 const mdef = m => m.def || MDEF[m.type];
 const mname = m => m.nm ? m.nm : m.elite ? MDEF[m.type].eliteName : MDEF[m.type].unit;
 
@@ -4472,7 +4472,7 @@ function newGame(opts) {
     revealed: new Set(), spots: SPOT_DEFS.filter(s => !s.only || s.only === scen.id).map(s => Object.assign({}, s, { token: null, searched: false, peeked: false })),
     exitUnlocked: false, escaped: 0, curse: null, darkCancelled: new Set(), tempDark: new Set(),
     salt: [], fire: [], traps: new Set(), activated: new Set(), active: null,
-    threat: 0, ol: { deck: shuffle(OL_DECK.map(id => ({ id, uid: uid(), v: (o.olUp || {})[id] || '' }))), hand: [], discard: [] },
+    threat: (o.olStart && o.olStart.threat) || 0, olStart: o.olStart || null, ol: { deck: shuffle(OL_DECK.map(id => ({ id, uid: uid(), v: (o.olUp || {})[id] || '' }))), hand: [], discard: [] },
     htraps: [], darkExp: new Map(), darkHard: new Map(), darkSlow: new Set(), darkAtk: new Set(), creep: null,
     log: [], fx: [],
   };
@@ -4481,7 +4481,7 @@ function newGame(opts) {
   G.heroes.forEach(h => draw(G, h, 5));
   // nezahrané nálezy z minulých scénářů (kampaň) jsou hned v ruce
   G.heroes.forEach(h => { const lo = (o.loadouts || {})[h.id]; for (const id of (lo && lo.loot) || []) if (D.LOOT[id]) h.hand.push(Object.assign({}, D.LOOT[id], { uid: uid() })); });
-  for (let i = 0; i < 4; i++) olDraw(G);
+  for (let i = 0; i < 3 + ((o.olStart && o.olStart.card) || 0); i++) olDraw(G); // v172: Dům začíná se 3 kartami (+ vylepšení z kampaně)
   return G;
 }
 // v60: načtená (uložená) hra převezme aktuální data: karty lovců se znovu sestaví ze šablon (podle id předmětu / schopnosti
@@ -8625,7 +8625,7 @@ function clearSetupPart(G, part) {
 }
 // rozmístění žetonů hledání: pasti blíž startu lovců (vyprázdní jim první akce), nálezy (loot) co nejhlouběji v domě,
 // scénářové žetony (svíce, relikvie, falešný klíč) náhodně uprostřed
-const upVal = (G, t) => { const u = (G.grpUp || {})[t] || {}; return (u.hp || 0) + 2 * (u.plus || 0) + 3 * (u.elite || 0); };
+const upVal = (G, t) => { const u = (G.grpUp || {})[t] || {}; return (u.hp || 0) + (u.hpN || 0) + .5 * (u.hpE || 0) + 2 * (u.plus || 0) + 3 * (u.elite || 0); };
 function placeTokensSmart(G, toks, taken) {
   const start = G.heroes[0].pos;
   const free = C.shuffle(G.spots.filter(s => !taken.includes(s.id))).sort((a, b) => C.dist(a.hex, start) - C.dist(b.hex, start));
@@ -8962,7 +8962,7 @@ const equipList = eq => [...new Set(HSLOTS.map(s => eq[s]).filter(Boolean))];
 // v2: Dům má temnou esenci (klíč ol.gold) a vylepšení skupin monster (ol.gold, ol.grp), lovci si nesou nezahrané nálezy (heroes[id].loot)
 // v3: pořadí scénářů volí vítěz předchozího: played [id] (v pořadí odehrání), next (id vybraného, null = čeká se na výběr),
 //     picker ('heroes'|'ol' = kdo vybírá / vybíral), pickedBy (kdo vybral: 'bot' nebo jméno hráče), score { heroes, ol }
-const VER = 4; // v4: vylepšení monster platí pro všechny skupiny (ol.gup), staré po skupinách se refundují
+const VER = 5; // v5: nová vylepšení Domu (karty, Hrozba, zdraví zvlášť, posila, elita), stará se refundují; v4: vylepšení monster platí pro všechny skupiny (ol.gup), staré po skupinách se refundují
 const FIRST = 'blackmoor'; // první scénář kampaně je vždy Půlnoc na Blackmooru
 // v82: kampaň = intro + 3 scénáře + boss + 3 scénáře + boss (9 her); boss fight vybírá strana, která prohrává na body (remíza: lovci)
 const LEN = 9, BOSS_SLOTS = [4, 8];
@@ -8970,7 +8970,7 @@ const isBossSlot = st => BOSS_SLOTS.includes((st.played || []).length);
 const scenById = id => D.SCENARIOS.find(sc => sc.id === id) || null;
 function fresh() {
   const st = { v: VER, played: [], next: FIRST, picker: null, pickedBy: null, score: { heroes: 0, ol: 0 }, esence: 0, chest: [], history: [], streak: { heroes: 0, ol: 0 }, shop: null, rerolled: false, rewarded: null,
-    heroes: {}, ol: { xp: 0, gold: 0, up: {}, gup: { hp: 0, plus: 0, elite: 0 } } };
+    heroes: {}, ol: { xp: 0, gold: 0, up: {}, gup: { card: 0, threat: 0, hpN: 0, hpE: 0, plus: 0, elite: 0 } } };
   for (const h of D.HEROES) st.heroes[h.id] = { xp: 0, abil: {}, equip: startEquip(h.id), bag: [], loot: [] };
   return st;
 }
@@ -9001,11 +9001,17 @@ function migrate(st) {
     st.ol.gold = (st.ol.gold || 0) + back; st.ol.grp = {}; st.ol.gup = { hp: 0, plus: 0, elite: 0 }; if (back) st.ol.refund = back;
     delete st.ol.core; st.v = 4;
   }
+  if (st.v === 4) {
+    // v5: staré nákupy (Zocelení 2+3, Posila 5+7, Elita 7) se vrací jako temná esence
+    const OLD = { hp: [2, 3], plus: [5, 7], elite: [7] }, g = (st.ol && st.ol.gup) || {}; let back = 0;
+    for (const k of Object.keys(OLD)) for (let i = 0; i < Math.min(g[k] || 0, OLD[k].length); i++) back += OLD[k][i];
+    st.ol.gold = (st.ol.gold || 0) + back; st.ol.gup = { card: 0, threat: 0, hpN: 0, hpE: 0, plus: 0, elite: 0 }; if (back) st.ol.refund = (st.ol.refund || 0) + back; st.v = 5;
+  }
   if (st.v !== VER) return null;
   st.played = (st.played || []).filter(scenById); st.history = st.history || []; st.score = st.score || scoreOf(st.history);
   if (st.next && (!scenById(st.next) || st.played.includes(st.next))) st.next = null;
   if (!st.played.length && !st.next) st.next = FIRST;
-  st.ol.gold = st.ol.gold || 0; st.ol.gup = Object.assign({ hp: 0, plus: 0, elite: 0 }, st.ol.gup || {}); delete st.ol.grp; st.ol.up = st.ol.up || {}; st.streak = st.streak || { heroes: 0, ol: 0 };
+  st.ol.gold = st.ol.gold || 0; st.ol.gup = Object.assign({ card: 0, threat: 0, hpN: 0, hpE: 0, plus: 0, elite: 0 }, st.ol.gup || {}); delete st.ol.grp; st.ol.up = st.ol.up || {}; st.streak = st.streak || { heroes: 0, ol: 0 };
   // v60: všechno jsou id → po načtení platí aktuální data; neznámá (vyřazená) id zahodíme, chybějící lovce doplníme
   const okItem = x => !!(x && D.EQUIP[x]);
   st.chest = (st.chest || []).filter(okItem);
@@ -9028,7 +9034,8 @@ function clear() { try { localStorage.removeItem(KEY); } catch (e) { /* nic */ }
 function gameOpts(st) {
   const loadouts = {};
   for (const h of D.HEROES) loadouts[h.id] = { equip: equipList(st.heroes[h.id].equip), abil: Object.assign({}, st.heroes[h.id].abil), loot: (st.heroes[h.id].loot || []).slice() };
-  return { scenario: st.next || FIRST, loadouts, olUp: Object.assign({}, st.ol.up), grpUp: grpMap(st) };
+  const g = gupOf(st);
+  return { scenario: st.next || FIRST, loadouts, olUp: Object.assign({}, st.ol.up), grpUp: grpMap(st), olStart: { card: g.card || 0, threat: g.threat || 0 } };
 }
 // odměny za dohraný scénář; vrací souhrn pro obrazovku
 function applyResult(st, G) {
@@ -9131,18 +9138,22 @@ function upgradeOl(st, id, to) {
 }
 // vylepšení monster za temnou esenci Domu (v kódu ol.gold) – v4: platí pro VŠECHNY skupiny, cena podle úrovně
 const COMP = { heroEss: 2, heroXp: 1, olXp: 1, olGold: 1 };
+// v172: ceny podle hodnoty v Hrozbě (návrat přisluhovače = 3, elity = 6); Dům za kampaň vydělá zhruba 12–15 esence, všechno stojí 26
 const GRP_UPS = [
-  { k: 'hp', name: 'Zocelení', costs: [2, 3], max: 2, text: '+zdraví všem figurkám všech skupin.' },
-  { k: 'plus', name: 'Posila', costs: [5, 7], max: 2, text: '+1 přisluhovač v základní sestavě každé skupiny.' },
-  { k: 'elite', name: 'Elita navíc', costs: [7], max: 1, text: '+1 elita navíc v každé skupině.' },
+  { k: 'card', name: 'Karta do začátku', costs: [2, 3], max: 2, text: '+1 karta Domu v ruce na začátku scénáře (základ 3).' },
+  { k: 'threat', name: 'Hrozba do začátku', costs: [1, 1], max: 2, text: '+1 Hrozba na začátku scénáře.' },
+  { k: 'hpN', name: 'Zocelení přisluhovačů', costs: [3, 4], max: 2, text: '+1 zdraví každému přisluhovači.' },
+  { k: 'hpE', name: 'Zocelení elit', costs: [1, 2], max: 2, text: '+1 zdraví každé elitě.' },
+  { k: 'plus', name: 'Posila', costs: [4], max: 1, text: '+1 přisluhovač v každé skupině.' },
+  { k: 'elite', name: 'Elita navíc', costs: [6], max: 1, text: '+1 elita v každé skupině.' },
 ];
 const upgradableGroups = () => Object.keys(D.MDEF).filter(t => { const d = D.MDEF[t]; return !d.object && !d.hidden && !d.part && !d.lieutenant && !d.boss && !d.obelisk; });
 // skupiny, které se dají nasadit ve zbývajících (neodehraných) scénářích kampaně
 const remaining = st => D.SCENARIOS.filter(sc => !(st.played || []).includes(sc.id));
 const groupsFor = st => { const cats = new Set(remaining(st).flatMap(sc => sc.cats || [])); return upgradableGroups().filter(t => cats.has(D.MDEF[t].cat)); };
-const gupOf = st => Object.assign({ hp: 0, plus: 0, elite: 0 }, (st.ol && st.ol.gup) || {});
+const gupOf = st => Object.assign({ card: 0, threat: 0, hpN: 0, hpE: 0, plus: 0, elite: 0 }, (st.ol && st.ol.gup) || {});
 // pro hru: stejné vylepšení pro každou skupinu (jádro hry pracuje po typech)
-function grpMap(st) { const g = gupOf(st); if (!g.hp && !g.plus && !g.elite) return {}; return Object.fromEntries(upgradableGroups().map(t => [t, Object.assign({}, g)])); }
+function grpMap(st) { const g = gupOf(st), u = { hpN: g.hpN, hpE: g.hpE, plus: g.plus, elite: g.elite }; if (!u.hpN && !u.hpE && !u.plus && !u.elite) return {}; return Object.fromEntries(upgradableGroups().map(t => [t, Object.assign({}, u)])); }
 const grpCost = (st, k) => { const u = GRP_UPS.find(x => x.k === k); if (!u) return null; const n = gupOf(st)[k] || 0; return n >= u.max ? null : u.costs[n]; };
 function grpCan(st, k) {
   const u = GRP_UPS.find(x => x.k === k); if (!u) return 'Neznámé vylepšení.';
@@ -9155,10 +9166,10 @@ function buyGroupUp(st, k) {
   const c = grpCost(st, k); st.ol.gold -= c; st.ol.gup = gupOf(st); st.ol.gup[k] = (st.ol.gup[k] || 0) + 1;
   save(st); return null;
 }
-// bot Domu: kupuje posilu > elitu > zocelení, kdykoli na ně má
+// bot Domu: šetří a kupuje v pořadí posila > elita > zocelení přisluhovačů > karta > zocelení elit > Hrozba
 function botGold(st) {
   let guard = 0;
-  while (guard++ < 8) { const k = ['plus', 'elite', 'hp'].find(x => !grpCan(st, x)); if (!k) break; buyGroupUp(st, k); }
+  while (guard++ < 8) { const k = ['plus', 'elite', 'hpN', 'card', 'hpE', 'threat'].find(x => grpCost(st, x) != null); if (!k || grpCan(st, k)) break; buyGroupUp(st, k); }
 }
 // bot Domu: karty vylepšuje cíleně – drží si 4 oblíbené karty a ty prohlubuje do konce stromu
 function botOlCards(st) {
@@ -17583,13 +17594,13 @@ function campGrpHTML(st) {
   const nextT = nx ? Camp.groupsFor(st).filter(t => (nx.cats || []).includes(C.MDEF[t].cat)) : [];
   const row = u => { const n = g[u.k] || 0, cost = Camp.grpCost(st, u.k), why = Camp.grpCan(st, u.k);
     return `<div class="gup${n ? ' has' : ''}"><div class="gup-b"><b>${esc(u.name)}</b><small>${esc(u.text)}</small></div><span class="gup-pips">${Array.from({ length: u.max }, (_, i) => `<i class="${i < n ? 'on' : ''}"></i>`).join('')}</span>${cost == null ? '<span class="gup-max">max</span>' : `<button class="${buiOn() ? 'bbtn sm' : 'btn sm'}${why ? '' : ' primary'}" data-gup="${u.k}" ${why ? 'aria-disabled="true"' : ''} data-hint="${esc(u.name + ': ' + u.text + ' Cena ' + cost + ' temné esence.' + (why ? ' ' + why : ''))}">${cost} ${A.icon('crown')}</button>`}</div>`; };
-  return `<section class="grp-up"><div class="cp-h"><h3>Monstra Domu</h3><span class="ess gold">${A.icon('crown')} <b>${gold}</b> temné esence</span></div>
-    <p class="grp-hint" data-hint0="Vylepšení platí natrvalo pro všechny skupiny monster.">Vylepšení platí natrvalo pro všechny skupiny monster.</p>
+  return `<section class="grp-up"><div class="cp-h"><h3>Vylepšení Domu</h3><span class="ess gold">${A.icon('crown')} <b>${gold}</b> temné esence</span></div>
+    <p class="grp-hint" data-hint0="Platí natrvalo, pro všechny skupiny a každý další scénář.">Platí natrvalo, pro všechny skupiny a každý další scénář.</p>
     <div class="gup-list">${Camp.GRP_UPS.map(row).join('')}</div>
     ${nextT.length ? `<div class="gup-next"><span>Skupiny pro další scénář:</span>${nextT.map(t => `<span class="gup-t" title="${esc(C.MDEF[t].name)}">${monPortrait(t)}</span>`).join('')}</div>` : ''}${campScenDetHTML(nx, 'Další scénář')}</section>`;
 }
-const grpUpText = (t, u) => u.k === 'hp' ? '+' + C.D.grpHpPer(t) + ' zdraví všem figurkám' : u.text;
-const grpBadge = (t, g) => [g.hp ? '+' + g.hp * C.D.grpHpPer(t) + ' zdraví' : '', g.plus ? '+' + g.plus + ' přisluhovač' + (g.plus > 1 ? 'i' : '') : '', g.elite ? '+' + g.elite + ' elita' : ''].filter(Boolean).join(' · ');
+const grpUpText = (t, u) => u.text;
+const grpBadge = (t, g) => [g.hp ? '+' + g.hp * C.D.grpHpPer(t) + ' zdraví' : '', g.hpN ? '+' + g.hpN + ' zdraví přisluhovačům' : '', g.hpE ? '+' + g.hpE + ' zdraví elitám' : '', g.plus ? '+' + g.plus + ' přisluhovač' + (g.plus > 1 ? 'i' : '') : '', g.elite ? '+' + g.elite + ' elita' : ''].filter(Boolean).join(' · ');
 function campOlHTML(st) {
   return `<div class="cp-olgrid">${campGrpHTML(st)}<section class="cp-olc"><div class="cp-h"><h3>Karty Domu</h3><span class="ess">${st.ol.xp} xp</span><span class="ess o">${A.icon('threat')} 3 sloty skupin</span></div>
     <div class="ol-up">${C.OL_DECK.map(id => { const cur = st.ol.up[id] || '', nodes = Object.assign({ '': C.OL_CARDS[id].name }, Object.fromEntries(Object.entries(C.OL_VAR[id] || {}).map(([k, v]) => [k, v[0]]))); const nx = Camp.nextVariants(cur), cost = Camp.upCost(cur); return `<div class="olu"><p class="ab-name"><b class="ab-cur" data-pv="${cur}">${esc(nodes[cur] || C.OL_CARDS[id].name)}</b> <small>${cur ? 'úr. ' + C.levelOf(cur) : 'základ'}</small>${C.OL_VAR[id] && nx.length ? `<span class="olu-c${cost > st.ol.xp ? ' poor' : ''}">${cost} xp</span>` : ''}</p><div class="ab-next">${C.OL_VAR[id] ? treeMiniHTML(nodes, cur, st.ol.xp, `data-olup="${id}" data-v`, true) : '<small class="tmax">bez vylepšení</small>'}</div></div>`; }).join('')}</div><p class="grp-hint">Najetím na kartu nebo variantu uvidíš její znění.</p></section></div>`;
