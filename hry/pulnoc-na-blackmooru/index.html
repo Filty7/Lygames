@@ -3437,7 +3437,7 @@ const MDEF = {
   vlci: { cat: 'chatrc', name: 'Vlci', unit: 'Vlk', eliteName: 'Alfa', glyph: 'W', cost: 9, respawn: 2, eliteRespawn: 4, minions: { 2: 1, 3: 2, 4: 3 }, pack: true,
     base: { hp: 4, move: 5, range: 1, mod: 0, dmg: 2, fear: 0, evasion: 0, armor: 0 }, elite: { hp: 7, mod: 1, dmg: 3, howl: 3 },
     text: 'Smečka: +1 zranění za každého dalšího vlka u cíle (nejvýš +3).', eliteText: 'Alfa: 7♥, 3 dmg. Akce Vytí: lovci do 3 polí +1 Strach.' },
-  carodejnice: { darkAdv: true, cat: 'chatrc', name: 'Čarodějnice z hájovny', unit: 'Čarodějnice', eliteName: 'Baba z chatrče', glyph: 'C', cost: 15, respawn: 3, eliteRespawn: 6, minions: { 2: 1, 3: 1, 4: 2 }, auraDark: 1,
+  carodejnice: { darkAdv: true, cat: 'chatrc', name: 'Čarodějnice z hájovny', unit: 'Čarodějnice', eliteName: 'Baba z chatrče', glyph: 'C', cost: 15, respawn: 3, eliteRespawn: 6, minions: { 2: 2, 3: 2, 4: 3 }, auraDark: 1,
     base: { hp: 5, move: 3, range: 4, mod: 1, dmg: 2, fear: 0, evasion: 0, armor: 0, poison: 1 }, elite: { hp: 7, mod: 2, fear: 1, cauldron: 2 },
     text: 'Aura Temný šat: pole do 1 od ní jsou v Tmě. Zásah dá jed 1. Na lovce ve Tmě útočí s výhodou.', eliteText: 'Baba z chatrče: 7♥. Kotel: na konci aktivace vyléčí monstra do 2 polí o 2.' },
   vlkodlak: { cat: 'chatrc', boss: true, name: 'Vlkodlaci', unit: 'Prokletý hajný', eliteName: 'Vlkodlak', glyph: 'L', cost: 24, respawn: 8, eliteRespawn: 16, minions: { 2: 1, 3: 1, 4: 1 }, regen: 2, transform: true,
@@ -4039,7 +4039,7 @@ const SCENARIOS = [
 
 // ===== bot Domu: síla skupin a kombinace (simulace v60: poměr způsobeného zranění k referenci) =====
 const GRP_STR = { sluha: 1.0, krysy: 0.82, zbroj: 0.74, polt: 1.13, slimak: 0.94, zalarnik: 0.75, kostlivci: 0.85, ghulove: 1.01, hrobnik: 0.9,
-  kvety: 0.85, mury: 1.12, strasaci: 0.78, oci: 1.1, grimoar: 1.17, panenky: 0.92, kapela: 0.95, havrani: 1.11, vlci: 1.17, carodejnice: 1.01 };
+  kvety: 0.85, mury: 1.12, strasaci: 0.78, oci: 1.1, grimoar: 1.17, panenky: 0.92, kapela: 0.95, havrani: 1.11, vlci: 1.17, carodejnice: 1.25 }; // v99c: ježibaby +1 přisluhovačka
 function grpRoles(t) {
   const b = (MDEF[t] || {}).base || {}, r = new Set();
   if (b.hp >= 6 || b.armor > 0) r.add('front');
