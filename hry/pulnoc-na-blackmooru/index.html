@@ -2668,14 +2668,14 @@ MAPS.chatrc = {
     { id: 'C', name: 'Chlév', k0: 12, k1: 18, y0: 8, y1: 12, floor: 'hay', wall: 'plank' },
   ],
   doors: [
-    { id: 'd1', hex: [9, 8], rooms: ['V', 'S'], name: 'Síň – Světnice', noLock: true },
+    { id: 'd1', hex: [9, 8], rooms: ['V', 'S'], name: 'Síň – Světnice', noLock: true, open0: true },
     { id: 'd2', hex: [6, 9], rooms: ['V', 'U'], name: 'Síň – Kůlna' },
     { id: 'd3', hex: [12, 11], rooms: ['V', 'C'], name: 'Síň – Chlév' },
     { id: 'd4', hex: [6, 5], rooms: ['S', 'K'], name: 'Světnice – Kuchyně' },
     { id: 'd5', hex: [12, 7], rooms: ['S', 'D'], name: 'Světnice – Dílna' },
     { id: 'd6', hex: [9, 4], rooms: ['S', 'L'], name: 'Světnice – Ložnice' },
     { id: 'd7', hex: [3, 4], rooms: ['K', 'P'], name: 'Kuchyně – Seník' },
-    { id: 'd8', hex: [15, 4], rooms: ['D', 'O'], name: 'Dílna – Komora' },
+    { id: 'd8', hex: [15, 4], rooms: ['D', 'O'], name: 'Dílna – Komora', noLock: true, open0: true },
     { id: 'd9', hex: [12, 3], rooms: ['L', 'O'], name: 'Ložnice – Komora' },
     { id: 'd10', hex: [16, 8], rooms: ['D', 'C'], name: 'Dílna – Chlév' },
     { id: 'a1', hex: [6, 1], rooms: ['P', 'L'], name: 'Díra ve stěně', arch: true },
@@ -4831,7 +4831,7 @@ function checkWin(G) {
 // ---------- odhalování ----------
 function zoneOf(room) {
   const out = new Set([room]); let grew = true;
-  while (grew) { grew = false; for (const d of DOOR_DEFS) if (d.arch) { const [a, b] = d.rooms; if (out.has(a) && !out.has(b)) { out.add(b); grew = true; } if (out.has(b) && !out.has(a)) { out.add(a); grew = true; } } }
+  while (grew) { grew = false; for (const d of DOOR_DEFS) if (d.arch || d.open0) { /* v172: open0 = průchod */ const [a, b] = d.rooms; if (out.has(a) && !out.has(b)) { out.add(b); grew = true; } if (out.has(b) && !out.has(a)) { out.add(a); grew = true; } } }
   return [...out];
 }
 function revealRoom(G, room, quiet) {
