@@ -4041,7 +4041,7 @@ const SCENARIOS = [
     tokens: ['loot', 'loot', 'loot', 'trap', 'trap'], setup: ['tokens', 'buy', 'place'], locks: 0, bossName: 'Vlkodlak',
     short: 'Zabijte vlkodlaka. Pomůžou vám pasti – ale chytí jen hajného.',
     blurb: 'Úplněk nad Černým lesem. Vlkodlak krouží kolem staré hájovny. Když ho krev přejde, nebo když měsíc zajdou mraky, je z něj zase jen hajný – a toho se dá dostat do pasti.',
-    goalShort: 'Zabijte vlkodlaka (66 ♥). Ovládá ho Dům: po tahu každého lovce má 2 akce (pohyb 3) a útočí i na lovce vedle cíle. Když za kolo nikoho nezraní, na konci kola se promění v hajného (−5) a celé další kolo ho Dům neovládá; v kolech 3, 6, 9 a 12 je hajným kvůli mrakům. Hajného odstrčíš ze sousedního pole o 1–3 v přímce (2 pohyb). Skončí-li v jedné z 5 pastí, dostane 15 zranění, past zmizí a on je hned zase vlkem.' },
+    goalShort: 'Zabijte vlkodlaka (66 ♥). Ovládá ho Dům: po tahu každého lovce má 2 akce (pohyb 2, útok +1, zranění 2) a útočí i na lovce vedle cíle. Když za kolo nikoho nezraní, na konci kola se promění v hajného (−5) a celé další kolo ho Dům neovládá; v kolech 3, 6, 9 a 12 je hajným kvůli mrakům. Hajného odstrčíš ze sousedního pole o 1–3 v přímce (2 pohyb). Skončí-li v jedné z 5 pastí, dostane 15 zranění, past zmizí a on je hned zase vlkem.' },
   { id: 'kanaly', noElite: true, noThreat: true, n: 12, boss: true, map: 'kanaly', name: 'Zatopené kanály', goal: 'sluice', cats: ['kobka', 'chatrc'], maxRound: 10, bossHp: 28, budgetBonus: -1,
     tokens: [], setup: ['buy', 'place'], locks: 0, bossName: 'Obří troll',
     short: 'Zavřete tři stavidla dřív, než voda zaplaví výlez.',
@@ -4771,6 +4771,13 @@ function damageHero(G, h, n, cause) {
       if (G.fx) G.fx.push({ t: 'lost', at: h.pos.slice(), hero: h.id });
     }
   }
+}
+// v191: zvednutý lovec, na jehož poli stojí monstrum, se postaví na volné sousední pole – vybere zvedající (nebo on sám)
+async function liftOff(G, who, o, C, ui) {
+  if (!G.monsters.some(m => !mdef(m).object && eq(m.pos, o.pos))) return;
+  const cands = neighbors(o.pos).filter(n => standable(G, n) && linkOK(o.pos, n)); if (!cands.length) return;
+  const x = cands.length === 1 ? cands[0] : (await C.H.chooseTarget(G, who, { kind: 'hex', cands, prompt: o.name + ' vstává – na jeho poli stojí monstrum. Vyber volné pole vedle.' })) || cands[0];
+  o.pos = x.slice(); log(G, o.name + ' se zvedá na vedlejší pole.'); await ui.anim({ type: 'step', who: 'h:' + o.id, hex: x });
 }
 // zvednutí spoluhráčem: polovina zdraví, bez Paniky, plný tah při aktivaci
 function revive(G, t) {
@@ -5927,7 +5934,7 @@ async function resolveCard(G, h, card, half, C, ui) {
       else { const cand = G.heroes.filter(o => !o.escaped && !o.lost && dist(o.pos, h.pos) <= s.range && hurt(o)); const o = await pick('hero', cand); if (!o) return false; targets = [o]; }
       if (!targets.length) return false;
       for (const o of targets) {
-        if (o.downed) { o.downed = false; o.hp = Math.min(o.maxHp, healBy(G, h, s.n)); log(G, h.name + ' křísí ' + o.name + ': ' + o.hp + ' zdraví, bez Paniky.'); await ui.anim({ type: 'float', at: o.pos, text: 'Na nohou! +' + o.hp + ' ♥', cls: 'good' }); }
+        if (o.downed) { o.downed = false; o.hp = Math.min(o.maxHp, healBy(G, h, s.n)); log(G, h.name + ' křísí ' + o.name + ': ' + o.hp + ' zdraví, bez Paniky.'); await liftOff(G, h, o, C, ui); await ui.anim({ type: 'float', at: o.pos, text: 'Na nohou! +' + o.hp + ' ♥', cls: 'good' }); }
         else { const n = healHero(G, o, healBy(G, h, s.n * (s.x2 && posStatus(G, o) ? 2 : 1))); log(G, h.name + ' léčí ' + o.name + ': +' + n + ' zdraví.'); await ui.anim({ type: 'float', at: o.pos, text: '+' + n + ' ♥', cls: 'good' }); }
         if (s.fear) { o.fear = Math.max(0, o.fear - s.fear); }
         if (s.cure) { o.poison = 0; o.bleed = 0; }
@@ -5943,7 +5950,7 @@ async function resolveCard(G, h, card, half, C, ui) {
       o.downed = false; o.hp = Math.min(o.maxHp, s.half ? Math.ceil(o.maxHp / 2) : s.hp);
       if (s.heal) healHero(G, o, healBy(G, h, s.heal));
       if (s.armor) addArmor(G, o, s.armor);
-      log(G, h.name + ' křísí ' + o.name + ': ' + o.hp + ' zdraví, bez Paniky.'); await ui.anim({ type: 'float', at: o.pos, text: 'Na nohou!', cls: 'good' }); return true;
+      log(G, h.name + ' křísí ' + o.name + ': ' + o.hp + ' zdraví, bez Paniky.'); await liftOff(G, h, o, C, ui); await ui.anim({ type: 'float', at: o.pos, text: 'Na nohou!', cls: 'good' }); return true;
     }
     case 'analyze': {
       const picked = [];
@@ -6162,10 +6169,10 @@ async function heroTurn(G, h, C, ui) {
     if (h.downed && (h.plays > 0 || !downAtStart || h.lost)) { if (!downAtStart && !fellNow) { fellNow = true; log(G, h.name + ' padl ve svém tahu: tah končí.'); } break; }
     const a = await C.H.chooseAction(G, h); idle++;
     if (!a || a.type === 'end') break;
-    if (a.type === 'standup') { if (h.downed && !h.lost && !fellNow) { standUp(G, h); idle = 0; await ui.anim({ type: 'float', at: h.pos, text: 'Vstává!', cls: 'good' }); } }
+    if (a.type === 'standup') { if (h.downed && !h.lost && !fellNow) { standUp(G, h); idle = 0; await liftOff(G, h, h, C, ui); await ui.anim({ type: 'float', at: h.pos, text: 'Vstává!', cls: 'good' }); } }
     else if (a.type === 'revive') {
       const t = G.heroes.find(x => x.id === a.target);
-      if (t && t.downed && !t.lost && dist(t.pos, h.pos) <= 1) { revive(G, t); h.plays++; idle = 0; }
+      if (t && t.downed && !t.lost && dist(t.pos, h.pos) <= 1) { revive(G, t); h.plays++; idle = 0; await liftOff(G, h, t, C, ui); }
     } else if (a.type === 'relight') {
       // sc. 8: zapálení zhaslé svíce vedle lovce za 1 akci
       const c = adjCandles(G, h, false).find(x => x.id === a.candle);
@@ -7950,7 +7957,7 @@ function huntInit(G) {
   G.hunt = { human: false, back: 0, dealt: false, catches: 0, howlRound: 0, gone: [],
     traps: B.traps.map((x, i) => ({ hex: x.slice(), armed: true, pick: true, id: i })) }; // v99c: 5 pevných pastí; po chycení zmizí
   syncGone(G);
-  const w = makeBoss(G, 'vlkodlak', B.wolf, 'Vlkodlak', bossHpFor(G), { regen: 0, transform: false }, { move: 3, range: 1, attacks: 1, dmg: 3, mod: 2 }); // v179: pohyb 3 (2 akce po tahu lovců)
+  const w = makeBoss(G, 'vlkodlak', B.wolf, 'Vlkodlak', bossHpFor(G), { regen: 0, transform: false }, { move: 2, range: 1, attacks: 1, dmg: 2, mod: 1 }); // v191: pohyb 2, zranění 2, útok +1 (2 akce po tahu každého lovce)
   w.auto = true; w.awake = true;
 }
 // příprava: Dům vybírá 5 ze 7 míst pro pasti
@@ -16585,7 +16592,7 @@ function monSum(t) {
   const status = !ms.length ? 'eliminováno' : hv ? (shownMs.length ? 'vidíš ' + shownMs.length : 'teď nevidíš') : ms.length + '/' + C.groupSize(t) + ' · ' + (act ? 'aktivována' : awake ? 'bdí' : 'spí');
   const ab = (list) => (list || []).map(([ic, tip]) => `<span class="ms-ab" title="${esc(tip)}">${A.icon(ic)}</span>`).join('');
   { const w = G.hunt && C.bossOf(G); if (w && w.type === t) { // v99: vlkodlak – skutečné hodnoty bosse, žádný obecný řádek skupiny
-    const st = C.stats(w), stt = w.human ? 'hajný · Dům ho neovládá · odstrč ho do pasti (−15)' : 'vlk · 2 akce po každém lovci · pohyb 3 · útočí i na sousedy cíle';
+    const st = C.stats(w), stt = w.human ? 'hajný · Dům ho neovládá · odstrč ho do pasti (−15)' : 'vlk · 2 akce po každém lovci · pohyb 2 · útočí i na sousedy cíle';
     return `<div class="msum" data-mon="${t}" role="button" tabindex="0" title="Klikni pro detail"><span class="ms-mini">${monPortrait(t, !w.human)}<b>1</b></span><div class="ms-head"><b>${esc(w.nm || 'Vlkodlak')}</b><small>${stt} · ${w.hp}/${st.hp} ♥</small></div><div class="ms-row el"><span class="ms-p">${monPortrait(t, !w.human)}</span><span class="ms-n"></span><span class="ms-st">${statRow(st, true, t)}</span></div></div>`; } }
   const row = (elite) => `<div class="ms-row${elite ? ' el' : ''}"><span class="ms-p">${monPortrait(t, elite)}</span><span class="ms-n" title="${esc(elite ? d.eliteName : d.unit)}">${elite ? '★' : ''}</span><span class="ms-st">${statRow(C.stats({ type: t, elite }), elite, t)}${ab(elite ? (MON_ABE[t] || []).concat(MON_AB[t] || []) : MON_AB[t])}</span></div>`;
   return `<div class="msum${act ? ' done' : ''}${!ms.length ? ' gone' : ''}" data-mon="${t}" role="button" tabindex="0" title="Klikni pro detail monster"><span class="ms-mini">${monPortrait(t)}<b>${hv ? shownMs.length : ms.length}</b></span>
@@ -17630,7 +17637,7 @@ const GOAL_H = {
   comb: { story: 'Mlha nad bažinou je tak hustá, že je vidět jen na dvě pole. Jeden z vás nese hřeben Banshee a ona si pro něj jde.', goal: 'Vložte hřeben do pravého ze čtyř hrobů, nebo Banshee zabijte.',
     how: ['Nositel hřebenu cítí směr k pravému hrobu (šipka). Vložit hřeben = 1 pohyb vedle hrobu. Špatný hrob vzbudí mrtvé.', 'Hřeben jde podat sousedovi nebo hodit až na 3 pole. Od ležícího ho můžeš vzít.', 'Na konci kola Banshee dojde k nositeli a zakvílí: +2 Strach do 3 polí. Pak je kolo vidět a jde zasáhnout.', 'Kořenářka nese lucernu a vidí dál. Bludičky lákají lovce k sobě.'] },
   hunt: { story: 'Úplněk nad Černým lesem. Vlkodlak krouží kolem staré hájovny.', goal: 'Zabijte vlkodlaka (66 ♥) do konce 12. kola.',
-    how: ['Vlkodlaka ovládá Dům. Po tahu každého lovce má 2 akce: pohyb 3, útok, nebo vytí (lovci do 3 polí mají Strach těsně pod Panikou). Útočí i na lovce vedle svého cíle.', 'Když za celé kolo nikoho nezraní, na konci kola se promění v hajného. Celé další kolo ho Dům neovládá. V kolech 3, 6, 9 a 12 zakryjí měsíc mraky a je hajným celé kolo.', 'Každá proměna v hajného ho stojí 5 zranění.', 'Hajného odstrčíš ze sousedního pole v přímém směru o 1–3 pole (2 pohyb). Když skončí v jedné z 5 pastí, dostane 15 zranění, past zmizí a on je hned zase vlkem.', 'Hajný se po tahu každého lovce posune o 1 pole k nejbližší pasti, jen když se k ní tím opravdu přiblíží (může do ní i sám vlézt).'] },
+    how: ['Vlkodlaka ovládá Dům. Po tahu každého lovce má 2 akce: pohyb 2, útok, nebo vytí (lovci do 3 polí mají Strach těsně pod Panikou). Útočí i na lovce vedle svého cíle.', 'Když za celé kolo nikoho nezraní, na konci kola se promění v hajného. Celé další kolo ho Dům neovládá. V kolech 3, 6, 9 a 12 zakryjí měsíc mraky a je hajným celé kolo.', 'Každá proměna v hajného ho stojí 5 zranění.', 'Hajného odstrčíš ze sousedního pole v přímém směru o 1–3 pole (2 pohyb). Když skončí v jedné z 5 pastí, dostane 15 zranění, past zmizí a on je hned zase vlkem.', 'Hajný se po tahu každého lovce posune o 1 pole k nejbližší pasti, jen když se k ní tím opravdu přiblíží (může do ní i sám vlézt).'] },
   sluice: { story: 'Kanály pod Blackmoorem po průtrži. Voda stoupá a Obří troll rve stavidla zpátky.', goal: 'Zavřete všechna tři stavidla, nebo trolla zabijte.',
     how: ['Točit stavidlem = 1 pohyb vedle něj, zavřené je po 3 dílcích.', 'Proud unáší figurky ve vodě o 2 pole, každé 2. kolo troll pošle vlnu o 3. Troll stojící u stavidla ho vrací.', 'Voda stoupá na konci 3., 6. a 9. kola. Na hladině 3 zaplaví výlez.', 'Krysař pomáhá točit nejbližším stavidlem.'] },
   escape: { story: 'Seance se zvrtla a dům za vámi zabouchl dveře.', goal: 'Utečte hlavními dveřmi ve Vstupní hale. Stačí dva z vás.',
@@ -17802,8 +17809,9 @@ function initFullscreen() {
 }
 // tlačítka zvuku: v liště hry i v hlavním menu (v61) ukazují stejný stav
 // v190: verze a change log v hlavním menu
-const GAME_VER = 'v191';
+const GAME_VER = 'v192';
 const CHANGELOG = [
+  ['v192 · 23. 11.', ['Lovec, který vstane na poli s monstrem, se postaví na volné sousední pole (vybírá zvedající, nebo on sám).', 'Divoký hon: vlkodlak pohyb 2, zranění 2, útok +1.']],
   ['v191 · 23. 11.', ['Oprava nápisu v menu po přepnutí grafiky tam a zpět.']],
   ['v190 · 23. 11.', ['Change log a číslo verze v menu.', 'Divoký hon: vlkodlak hraje po tahu každého lovce, 2 akce, pohyb 3, 66 ♥.', 'Hajný se po tahu lovce posune o pole k nejbližší pasti (jen když se přiblíží, může do ní i vlézt).', 'Na hodinách měsíce u kol s mraky (3, 6, 9, 12).', 'Bez dveří se Zamčení mění na líznutí karty zdarma.']],
   ['22. 11.', ['Zelené bludiště: vždy dvě otevřené branky, 20 živých průchodů, 3 skupiny vzhůru od začátku, bez Tmy na startu.', 'Měnění keřů s animací (uvadnutí → pauza → nové keře); výběr Domu se zeleným zvýrazněním, keř z minulého kola nejde.', 'Plot vykreslený jako bitmapa – plynulejší zoom; nižší a rozcuchanější keře, záře otevřené branky, trnitá zavřená branka.', 'Oprava blikání monster a světel při každém kroku (napříč scénáři).', 'Můry −1 k hodu, Smrtihlav jistý jed 1; dynamit ukazuje šanci na zásah; jednorázové karty z lootu modře.', 'Zrádná podlaha: vlastní efekt pro každou úroveň; zlatý obrys lootu v lese a mlze; hledání přes hranici místností bez zdi.', 'Respawn na kliknuté místo, létající monstra otevřou dveře jen na konci pohybu, monstrum po útoku už se nehýbe.', 'Konec scénáře v kampani říká, kdo vybírá další scénář (a boss fight).', 'Vytí vlkodlaka při proměně a vzdálená smečka; plynulejší zvuky bez lupání.']],
