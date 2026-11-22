@@ -7947,7 +7947,7 @@ function huntInit(G) {
   G.hunt = { human: false, back: 0, dealt: false, catches: 0, howlRound: 0, gone: [],
     traps: B.traps.map((x, i) => ({ hex: x.slice(), armed: true, pick: true, id: i })) }; // v99c: 5 pevných pastí; po chycení zmizí
   syncGone(G);
-  const w = makeBoss(G, 'vlkodlak', B.wolf, 'Vlkodlak', bossHpFor(G), { regen: 0, transform: false }, { move: 5, range: 1, attacks: 1, dmg: 3, mod: 2 });
+  const w = makeBoss(G, 'vlkodlak', B.wolf, 'Vlkodlak', bossHpFor(G), { regen: 0, transform: false }, { move: 3, range: 1, attacks: 1, dmg: 3, mod: 2 }); // v179: pohyb 3 (2 akce po tahu lovců)
   w.auto = true; w.awake = true;
 }
 // příprava: Dům vybírá 5 ze 7 míst pro pasti
@@ -17627,7 +17627,7 @@ const GOAL_H = {
   comb: { story: 'Mlha nad bažinou je tak hustá, že je vidět jen na dvě pole. Jeden z vás nese hřeben Banshee a ona si pro něj jde.', goal: 'Vložte hřeben do pravého ze čtyř hrobů, nebo Banshee zabijte.',
     how: ['Nositel hřebenu cítí směr k pravému hrobu (šipka). Vložit hřeben = 1 pohyb vedle hrobu. Špatný hrob vzbudí mrtvé.', 'Hřeben jde podat sousedovi nebo hodit až na 3 pole. Od ležícího ho můžeš vzít.', 'Na konci kola Banshee dojde k nositeli a zakvílí: +2 Strach do 3 polí. Pak je kolo vidět a jde zasáhnout.', 'Kořenářka nese lucernu a vidí dál. Bludičky lákají lovce k sobě.'] },
   hunt: { story: 'Úplněk nad Černým lesem. Vlkodlak krouží kolem staré hájovny.', goal: 'Zabijte vlkodlaka (66 ♥) do konce 12. kola.',
-    how: ['Vlkodlaka ovládá Dům. Až odehrají všichni lovci, má 2 akce: pohyb 5, útok, nebo vytí (lovci do 3 polí mají Strach těsně pod Panikou). Útočí i na lovce vedle svého cíle.', 'Když za celé kolo nikoho nezraní, na konci kola se promění v hajného. Celé další kolo ho Dům neovládá. V kolech 3, 6, 9 a 12 zakryjí měsíc mraky a je hajným celé kolo.', 'Každá proměna v hajného ho stojí 5 zranění.', 'Hajného odstrčíš ze sousedního pole v přímém směru o 1–3 pole (2 pohyb). Když skončí v jedné z 5 pastí, dostane 15 zranění, past zmizí a on je hned zase vlkem.', 'Hajný se po tahu každého lovce posune o 1 pole k nejbližší pasti, jen když se k ní tím opravdu přiblíží (může do ní i sám vlézt).'] },
+    how: ['Vlkodlaka ovládá Dům. Až odehrají všichni lovci, má 2 akce: pohyb 3, útok, nebo vytí (lovci do 3 polí mají Strach těsně pod Panikou). Útočí i na lovce vedle svého cíle.', 'Když za celé kolo nikoho nezraní, na konci kola se promění v hajného. Celé další kolo ho Dům neovládá. V kolech 3, 6, 9 a 12 zakryjí měsíc mraky a je hajným celé kolo.', 'Každá proměna v hajného ho stojí 5 zranění.', 'Hajného odstrčíš ze sousedního pole v přímém směru o 1–3 pole (2 pohyb). Když skončí v jedné z 5 pastí, dostane 15 zranění, past zmizí a on je hned zase vlkem.', 'Hajný se po tahu každého lovce posune o 1 pole k nejbližší pasti, jen když se k ní tím opravdu přiblíží (může do ní i sám vlézt).'] },
   sluice: { story: 'Kanály pod Blackmoorem po průtrži. Voda stoupá a Obří troll rve stavidla zpátky.', goal: 'Zavřete všechna tři stavidla, nebo trolla zabijte.',
     how: ['Točit stavidlem = 1 pohyb vedle něj, zavřené je po 3 dílcích.', 'Proud unáší figurky ve vodě o 2 pole, každé 2. kolo troll pošle vlnu o 3. Troll stojící u stavidla ho vrací.', 'Voda stoupá na konci 3., 6. a 9. kola. Na hladině 3 zaplaví výlez.', 'Krysař pomáhá točit nejbližším stavidlem.'] },
   escape: { story: 'Seance se zvrtla a dům za vámi zabouchl dveře.', goal: 'Utečte hlavními dveřmi ve Vstupní hale. Stačí dva z vás.',
