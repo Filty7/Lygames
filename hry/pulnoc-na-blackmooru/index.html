@@ -4037,7 +4037,7 @@ const SCENARIOS = [
     tokens: ['loot', 'loot', 'loot', 'trap', 'trap'], setup: ['tokens', 'buy', 'place'], locks: 0, bossName: 'Vlkodlak',
     short: 'Zabijte vlkodlaka. Pomůžou vám pasti – ale chytí jen hajného.',
     blurb: 'Úplněk nad Černým lesem. Vlkodlak krouží kolem staré hájovny. Když ho krev přejde, nebo když měsíc zajdou mraky, je z něj zase jen hajný – a toho se dá dostat do pasti.',
-    goalShort: 'Zabijte vlkodlaka (66 ♥). Ovládá ho Dům: po tahu všech lovců má 2 akce a útočí i na lovce vedle cíle. Když za kolo nikoho nezraní, na konci kola se promění v hajného (−5) a celé další kolo ho Dům neovládá; v kolech 3, 6, 9 a 12 je hajným kvůli mrakům. Hajného odstrčíš ze sousedního pole o 1–3 v přímce (2 pohyb). Skončí-li v jedné z 5 pastí, dostane 15 zranění, past zmizí a on je hned zase vlkem.' },
+    goalShort: 'Zabijte vlkodlaka (66 ♥). Ovládá ho Dům: po tahu každého lovce má 2 akce (pohyb 3) a útočí i na lovce vedle cíle. Když za kolo nikoho nezraní, na konci kola se promění v hajného (−5) a celé další kolo ho Dům neovládá; v kolech 3, 6, 9 a 12 je hajným kvůli mrakům. Hajného odstrčíš ze sousedního pole o 1–3 v přímce (2 pohyb). Skončí-li v jedné z 5 pastí, dostane 15 zranění, past zmizí a on je hned zase vlkem.' },
   { id: 'kanaly', noElite: true, noThreat: true, n: 12, boss: true, map: 'kanaly', name: 'Zatopené kanály', goal: 'sluice', cats: ['kobka', 'chatrc'], maxRound: 10, bossHp: 28, budgetBonus: -1,
     tokens: [], setup: ['buy', 'place'], locks: 0, bossName: 'Obří troll',
     short: 'Zavřete tři stavidla dřív, než voda zaplaví výlez.',
@@ -7602,8 +7602,7 @@ async function playRound(G, C, ui) {
       h.acted = true;
       await heroTurn(G, h, C, ui);
       if (checkWin(G)) break;
-      if (G.hunt) { await huntKeeperDrift(G, ui); if (checkWin(G)) break; // v179: hajný po každém lovci o pole k pasti; vlkodlak jedná až po tahu všech lovců (2 akce)
-        if (!G.heroes.some(x => !x.acted && !x.escaped && !x.lost)) { await huntWolfAct(G, C, ui); if (checkWin(G)) break; } }
+      if (G.hunt) { await huntWolfAct(G, C, ui); if (checkWin(G)) break; await huntKeeperDrift(G, ui); if (checkWin(G)) break; } // v179: vlkodlak po tahu každého lovce (2 akce), hajný o pole k pasti
       if (G.mazeNeedExit) await mazeOpenExit(G, C, ui); // v94: lovec utekl – Dům otevře jinou branku
     }
     // Dům je na tahu po každém lovci: aktivuje skupinu, nebo (nemá-li žádnou) aspoň zahraje karty
@@ -7934,7 +7933,7 @@ function combGoals(G, h) {
 }
 
 // ---------------- Divoký hon (Vlkodlak) – v99 ----------------
-// Vlkodlaka ovládá Dům: po tahu každého lovce má 1 akci (pohyb 5 / útok / vytí), skupiny monster jedou normálně.
+// Vlkodlaka ovládá Dům: po tahu každého lovce má 2 akce (pohyb 3 / útok / vytí), skupiny monster jedou normálně.
 // Když za celé kolo nikoho nezraní, na konci kola se promění v hajného (lidskou podobu) a celé další kolo ho Dům neovládá.
 // V kolech 3, 6, 9 a 12 zakryjí měsíc mraky: hajný celé kolo. Hajného lze odstrčit v přímce až o 3; past ho chytí. 3× chycen = výhra lovců.
 // Pasti: Dům při přípravě vybere 5 ze 7 míst. Vlk v podobě vlka pastí projde bez následků; promění-li se na pasti, je chycen.
@@ -8012,7 +8011,7 @@ async function huntWolfAct(G, C, ui) {
   const H = G.hunt, w = bossOf(G); huntCleanse(G); if (!H || !w || H.human || G.over || w.down) return;
   if (!liveHeroes(G).length) return;
   G.phase = 'overlord';
-  await activateGroup(G, w.type, C, ui, true, { only: [w], actions: 2 }); // v179: po tahu lovců 2 akce
+  await activateGroup(G, w.type, C, ui, true, { only: [w], actions: 2 }); // v179: po tahu každého lovce 2 akce
 }
 // v179: hajný se po tahu každého lovce posune o 1 pole k nejbližší pasti (klidně do ní sám vleze);
 // pohne se jen tehdy, když se tím k pasti opravdu přiblíží – nikdy se nevzdálí. Při volbě míří tam, odkud jde odstrčit dál k pasti.
@@ -16582,7 +16581,7 @@ function monSum(t) {
   const status = !ms.length ? 'eliminováno' : hv ? (shownMs.length ? 'vidíš ' + shownMs.length : 'teď nevidíš') : ms.length + '/' + C.groupSize(t) + ' · ' + (act ? 'aktivována' : awake ? 'bdí' : 'spí');
   const ab = (list) => (list || []).map(([ic, tip]) => `<span class="ms-ab" title="${esc(tip)}">${A.icon(ic)}</span>`).join('');
   { const w = G.hunt && C.bossOf(G); if (w && w.type === t) { // v99: vlkodlak – skutečné hodnoty bosse, žádný obecný řádek skupiny
-    const st = C.stats(w), stt = w.human ? 'hajný · Dům ho neovládá · odstrč ho do pasti (−15)' : 'vlk · 1 akce po každém lovci · útočí i na sousedy cíle';
+    const st = C.stats(w), stt = w.human ? 'hajný · Dům ho neovládá · odstrč ho do pasti (−15)' : 'vlk · 2 akce po každém lovci · pohyb 3 · útočí i na sousedy cíle';
     return `<div class="msum" data-mon="${t}" role="button" tabindex="0" title="Klikni pro detail"><span class="ms-mini">${monPortrait(t, !w.human)}<b>1</b></span><div class="ms-head"><b>${esc(w.nm || 'Vlkodlak')}</b><small>${stt} · ${w.hp}/${st.hp} ♥</small></div><div class="ms-row el"><span class="ms-p">${monPortrait(t, !w.human)}</span><span class="ms-n"></span><span class="ms-st">${statRow(st, true, t)}</span></div></div>`; } }
   const row = (elite) => `<div class="ms-row${elite ? ' el' : ''}"><span class="ms-p">${monPortrait(t, elite)}</span><span class="ms-n" title="${esc(elite ? d.eliteName : d.unit)}">${elite ? '★' : ''}</span><span class="ms-st">${statRow(C.stats({ type: t, elite }), elite, t)}${ab(elite ? (MON_ABE[t] || []).concat(MON_AB[t] || []) : MON_AB[t])}</span></div>`;
   return `<div class="msum${act ? ' done' : ''}${!ms.length ? ' gone' : ''}" data-mon="${t}" role="button" tabindex="0" title="Klikni pro detail monster"><span class="ms-mini">${monPortrait(t)}<b>${hv ? shownMs.length : ms.length}</b></span>
@@ -16900,7 +16899,7 @@ function huntDetailHTML() {
   return `<div class="dialog wide mdet"><p class="eyebrow">Boss · Divoký hon</p><h2>${esc(w.human ? 'Prokletý hajný' : 'Vlkodlak')}</h2>
     <p class="muted">${w.hp} / ${st.hp} ♥ · ${w.human ? 'teď člověk – Dům ho neovládá' : 'teď vlk – ovládá ho Dům'} · v pasti ${H.catches}×</p>
     <div class="md-half el"><div class="md-p">${monPortrait(t, true)}</div><div class="md-b"><p class="eyebrow">vlk</p><h3>Vlkodlak</h3>${statRow(st, true, t)}
-      <ul class="md-ab">${li('2 akce po tahu lovců:', 'pohyb ' + st.move + ', útok, nebo vytí.')}${li('Útok:', 'zasáhne cíl a samostatným hodem i každého lovce, který s cílem sousedí.')}${li('Vytí (1× za kolo):', 'lovci do 3 polí mají Strach těsně pod Panikou.')}${li('Pasti:', 'jako vlk jimi projde bez následků.')}${li('Konec:', 'lovci vyhrají, když vlkodlak padne. Když přežije 12. kolo, vyhrává Dům.')}</ul></div></div>
+      <ul class="md-ab">${li('2 akce po tahu každého lovce:', 'pohyb ' + st.move + ', útok, nebo vytí.')}${li('Útok:', 'zasáhne cíl a samostatným hodem i každého lovce, který s cílem sousedí.')}${li('Vytí (1× za kolo):', 'lovci do 3 polí mají Strach těsně pod Panikou.')}${li('Pasti:', 'jako vlk jimi projde bez následků.')}${li('Konec:', 'lovci vyhrají, když vlkodlak padne. Když přežije 12. kolo, vyhrává Dům.')}</ul></div></div>
     <div class="md-half"><div class="md-p">${monPortrait(t, false)}</div><div class="md-b"><p class="eyebrow">člověk</p><h3>Prokletý hajný</h3>
       <ul class="md-ab">${li('Proměna:', 'když vlkodlak za celé kolo nikoho nezraní, na konci kola se promění v hajného a celé další kolo ho Dům neovládá. V kolech ' + C.HUNT_CLOUDS.join(', ') + ' (mraky) je hajným celé kolo.')}${li('Odstrčit (2 pohyb):', 'ze sousedního pole, v přímém směru o 1–' + C.HUNT_PUSH + ' pole; skrz figurky a překážky neprojde.')}${li('Proměna bolí:', 'kdykoli se vlkodlak promění v hajného, dostane 5 zranění.')}${li('Past:', 'skončí-li v jedné z 5 pastí (i když se na ní promění), dostane 15 zranění, past zmizí a hned se mění zpátky ve vlka.')}</ul></div></div>
     <div class="dlg-btns"><button class="btn primary" id="detclose">Zavřít</button></div></div>`;
@@ -17627,7 +17626,7 @@ const GOAL_H = {
   comb: { story: 'Mlha nad bažinou je tak hustá, že je vidět jen na dvě pole. Jeden z vás nese hřeben Banshee a ona si pro něj jde.', goal: 'Vložte hřeben do pravého ze čtyř hrobů, nebo Banshee zabijte.',
     how: ['Nositel hřebenu cítí směr k pravému hrobu (šipka). Vložit hřeben = 1 pohyb vedle hrobu. Špatný hrob vzbudí mrtvé.', 'Hřeben jde podat sousedovi nebo hodit až na 3 pole. Od ležícího ho můžeš vzít.', 'Na konci kola Banshee dojde k nositeli a zakvílí: +2 Strach do 3 polí. Pak je kolo vidět a jde zasáhnout.', 'Kořenářka nese lucernu a vidí dál. Bludičky lákají lovce k sobě.'] },
   hunt: { story: 'Úplněk nad Černým lesem. Vlkodlak krouží kolem staré hájovny.', goal: 'Zabijte vlkodlaka (66 ♥) do konce 12. kola.',
-    how: ['Vlkodlaka ovládá Dům. Až odehrají všichni lovci, má 2 akce: pohyb 3, útok, nebo vytí (lovci do 3 polí mají Strach těsně pod Panikou). Útočí i na lovce vedle svého cíle.', 'Když za celé kolo nikoho nezraní, na konci kola se promění v hajného. Celé další kolo ho Dům neovládá. V kolech 3, 6, 9 a 12 zakryjí měsíc mraky a je hajným celé kolo.', 'Každá proměna v hajného ho stojí 5 zranění.', 'Hajného odstrčíš ze sousedního pole v přímém směru o 1–3 pole (2 pohyb). Když skončí v jedné z 5 pastí, dostane 15 zranění, past zmizí a on je hned zase vlkem.', 'Hajný se po tahu každého lovce posune o 1 pole k nejbližší pasti, jen když se k ní tím opravdu přiblíží (může do ní i sám vlézt).'] },
+    how: ['Vlkodlaka ovládá Dům. Po tahu každého lovce má 2 akce: pohyb 3, útok, nebo vytí (lovci do 3 polí mají Strach těsně pod Panikou). Útočí i na lovce vedle svého cíle.', 'Když za celé kolo nikoho nezraní, na konci kola se promění v hajného. Celé další kolo ho Dům neovládá. V kolech 3, 6, 9 a 12 zakryjí měsíc mraky a je hajným celé kolo.', 'Každá proměna v hajného ho stojí 5 zranění.', 'Hajného odstrčíš ze sousedního pole v přímém směru o 1–3 pole (2 pohyb). Když skončí v jedné z 5 pastí, dostane 15 zranění, past zmizí a on je hned zase vlkem.', 'Hajný se po tahu každého lovce posune o 1 pole k nejbližší pasti, jen když se k ní tím opravdu přiblíží (může do ní i sám vlézt).'] },
   sluice: { story: 'Kanály pod Blackmoorem po průtrži. Voda stoupá a Obří troll rve stavidla zpátky.', goal: 'Zavřete všechna tři stavidla, nebo trolla zabijte.',
     how: ['Točit stavidlem = 1 pohyb vedle něj, zavřené je po 3 dílcích.', 'Proud unáší figurky ve vodě o 2 pole, každé 2. kolo troll pošle vlnu o 3. Troll stojící u stavidla ho vrací.', 'Voda stoupá na konci 3., 6. a 9. kola. Na hladině 3 zaplaví výlez.', 'Krysař pomáhá točit nejbližším stavidlem.'] },
   escape: { story: 'Seance se zvrtla a dům za vámi zabouchl dveře.', goal: 'Utečte hlavními dveřmi ve Vstupní hale. Stačí dva z vás.',
@@ -17652,7 +17651,7 @@ const GOAL_H = {
 const GOAL_O = {
   ball: 'Ukryj Hraběte mezi tanečníky. Po odhalení ho chraň Maškarami a nech lovce běhat za stopami.',
   comb: 'Banshee jde sama po nositeli hřebenu. Ty hlídáš hroby a zdržuj lovce v mlze, dokud nevyprší čas.',
-  hunt: 'Vlkodlakem hraješ po tahu lovců (2 akce). Zraň někoho každé kolo, jinak se promění v hajného a lovci ho natlačí do pasti (−15). Přežij do konce 12. kola.',
+  hunt: 'Vlkodlakem hraješ po tahu každého lovce (2 akce). Zraň někoho každé kolo, jinak se promění v hajného a lovci ho natlačí do pasti (−15). Přežij do konce 12. kola.',
   sluice: 'Drž trolla u stavidel a nech vodu stoupat. Na hladině 3 jsi vyhrál.',
   escape: 'Nepusť dva lovce ven. Východ je hned vedle salonu, pravý klíč schovej daleko.',
   circles: 'Nedovol lovcům nasbírat 6 vyvolání. Svítí vždy jen jeden kruh; obsaď ho monstry a zamykej branky.',
