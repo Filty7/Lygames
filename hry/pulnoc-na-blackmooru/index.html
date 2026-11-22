@@ -194,8 +194,9 @@ body.busy svg.map .flick, body.busy .tok-idle, body.busy .mir-eye, body.busy .li
 .grade { fill: #0b1020; opacity: .28; pointer-events: none; }
 .e7wilt{animation:e7wilt .28s steps(2,end) infinite;filter:saturate(.35) brightness(.8)}@keyframes e7wilt{0%{transform:translateX(-.6px)}50%{transform:translateX(.6px)}}
 .e7grow{transform-box:fill-box;transform-origin:50% 100%;animation:e7grow .75s cubic-bezier(.2,1.5,.4,1)}@keyframes e7grow{from{transform:scale(.15,.05);opacity:.2}to{transform:none;opacity:1}}
+.hl-grow{fill:#6aff4a;fill-opacity:.42;stroke:#b8ff98;stroke-width:1.6;stroke-opacity:.9}
 .e7mwarn,.e7msprout{animation:e7mp .5s ease-in-out infinite alternate}@keyframes e7mp{from{opacity:.35}to{opacity:1}}
-.e7exitglow{animation:e7xg 3.2s ease-in-out infinite alternate}@keyframes e7xg{from{opacity:.75}to{opacity:1}}
+
 
 .tok { transition: transform .26s ease-in-out, opacity .35s; }
 .tok-act, .tok-actg { opacity: 0; }
@@ -4440,6 +4441,8 @@ function newGame(opts) {
     log: [], fx: [],
   };
   G.doorByK = new Map(G.doors.map(d => [K(d.hex), d]));
+  // v179: nejvýš 2 prázdné úkryty na scénář – přebytečná místa zůstanou jen jako kulisa (obrázek bez lootu)
+  { const need = (scen.tokens || []).length; if (need && G.spots.length > need + 2) { const keep = new Set(shuffle(G.spots.slice()).slice(0, need + 2)); G.spots = G.spots.filter(sp => keep.has(sp)); } }
   setupScenario(G);
   G.heroes.forEach(h => draw(G, h, 5));
   // nezahrané nálezy z minulých scénářů (kampaň) jsou hned v ruce
@@ -6278,8 +6281,9 @@ function monsterAttackInfo(G, m, h) {
   return { mods, sum, chance: chanceFor(sum, 10, adv), adv };
 }
 async function walkMonster(G, m, path, ui) {
-  for (const hex of path) {
-    if (!mdef(m).ghost) { const d = doorAt(G, hex); if (d && d.state === 'closed') { openDoor(G, d); log(G, mname(m) + ' rozráží dveře ' + d.name + '.'); } }
+  for (let pi = 0; pi < path.length; pi++) { const hex = path[pi];
+    // v179: létající dveře přeletí; otevře je, jen když na nich skončí pohyb
+    if (!mdef(m).ghost && (!mdef(m).flying || pi === path.length - 1)) { const d = doorAt(G, hex); if (d && d.state === 'closed') { openDoor(G, d); log(G, mname(m) + ' rozráží dveře ' + d.name + '.'); } }
     m.pos = hex.slice(); m.dived = (m.dived || 0) + 1;
     if (hexRevealed(G, hex)) m.awake = true;
     await ui.anim({ type: 'step', who: 'm:' + m.uid, hex });
@@ -6467,7 +6471,7 @@ async function activateGroup(G, type, C, ui, single, mode) {
       const maxAtk = st.attacks || 1;
       const canAtk = !md.moveOnly && attacks < maxAtk && !m.disarmed && !saltAt(G, m.pos);
       const mv = st.move + (md.moveBonus || 0);
-      const opts = { reach: m.rooted || mv <= 0 ? new Map() : monsterReach(G, m, mv, md.passHeroes), targets: canAtk ? monsterTargets(G, m) : [], specials: md.moveOnly ? [] : monsterSpecials(G, m, used) };
+      const opts = { reach: m.rooted || mv <= 0 || attacks > 0 ? new Map() : monsterReach(G, m, mv, md.passHeroes), targets: canAtk ? monsterTargets(G, m) : [], specials: md.moveOnly ? [] : monsterSpecials(G, m, used) };
       // v60: dokud monstrum nic neudělalo, smí Dům vybrat jiné ze skupiny
       if (actions === actions0 && !attacks && !used.size) { const others = G.monsters.filter(o => o !== m && o.type === type && isAwake(G, o) && !done.has(o.uid) && (!md.only || md.only.includes(o))); if (others.length) opts.switchTo = others.map(o => o.uid); }
       await ui.refresh();
@@ -7146,8 +7150,8 @@ async function mazeShift(G, C, ui) {
   if (was.length && G.fx) { G.fx.push({ t: 'mazewarn', hexes: was.map(d => d.hex.slice()) }); await ui.anim({ type: 'reveal' }); }
   was.forEach(d => { d.state = 'open'; });
   if (was.length && G.fx) { G.fx.push({ t: 'mazeopen', hexes: was.map(d => d.hex.slice()) }); await ui.anim({ type: 'reveal' }); }
-  let combos = [];
-  for (let k = Math.min(MAZE_GROW, open.length); k > 0 && !combos.length; k--) combos = mazeCombos(open, k).filter(c => mazeHeroPaths(G, c).ok);
+  let combos = []; const fresh = open.filter(d => !was.includes(d)); // v179: keř, který zarostl minulé kolo, nemůže zarůst hned znovu
+  for (let k = Math.min(MAZE_GROW, fresh.length); k > 0 && !combos.length; k--) combos = mazeCombos(fresh, k).filter(c => mazeHeroPaths(G, c).ok);
   let chosen = [];
   if (combos.length) {
     const score = c => mazeHeroPaths(G, c).len + random() * 2;
@@ -7157,7 +7161,8 @@ async function mazeShift(G, C, ui) {
       const rest = combos.filter(c => chosen.every(x => c.includes(x)));
       const cands = [...new Set(rest.flat())].filter(d => !chosen.includes(d));
       const bx = best.find(d => !chosen.includes(d) && cands.includes(d)) || cands[0];
-      const p = await C.O.olPick(G, { kind: 'door', prompt: 'Bludiště roste: vyber živý průchod, který zaroste (' + (i + 1) + '/' + n + ')', cands, best: bx }) || bx;
+      const p = await C.O.olPick(G, { kind: 'door', prompt: 'Bludiště roste: vyber živý průchod, který zaroste (' + (i + 1) + '/' + n + ')', cands, best: bx, maze: true, chosen: chosen.map(d => d.hex.slice()),
+        deny: was.map(d => ({ hex: d.hex.slice(), msg: 'Tenhle keř zarůst nemůže – byl zarostlý minulé kolo.' })).concat(open.filter(d => !cands.includes(d) && !chosen.includes(d) && !was.includes(d)).map(d => ({ hex: d.hex.slice(), msg: 'Tady keř zarůst nesmí – lovcům by se zavřela cesta ven.' }))) }) || bx;
       chosen.push(p);
     }
   }
@@ -8345,8 +8350,9 @@ function heroGoals(G, h) {
     return adjFree(C.FOUNTAIN);
   }
   if (goal === 'maze') {
-    const ex = G.doors.find(d => d.mazeExit && d.state === 'open');
-    if (ex) return [ex.hex];
+    // v179: otevřené jsou dvě branky – každý míří k té své (nejbližší, kam nemá blíž jiný lovec); obě strany hrozí zároveň
+    const exs = G.doors.filter(d => d.mazeExit && d.state === 'open');
+    if (exs.length) { const mineX = exs.filter(d => { const md = dist(h.pos, d.hex); return !mates.some(o => dist(o.pos, d.hex) < md - 2); }); return (mineX.length ? mineX : exs).map(d => d.hex); }
     const untried = G.doors.filter(d => d.mazeExit && d.state === 'shut');
     // každý lovec jde k jiné branke (nejbližší, kterou nemá blíž jiný lovec)
     const mine = untried.filter(d => { const md = dist(h.pos, d.hex); return !mates.some(o => dist(o.pos, d.hex) < md - 1); });
@@ -8515,7 +8521,8 @@ const heroBot = {
       const lowCard = h.hand.filter(c => !c.panic).some(c => cardAttackValue(G, h, c) < 0.5 && !isReaction(c));
       // v60: se Zubem mrtvého stojí Panika akci, ale bez odhození karty
       if (zub && (h.plays === 2 || lowCard || h.hand.filter(c => c.panic).length >= 2) && !((h.keys.length || G.exitUnlocked) && h.plays < 2)) return { type: 'play', uid: pnc.uid, half: 'pri' };
-      const pN = h.hand.filter(c => c.panic).length, lazy = V2.hero && V2.panicLazy;
+      const pN = h.hand.filter(c => c.panic).length, lazy = true, boostCard = h.hand.some(c => !c.panic && c.pri && c.pri.panicBoost); // v179: Paniku si chvíli nechá; s kartou, co z Paniky těží (Ilona), ji drží pro ni
+      if (boostCard && pN < 2) { /* drží Paniku pro posílení */ } else
       if (!zub && !((h.keys.length || G.exitUnlocked) && h.plays < 2) && (lazy ? pN >= 2 || (h.plays === 2 && bestAtk < 0.6) : (h.plays === 2 || (lowCard && bestAtk < 1.5) || pN >= 2))) return { type: 'play', uid: pnc.uid, half: 'pri' };
     }
     if (h.plays >= 3) return { type: 'end' };
@@ -8531,7 +8538,7 @@ const heroBot = {
     const clBlock = G.scen.goal === 'cleanse' && G.spots.some(sp => !sp.searched && dist(sp.hex, h.pos) <= 2 && G.monsters.some(m => !MDEF[m.type].object && !m.dormant && dist(m.pos, sp.hex) <= 2 && roomOf(m.pos) === roomOf(sp.hex))) && G.monsters.some(m => C.visibleToHeroes(G, m) && dist(m.pos, h.pos) <= 4);
     if (se0 && !clBlock) return { type: 'play', uid: se0.uid, half: 'sec' };
     if (h.keys.length && dist(h.pos, C.EXIT) === 1) { const mvc = h.hand.filter(c => moveValue(c) > 0).sort((a, b) => moveValue(a) - moveValue(b))[0]; if (mvc) return { type: 'play', uid: mvc.uid, half: 'sec' }; }
-    const hurry = h.keys.length > 0 || G.exitUnlocked || !!wc || !!G.exitFound || (G.fireFront != null && G.round >= 2) || (!!G.comb && G.comb.holder === h.id) || (!!G.hunt && G.hunt.human);
+    const hurry = h.keys.length > 0 || G.exitUnlocked || !!wc || !!G.exitFound || (G.fireFront != null && G.round >= 2) || (!!G.comb && G.comb.holder === h.id) || (!!G.hunt && G.hunt.human) || G.scen.goal === 'maze'; // v179: v bludišti se neperou, běží ven
     if (G.scen.goal === 'cleanse') {
       const gm0 = goalMap(G, heroGoals(G, h)), here0 = gm0.has(K(h.pos)) ? gm0.get(K(h.pos)) : 99;
       const blocker = G.monsters.filter(m => !MDEF[m.type].object && C.visibleToHeroes(G, m) && G.spots.some(sp => !sp.searched && dist(sp.hex, m.pos) <= 2 && dist(sp.hex, h.pos) <= 4));
@@ -8588,7 +8595,7 @@ const heroBot = {
     }
     if (!hurry && h.plays <= 1 && atkCards >= 1 && (sp = h.hand.find(c => (c.pri.t === 'buff' || c.pri.t === 'analyze') && ok(c) && !(c.pri.selfDmg && h.hp <= c.pri.selfDmg + 4)))) return { type: 'play', uid: sp.uid, half: 'pri' };
     if ((sp = h.hand.find(c => c.pri.t === 'rally' && ok(c))) && G.heroes.some(o => !o.escaped && dist(o.pos, h.pos) <= 4 && o.fear >= 2)) return { type: 'play', uid: sp.uid, half: 'pri' };
-    if (near.length >= 2 && (sp = h.hand.find(c => (c.pri.t === 'blind' || c.pri.t === 'rootarea' || c.pri.t === 'salt' || c.pri.t === 'fire') && ok(c)))) return { type: 'play', uid: sp.uid, half: 'pri' };
+    if (near.length >= 2 && (sp = h.hand.find(c => (c.pri.t === 'blind' || c.pri.t === 'rootarea' || c.pri.t === 'salt' || (c.pri.t === 'fire' && near.filter(m => !C.trapImmune(m)).length >= 2)) && ok(c)))) return { type: 'play', uid: sp.uid, half: 'pri' };
     if (hurry && near.some(m => dist(m.pos, h.pos) === 1) && (sp = h.hand.find(c => c.pri.t === 'shove' && ok(c)))) return { type: 'play', uid: sp.uid, half: 'pri' };
     const adj = G.monsters.filter(m => C.visibleToHeroes(G, m) && dist(m.pos, h.pos) === 1);
     const play = (c, half) => ({ type: 'play', uid: c.uid, half: half || 'pri' });
@@ -8737,7 +8744,7 @@ const heroBot = {
       if (req.throwOver || (req.spec && req.spec.t === 'nudge')) {
         const bad = x => (G.fire.some(f => C.eq(f.hex, x)) ? 3 : 0) + (C.saltAt(G, x) ? 2 : 0) - G.monsters.filter(o => !MDEF[o.type].object && dist(o.pos, x) === 1).length * 0.5;
         return c.slice().sort((a, b) => bad(b) - bad(a))[0];
-      } else { const ms = G.monsters.filter(m => C.visibleToHeroes(G, m)); const sc = req.area === 'root' ? x => -ms.filter(m => !MDEF[m.type].object && dist(m.pos, x) <= 1).length : x => Math.min(99, ...ms.map(m => dist(m.pos, x))) + (req.area === 'fire' && G.heroes.some(o => C.eq(o.pos, x)) ? 50 : 0); return c.slice().sort((a, b) => sc(a) - sc(b))[0]; }
+      } else { const ms = G.monsters.filter(m => C.visibleToHeroes(G, m) && !(req.area === 'fire' && C.trapImmune(m))); const sc = req.area === 'root' ? x => -ms.filter(m => !MDEF[m.type].object && dist(m.pos, x) <= 1).length : x => Math.min(99, ...ms.map(m => dist(m.pos, x))) + (req.area === 'fire' && G.heroes.some(o => C.eq(o.pos, x)) ? 50 : 0); return c.slice().sort((a, b) => sc(a) - sc(b))[0]; }
       default: return c[0];
     }
   },
@@ -10424,7 +10431,7 @@ function start() {
 // ---------- stavebnice ----------
 const now = () => ctx.currentTime;
 function out(dest, wet) { const g = ctx.createGain(); g.connect(dest || sfxG); if (wet) { const s = ctx.createGain(); s.gain.value = wet; g.connect(s); s.connect(revIn); } return g; }
-function env(g, t, a, peak, dcy, sustain = 0) { g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(Math.max(peak, .0002), t + a); g.gain.exponentialRampToValueAtTime(Math.max(sustain, .0001), t + a + dcy); }
+function env(g, t, a, peak, dcy, sustain = 0) { a = Math.max(a, .007); /* v179: příliš ostrý náběh lupal */ g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(Math.max(peak, .0002), t + a); g.gain.exponentialRampToValueAtTime(Math.max(sustain, .0001), t + a + dcy); }
 function tone(type, f, t, a, peak, dcy, o = {}) {
   const os = ctx.createOscillator(), g = ctx.createGain();
   os.type = type; os.frequency.setValueAtTime(f, t);
@@ -10572,7 +10579,11 @@ function fileBuf(k) {
   if (!fileCache[k]) fileCache[k] = fetch(MUS.base + k + '.ogg').then(r => r.ok ? r.arrayBuffer() : Promise.reject()).then(b => ctx.decodeAudioData(b)).catch(() => null);
   return fileCache[k];
 }
-function playBuf(buf, gain, rate) { const s = ctx.createBufferSource(), g = ctx.createGain(); s.buffer = buf; if (rate) s.playbackRate.value = rate; g.gain.value = gain; s.connect(g); g.connect(smpG); s.start(now() + .01); }
+function playBuf(buf, gain, rate) { const s = ctx.createBufferSource(), g = ctx.createGain(); s.buffer = buf; if (rate) s.playbackRate.value = rate;
+  // v179: krátké nájezdy/dojezdy hlasitosti – vzorek nezačne ani neskončí skokem (lupání)
+  const t = now() + .01, d = buf.duration / (rate || 1), fi = Math.min(.006, d / 4), fo = Math.min(.025, d / 4);
+  g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(gain, t + fi); g.gain.setValueAtTime(gain, Math.max(t + fi, t + d - fo)); g.gain.linearRampToValueAtTime(0, t + d);
+  s.connect(g); g.connect(smpG); s.start(t); }
 function pickVar(key, n) { let i; do { i = Math.floor(Math.random() * n); } while (n > 1 && i === smpLast[key]); smpLast[key] = i; return i; }
 function playSmp(name, opts) {
   const bs = (smpBuf[name] || []).filter(Boolean); if (!bs.length) return false;
@@ -10586,7 +10597,7 @@ async function mx(type, cat, opts) {
   const tms = performance.now(); if (cat === 'act' && tms - mxT < 900) return false; if (cat === 'act') mxT = tms;
   const i = 1 + pickVar('mx' + t0 + cat, d[cat]), k = t0.startsWith('obj_') ? 'mx_' + t0 + i : 'mx_' + t0 + '_' + cat + i;
   const b = await fileBuf(k); if (!b) return false;
-  playBuf(b, (opts && opts.vol) || (cat === 'act' ? .75 : .9)); return true;
+  playBuf(b, (opts && opts.vol) || (cat === 'act' ? .75 : .9), opts && opts.rate); return true;
 }
 function mxHas(type, cat) { const d = MXN[MX_ALIAS[type] || type]; return !!(d && d[cat]); }
 function mxPrefetch(types) { if (!ctx) return; for (const ty of types) { const t0 = MX_ALIAS[ty] || ty, d = MXN[t0]; if (!d) continue; for (const [c, n] of Object.entries(d)) for (let i = 1; i <= n; i++) fileBuf(t0.startsWith('obj_') ? 'mx_' + t0 + i : 'mx_' + t0 + '_' + c + i); } }
@@ -10722,8 +10733,17 @@ const AMBV = {}; let ambBus = null, ambName = 'menu'; const AMB = {};
 const AMB_SCENES = {
   menu: { wind: .9 }, panstvi: { wind: .8, rain: .5, fire: .25 }, hrbitov: { wind: 1, crows: .8, owl: .6 }, les: { wind: 1, crows: .6, owl: .5 },
   krypta: { wind: .25, drips: .9, water: .3 }, klaster: { wind: .7, rain: .9, thunder: .7 }, zahrada: { wind: .9, crows: .7 }, mlyn: { wind: .6, fire: 1 },
-  svitani: { wind: .95, rain: .9, thunder: 1, gust: 1 }, ples: { wind: .3, murmur: .45, fire: .2 }, mlha: { wind: .7, owl: .8, crows: .4 }, hon: { wind: .9, owl: .5, crows: .2, gust: .8 }, hon_mrak: { wind: .65, owl: .75, gust: .5 }, kanaly: { water: 1, drips: .8, wind: .15 },
+  svitani: { wind: .95, rain: .9, thunder: 1, gust: 1 }, ples: { wind: .3, murmur: .45, fire: .2 }, mlha: { wind: .7, owl: .8, crows: .4 }, hon: { wind: .9, owl: .5, crows: .2, gust: .8, wolves: .7 }, hon_mrak: { wind: .65, owl: .75, gust: .5, wolves: .9 }, kanaly: { water: 1, drips: .8, wind: .15 },
 };
+// v179: vytí smečky z dálky (lowpass + dozvuk), volitelně do ambientní sběrnice
+async function packHowl(vol, dest) {
+  if (!started || !ctx || !P.sfxOn) return; const n = 1 + Math.floor(Math.random() * 2), t0 = now() + .05;
+  for (let i = 0; i < n; i++) { const b = await fileBuf('mx_vlci_act' + (1 + Math.floor(Math.random() * 2))); if (!b) return;
+    const s = ctx.createBufferSource(), f = ctx.createBiquadFilter(), g = ctx.createGain(), p = ctx.createStereoPanner ? ctx.createStereoPanner() : null; s.buffer = b; s.playbackRate.value = .86 + Math.random() * .16;
+    f.type = 'lowpass'; f.frequency.value = 1100; const t = t0 + i * (.6 + Math.random() * 1.1), d = b.duration / s.playbackRate.value, v = vol * (.7 + Math.random() * .3);
+    g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(v, t + .2); g.gain.setValueAtTime(v, t + Math.max(.2, d - .5)); g.gain.linearRampToValueAtTime(0, t + d);
+    s.connect(f); f.connect(g); let o = g; if (p) { p.pan.value = Math.random() * 1.4 - .7; g.connect(p); o = p; } o.connect(dest || out(null, 1.2)); s.start(t); }
+}
 function startAmb() {
   ambBus = ctx.createGain(); ambBus.gain.value = 1; ambBus.connect(ambG);
   const lay = (name, build) => { const g = ctx.createGain(); g.gain.value = 0; g.connect(ambBus); AMB[name] = g; build(g); };
@@ -10732,7 +10752,7 @@ function startAmb() {
   lay('water', g => { loopNoise(g, 'lowpass', 420, .7, .09, [.07, .5]); loopNoise(g, 'bandpass', 1100, 2, .015, [.21, .8]); });
   lay('fire', g => { loopNoise(g, 'lowpass', 180, .7, .07, [.3, .4]); });
   lay('murmur', g => { loopNoise(g, 'bandpass', 520, 1.2, .025, [.4, .6]); loopNoise(g, 'bandpass', 1300, 2.5, .01, [.7, .8]); });
-  ['crows', 'owl', 'drips', 'thunder'].forEach(n => lay(n, () => {}));
+  ['crows', 'owl', 'drips', 'thunder', 'wolves'].forEach(n => lay(n, () => {}));
   const rnd = (a, b) => a + Math.random() * (b - a);
   const on = n => AMBV[n] > 0 && P.sfxOn && ctx.state === 'running';
   // praskání ohně
@@ -10750,6 +10770,8 @@ function startAmb() {
     setTimeout(crow, rnd(7000, 18000)); }; setTimeout(crow, 4000);
   // sova
   const owl = () => { if (on('owl')) { const t = now() + .05; [0, .55, .85].forEach((d, i) => { tone('sine', i === 0 ? 390 : 360, t + d, .06, .05, .28, { dest: AMB.owl, wet: 1.4, to: (i === 0 ? 390 : 360) * .93 }); }); } setTimeout(owl, rnd(14000, 30000)); }; setTimeout(owl, 9000);
+  // v179: vzdálená smečka vlků (Divoký hon) – ztlumené vytí z dálky
+  const wolves = () => { if (on('wolves')) packHowl(.32 * AMBV.wolves, AMB.wolves); setTimeout(wolves, rnd(35000, 80000)); }; setTimeout(wolves, rnd(12000, 25000));
   // hrom
   const thunder = () => { if (on('thunder') && !extThunder) strike(.35 + Math.random() * .4); setTimeout(thunder, rnd(22000, 50000)); }; setTimeout(thunder, 15000);
   // v97: nárazy větru (bouře v kostele) – vítr se na pár vteřin zvedne a zaskučí
@@ -10789,7 +10811,7 @@ async function voice(hero, cat, chance, force) {
 
 function setSfx(on) { P.sfxOn = on; save(); if (sfxG) { sfxG.gain.setTargetAtTime(on ? .55 : 0, now(), .1); smpG.gain.setTargetAtTime(on ? .6 : 0, now(), .1); ambG.gain.setTargetAtTime(on ? .4 : 0, now(), .3); } }
 function setMusic(on) { P.musicOn = on; save(); if (musG) musG.gain.setTargetAtTime(on ? .1 : 0, now(), .4); }
-return { strike, extThunder(on) { extThunder = !!on; }, start, play, setSfx, setMusic, setScene, setTension, combat, roundBell, setAmb, voice, dance, mx, mxHas, mxPrefetch, get stems() { return MUS.ok; }, get sfxOn() { return P.sfxOn; }, get musicOn() { return P.musicOn; } };
+return { strike, packHowl, extThunder(on) { extThunder = !!on; }, start, play, setSfx, setMusic, setScene, setTension, combat, roundBell, setAmb, voice, dance, mx, mxHas, mxPrefetch, get stems() { return MUS.ok; }, get sfxOn() { return P.sfxOn; }, get musicOn() { return P.musicOn; } };
 })();
 if (typeof module !== 'undefined') module.exports = Sfx;
 
@@ -10963,7 +10985,7 @@ function darkRoomFX(G, r, x0, y0, w, hh) {
   s += `</g>`;
   return s;
 }
-const roomDark = (G, r) => !!r && ((G.curse === r && !G.darkCancelled.has(r)) || G.tempDark.has(r) || C.obeliskIn(G, 'dark', r) || (G.angels && !G.angels.lit.includes(r) && !G.darkCancelled.has(r)));
+const roomDark = (G, r) => !!(r && ((G.curse === r && !G.darkCancelled.has(r)) || G.tempDark.has(r) || C.obeliskIn(G, 'dark', r) || (G.angels && !G.angels.lit.includes(r) && !G.darkCancelled.has(r)))); // v179: vždy boolean – undefined v classList.toggle přepínal třídu při každém překreslení (blikání monster)
 
 // ---------- materiály podlah a stěn ----------
 const MAT = {
@@ -12417,6 +12439,8 @@ function e7HedgeKeys() { // co NENÍ plot: hratelná pole, průchody, nábytek n
   for (const f of C.FURN_DEFS) if (f.icon === 'hedge' && !f.spot) free.delete(C.K(f.hex));
   e7HedgeSet = free; return free;
 }
+function e7GrowGlow(h) { const [x, y] = px(h), pts = [0, 1, 2, 3, 4, 5].map(i => envV(x, y, SIZE - 1, i).map(v => v.toFixed(1)).join(',')).join(' ');
+  return `<g class="e7growsel"><polygon points="${pts}" fill="#7cff5a" fill-opacity=".38" stroke="#c8ffb0" stroke-width="1.6"/><path d="M${x - 15} ${y + 2}L${x - 9} ${y - 42}L${x + 9} ${y - 42}L${x + 15} ${y + 2}Z" fill="url(#e7growg)"/></g>`; }
 function e7DoorEl(h) { const d = S.G && S.G.doors.find(x => C.eq(x.hex, h)); return d ? gDepth.querySelector(`[data-door="${d.id}"]`) : null; }
 function e7HexMark(h, col, cls) { const [x, y] = px(h), pts = [0, 1, 2, 3, 4, 5].map(i => envV(x, y, SIZE - 1, i).map(v => v.toFixed(1)).join(',')).join(' ');
   return `<g class="${cls}"><polygon points="${pts}" fill="${col}" fill-opacity=".18" stroke="${col}" stroke-width="2.2"/><polygon points="${pts}" fill="none" stroke="#fff" stroke-opacity=".5" stroke-width=".8"/></g>`; }
@@ -12520,8 +12544,8 @@ function e7Lights() {
   // jediná teplá lucerna u středu bludiště
   const mid = C.ROOM_DEFS.find(r => r.id === 'e');
   const lampF = C.FURN_DEFS.find(f => f.spr === 'm_lamp');
-  if (lampF) { const [lx, ly] = px(lampF.hex); const fx = lx - 12, fy = ly - 34; s += `<g class="lit bflk" data-room="${C.roomOf(lampF.hex)}"><ellipse cx="${lx}" cy="${ly + 8}" rx="150" ry="100" fill="url(#ag-warm)" opacity=".85"/><ellipse cx="${lx}" cy="${ly + 4}" rx="80" ry="54" fill="url(#ag-warm)" opacity=".75"/><ellipse cx="${fx}" cy="${fy}" rx="34" ry="30" fill="url(#ag-warm)" opacity=".8"/></g>`; }
-  else if (mid) { const lx = wx(mid.k1) - 10, ly = wy(mid.y0) + 16; s += `<g class="lit bflk" data-room="e"><ellipse cx="${lx}" cy="${ly + 22}" rx="70" ry="44" fill="url(#ag-warm)" opacity=".55"/></g>`; e7Lamp = [lx, ly]; }
+  if (lampF) { const [lx, ly] = px(lampF.hex); const fx = lx - 12, fy = ly - 34; s += `<g class="lit" data-room="${C.roomOf(lampF.hex)}"><ellipse cx="${lx}" cy="${ly + 8}" rx="150" ry="100" fill="url(#ag-warm)" opacity=".85"/><ellipse cx="${lx}" cy="${ly + 4}" rx="80" ry="54" fill="url(#ag-warm)" opacity=".75"/><ellipse cx="${fx}" cy="${fy}" rx="34" ry="30" fill="url(#ag-warm)" opacity=".8"/></g>`; }
+  else if (mid) { const lx = wx(mid.k1) - 10, ly = wy(mid.y0) + 16; s += `<g class="lit" data-room="e"><ellipse cx="${lx}" cy="${ly + 22}" rx="70" ry="44" fill="url(#ag-warm)" opacity=".55"/></g>`; e7Lamp = [lx, ly]; }
   // chladné měsíční světlo shora vlevo
   // v179: měsíc je zapečený v bitmapách podlahy a plotu
   // přízemní mlha a bludičky
@@ -12532,7 +12556,7 @@ function e7Lights() {
     w += `<g class="e7wisp" data-room="${R.id}" style="animation-delay:-${(rnd() * 9).toFixed(1)}s"><circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="5" fill="url(#e7wispg)"/><circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="1.1" fill="#d8ffd0"/></g>`; }
   s += `<g class="lit e7wisps">${w}</g>`; // v179: mlžné ovály v bludišti pryč (působily jako divné kruhy nad plotem)
   gLight.insertAdjacentHTML('afterbegin', s);
-  svg.querySelector('defs').insertAdjacentHTML('beforeend', `<radialGradient id="e7xg" r=".5"><stop offset="0" stop-color="#dff4ff" stop-opacity=".75"/><stop offset=".45" stop-color="#9fd0ff" stop-opacity=".35"/><stop offset="1" stop-color="#6f94d8" stop-opacity="0"/></radialGradient><radialGradient id="e7moong" cx=".1" cy="0" r="1.1"><stop offset="0" stop-color="#9ab8ff" stop-opacity=".16"/><stop offset=".6" stop-color="#7a90d0" stop-opacity=".05"/><stop offset="1" stop-color="#000" stop-opacity="0"/></radialGradient><radialGradient id="e7wispg"><stop offset="0" stop-color="#9cff8a" stop-opacity=".75"/><stop offset="1" stop-color="#4aff6a" stop-opacity="0"/></radialGradient>`);
+  svg.querySelector('defs').insertAdjacentHTML('beforeend', `<linearGradient id="e7growg" x1="0" y1="1" x2="0" y2="0"><stop offset="0" stop-color="#9cff6a" stop-opacity=".55"/><stop offset="1" stop-color="#9cff6a" stop-opacity="0"/></linearGradient><radialGradient id="e7xg" r=".5"><stop offset="0" stop-color="#dff4ff" stop-opacity=".75"/><stop offset=".45" stop-color="#9fd0ff" stop-opacity=".35"/><stop offset="1" stop-color="#6f94d8" stop-opacity="0"/></radialGradient><radialGradient id="e7moong" cx=".1" cy="0" r="1.1"><stop offset="0" stop-color="#9ab8ff" stop-opacity=".16"/><stop offset=".6" stop-color="#7a90d0" stop-opacity=".05"/><stop offset="1" stop-color="#000" stop-opacity="0"/></radialGradient><radialGradient id="e7wispg"><stop offset="0" stop-color="#9cff8a" stop-opacity=".75"/><stop offset="1" stop-color="#4aff6a" stop-opacity="0"/></radialGradient>`);
 }
 let e7Lamp = null;
 // lucerna u středu (dekorace mimo pole, na severním okraji středu)
@@ -13508,7 +13532,9 @@ const BM_DSTYLE = { sluha: 'ghost', polt: 'ghost', kapela: 'ghost', zbroj: 'scra
 const BAT = ['b...b', 'bb.bb', '.bbb.', '..b..'];
 // v92: pád monstra – jeho vlastní zvuk (hlas/efekt), jinak původní; Maškary mlčí
 const tokMask = t => /mask/.test(String(t && t.sig || ''));
-function deathSnd(key, snd, t) { if (SND && SND.mxHas && !tokMask(t) && SND.mxHas(key, 'die')) { SND.mx(key, 'die'); return; } sfx(snd); }
+// v179: elitní služebný přízrak (komorník) mluví hlubším, mužským hlasem
+const mxOpt = m => m && m.elite && m.type === 'sluha' ? { rate: .74 } : undefined;
+function deathSnd(key, snd, t) { if (SND && SND.mxHas && !tokMask(t) && SND.mxHas(key, 'die')) { SND.mx(key, 'die', t && t.bmE && key === 'sluha' ? { rate: .74 } : undefined); return; } sfx(snd); }
 function houseMine() { return NETS.role ? NETS.roles.overlord === Net.myId : S.ctl.overlord === 'human'; }
 async function bmDeath(t, key, snd) {
   const p = bFigPos(t), b = t.fig.querySelector('.tok-body'); if (!p) return;
@@ -14336,7 +14362,8 @@ function renderMap() {
     xg.style.display = d.state === 'open' ? '' : 'none'; }
   for (const d of G.doors) {
     const g = gDepth.querySelector(`[data-door="${d.id}"]`); if (!g) continue;
-    g.classList.remove('closed', 'open', 'locked'); g.classList.add(d.state === 'arch' ? 'open' : d.state === 'bars' || d.state === 'shut' ? 'closed' : d.state === 'fake' || d.state === 'sealed' || d.state === 'grown' ? 'locked' : d.state);
+    { const want = d.state === 'arch' ? 'open' : d.state === 'bars' || d.state === 'shut' ? 'closed' : d.state === 'fake' || d.state === 'sealed' || d.state === 'grown' ? 'locked' : d.state; // v179: měnit třídu jen při změně (jinak se při každém překreslení restartovaly animace = blikání)
+      for (const c of ['closed', 'open', 'locked']) if (c !== want && g.classList.contains(c)) g.classList.remove(c); if (!g.classList.contains(want)) g.classList.add(want); }
     g.classList.toggle('fogged', !d.rooms.some(roomVisible));
     const prev = S.doorState[d.id], quietDoors = G.phase === 'setup' || S._lastPhase === 'setup'; if (!quietDoors && prev && prev !== d.state && d.state === 'open') sfx(d.portcullis ? 'clank' : 'door'); if (!quietDoors && prev && prev !== d.state && d.state === 'locked') sfx('lock');
     S.doorState[d.id] = d.state;
@@ -14433,8 +14460,8 @@ function renderMap() {
     t.fig.classList.toggle('active', !!(G.active && G.active.monster === m.uid)); t.lab.classList.toggle('act', !!(G.active && G.active.monster === m.uid));
     t.fig.classList.toggle('sleeping', !C.isAwake(G, m) && G.phase !== 'setup' && !(G.hunt && m.boss));
     t.fig.classList.toggle('indark', roomDark(G, C.roomOf(m.pos)) && hv);
-    t.lab.querySelector('.pl-t').textContent = m.hp;
-    t.lab.querySelector('.pl-fill').setAttribute('width', (16 * Math.max(0, m.hp) / (m.maxHp || st.hp)).toFixed(1));
+    { const pt = t.lab.querySelector('.pl-t'), pf = t.lab.querySelector('.pl-fill'), w = (16 * Math.max(0, m.hp) / (m.maxHp || st.hp)).toFixed(1); // v179: přepsat jen při změně
+      if (pt.textContent !== String(m.hp)) pt.textContent = m.hp; if (pf.getAttribute('width') !== w) pf.setAttribute('width', w); }
     { const bl = badgesFor('m', m); renderBadges(t, bl); if (betaOn() && shown) bStatScan(t, m, bl); else t.bst = null; }
     if (!t.anim && (!t.pos || !C.eq(t.pos, m.pos))) setTokPos(t, m.pos);
   }
@@ -14818,6 +14845,7 @@ function renderHighlights0() {
     const r = m.spec;
     if (r.kind === 'hex') { r.cands.forEach(h => hlHex(h, 'hl-pick')); (r.chosen || []).forEach(h => hlTrap(h)); }
     else if (r.kind === 'hero') r.cands.forEach(h => hlRing(h.pos, 'ring-act'));
+    else if (r.kind === 'door' && r.maze) { r.cands.forEach(d => hlHex(d.hex, 'hl-grow')); (r.chosen || []).forEach(h => gHl.insertAdjacentHTML('beforeend', e7GrowGlow(h))); } // v179: kde může keř zarůst = zelená podlaha, vybrané = záře nahoru
     else if (r.kind === 'door') r.cands.forEach(d => hlRing(d.hex, 'ring-act'));
     else if (r.kind === 'monster' || r.kind === 'any') r.cands.forEach(x => hlRing(x.pos, 'ring-act'));
     else if (r.kind === 'room') C.ROOM_HEXES.filter(h => r.cands.includes(C.roomOf(h))).forEach(h => hlHex(h, 'hl-pick'));
@@ -15047,12 +15075,14 @@ function onMapClick(ev) {
     else if (r.kind === 'door') f = find(r.cands, d => d.hex);
     else if (r.kind === 'room') f = r.cands.find(x => x === C.roomOf(hit.hex));
     if (f !== null && f !== undefined) { sfx('click'); m.resolve(f); }
+    else if (r.deny) { const dn = r.deny.find(x => hitList(hit).some(y => C.eq(x.hex, y))); if (dn) { sfx('deny'); toast(dn.msg); } }
   } else if (m.type === 'chooseMonster') {
     const h = pickBy(hit, x => m.list.some(mm => C.eq(mm.pos, x))); if (h) m.resolve(m.list.find(mm => C.eq(mm.pos, h)));
   } else if (m.type === 'chooseHero') {
     const h = pickBy(hit, x => m.list.some(o => C.eq(o.pos, x))); if (h) m.resolve(m.list.find(o => C.eq(o.pos, h)));
   } else if (m.type === 'olStep' && m.respawnType) {
-    const p = C.respawnOptions(G).points.find(p => hitList(hit).some(x => C.eq(p.hex, x) || C.roomOf(p.hex) === C.roomOf(x))); if (p) m.resolve({ type: 'respawn', mtype: m.respawnType, point: p.id });
+    const pts = C.respawnOptions(G).points, hl = hitList(hit); // v179: nejdřív přesně kliknuté místo (v bludišti je víc míst v jedné zahradě)
+    const p = pts.find(p => hl.some(x => C.eq(p.hex, x))) || pts.find(p => hl.some(x => C.dist(p.hex, x) <= 1)) || pts.find(p => hl.some(x => C.roomOf(p.hex) === C.roomOf(x))); if (p) m.resolve({ type: 'respawn', mtype: m.respawnType, point: p.id });
   }
 }
 const NO_HOVER_DETAIL = true;
@@ -15658,7 +15688,7 @@ function sndTick(G) {
   if (hid && hid !== S.voxHero) { S.voxHero = hid; const h = G.heroes.find(x => x.id === hid); if (h && !h.downed) voxMine(hid, 'select'); }
   if (!hid) S.voxHero = null;
   { const mid = a && a.monster, mm = mid && G.monsters.find(x => x.uid === mid), key = mm ? mm.type + ':' + G.round : null; // v92: aktivace skupiny monster
-    if (key && key !== S.mxAct) { S.mxAct = key; if (!mm.mask && houseMine() && SND.mx && monsterShown(mm)) SND.mx(mm.type, 'act'); } }
+    if (key && key !== S.mxAct) { S.mxAct = key; if (!mm.mask && houseMine() && SND.mx && monsterShown(mm)) SND.mx(mm.type, 'act', mxOpt(mm)); } }
   S.voxDown = S.voxDown || {};
   for (const h of G.heroes) { if (h.downed && !S.voxDown[h.id] && G.phase !== 'setup') SND.voice(h.id, 'death'); S.voxDown[h.id] = !!h.downed; }
 }
@@ -15951,7 +15981,7 @@ async function rollAnim(ev) {
   await sleep(dur(620));
   if (aim) aim.remove();
   { const a = S.G.active; if (!ev.pry && !ev.enemy && a && a.side === 'heroes' && a.hero && SND && SND.voice) SND.voice(a.hero, 'attack', .7); } // v91: výkřik až s nápřahem
-  if (ev.enemy && !ev.pry && SND && SND.mx) { const mm = ev.from && C.monsterAt(S.G, ev.from); if (mm && !mm.mask) SND.mx(mm.type, 'atk', { vol: .8 }); } // v92: útok monstra slyší všichni
+  if (ev.enemy && !ev.pry && SND && SND.mx) { const mm = ev.from && C.monsterAt(S.G, ev.from); if (mm && !mm.mask) SND.mx(mm.type, 'atk', Object.assign({ vol: .8 }, mxOpt(mm))); } // v92: útok monstra slyší všichni
   const bMelee = bA && !ev.pry && st.kind === 'melee'; // v61c: úder zblízka řeší bStrike (nápřah na místě, krátký výpad)
   if (bA && !bMelee) bPose(bA, ev.pry ? 'pry' : st.proj === 'flash' ? 'cast' : 'atk2', ev.pry ? 1000 : 750);
   const tip = bA && !ev.pry && st.proj !== 'flash' ? BETA_TIP[bA.id.slice(2)] : null;
@@ -16353,7 +16383,8 @@ async function bossFxEv(e) {
     case 'moon': { // v99: proměna – do lidské podoby agónie, zpátky ve vlka úleva; zvuk slyší všichni
       const w = C.bossOf(G), t = w && toks.get('m:' + w.uid), body = t && t.fig.querySelector('.tok-body'), cls = e.human ? 'morph-agony' : 'morph-relief';
       if (body) { body.classList.remove('morph-agony', 'morph-relief'); void body.getBoundingClientRect(); body.classList.add(cls); }
-      sfx(e.human ? 'agony' : 'relief'); if (e.why === 'cloud') { if (env10On()) e10Sync(G, true); screenFlash('#101828', 500); }
+      sfx(e.human ? 'agony' : 'relief'); if (!e.human && SND && SND.mx) { SND.mx('vlkodlak', 'act', { vol: 1 }); if (SND.packHowl && Math.random() < .55) setTimeout(() => SND.packHowl(.3), 2200 + Math.random() * 1500); } // v179: zpátky ve vlka = zavytí, občas mu odpoví smečka z dálky
+      if (e.why === 'cloud') { if (env10On()) e10Sync(G, true); screenFlash('#101828', 500); }
       banner(e.human ? (e.why === 'cloud' ? 'Mraky zakryly měsíc' : 'Vlkodlak se proměnil v hajného') : 'Hajný je zase vlkodlak', !e.human);
       await sleep(dur(e.human ? 1100 : 800)); render(); await sleep(dur(500)); if (body) body.classList.remove(cls); return true; }
     case 'huntsky': { if (env10On()) e10Sync(G, true); return true; }
