@@ -1403,6 +1403,9 @@ button.pd-cell { cursor: default; } .pd-cell.full { cursor: pointer; border-styl
 .mm-lore { position: absolute; left: 150px; right: 110px; bottom: 50px; text-align: center; color: #bfb3a0; font: italic 400 17px/1.5 var(--f-body); margin: 0; text-shadow: 0 1px 0 #000; }
 .mm-lore::before { content: "✦"; display: block; color: var(--candle); font-style: normal; font-size: 12px; margin-bottom: 6px; opacity: .8; }
 .mm-corner { position: absolute; right: 26px; top: 22px; z-index: 6; display: flex; gap: 8px; align-items: center; }
+.mm-ver { position: absolute; right: 26px; bottom: 16px; z-index: 6; display: flex; gap: 10px; align-items: center; font-size: 12px; color: #a89878; }
+.mm-clog { background: rgba(20,14,10,.7); border: 1px solid #6a5434; color: #d8c49a; font: inherit; font-size: 12px; padding: 3px 10px; border-radius: 4px; cursor: pointer; } .mm-clog:hover { border-color: #c9a24a; color: #f0dcb0; }
+.clog { max-width: 620px; } .clog-list { max-height: 62vh; overflow-y: auto; padding-right: 8px; text-align: left; } .clog-list h3 { margin: 14px 0 4px; font-size: 15px; color: #e0c080; } .clog-list ul { margin: 0; padding-left: 18px; } .clog-list li { margin: 3px 0; font-size: 13.5px; line-height: 1.4; }
 .mm-ico { display: inline-flex; align-items: center; gap: 7px; padding: 7px 11px; border-radius: 4px; border: 1px solid #3a2e24; background: #0b0908d0; color: var(--muted); font: 600 13px var(--f-body); cursor: pointer; }
 .mm-ico .ic { width: 18px; height: 18px; } .mm-ico[aria-pressed="true"] { color: var(--candle-2); border-color: #6a5030; } .mm-ico:hover { border-color: var(--candle); }
 .mm-ico[aria-pressed="false"] span { text-decoration: line-through; text-decoration-color: #cf5b45; }
@@ -2448,6 +2451,7 @@ body.bui #menupop > label, body.bui #menupop > .pop-row { align-self: center; ju
     </div>
     <div class="mm-right"><div id="menuart" aria-hidden="true"></div><p class="mm-lore">Seance se zvrtla. Tři lovci duchů uvízli v domě, který ožil. Dvanáct kol do půlnoci: lovci hrají kartami, Dům ovládá monstra a karty hrůzy.</p></div>
     <div class="mm-corner"><button class="mm-ico" id="mm-mus" aria-pressed="true"></button><button class="mm-ico" id="mm-snd" aria-pressed="true"></button></div>
+    <div class="mm-ver"><button id="mm-clog" class="mm-clog" type="button">Change log</button><span id="mm-vnum"></span></div>
   </div>
   <div class="menu-card" id="legacy" hidden>
     <div id="menuart" aria-hidden="true"></div>
@@ -17797,6 +17801,21 @@ function initFullscreen() {
   upd();
 }
 // tlačítka zvuku: v liště hry i v hlavním menu (v61) ukazují stejný stav
+// v190: verze a change log v hlavním menu
+const GAME_VER = 'v190';
+const CHANGELOG = [
+  ['v190 · 23. 11.', ['Change log a číslo verze v menu.', 'Divoký hon: vlkodlak hraje po tahu každého lovce, 2 akce, pohyb 3, 66 ♥.', 'Hajný se po tahu lovce posune o pole k nejbližší pasti (jen když se přiblíží, může do ní i vlézt).', 'Na hodinách měsíce u kol s mraky (3, 6, 9, 12).', 'Bez dveří se Zamčení mění na líznutí karty zdarma.']],
+  ['22. 11.', ['Zelené bludiště: vždy dvě otevřené branky, 20 živých průchodů, 3 skupiny vzhůru od začátku, bez Tmy na startu.', 'Měnění keřů s animací (uvadnutí → pauza → nové keře); výběr Domu se zeleným zvýrazněním, keř z minulého kola nejde.', 'Plot vykreslený jako bitmapa – plynulejší zoom; nižší a rozcuchanější keře, záře otevřené branky, trnitá zavřená branka.', 'Oprava blikání monster a světel při každém kroku (napříč scénáři).', 'Můry −1 k hodu, Smrtihlav jistý jed 1; dynamit ukazuje šanci na zásah; jednorázové karty z lootu modře.', 'Zrádná podlaha: vlastní efekt pro každou úroveň; zlatý obrys lootu v lese a mlze; hledání přes hranici místností bez zdi.', 'Respawn na kliknuté místo, létající monstra otevřou dveře jen na konci pohybu, monstrum po útoku už se nehýbe.', 'Konec scénáře v kampani říká, kdo vybírá další scénář (a boss fight).', 'Vytí vlkodlaka při proměně a vzdálená smečka; plynulejší zvuky bez lupání.']],
+  ['21. 11.', ['Nové Zelené bludiště a Krypta strážných andělů (svatyně, měsíční světlo, prach).', 'Nová vylepšení Domu za temnou esenci; Dům začíná se 3 kartami.', 'Obelisky v hájovně: popisky, paprsek, otevřené dveře od začátku.', 'Divoký hon: 5 pevných pastí, odstrčení hajného, užší mapa.']],
+  ['20. 11.', ['Hřeben Banshee: nový Mlžný les s jezerem, hroby a kaplí; pole výkřiku.', 'Divoký hon: nová grafika Černého lesa, úplněk a mraky.', 'Kostel: vitráže, paprsky, bouře s blesky; chytřejší boti.', 'Léčivá výbava a nálezy, nová vylepšení monster Domu.', 'Mlýn v plamenech: oheň, řeka, kouř; okno výsledku prohledání.']],
+  ['19. 11.', ['Hudba podle prostředí, zvuky monster a prostředí.', 'Hlášky lovců (Ashford, Varga, Wren).', 'Krvavý ples: valčík a večírek.']],
+];
+function showChangelog() {
+  const box = $('#modal'); if (!box) return;
+  box.innerHTML = `<div class="dialog clog"><h2>Change log <small class="muted">${GAME_VER}</small></h2><div class="clog-list">${CHANGELOG.map(([d, it]) => `<h3>${esc(d)}</h3><ul>${it.map(x => `<li>${esc(x)}</li>`).join('')}</ul>`).join('')}</div><div class="btns"><button class="btn primary" id="clog-ok">Zavřít</button></div></div>`;
+  box.hidden = false; const close = () => { box.hidden = true; box.innerHTML = ''; };
+  $('#clog-ok').addEventListener('click', close); box.addEventListener('click', e => { if (e.target === box) close(); }, { once: true });
+}
 function syncSoundBtns() {
   if (!SND) return;
   const set = (id, ic, on, lab) => { const b = $(id); if (!b) return; b.innerHTML = A.icon(ic) + (lab ? `<span>${lab}</span>` : ''); b.setAttribute('aria-pressed', on); };
@@ -17809,6 +17828,7 @@ const toggleMusic = () => { if (!SND) return; SND.start(); SND.setMusic(!SND.mus
 function initSound() {
   $('#sndbtn').addEventListener('click', toggleSfx);
   $('#musbtn').addEventListener('click', toggleMusic);
+  { const vn = $('#mm-vnum'), cb = $('#mm-clog'); if (vn) vn.textContent = GAME_VER; if (cb) cb.addEventListener('click', showChangelog); }
   const ms = $('#mm-snd'), mu = $('#mm-mus');
   if (ms) ms.addEventListener('click', toggleSfx); if (mu) mu.addEventListener('click', toggleMusic);
   syncSoundBtns();
