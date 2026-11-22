@@ -7585,7 +7585,7 @@ async function playRound(G, C, ui) {
       h.acted = true;
       await heroTurn(G, h, C, ui);
       if (checkWin(G)) break;
-      if (G.hunt) { await huntWolfAct(G, C, ui); if (checkWin(G)) break; }
+      if (G.hunt) { await huntWolfAct(G, C, ui); if (checkWin(G)) break; await huntKeeperDrift(G, ui); if (checkWin(G)) break; }
       if (G.mazeNeedExit) await mazeOpenExit(G, C, ui); // v94: lovec utekl – Dům otevře jinou branku
     }
     // Dům je na tahu po každém lovci: aktivuje skupinu, nebo (nemá-li žádnou) aspoň zahraje karty
@@ -7996,6 +7996,24 @@ async function huntWolfAct(G, C, ui) {
   G.phase = 'overlord';
   await activateGroup(G, w.type, C, ui, true, { only: [w], actions: 1 });
 }
+// v179: hajný po tahu každého lovce sám udělá pohyb 2 k nejbližší pasti (skrz monstra i lovce, do pasti sám nevkročí);
+// má-li na výběr, postaví se tak, aby ho lovci mohli odstrčit dál směrem k pasti
+const HUNT_DRIFT = 2;
+async function huntKeeperDrift(G, ui) {
+  const H = G.hunt, w = bossOf(G); if (!H || !w || !H.human || G.over || w.down) return;
+  if (!H.traps.some(t => t.armed)) return;
+  const pass = (a, n) => { if (!isPlayable(n) || !linkOK(a, n) || isBlock(n) || huntTrapAt(G, n)) return false; const d = doorAt(G, n); return !(d && (d.state === 'locked' || isImpass(d))); };
+  const prev = new Map([[K(w.pos), null]]), q = [[w.pos, 0]];
+  for (let i = 0; i < q.length; i++) { const [c, dd] = q[i]; if (dd >= HUNT_DRIFT) continue; for (const n of neighbors(c)) { const k = K(n); if (prev.has(k) || !pass(c, n)) continue; prev.set(k, c); q.push([n, dd + 1]); } }
+  const cands = q.map(x => x[0]).filter(x => eq(x, w.pos) || (standable(G, x) && !(doorAt(G, x) && doorAt(G, x).mazeExit)));
+  const save = w.pos;
+  const pushBest = x => { w.pos = x; let best = 99; for (const n of neighbors(x)) { if (!linkOK(n, x) || isBlock(n) || !roomOf(n)) continue; const L = huntLine(G, n, w); if (!L.length) continue; best = Math.min(best, ...L.map(y => huntTrapAt(G, y) ? 0 : huntTrapDist(G, y))); } w.pos = save; return best; };
+  const sc = cands.map(x => ({ x, d: huntTrapDist(G, x), p: pushBest(x), s: eq(x, save) ? 0 : 1, r: random() })).sort((a, b) => a.d - b.d || a.p - b.p || a.s - b.s || a.r - b.r);
+  const to = sc[0] && sc[0].x; if (!to || eq(to, w.pos)) return;
+  const path = []; for (let c = to; c && !eq(c, save); c = prev.get(K(c))) path.unshift(c);
+  log(G, 'Prokletý hajný bloudí lesem a táhne ho to k pasti (pohyb ' + path.length + ').');
+  for (const x of path) { w.pos = x.slice(); await ui.anim({ type: 'step', who: 'm:' + w.uid, hex: x }); }
+}
 // pole, kudy by odstrčený hajný letěl (zastaví se o překážku nebo v pasti)
 function huntLine(G, from, w) {
   const save = w.pos, out = [];
@@ -8170,7 +8188,7 @@ API = {
   useMap, MAPS, isFence, blocksSight, OBELISK_SITES, MAP, OUTDOOR,
   isRealExit, MAZE_OPEN, LEVERS, HOLY, holyAt, FOUNTAIN, ALTAR, CANDLES, EXIT_DOORS, adjLevers, adjExits, adjCandles, setRealExit, mazeExits, isImpass, mazeLinked, frontBurning, fireAt, isBars, exitDoorAt, LEVER_COST, canStillEscape, purgeWater, candleGuarded,
   bossGoals, isBossGoal, bossOf, ballDo, ballRoundStart, BALL_DANCES, BALL_PHASES, BALL_PHASE_HP, BALL_MASK_HP, TRAP_KINDS, laneHexes, setBallCount, grpNeed, ballDancers, setHuntTrap, huntArm, huntTrapAt, huntLine, HUNT_TRAPS, HUNT_CLOUDS, HUNT_PUSH, sewWater, sewLevelOf, combSees, combSense, combHolder, setRealGrave, combZoneHas, combZoneR, COMB_ZONE, onParquet, furnGone: h => FURN_GONE.has(K(h)), HUNT_CATCH, SEW_NEED, BALL_BRIDES_LOSE, BALL_BRIDE_EVERY, isNpc, rotHex,
-  _heroTurn: heroTurn, _monsterAttack: monsterAttack, _heroMove: heroMove, _checkWin: checkWin, _activateGroup: activateGroup, _endRound: endRound, _mazeShift: mazeShift, __mazeOpenExit: mazeOpenExit, mazeHeroPaths, _awakenAngel: awakenAngel, _angelsAct: angelsAct, _freeRespawn: freeRespawn, _damageHero: damageHero,
+  _heroTurn: heroTurn, _monsterAttack: monsterAttack, _heroMove: heroMove, _checkWin: checkWin, _activateGroup: activateGroup, _endRound: endRound, _mazeShift: mazeShift, __mazeOpenExit: mazeOpenExit, _huntKeeperDrift: huntKeeperDrift, mazeHeroPaths, _awakenAngel: awakenAngel, _angelsAct: angelsAct, _freeRespawn: freeRespawn, _damageHero: damageHero,
 };
 function syncApi() { Object.assign(API, { LEVERS, HOLY, FOUNTAIN, ALTAR, CANDLES, EXIT_DOORS, CRYPTS, MAP, COLS, ROWS, ROOM_DEFS, ROOMS, DOOR_DEFS, EXIT, EXIT_ROOM, SPOT_DEFS, FURN_DEFS, SPAWN_DEFS, MIRRORS, HERO_START, WALL_HEXES, ALL_HEXES, ROOM_HEXES, MONSTER_ROOMS, CURSE_ROOMS, LOCKABLE, SETUP_BANNED, CIRCLES, OBELISK_SITES, OUTDOOR }); }
 syncApi();
@@ -17491,7 +17509,7 @@ const GOAL_H = {
   comb: { story: 'Mlha nad bažinou je tak hustá, že je vidět jen na dvě pole. Jeden z vás nese hřeben Banshee a ona si pro něj jde.', goal: 'Vložte hřeben do pravého ze čtyř hrobů, nebo Banshee zabijte.',
     how: ['Nositel hřebenu cítí směr k pravému hrobu (šipka). Vložit hřeben = 1 pohyb vedle hrobu. Špatný hrob vzbudí mrtvé.', 'Hřeben jde podat sousedovi nebo hodit až na 3 pole. Od ležícího ho můžeš vzít.', 'Na konci kola Banshee dojde k nositeli a zakvílí: +2 Strach do 3 polí. Pak je kolo vidět a jde zasáhnout.', 'Kořenářka nese lucernu a vidí dál. Bludičky lákají lovce k sobě.'] },
   hunt: { story: 'Úplněk nad Černým lesem. Vlkodlak krouží kolem staré hájovny.', goal: 'Zabijte vlkodlaka (50 ♥) do konce 12. kola.',
-    how: ['Vlkodlaka ovládá Dům. Po tahu každého lovce má 1 akci: pohyb 5, útok, nebo vytí (lovci do 3 polí mají Strach těsně pod Panikou). Útočí i na lovce vedle svého cíle.', 'Když za celé kolo nikoho nezraní, na konci kola se promění v hajného. Celé další kolo ho Dům neovládá. V kolech 3, 6, 9 a 12 zakryjí měsíc mraky a je hajným celé kolo.', 'Každá proměna v hajného ho stojí 5 zranění.', 'Hajného odstrčíš ze sousedního pole v přímém směru o 1–3 pole (2 pohyb). Když skončí v jedné z 5 pastí, dostane 15 zranění, past zmizí a on je hned zase vlkem.'] },
+    how: ['Vlkodlaka ovládá Dům. Po tahu každého lovce má 1 akci: pohyb 5, útok, nebo vytí (lovci do 3 polí mají Strach těsně pod Panikou). Útočí i na lovce vedle svého cíle.', 'Když za celé kolo nikoho nezraní, na konci kola se promění v hajného. Celé další kolo ho Dům neovládá. V kolech 3, 6, 9 a 12 zakryjí měsíc mraky a je hajným celé kolo.', 'Každá proměna v hajného ho stojí 5 zranění.', 'Hajného odstrčíš ze sousedního pole v přímém směru o 1–3 pole (2 pohyb). Když skončí v jedné z 5 pastí, dostane 15 zranění, past zmizí a on je hned zase vlkem.', 'Hajný po tahu každého lovce sám udělá pohyb 2 k nejbližší pasti (projde skrz monstra i lovce, do pasti sám nevkročí) a postaví se tak, aby šel odstrčit dál k ní.'] },
   sluice: { story: 'Kanály pod Blackmoorem po průtrži. Voda stoupá a Obří troll rve stavidla zpátky.', goal: 'Zavřete všechna tři stavidla, nebo trolla zabijte.',
     how: ['Točit stavidlem = 1 pohyb vedle něj, zavřené je po 3 dílcích.', 'Proud unáší figurky ve vodě o 2 pole, každé 2. kolo troll pošle vlnu o 3. Troll stojící u stavidla ho vrací.', 'Voda stoupá na konci 3., 6. a 9. kola. Na hladině 3 zaplaví výlez.', 'Krysař pomáhá točit nejbližším stavidlem.'] },
   escape: { story: 'Seance se zvrtla a dům za vámi zabouchl dveře.', goal: 'Utečte hlavními dveřmi ve Vstupní hale. Stačí dva z vás.',
@@ -17533,7 +17551,7 @@ const RULES_H = () => `<details class="brules"><summary>Základní pravidla</sum
 const BRIEF_S = {
   ball: ['Maškarní ples. Mezi tanečníky se skrývá Hrabě.', 'Najděte Hraběte a zabijte ho ve všech třech podobách.', ['Prozkoumat tanečníka = 2 pohyby, nevinný se rozpadne.', 'Stopy rozprášují nevinné.', 'Nálezy proti upírům: 5 dmg.']],
   comb: ['Mlha je vidět na dvě pole. Banshee jde pro svůj hřeben.', 'Vložte hřeben do pravého hrobu, nebo Banshee zabijte.', ['Nositel cítí směr k hrobu.', 'Hřeben jde podat i hodit.', 'Po nářku je Banshee vidět.']],
-  hunt: ['Úplněk. Vlkodlak krouží kolem hájovny.', 'Zabijte vlkodlaka (50 ♥).', ['Kolo bez zranění = proměna v hajného (−5).', 'Mraky v kolech 3, 6, 9, 12.', 'Hajný v pasti: −15, past zmizí.']],
+  hunt: ['Úplněk. Vlkodlak krouží kolem hájovny.', 'Zabijte vlkodlaka (50 ♥).', ['Kolo bez zranění = proměna v hajného (−5).', 'Mraky v kolech 3, 6, 9, 12.', 'Hajný v pasti: −15, past zmizí.', 'Hajný se sám táhne k pastem.']],
   sluice: ['Kanály se plní vodou.', 'Zavřete tři stavidla dřív, než voda zaplaví výlez.', ['Stavidlo = 3× 1 pohyb.', 'Proud unáší po 2 polích.', 'Voda stoupá ve 3., 6. a 9. kole.']],
   escape: ['Seance se zvrtla a dům vás nepustí ven.', 'Najděte pravý klíč a utečte hlavními dveřmi. Stačí dva.', ['Jeden z klíčů je falešný.', 'Kořist hledej v nábytku se značkou.']],
   circles: ['Na hřbitově u sv. Jiljí bloudí duše, které nemohou odejít.', 'Nasbírejte 6 vyvolání.', ['Svítí vždy jen jeden kruh. Začni v něm tah a získáš vyvolání.', 'Krypty propojují hřbitov.']],
