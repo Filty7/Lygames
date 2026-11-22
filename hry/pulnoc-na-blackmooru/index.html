@@ -17620,7 +17620,7 @@ function campNextNote(st, id, win) {
   if (played.length >= Camp.LEN) return 'Tímto scénářem kampaň končí.';
   const sc = Camp.scoreOf(hist);
   if (Camp.isBossSlot({ played })) { const side = sc.heroes > sc.ol ? 'ol' : 'heroes';
-    return `Další scénář je <b>boss fight</b>. Vybírá ho <b>${side === 'ol' ? 'Dům' : 'lovci'}</b>, ${sc.heroes === sc.ol ? 'protože je remíza (' + sc.heroes + ' : ' + sc.ol + ') a při remíze vybírají lovci' : 'protože ' + (side === 'ol' ? 'Dům má' : 'lovci mají') + ' vyhráno méně her (lovci ' + sc.heroes + ' : ' + sc.ol + ' Dům)'}.`; }
+    return `Další scénář je <b>boss fight</b>.<br>${side === 'ol' ? 'Vybírá ho <b>Dům</b>' : 'Vybírají ho <b>lovci</b>'}, ${sc.heroes === sc.ol ? 'protože je remíza (' + sc.heroes + ' : ' + sc.ol + ') a při remíze vybírají lovci' : 'protože ' + (side === 'ol' ? 'Dům má' : 'lovci mají') + ' vyhráno méně her (lovci ' + sc.heroes + ' : ' + sc.ol + ' Dům)'}.`; }
   return `Další scénář vybírá <b>${win ? 'strana lovců' : 'Dům'}</b>, protože ${win ? 'zvítězili' : 'zvítězil'}.`;
 }
 function showEnd(res) {
