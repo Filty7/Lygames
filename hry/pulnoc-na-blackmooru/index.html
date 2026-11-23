@@ -8271,7 +8271,7 @@ function goalMap(G, goals) {
 // nebezpečí pole = očekávané zranění od bdělých monster, která na pole dosáhnou pohybem + dosahem
 let dangerCache = { key: '', map: null };
 function dangerAt(G, hex) {
-  const key = G.round + ':' + (G.hunt && G.hunt.human ? 'H:' : '') + (G.comb && G.comb.zone ? G.comb.zone + ':' : '') + G.monsters.map(m => m.uid + '@' + m.pos).join(';');
+  const key = G.round + ':' + (G.hunt && G.hunt.human ? 'H:' : '') + (G.comb && G.comb.zone ? G.comb.zone + ':' : '') + [...(G.activated || [])].join(',') + ':' + G.monsters.map(m => m.uid + '@' + m.pos).join(';');
   if (dangerCache.key !== key) dangerCache = { key, map: new Map() };
   const k = K(hex); if (dangerCache.map.has(k)) return dangerCache.map.get(k);
   let d = 0;
@@ -8280,12 +8280,36 @@ function dangerAt(G, hex) {
     if (MDEF[m.type].object || !C.isAwake(G, m) || m.dormant) continue;
     if (G.comb && m.boss) { if (C.combZoneHas(G, hex)) d += (C.mstats(G, m).dmg + 1) * 1.2; continue; } // Banshee útočí jen do pole výkřiku
     const s = C.mstats(G, m), reach = Math.max(0, dist(m.pos, hex) - s.range);
-    if (reach <= s.move) d += (s.dmg + s.fear * 0.5) * 0.6 * (s.attacks || 1);
+    // v194 (adaptace): skupina, která už v tomto kole hrála, ohrožuje až příští kolo – váží méně
+    if (reach <= s.move) d += (s.dmg + s.fear * 0.5) * 0.6 * (s.attacks || 1) * (pendingGrp(G, m) || OFF.has('dang') ? 1 : 0.4);
   }
   if (G.fireFront != null) { if (C.frontBurning(G, hex)) d += 6; else if (C.xcOf(hex) <= G.fireFront + (G.fireStep || 2) + 1e-6) d += 2.5; }
   const r = roomOf(hex); if (r) { if (C.obeliskIn(G, 'pain', r)) d += 2.5; if (C.obeliskIn(G, 'ice', r)) d += 1.2; if (C.obeliskIn(G, 'dark', r)) d += 0.8; }
   dangerCache.map.set(k, d); return d;
 }
+// ---------- v194: ADAPTACE BOTŮ – pomocné funkce ----------
+// skupina monster ještě v tomto kole nehrála (je to reálná hrozba před dalším tahem lovců)
+const pendingGrp = (G, m) => !(G.activated && G.activated.has(m.type));
+const liveMon = G => G.monsters.filter(m => !MDEF[m.type].object && !m.dormant && C.visibleToHeroes(G, m));
+// role lovců: tank (Ashford) vepředu, střelec (Wren) vzadu a v pohybu, podpora (Varga) vzadu u party
+const ROLE = { ashford: 'tank', wren: 'skirm', varga: 'support' };
+const roleOf = h => ROLE[h.id] || 'skirm';
+// scénáře, kde se parta záměrně dělí (každý ke svému cíli)
+const OFF = new Set((typeof process !== 'undefined' && process.env && process.env.BOFF || '').split(',')); // ladění: vypnutí částí adaptace
+const SPLIT_GOALS = ['maze', 'angels', 'circles'];
+// hrozba v okolí lovce od nehraných skupin (pro pořadí aktivace)
+function pendingThreat(G, h) { let v = 0; for (const m of liveMon(G)) { if (!pendingGrp(G, m) || !C.isAwake(G, m)) continue; const s = C.mstats(G, m); if (Math.max(0, dist(m.pos, h.pos) - s.range) <= s.move) v += (s.dmg + s.fear * 0.5) * (s.attacks || 1); } return v; }
+// kontrolní karty podpory (sůl, poutání, oslepení, omráčení) – kolik nehraných monster by zastavily u spojenců
+function controlValue(G, h) {
+  const card = h.hand.find(c => c.pri && ['salt', 'rootarea', 'blind', 'stunone', 'rootone'].includes(c.pri.t) && !c.pri.around && !C.cannotPlay(G, h, c, 'pri')); if (!card) return 0;
+  const r = (card.pri.range || 3) + 1, ms = liveMon(G).filter(m => pendingGrp(G, m) && C.isAwake(G, m) && dist(m.pos, h.pos) <= r + 1);
+  const threatAlly = ms.filter(m => G.heroes.some(o => !o.downed && !o.escaped && dist(o.pos, m.pos) <= 2)).length;
+  return threatAlly >= 2 ? 2.5 + threatAlly * 0.4 : threatAlly === 1 ? 0.8 : 0;
+}
+// nejlepší „zabíjecí“ útok v ruce (jistý zabitý cíl)
+function killShot(G, h, minCh = 0.6) { for (const c of h.hand) { if (!c.pri || c.pri.t !== 'attack' || C.cannotPlay(G, h, c, 'pri')) continue; if (C.attackTargets(G, h, c.pri).some(t => t.m.hp <= Math.max(0, c.pri.dmg - t.armor) && t.chance >= minCh)) return c; } return null; }
+// pozdní fáze / prázdná mapa: na mapě nejsou bdělá monstra → postup k cíli (v posledních kolech rychle a s rizikem)
+const lateRush = G => G.round >= G.maxRound - 2 || (!liveMon(G).some(m => C.isAwake(G, m)) && G.round >= G.maxRound - 4);
 // pole, která chce Dům hlídat (kruhy, relikviáře, obelisky, východ)
 function objectiveHexes(G) {
   const out = [], hs = G.heroes.filter(h => !h.downed && !h.escaped), near = (hex, r) => hs.some(h => dist(h.pos, hex) <= r);
@@ -8293,7 +8317,9 @@ function objectiveHexes(G) {
   if (g === 'circles') { const act = G.circles[G.activeCircle]; for (const c of G.circles) { const hot = near(c.hexes[0], 6); c.hexes.forEach(x => out.push({ hex: x, w: c === act ? (hot ? 8 : 4) : (hot ? 2 : 1), on: true })); } }
   if (g === 'cleanse') for (const sp of G.spots.filter(s => !s.searched)) { const hot = near(sp.hex, 6); neighbors(sp.hex).filter(n => roomOf(n) === roomOf(sp.hex) && !C.isBlock(n)).forEach(x => out.push({ hex: x, w: hot ? 4.5 : 1.2 })); }
   if (g === 'obelisks') for (const o of G.monsters.filter(m => MDEF[m.type].obelisk)) { const hot = near(o.pos, 5); neighbors(o.pos).filter(n => !C.isBlock(n) && roomOf(n)).forEach(x => out.push({ hex: x, w: hot ? 3 : 0.8 })); }
-  if (g === 'escape') { const car = hs.find(h => h.keys.length); if (car) neighbors(C.EXIT).filter(n => roomOf(n)).forEach(x => out.push({ hex: x, w: 6 })); }
+  if (g === 'escape') { const car = hs.find(h => h.keys.length); if (car) neighbors(C.EXIT).filter(n => roomOf(n)).forEach(x => out.push({ hex: x, w: 6 }));
+    // v194: Dům hlídá truhly s klíčem – a stejně tak tu s falešným (blaf: lovci z hlídání nepoznají, který je pravý)
+    if (!G.exitUnlocked) for (const sp of G.spots.filter(s => !s.searched && ['key', 'fake'].includes(s.token))) { const hot = near(sp.hex, 6); adjFree(sp.hex).forEach(x => out.push({ hex: x, w: hot ? 3 : 1 })); } }
   if (g === 'altar' && C.ALTAR) {
     const car = hs.filter(h => hasWater(h)), hot = car.some(h => dist(h.pos, C.ALTAR) <= 10);
     adjFree(C.ALTAR).forEach(x => out.push({ hex: x, w: hot ? 7 : car.length ? 4 : 2.2, on: true }));
@@ -8415,7 +8441,19 @@ function heroGoals(G, h) {
     if (spots.length && G.round <= 3) return spots.flatMap(sp => adjFree(sp.hex));
     return tgt ? tgt.hexes.flatMap(x => [x].concat(neighbors(x))).filter(x => roomOf(x) === tgt.room && !C.isBlock(x)) : [];
   }
-  if (goal === 'mirrors' || goal === 'obelisks') {
+  if (goal === 'obelisks') { // v194: najít všechny obelisky co nejdřív – průzkum neodkrytých místností, viditelné obelisky mají přednost
+    const known = G.monsters.filter(m => MDEF[m.type].obelisk && C.visibleToHeroes(G, m));
+    const hidden = G.monsters.filter(m => MDEF[m.type].obelisk && !C.visibleToHeroes(G, m)).length;
+    if (hidden) { const doors = G.doors.filter(d => d.rooms && d.rooms.some(r => !G.revealed.has(r)) && d.rooms.some(r => G.revealed.has(r)) && !C.isImpass(d));
+      const mineD = doors.filter(d => !mates.some(o => dist(o.pos, d.hex) + 1 < dist(h.pos, d.hex)));
+      const ex = (mineD.length ? mineD : doors).map(d => d.hex);
+      if (ex.length && (!known.length || known.every(o => dist(o.pos, h.pos) > 5))) return ex; }
+    if (known.length) { const near = known.slice().sort((a, b) => dist(a.pos, h.pos) - dist(b.pos, h.pos));
+      return near.slice(0, 2).flatMap(m => { const bad = MDEF[m.type].obelisk === 'pain' || MDEF[m.type].obelisk === 'ice';
+        if (bad) { const out = C.ALL_HEXES.filter(x => roomOf(x) && roomOf(x) !== roomOf(m.pos) && dist(x, m.pos) <= 3 && !C.isBlock(x) && C.canStrike(G, x, m.pos, 3)); if (out.length) return out; }
+        return neighbors(m.pos).filter(n => linkOK(n, m.pos) && !C.isBlock(n)); }); }
+  }
+  if (goal === 'mirrors') {
     const ms = G.monsters.filter(m => MDEF[m.type].object);
     if (ms.length) {
       const near = ms.slice().sort((a, b) => dist(a.pos, h.pos) - dist(b.pos, h.pos));
@@ -8435,7 +8473,7 @@ function heroGoals(G, h) {
   if (G.exitUnlocked) return [C.EXIT];
   if (h.keys.length) return neighbors(C.EXIT).filter(n => roomOf(n) === C.EXIT_ROOM);
   // v97: klíč už někdo nese → ostatní míří k východu (utéct musí dva), cestou prohledají jen to, co mají vedle sebe
-  if (V2.hero && V2.escort && G.scen.goal === 'escape' && mates.some(o => o.keys.length) && !G.spots.some(sp => !sp.searched && dist(sp.hex, h.pos) <= 2)) return C.ALL_HEXES.filter(x => roomOf(x) === C.EXIT_ROOM && dist(x, C.EXIT) <= 2 && !C.isBlock(x));
+  if (V2.hero && G.scen.goal === 'escape' && mates.some(o => o.keys.length) && !G.spots.some(sp => !sp.searched && dist(sp.hex, h.pos) <= 2)) return C.ALL_HEXES.filter(x => roomOf(x) === C.EXIT_ROOM && dist(x, C.EXIT) <= 2 && !C.isBlock(x));
   const known = G.spots.filter(s => !s.searched && s.peeked && s.token === 'key');
   let targets = known.length ? known : G.spots.filter(s => !s.searched && !(s.peeked && s.token !== 'key' && s.token !== 'fake'));
   if (!targets.length) targets = G.spots.filter(s => !s.searched);
@@ -8484,6 +8522,7 @@ const moveValue = c => c.sec && (c.sec.t === 'move' || c.sec.t === 'lightmove') 
 const isReaction = c => c.pri && c.pri.t === 'react';
 
 // poziční preference lovců (nižší = lepší)
+function wrenOld(G, h, hx, vis) { let b = 0; const cf = h.hand.find(c => c.pri && c.pri.t === 'crossfire'); if (cf && C.crossPairs(G, Object.assign({}, h, { pos: hx }), cf.pri.range).length) b -= 2.5; if (vis.some(m => dist(m.pos, hx) <= 3 && !vis.some(o => o !== m && dist(o.pos, m.pos) === 1))) b -= 0.2; return b; }
 function posBonus(G, h, hx) {
   const vis = G.monsters.filter(m => C.visibleToHeroes(G, m) && !MDEF[m.type].object && !m.dormant);
   const hasMelee = h.hand.some(c => c.pri && ((c.pri.t === 'attack' && c.pri.range === 1) || ['sweep', 'swapatk', 'charge', 'lunge'].includes(c.pri.t)));
@@ -8492,18 +8531,37 @@ function posBonus(G, h, hx) {
   // střelec (většina útoků na dálku) nechce stát u monstra: útok na dálku zblízka má nevýhodu
   const rngAtk = h.hand.filter(c => c.pri && ['attack', 'crossfire'].includes(c.pri.t) && (c.pri.range || 1) > 1).length, melAtk = h.hand.filter(c => c.pri && ((c.pri.t === 'attack' && c.pri.range === 1) || ['sweep', 'swapatk', 'charge', 'lunge'].includes(c.pri.t))).length;
   if (rngAtk > melAtk && vis.some(m => dist(m.pos, hx) === 1)) b += 0.7;
-  if (h.id === 'varga') b -= 0.25 * G.heroes.filter(o => o !== h && !o.downed && !o.escaped && dist(o.pos, hx) <= 3).length;
+  if (OFF.has('pos')) return b + (h.id === 'wren' ? wrenOld(G, h, hx, vis) : 0);
+  if (h.id === 'varga') { b -= 0.25 * G.heroes.filter(o => o !== h && !o.downed && !o.escaped && dist(o.pos, hx) <= 3).length; if (vis.some(m => dist(m.pos, hx) <= 1)) b += 0.9; } // v194: podpora vzadu, ale na dosah party
+  if (h.id === 'ashford' && h.hp > h.maxHp * 0.35) { // v194: tank – postaví se mezi monstrum a křehčí spojence (blok cesty / výhledu)
+    for (const m of vis) { if (!pendingGrp(G, m) || dist(m.pos, hx) > 3) continue; for (const o of G.heroes) { if (o === h || o.downed || o.escaped || dist(o.pos, m.pos) > 5) continue; if (dist(hx, m.pos) < dist(o.pos, m.pos) && dist(hx, o.pos) <= 2) b -= 0.35; } } }
   if (h.id === 'wren') {
     const cf = h.hand.find(c => c.pri && c.pri.t === 'crossfire');
     if (cf && C.crossPairs(G, Object.assign({}, h, { pos: hx }), cf.pri.range).length) b -= 2.5;
     if (vis.some(m => dist(m.pos, hx) <= 3 && !vis.some(o => o !== m && dist(o.pos, m.pos) === 1))) b -= 0.2;
+    if (vis.some(m => dist(m.pos, hx) <= 1)) b += 0.6; // v194: střelec drží odstup
   }
   return b;
 }
+const visibleNear = (G, h) => liveMon(G).some(m => C.isAwake(G, m) && dist(m.pos, h.pos) <= 4);
 const heroBot = {
   async chooseHero(G, hs) {
-    let best = hs[0], bv = -1;
-    for (const h of hs) { const v = h.downed ? -0.5 : Math.max(0, ...h.hand.map(c => cardAttackValue(G, h, c))) + (h.keys.length ? 3 : 0); if (v > bv) { bv = v; best = h; } }
+    // v194: pořadí aktivace – kdo je v ohrožení od nehraných skupin a sám (zabít/ustoupit dřív, než se na něj sesypou),
+    // podpora s kontrolou (sůl, poutání), když tím zachrání spojence; kdo dosáhne cíle; padlí co nejpozději (zvednou je ostatní)
+    if (OFF.has('order')) { let b0 = hs[0], v0 = -1; for (const h of hs) { const v = h.downed ? -0.5 : Math.max(0, ...h.hand.map(c => cardAttackValue(G, h, c))) + (h.keys.length ? 3 : 0); if (v > v0) { v0 = v; b0 = h; } } return b0; }
+    let best = hs[0], bv = -1e9;
+    for (const h of hs) {
+      let v;
+      if (h.downed) { const helper = G.heroes.some(o => o !== h && !o.downed && !o.escaped && !o.acted && dist(o.pos, h.pos) <= 4); v = helper ? -9 : -2; }
+      else {
+        const atk = Math.max(0, ...h.hand.map(c => cardAttackValue(G, h, c)));
+        const pt = pendingThreat(G, h), alone = !G.heroes.some(o => o !== h && !o.downed && !o.escaped && dist(o.pos, h.pos) <= 2);
+        v = atk + Math.min(4, pt * 0.35) * (alone ? 1.6 : 1) + (pt >= h.hp * 0.6 ? 2 : 0) + controlValue(G, h) + (h.keys.length ? 3 : 0) + (hasWater(h) ? 2 : 0);
+        const gm = heroGoalMapC(G, h), gd = gm.get(K(h.pos)); if (gd != null && gd > 0 && gd <= 4) v += 1.2;
+        if (h.hand.filter(c => c.panic).length >= 3) v -= 0.8; // zahlcený Panikou počká, ať ostatní připraví situaci
+      }
+      if (v > bv) { bv = v; best = h; }
+    }
     return best;
   },
   async chooseAction(G, h) {
@@ -8548,6 +8606,12 @@ const heroBot = {
     }
     // v59: zbavit se Paniky stojí 1 akci + odhození jiné karty (v60: se Zubem mrtvého bez odhození)
     const pnc = h.hand.find(c => c.panic), zub = C.hasPassive(G, h, 'zub');
+    // v194: priorita Paniky roste s počtem v ruce – 1 nevadí, 2 až s volnou akcí, 3 před pohybem, 4 absolutně první
+    { const pN = h.hand.filter(c => c.panic).length, boost = h.hand.some(c => !c.panic && c.pri && c.pri.panicBoost) ? 1 : 0;
+      if (pnc && (zub || h.hand.some(c => !c.panic)) && !C.cannotPlay(G, h, pnc, 'pri')) {
+        if (OFF.has('panic')) {} else if (pN >= 4) return { type: 'play', uid: pnc.uid, half: 'pri' };
+        if (pN - boost >= 3 && !killShot(G, h) && !(h.keys.length && h.plays < 2)) return { type: 'play', uid: pnc.uid, half: 'pri' };
+      } }
     if (pnc && (zub || h.hand.some(c => !c.panic)) && !C.cannotPlay(G, h, pnc, 'pri')) {
       const bestAtk = Math.max(0, ...h.hand.map(c => cardAttackValue(G, h, c)));
       const lowCard = h.hand.filter(c => !c.panic).some(c => cardAttackValue(G, h, c) < 0.5 && !isReaction(c));
@@ -8555,7 +8619,8 @@ const heroBot = {
       if (zub && (h.plays === 2 || lowCard || h.hand.filter(c => c.panic).length >= 2) && !((h.keys.length || G.exitUnlocked) && h.plays < 2)) return { type: 'play', uid: pnc.uid, half: 'pri' };
       const pN = h.hand.filter(c => c.panic).length, lazy = true, boostCard = h.hand.some(c => !c.panic && c.pri && c.pri.panicBoost); // v179: Paniku si chvíli nechá; s kartou, co z Paniky těží (Ilona), ji drží pro ni
       if (boostCard && pN < 2) { /* drží Paniku pro posílení */ } else
-      if (!zub && !((h.keys.length || G.exitUnlocked) && h.plays < 2) && (lazy ? pN >= 2 || (h.plays === 2 && bestAtk < 0.6) : (h.plays === 2 || (lowCard && bestAtk < 1.5) || pN >= 2))) return { type: 'play', uid: pnc.uid, half: 'pri' };
+      if (OFF.has('panic')) { if (!zub && !((h.keys.length || G.exitUnlocked) && h.plays < 2) && (pN >= 2 || (h.plays === 2 && bestAtk < 0.6))) return { type: 'play', uid: pnc.uid, half: 'pri' }; } else
+      if (!zub && !((h.keys.length || G.exitUnlocked) && h.plays < 2) && h.plays === 2 && (pN >= 2 ? bestAtk < 1.2 : bestAtk < 0.4 && !visibleNear(G, h))) return { type: 'play', uid: pnc.uid, half: 'pri' }; // v194: jen s volnou (poslední) akcí
     }
     if (h.plays >= 3) return { type: 'end' };
     // cíle nových scénářů: vylít vodu, vyzkoušet branku, zapálit svíci
@@ -8564,13 +8629,17 @@ const heroBot = {
     const ex = C.adjExits(G, h)[0]; if (ex) return { type: 'tryexit', door: ex.id };
     const cd = C.adjCandles(G, h, false)[0]; if (cd) return { type: 'relight', candle: cd.id };
     const down = G.heroes.find(o => o.downed && !o.escaped && !o.lost && dist(o.pos, h.pos) <= 1);
-    if (down) return { type: 'revive', target: down.id };
+    // v194: zvednout kamaráda – ale jistý zabitý nepřítel u nás má přednost (zvednutý pak nebude hned pod útokem)
+    if (down) { const ks = killShot(G, h, 0.65); if (ks && liveMon(G).some(m => pendingGrp(G, m) && dist(m.pos, down.pos) <= 2)) return { type: 'play', uid: ks.uid, half: 'pri' }; return { type: 'revive', target: down.id }; }
     const visible = G.monsters.filter(m => C.visibleToHeroes(G, m) && dist(m.pos, h.pos) <= 6);
     const se0 = h.hand.find(c => c.sec.t === 'search' && !C.cannotPlay(G, h, c, 'sec'));
     const clBlock = G.scen.goal === 'cleanse' && G.spots.some(sp => !sp.searched && dist(sp.hex, h.pos) <= 2 && G.monsters.some(m => !MDEF[m.type].object && !m.dormant && dist(m.pos, sp.hex) <= 2 && roomOf(m.pos) === roomOf(sp.hex))) && G.monsters.some(m => C.visibleToHeroes(G, m) && dist(m.pos, h.pos) <= 4);
-    if (se0 && !clBlock) return { type: 'play', uid: se0.uid, half: 'sec' };
+    // v194: lootování jen „po cestě“ – když vedle nestojí nehrané monstrum (u hledacích scénářů je hledání cíl)
+    const searchGoal = ['escape', 'cleanse'].includes(G.scen.goal) && !G.exitUnlocked;
+    const adjPend = liveMon(G).some(m => pendingGrp(G, m) && C.isAwake(G, m) && dist(m.pos, h.pos) <= 1);
+    if (se0 && !clBlock && (searchGoal || !adjPend || OFF.has('srch'))) return { type: 'play', uid: se0.uid, half: 'sec' };
     if (h.keys.length && dist(h.pos, C.EXIT) === 1) { const mvc = h.hand.filter(c => moveValue(c) > 0).sort((a, b) => moveValue(a) - moveValue(b))[0]; if (mvc) return { type: 'play', uid: mvc.uid, half: 'sec' }; }
-    const hurry = h.keys.length > 0 || G.exitUnlocked || !!wc || !!G.exitFound || (G.fireFront != null && G.round >= 2) || (!!G.comb && G.comb.holder === h.id) || (!!G.hunt && G.hunt.human) || G.scen.goal === 'maze'; // v179: v bludišti se neperou, běží ven
+    const hurry = (G.round >= G.maxRound && OFF.has('rush2')) || h.keys.length > 0 || G.exitUnlocked || !!wc || !!G.exitFound || (G.fireFront != null && G.round >= 2) || (!!G.comb && G.comb.holder === h.id) || (!!G.hunt && G.hunt.human) || G.scen.goal === 'maze'; // v179: v bludišti se neperou, běží ven
     if (G.scen.goal === 'cleanse') {
       const gm0 = goalMap(G, heroGoals(G, h)), here0 = gm0.has(K(h.pos)) ? gm0.get(K(h.pos)) : 99;
       const blocker = G.monsters.filter(m => !MDEF[m.type].object && C.visibleToHeroes(G, m) && G.spots.some(sp => !sp.searched && dist(sp.hex, m.pos) <= 2 && dist(sp.hex, h.pos) <= 4));
@@ -8582,7 +8651,9 @@ const heroBot = {
     if (['altar', 'maze', 'fire'].includes(G.scen.goal) || (C.isBossGoal && C.isBossGoal(G)) || (V2.hero && V2.push && ['escape', 'circles', 'cleanse'].includes(G.scen.goal) && (G.round >= (V2.early && G.scen.goal === 'escape' ? 1 : 3) || hurry))) {
       const gm0 = goalMap(G, heroGoals(G, h)), here0 = gm0.has(K(h.pos)) ? gm0.get(K(h.pos)) : 99;
       const adjThreat = G.monsters.some(m => !MDEF[m.type].object && C.visibleToHeroes(G, m) && dist(m.pos, h.pos) <= 1);
-      if (here0 > 0 && (!adjThreat || hurry)) {
+      // v194: od poloviny hry se cíl nepřestává sledovat kvůli monstru vedle (zrcadla je stejně vrací) – jen jistý zásah má přednost
+      const pushThrough = G.round >= Math.ceil(G.maxRound / 2) - 1 && h.hp > h.maxHp * 0.4 && !killShot(G, h, 0.6);
+      if (here0 > 0 && (!adjThreat || hurry || (pushThrough && OFF.has('push2')))) {
         const kill = h.hand.find(c => c.pri.t === 'attack' && !C.cannotPlay(G, h, c, 'pri') && C.attackTargets(G, h, c.pri).some(t => t.m.hp <= Math.max(0, c.pri.dmg - t.armor) && t.chance >= .6 && dist(t.m.pos, h.pos) <= 2));
         if (kill && !hurry) return { type: 'play', uid: kill.uid, half: 'pri' };
         const mv = h.hand.filter(c => moveValue(c) > 0 && !C.cannotPlay(G, h, c, 'sec') && !c.scenWater && (hurry || c.pri.t !== 'attack' || h.hand.filter(x => moveValue(x) > 0).length === 1)).sort((a, b) => moveValue(b) - moveValue(a))[0];
@@ -8627,6 +8698,8 @@ const heroBot = {
     }
     if (!hurry && h.plays <= 1 && atkCards >= 1 && (sp = h.hand.find(c => (c.pri.t === 'buff' || c.pri.t === 'analyze') && ok(c) && !(c.pri.selfDmg && h.hp <= c.pri.selfDmg + 4)))) return { type: 'play', uid: sp.uid, half: 'pri' };
     if ((sp = h.hand.find(c => c.pri.t === 'rally' && ok(c))) && G.heroes.some(o => !o.escaped && dist(o.pos, h.pos) <= 4 && o.fear >= 2)) return { type: 'play', uid: sp.uid, half: 'pri' };
+    // v194: kontrola (sůl, poutání, oslepení) – když zastaví aspoň 2 nehraná monstra u party (sůl: nezaútočí z ní, uprostřed kruhu nemůže ven)
+    if (!OFF.has('ctrl') && controlValue(G, h) >= 2.5 && (sp = h.hand.find(c => ['salt', 'rootarea', 'blind'].includes(c.pri.t) && !c.pri.around && ok(c)))) return { type: 'play', uid: sp.uid, half: 'pri' };
     if (near.length >= 2 && (sp = h.hand.find(c => (c.pri.t === 'blind' || c.pri.t === 'rootarea' || c.pri.t === 'salt' || (c.pri.t === 'fire' && near.filter(m => !C.trapImmune(m)).length >= 2)) && ok(c)))) return { type: 'play', uid: sp.uid, half: 'pri' };
     if (hurry && near.some(m => dist(m.pos, h.pos) === 1) && (sp = h.hand.find(c => c.pri.t === 'shove' && ok(c)))) return { type: 'play', uid: sp.uid, half: 'pri' };
     const adj = G.monsters.filter(m => C.visibleToHeroes(G, m) && dist(m.pos, h.pos) === 1);
@@ -8720,7 +8793,12 @@ const heroBot = {
     const holder = (!!G.comb && G.comb.holder === h.id) || (!!G.hunt && G.hunt.human);
     const urgent = h.keys.length > 0 || G.exitUnlocked || G.round >= G.maxRound - 2 || hasWater(h) || !!G.exitFound || G.fireFront != null || holder;
     const retreat = V2.hero && typeof h._retreat === 'string' && h._retreat.startsWith(G.round + ':');
-    const dw = retreat ? 2.5 : holder ? 0.6 : urgent ? 0.15 : h.hp <= 4 ? 0.9 : 0.45, gw = retreat ? 0.3 : 1;
+    const roleDw = OFF.has('role') ? 1 : roleOf(h) === 'support' ? 1.45 : roleOf(h) === 'tank' ? 0.7 : 1; // v194: Varga křehká, Ashford snese víc
+    const dw = (retreat ? 2.5 : holder ? 0.6 : urgent ? 0.15 : h.hp <= 4 ? 0.9 : 0.45) * roleDw, gw = retreat ? 0.3 : 1;
+    // v194: soudržnost party – nevzdalovat se, zvlášť když u kolegů jsou nepřátelé (kromě scénářů, kde se dělí)
+    const split = SPLIT_GOALS.includes(G.scen.goal) || h.keys.length > 0 || lateRush(G);
+    const matesInDanger = G.heroes.some(o => o !== h && !o.downed && !o.escaped && liveMon(G).some(m => dist(m.pos, o.pos) <= 3));
+    const allyW = OFF.has('coh') ? 0.6 : split ? 0.2 : matesInDanger ? 1.6 : 0.9;
     // zbývá-li po pohybu akce a v ruce je útok, táhni na pole, odkud jde zaútočit
     const atkC = h.plays <= 1 && !urgent ? h.hand.filter(c => c.pri && ['attack', 'crossfire', 'grenade', 'swapatk', 'sweep'].includes(c.pri.t) && !c.cursed) : [];
     const vis = atkC.length ? G.monsters.filter(m => C.visibleToHeroes(G, m) && !m.dormant && !MDEF[m.type].object) : [];
@@ -8729,8 +8807,8 @@ const heroBot = {
     let best = null, bv = here * gw + dangerAt(G, h.pos) * dw + atkBonus(h.pos) + darkP(h.pos) + (retreat ? 50 : 0); // při ústupu zůstat stát nejde
     for (const [k, e] of opts.reach) {
       const v = gm.has(k) ? gm.get(k) : 999;
-      const hx = unK(k), ally = G.heroes.some(o => o !== h && !o.downed && !o.escaped && dist(o.pos, hx) <= 3) ? 0 : (V2.hero && V2.cohesion ? (retreat ? 3 : 1.5) : 0.6);
-      const score = v * gw + e.cost * 0.01 + dangerAt(G, hx) * dw + ally * (urgent && !retreat ? 0 : 1) + (urgent ? 0 : posBonus(G, h, hx)) + atkBonus(hx) + darkP(hx);
+      const hx = unK(k), ally = G.heroes.some(o => o !== h && !o.downed && !o.escaped && dist(o.pos, hx) <= 3) ? 0 : (retreat ? 3 : allyW);
+      const score = v * gw + e.cost * 0.01 + dangerAt(G, hx) * dw + ally + (urgent && h.keys.length ? 0 : posBonus(G, h, hx)) + atkBonus(hx) + darkP(hx);
       if (score < bv - 0.05) { bv = score; best = hx; }
     }
     if (best) return { kind: 'walk', hex: best };
@@ -8750,6 +8828,8 @@ const heroBot = {
           if (G.scen.goal === 'circles' && G.circles[G.activeCircle] && G.circles[G.activeCircle].hexes.some(x => dist(x, t.m.pos) <= 1)) v += 1.5 * t.chance;
           if (G.scen.goal === 'cleanse' && G.spots.some(sp => !sp.searched && dist(sp.hex, t.m.pos) <= 1)) v += 1 * t.chance;
           if (G.heroes.some(o => o.downed && !o.escaped && dist(o.pos, t.m.pos) <= 2)) v += 0.6 * t.chance;
+          if (!OFF.has('tgt') && pendingGrp(G, t.m) && C.isAwake(G, t.m)) v += 0.6 * t.chance; // v194: skupina, která ještě tento kolo hraje = skutečná hrozba
+          if (!OFF.has('tgt')) { const gm = heroGoalMapC(G, h), here = gm.get(K(h.pos)), at = gm.get(K(t.m.pos)); if (here != null && at != null && at < here && dist(t.m.pos, h.pos) <= 3) v += 0.5 * t.chance; } // překáží v cestě k cíli
           if (t.m.boss) v += (G.scen.goal === 'ball' || G.scen.goal === 'comb' ? 2.2 : 1.2) * t.chance;
           if (MDEF[t.m.type].retaliate && dist(h.pos, t.m.pos) === 1) v -= 0.25 + (t.m.elite ? 0.35 : 0) + (h.fear >= h.courage - 1 ? 0.6 : 0);
           if (MDEF[t.m.type].guardAdj) v += 0.35 * G.monsters.filter(o => o !== t.m && dist(o.pos, t.m.pos) === 1).length * t.chance;
@@ -8776,6 +8856,11 @@ const heroBot = {
       if (req.throwOver || (req.spec && req.spec.t === 'nudge')) {
         const bad = x => (G.fire.some(f => C.eq(f.hex, x)) ? 3 : 0) + (C.saltAt(G, x) ? 2 : 0) - G.monsters.filter(o => !MDEF[o.type].object && dist(o.pos, x) === 1).length * 0.5;
         return c.slice().sort((a, b) => bad(b) - bad(a))[0];
+      } else if (req.area === 'salt' || req.area === 'root') { // v194: kruh tam, kde chytí nejvíc nehraných monster (střed = past) a ochrání spojence
+        const ms = liveMon(G).filter(m => C.isAwake(G, m) && !(req.area === 'root' && C.trapImmune(m))), wv = m => pendingGrp(G, m) ? 1 : 0.5; // oheň (area 'root') létající neberou
+        const sc = x => { let v = 0; for (const m of ms) { const d = dist(m.pos, x); if (d === 0) v += 2.2 * wv(m); else if (d === 1) v += 1 * wv(m); else if (d === 2 && G.heroes.some(o => !o.downed && !o.escaped && dist(o.pos, m.pos) <= 2)) v += 0.2; }
+          const allyIn = G.heroes.filter(o => !o.downed && !o.escaped && dist(o.pos, x) <= 1).length; v += req.area === 'root' ? -3 * allyIn : 0.3 * allyIn; return -v; }; // oheň nesmí na své
+        return c.slice().sort((a, b) => sc(a) - sc(b))[0];
       } else { const ms = G.monsters.filter(m => C.visibleToHeroes(G, m) && !(req.area === 'fire' && C.trapImmune(m))); const sc = req.area === 'root' ? x => -ms.filter(m => !MDEF[m.type].object && dist(m.pos, x) <= 1).length : x => Math.min(99, ...ms.map(m => dist(m.pos, x))) + (req.area === 'fire' && G.heroes.some(o => C.eq(o.pos, x)) ? 50 : 0); return c.slice().sort((a, b) => sc(a) - sc(b))[0]; }
       default: return c[0];
     }
@@ -8897,6 +8982,15 @@ function botSetupPart(G, part, pool) {
 const SETUP_ORDER = ['tokens', 'exit', 'angels', 'locks', 'obelisks', 'traps', 'buy', 'place', 'curse'];
 function botSetup(G, pool) { for (const p of SETUP_ORDER) botSetupPart(G, p, pool); }
 const aliveHeroes = G => G.heroes.filter(h => !h.downed && !h.escaped);
+// v194: karty „do konce kola“ – nikdy na konci kola; nejlépe po tahu prvního lovce (ať zasáhnou dva zbývající), po druhém jen občas
+function goodTiming(G, phase) {
+  if (phase === 'house') return false;
+  const live = G.heroes.filter(h => !h.escaped && !h.lost), acted = live.filter(h => h.acted).length, left = live.length - acted;
+  if (left <= 0) return false;
+  if (acted === 1 || (live.length <= 2 && acted === 0)) return true;
+  if (acted === 2 && left >= 1) return C.random() < 0.25;
+  return false;
+}
 const nearestHeroDist = (G, hex) => Math.min(99, ...aliveHeroes(G).map(h => dist(h.pos, hex)));
 // jak moc je pole ohrožené lovci (pro ústup střelců)
 const dangerAtHeroes = (G, hex) => aliveHeroes(G).filter(h => dist(h.pos, hex) <= 4).length;
@@ -8928,7 +9022,11 @@ const overlordBot = {
     let best = groups[0], bd = 1e9;
     for (const t of groups) {
       const ms = G.monsters.filter(m => m.type === t && C.isAwake(G, m)); if (!ms.length) continue;
-      const sc = Math.min(...ms.map(m => { const s = C.mstats(G, m); return nearestHeroDist(G, m.pos) - (s.move + s.range) * 1.2; })) - ms.length * 0.3;
+      let sc = Math.min(...ms.map(m => { const s = C.mstats(G, m); return nearestHeroDist(G, m.pos) - (s.move + s.range) * 1.2; })) - ms.length * 0.3;
+      // v194: skupina, které hrozí, že ji nehraní lovci zabijí dřív, než zahraje, jde první
+      const waiting = G.heroes.filter(h => !h.acted && !h.downed && !h.escaped);
+      const risk = ms.filter(m => m.hp <= 3 && waiting.some(h => dist(h.pos, m.pos) <= 4)).length;
+      sc -= risk * 1.5;
       if (sc < bd) { bd = sc; best = t; }
     }
     return { type: 'group', mtype: best };
@@ -8963,8 +9061,8 @@ const overlordBot = {
         if (v[0] === 'B') return hs.length >= 2 ? 1 : 0;
         return sick >= 1 || hs.length >= 3 ? 1 : 0;
       }
-      case 'zleoko': return phase !== 'house' && (v === 'AA' || v[0] === 'B' || byRoom() >= 2) ? 1 : 0;
-      case 'zavoj': { const cap = ({ '': 3, A: 2, AA: 1, AB: 2, B: 3, BA: 2, BB: 3 })[v] || 3; return phase !== 'house' && G.monsters.some(m => C.visibleToHeroes(G, m)) && (longAtk(cap) >= 1 || cap <= 1) ? 1 : 0; }
+      case 'zleoko': return goodTiming(G, phase) && (v === 'AA' || v[0] === 'B' || byRoom() >= 2) ? 1 : 0;
+      case 'zavoj': { const cap = ({ '': 3, A: 2, AA: 1, AB: 2, B: 3, BA: 2, BB: 3 })[v] || 3; return goodTiming(G, phase) && G.monsters.some(m => C.visibleToHeroes(G, m)) && (longAtk(cap) >= 1 || cap <= 1) ? 1 : 0; }
       case 'navrat': return 1;
       case 'prohozeni': { const rr = C.PROH_RANGE[v] || 6, carrier = hs.find(h => h.keys.length); return carrier && hs.some(h => h !== carrier && dist(h.pos, C.EXIT) > dist(carrier.pos, C.EXIT) + 3 && dist(h.pos, carrier.pos) <= rr) ? 1 : (v[0] === 'B' && G.round >= 3 ? 1 : 0); }
     }
@@ -9003,8 +9101,8 @@ const overlordBot = {
     const ev = i.chance * (s.dmg * (s.attacks || 1) + s.fear * 0.7);
     let mult = 1;
     if (G._olFocus === h.id) mult += 0.25;
-    if (!hs.some(o => o !== h && dist(o.pos, h.pos) <= 2)) mult += 0.15;
-    mult += (1 - h.hp / h.maxHp) * 0.4;
+    if (!hs.some(o => o !== h && dist(o.pos, h.pos) <= 2)) mult += 0.3; // v194: osamocený lovec
+    mult += (1 - h.hp / h.maxHp) * 0.6; // v194: zraněný lovec – dorazit
     let v = ev * mult;
     if (h.hp <= s.dmg) v += 2.5 * i.chance;
     if (h.keys.length || hasWater(h)) v += 1.5 * i.chance;
@@ -9081,7 +9179,9 @@ const overlordBot = {
       else if (noAtkNow && !(inSalt && C.eq(hex, m.pos))) { const nx = hs.filter(h => C.canStrike(G, hex, h.pos, s.range)); if (nx.length) v += 12 + Math.max(...nx.map(h => self._targetScore(G, m, h))); }
       if (inSalt && C.eq(hex, m.pos)) v -= 8;
       v += guardVal(hex) * 6;
-      if (V2.house && V2.hint && !tg.length) v += interceptVal(G, hex) * 2.5;
+      const icv = V2.house && V2.hint && !tg.length ? interceptVal(G, hex) : 0; v += icv * 2.5;
+      // v194: nestoupat k lovci, když na něj nejde zaútočit – leda by blokoval cestu nebo hlídal cíl
+      if (!tg.length && !noAtkNow && !(G.hunt && m.boss) && hs.some(h => dist(h.pos, hex) === 1) && guardVal(hex) < 1 && icv < 1) v -= 5;
       const nd = Math.min(99, ...hs.map(h => dist(h.pos, hex)));
       v -= nd * 2;
       if (focus) v -= dist(focus.pos, hex) * 0.8;
@@ -17837,8 +17937,9 @@ function initFullscreen() {
 }
 // tlačítka zvuku: v liště hry i v hlavním menu (v61) ukazují stejný stav
 // v190: verze a change log v hlavním menu
-const GAME_VER = 'v193';
+const GAME_VER = 'v194';
 const CHANGELOG = [
+  ['v194 · 23. 11.', ['Boti lovců: pořadí tahů podle ohrožení (kdo je sám u monster, které ještě nehrály, jde první; Ilona první, když kontrolou zachrání situaci), padlí čekají na pomoc.', 'Boti lovců: role – Ashford vepředu kryje ostatní, Wren drží odstup, Ilona vzadu, ale na dosah; sůl a poutání míří na skupiny, které ještě nehrály; oheň nehází na letce ani na spojence.', 'Boti lovců: útočí přednostně na nehrané skupiny a monstra v cestě; zvedání kamaráda až po jistém zabití u něj; lootují jen po cestě; Panika: 1 nevadí, se 3 kartami přednost, se 4 hned.', 'Obelisky: boti rychle odkrývají místnosti, než najdou všechny 4 (už „netuší“, kde jsou).', 'Dům: Zlé oko a Závoj hraje po prvním lovci (výjimečně po druhém), nikdy na konci kola; nejdřív aktivuje skupiny, kterým hrozí smrt; nestoupá k lovci, na kterého nemůže zaútočit (pokud neblokuje); víc se soustředí na osamocené a zraněné lovce; hlídá truhlu s klíčem i tu s falešným (blaf).']],
   ['v193 · 23. 11.', ['Divoký hon: oznámení „Měsíc zakryly mraky“ / „Měsíc vyšel zpoza mraků“ před proměnou.', 'Havrani a krkavci: útok −2, nálet +1 za každé pole vzdušnou čarou (kolem zdí) od začátku aktivace, bez limitu.', 'Přišpendlení a omráčení platí i na hajného; vlkodlak se ohání drápy, ne výstřelem.', 'Animace karty Odhal.', 'Štítek Tmy v nepravidelných místnostech u správného pole.']],
   ['v192 · 23. 11.', ['Lovec, který vstane na poli s monstrem, se postaví na volné sousední pole (vybírá zvedající, nebo on sám).', 'Divoký hon: vlkodlak pohyb 2, zranění 2, útok +1.']],
   ['v191 · 23. 11.', ['Oprava nápisu v menu po přepnutí grafiky tam a zpět.']],
