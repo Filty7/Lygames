@@ -3522,8 +3522,8 @@ const EQUIP = {
     ['Očista', { t: 'cleanse', range: 2, n: 2, heal: 2 }, SE]] },
   lekarnicka: { name: 'Lékárnička', slot: 'telo', tier: 1, cards: [
     ['Obvaz', { t: 'heal', range: 1, n: 2, free: true }, mv(3)],
-    ['Čichací sůl', { t: 'heal', range: 2, n: 2 }, mv(3)],
-    ['Kapky na nervy', { t: 'cleanse', range: 1, n: 3, heal: 0 }, SE]] },
+    ['Čichací sůl', { t: 'heal', range: 2, n: 2, fear: 2, free: true }, mv(3)],
+    ['Kapky na nervy', { t: 'cleanse', range: 1, n: 3, heal: 2, free: true }, { t: 'search' }]] },
   svice: { name: 'Černá svíce', slot: 'telo', tier: 0, cards: [
     ['Bludička', { t: 'fire', range: 3, area: true, dmg: 1, light: true }, mv(3)],
     ['Poutací kruh', { t: 'rootarea', range: 4 }, mv(3)],
@@ -3543,159 +3543,159 @@ const EQUIP = {
     ['Dynamit', { t: 'grenade', range: 3, dmg: 3, splash: 2, mod: 1 }, mv(4)]] },
   // hlava
   prilba: { name: 'Hornická přilba s karbidkou', slot: 'hlava', tier: 1, cards: [
-    ['Kužel světla', { t: 'beam', range: 3, free: true }, mv(3)],
-    ['Oslnění', { t: 'stunone', range: 3 }, mv(3)],
-    ['Do tmy', { t: 'nodark' }, SE]] },
+    ['Kužel světla', { t: 'flash', range: 3, light: true }, mv(3)],
+    ['Oslnění', { t: 'stunone', range: 4, dmg: 2 }, mv(3)],
+    ['Do tmy', { t: 'nodark', free: true, advNext: true }, mv(3)]] },
   okulary: { name: 'Okuláry s kouřovými skly', slot: 'hlava', tier: 2, cards: [
-    ['Druhý zrak', { t: 'reveal', range: 5, ally: 3 }, mv(3)],
-    ['Předtucha', { t: 'peekol', n: 3 }, { t: 'search', range: 2 }],
-    ['Vidění', { t: 'drawdisc', draw: 2, disc: 0, free: true }, mv(3)]] },
+    ['Druhý zrak', { t: 'markone', range: 6, n: 2, advNext: true, free: true }, mv(3)],
+    ['Předtucha', { t: 'drawdisc', draw: 1, disc: 0, advNext: true, advKeep: true, free: true }, { t: 'search', range: 2 }],
+    ['Vidění', { t: 'drawdisc', draw: 2, disc: 0, free: true, advNext: true }, mv(3)]] },
   maska: { name: 'Železná maska kajícníka', slot: 'hlava', tier: 2, cards: [
-    ['Bez tváře', { t: 'nofear', free: true }, mv(2)],
-    ['Kající prosba', { t: 'selfcalm', fear: 2, armor: 1 }, mv(3)],
-    ['Děsivý pohled', { t: 'scare', range: 2, push: 1, weaken: 1, advNext: true }, mv(3)]] },
+    ['Bez tváře', { t: 'nofear', free: true, advNext: true }, mv(2)],
+    ['Kající prosba', { t: 'selfcalm', fear: 2, armor: 2 }, mv(3)],
+    ['Děsivý pohled', { t: 'scare', range: 2, push: 1, weaken: 2, advNext: true }, mv(3)]] },
   // ruka
   dyka: { name: 'Lovecká dýka', slot: 'ruka', tier: 1, cards: [
     ['Bodnutí', { t: 'attack', range: 1, dmg: 3, mod: 1, ignoreEv: true, flank: 2 }, mv(4)],
     ['Dvojitý výpad', { t: 'attack', range: 1, dmg: 1, mod: 3, shots: 2, bleed: 1, bleedFirst: true }, mv(3)],
-    ['Hod dýkou', { t: 'attack', range: 3, dmg: 2, mod: 2, mark: true }, mv(3)]] },
+    ['Hod dýkou', { t: 'attack', range: 3, dmg: 2, mod: 2, mark: true, combo: { mod: 2 } }, mv(3)]] },
   derringer: { name: 'Derringer', slot: 'ruka', tier: 2, cards: [
     ['Kulka', { t: 'attack', range: 5, dmg: 3, mod: 1, ignoreAr: true }, mv(3)],
-    ['Rychlé dva', { t: 'attack', range: 4, dmg: 1, mod: 2, shots: 2 }, mv(3)],
-    ['Poslední náboj', { t: 'attack', range: 4, dmg: 5, mod: 3, once: true }, SE]] },
+    ['Rychlé dva', { t: 'attack', range: 4, dmg: 2, mod: 2, shots: 2 }, mv(3)],
+    ['Poslední náboj', { t: 'attack', range: 4, dmg: 5, mod: 3, once: true }, { t: 'search' }]] },
   breviar: { name: 'Exorcistický breviář', slot: 'ruka', tier: 2, cards: [
-    ['Slovo vyhnání', { t: 'attack', range: 3, dmg: 2, mod: 2, ignoreEv: true, flyPush: 2, dmgFly: 1 }, mv(3)],
-    ['Ochranný žalm', { t: 'psalm', range: 2, armor: 1, fear: 1 }, mv(3)],
-    ['Exorcismus', { t: 'attack', range: 2, dmg: 3, mod: 2, killThreat: 1 }, SE]] },
+    ['Slovo vyhnání', { t: 'attack', range: 3, dmg: 3, mod: 2, ignoreEv: true, flyPush: 2, dmgFly: 1 }, mv(3)],
+    ['Ochranný žalm', { t: 'psalm', range: 2, armor: 2, fear: 2 }, mv(3)],
+    ['Exorcismus', { t: 'attack', range: 2, dmg: 3, mod: 2, killThreat: 1 }, { t: 'search' }]] },
   hak: { name: 'Hák na řetězu', slot: 'ruka', tier: 1, cards: [
-    ['Přitažení', { t: 'pull', range: 4, stun: true }, mv(3)],
-    ['Švih řetězem', { t: 'attack', range: 1, dmg: 3, mod: 1, pushAdj: 1 }, mv(3)],
-    ['Zakotvit', { t: 'rootone', range: 3 }, mv(2)]] },
+    ['Přitažení', { t: 'pull', range: 4, stun: true, root: true }, mv(3)],
+    ['Švih řetězem', { t: 'attack', range: 1, dmg: 3, mod: 2, pushAdj: 1 }, mv(3)],
+    ['Zakotvit', { t: 'rootone', range: 4, n: 2 }, mv(2)]] },
   lucerna2: { name: 'Lucerna s modrým plamenem', slot: 'ruka', tier: 2, cards: [
-    ['Modrý plamen', { t: 'fire', range: 3, len: 4, dmg: 1, light: true }, mv(3)],
-    ['Spálit', { t: 'attack', range: 2, dmg: 3, mod: 1, burn: true, holy: true }, mv(3)],
-    ['Světlo naděje', { t: 'cleanse', range: 3, n: 1 }, { t: 'lightmove', n: 3 }]] },
+    ['Modrý plamen', { t: 'fire', range: 3, len: 4, dmg: 2, light: true }, mv(3)],
+    ['Spálit', { t: 'attack', range: 2, dmg: 3, mod: 2, burn: true, holy: true }, mv(3)],
+    ['Světlo naděje', { t: 'cleanse', range: 3, n: 2, heal: 2 }, { t: 'lightmove', n: 3 }]] },
   krucifix: { name: 'Krucifix', slot: 'ruka', tier: 1, cards: [
-    ['Zpět!', { t: 'repel', range: 2, n: 2, freeIfAdj: true }, mv(3)],
-    ['Požehnání', { t: 'react', kind: 'ward', fear: 2, dmg: 0, ally: 1, both: true, pushBack: 1 }, mv(3)],
-    ['Svatá pečeť', { t: 'salt', around: true, calm: 1 }, SE]] },
+    ['Zpět!', { t: 'repel', range: 2, n: 2, freeIfAdj: true, stun: true }, mv(3)],
+    ['Požehnání', { t: 'react', kind: 'ward', fear: 2, dmg: 2, ally: 1, both: true, pushBack: 1 }, mv(3)],
+    ['Svatá pečeť', { t: 'salt', around: true, calm: 1 }, { t: 'search' }]] },
   // obě ruce
   kopi: { name: 'Stříbrné kopí opata Benedikta', slot: 'obourucni', tier: 4, rare: true, cards: [
     ['Bodnutí kopím', { t: 'attack', range: 2, dmg: 4, mod: 2, ignoreEv: true, pierce: true, holy: true }, mv(3)],
-    ['Svaté světlo', { t: 'flash', range: 3, light: true }, mv(3)],
-    ['Přímluva opata', { t: 'rally', range: 3, fear: 2, mod: 1, dmg: 1 }, { t: 'search', range: 2 }],
-    ['Zeď z kopí', { t: 'armorup', n: 2, spikes: 1 }, mv(3)]] },
+    ['Svaté světlo', { t: 'flash', range: 3, light: true, combo: { mod: 2, dmg: 2 } }, mv(3)],
+    ['Přímluva opata', { t: 'rally', range: 3, fear: 2, mod: 2, dmg: 2 }, { t: 'search', range: 2 }],
+    ['Zeď z kopí', { t: 'armorup', n: 3, spikes: 2 }, mv(3)]] },
   puska: { name: 'Lovecká puška s optikou', slot: 'obourucni', tier: 3, cards: [
     ['Mířený výstřel', { t: 'attack', range: 7, dmg: 3, mod: 2, still: true, perDist: 'dmg', uncapped: true }, mv(3)],
     ['Průstřel', { t: 'attack', range: 6, dmg: 4, mod: 2, pierce: true }, mv(3)],
-    ['Palba z kyčle', { t: 'attack', range: 4, dmg: 3, mod: 1 }, mv(3)],
-    ['Zamířit', { t: 'markone', range: 7, advNext: true, advKeep: true }, mv(3)]] },
+    ['Palba z kyčle', { t: 'attack', range: 4, dmg: 3, mod: 2 }, mv(3)],
+    ['Zamířit', { t: 'markone', range: 7, advNext: true, advKeep: true, combo: { dmg: 2 } }, mv(3)]] },
   mec: { name: 'Popravčí meč', slot: 'obourucni', tier: 3, cards: [
-    ['Poprava', { t: 'attack', range: 1, dmg: 6, mod: -1, vsHelpless: 3 }, mv(2)],
-    ['Mlýn', { t: 'sweep', range: 1, dmg: 3, mod: 0 }, mv(3)],
+    ['Poprava', { t: 'attack', range: 1, dmg: 6, mod: 0, vsHelpless: 3 }, mv(2)],
+    ['Mlýn', { t: 'sweep', range: 1, dmg: 3, mod: 1 }, mv(3)],
     ['Rozmach', { t: 'lunge', move: 2, range: 1, dmg: 4, mod: 1, push: 1 }, mv(3)],
-    ['Hrozivý postoj', { t: 'armorup', n: 2, menace: 1 }, mv(2)]] },
+    ['Hrozivý postoj', { t: 'armorup', n: 3, menace: 1 }, mv(2)]] },
   hul: { name: 'Vymítací hůl s kadidelnicí', slot: 'obourucni', tier: 2, cards: [
-    ['Kouř kadidla', { t: 'incense', weaken: 1 }, mv(3)],
-    ['Úder holí', { t: 'attack', range: 1, dmg: 2, mod: 2, stunGround: true, x2: true }, mv(3)],
+    ['Kouř kadidla', { t: 'incense', weaken: 2, free: true }, mv(3)],
+    ['Úder holí', { t: 'attack', range: 1, dmg: 3, mod: 2, stunGround: true, x2: true }, mv(3)],
     ['Očistný kruh', { t: 'cleanse', range: 2, n: 2, heal: 2, all: true }, mv(3)],
-    ['Požehnaný dým', { t: 'psalm', range: 2, armor: 1, markRange: 2 }, mv(3)]] },
+    ['Požehnaný dým', { t: 'psalm', range: 2, armor: 2, fear: 1, markRange: 2 }, mv(3)]] },
   // tělo
   templar: { name: 'Zbroj padlého templáře', slot: 'telo', tier: 3, cards: [
     ['Nezlomný', { t: 'armorup', n: 3, steady: true, free: true }, mv(3)],
     ['Úder templáře', { t: 'attack', range: 1, dmg: 3, mod: 2, perArmor: 'dmg', uncapped: true, push: 1 }, mv(3)],
     ['Posedlost', { t: 'cursed' }, { t: 'cursed' }, { cursed: true }]] },
   plast: { name: 'Plášť z rubáše', slot: 'telo', tier: 2, cards: [
-    ['Stínem skrytý', { t: 'invis' }, mv(3)],
-    ['Mlha', { t: 'phase', evade: 1, free: true }, mv(3)],
-    ['Prázdný plášť', { t: 'react', kind: 'dodge', selfFear: 1 }, mv(2)]] },
+    ['Stínem skrytý', { t: 'invis', advNext: true, free: true }, mv(3)],
+    ['Mlha', { t: 'phase', evade: 2, free: true, draw: 1 }, mv(3)],
+    ['Prázdný plášť', { t: 'react', kind: 'dodge' }, mv(3)]] },
   vesta: { name: 'Polní lékařská vesta', slot: 'telo', tier: 2, cards: [
-    ['Morfium', { t: 'heal', range: 1, n: 3, fearCost: 1 }, mv(3)],
+    ['Morfium', { t: 'heal', range: 1, n: 4, fearCost: 1, free: true }, mv(3)],
     ['Škrtidlo', { t: 'raise', range: 1, half: true, heal: 4 }, mv(3)],
-    ['Plné kapsy', { t: 'drawdisc', draw: 2, disc: 0, free: true }, SE]] },
+    ['Plné kapsy', { t: 'drawdisc', draw: 2, disc: 0, free: true, advNext: true }, { t: 'search' }]] },
   // nohy
   holinky: { name: 'Jezdecké holínky s ostruhami', slot: 'nohy', tier: 2, cards: [
-    ['Cvalem', { t: 'phase', draw: 1, free: true }, mv(5)],
-    ['Ostruhy', { t: 'recall' }, mv(2)],
-    ['Do útoku', { t: 'advturn' }, mv(3)]] },
+    ['Cvalem', { t: 'phase', draw: 1, evade: 1, free: true }, mv(5)],
+    ['Ostruhy', { t: 'charge', n: 3, dmg: 3, mod: 1, push: 1 }, mv(4)],
+    ['Do útoku', { t: 'advturn', free: true }, mv(3)]] },
   utopenec: { name: 'Boty utopence', slot: 'nohy', tier: 3, cards: [
-    ['Bez stopy', { t: 'invis' }, mv(3)],
-    ['Tichý krok', { t: 'haste', n: 2, noPhase: true, free: true }, mv(3)],
+    ['Bez stopy', { t: 'invis', advNext: true, free: true }, mv(3)],
+    ['Ze zálohy', { t: 'attack', range: 1, dmg: 4, mod: 2, ignoreEv: true, vsLone: { mod: 1, dmg: 1 } }, mv(3)],
     ['Mokré stopy', { t: 'blink', range: 5, advNext: true, free: true }, mv(3)]] },
   okovane: { name: 'Okované boty', slot: 'nohy', tier: 1, cards: [
     ['Dupnutí', { t: 'stomp' }, mv(2)],
-    ['Pevně stát', { t: 'armorup', n: 1, steady: true, free: true }, mv(2)],
-    ['Kop do zámku', { t: 'pry', mod: 2, advNext: true }, mv(3)]] },
+    ['Pevně stát', { t: 'armorup', n: 2, steady: true, free: true }, mv(2)],
+    ['Okovaný kop', { t: 'attack', range: 1, dmg: 3, mod: 1, push: 1 }, { t: 'pry', mod: 2, advNext: true }]] },
   paveza: { name: 'Pavéza', slot: 'ruka', tier: 1, cards: [
-    ['Štítová stěna', { t: 'armorup', n: 2, ally: 1 }, mv(2)],
-    ['Hrana pavézy', { t: 'attack', range: 1, dmg: 1, mod: 1, perArmor: 'dmg', uncapped: true, push: 1 }, mv(3)],
-    ['Za pavézou', { t: 'react', kind: 'guard', dmg: 1, retortArmor: true, ally: 1 }, mv(3)]] },
+    ['Štítová stěna', { t: 'armorup', n: 2, ally: 1, allyN: 1 }, mv(2)],
+    ['Hrana pavézy', { t: 'attack', range: 1, dmg: 2, mod: 1, perArmor: 'dmg', uncapped: true, push: 1, stun: true }, mv(3)],
+    ['Za pavézou', { t: 'react', kind: 'guard', dmg: 3, retortArmor: true, ally: 1 }, mv(3)]] },
   halapartna: { name: 'Halapartna', slot: 'obourucni', tier: 2, cards: [
-    ['Hák halapartny', { t: 'pull', range: 2, stun: true }, mv(3)],
+    ['Hák halapartny', { t: 'pull', range: 2, stun: true, combo: { dmg: 2 } }, mv(3)],
     ['Zátah', { t: 'attack', range: 2, dmg: 4, mod: 1, throwOver: true }, mv(3)],
     ['Seč z místa', { t: 'attack', range: 2, dmg: 4, mod: 1, stillBonus: { mod: 1, dmg: 1 } }, mv(2)],
-    ['Udržet odstup', { t: 'repel', range: 1, n: 1, armor: 1 }, mv(3)]] },
+    ['Udržet odstup', { t: 'repel', range: 1, n: 1, armor: 2, stun: true }, mv(3)]] },
   sekera: { name: 'Bojová sekera', slot: 'obourucni', tier: 3, price: 5, cards: [
-    ['Rozpolcení', { t: 'attack', range: 1, dmg: 5, mod: 0, selfDmg: 1 }, mv(3)],
-    ['Krvavá sklizeň', { t: 'sweep', range: 1, dmg: 2, mod: 1, lifesteal: 1, selfDmg: 2 }, mv(3)],
-    ['Bojová extáze', { t: 'buff', mod: 1, dmg: 1, lifesteal: 1, selfDmg: 2 }, mv(3)],
-    ['Zuřivý řev', { t: 'stomp', calm: 2 }, mv(3)]] },
+    ['Rozpolcení', { t: 'attack', range: 1, dmg: 6, mod: 1, selfDmg: 1 }, mv(3)],
+    ['Krvavá sklizeň', { t: 'sweep', range: 1, dmg: 3, mod: 1, lifesteal: 1, selfDmg: 1 }, mv(3)],
+    ['Bojová extáze', { t: 'buff', mod: 2, dmg: 2, lifesteal: 1 }, mv(3)],
+    ['Zuřivý řev', { t: 'stomp', calm: 2, combo: { mod: 2, dmg: 2 } }, mv(3)]] },
   lebka: { name: 'Lebka věštkyně', slot: 'ruka', tier: 2, cards: [
     ['Hlas zemřelých', { t: 'attack', range: 4, dmg: 3, mod: 2, selfFear: 1, panicBoost: { dmg: 2 } }, mv(3)],
-    ['Výkřik z hrobu', { t: 'repel', range: 2, n: 2, one: true, dmg: 1, panicBoost: { one: false, stun: true } }, mv(3)],
-    ['Temný pakt', { t: 'drawdisc', draw: 2, disc: 0, selfFear: 2, free: true }, mv(2)]] },
+    ['Výkřik z hrobu', { t: 'repel', range: 2, n: 2, one: true, dmg: 2, stun: true, panicBoost: { one: false } }, mv(3)],
+    ['Temný pakt', { t: 'drawdisc', draw: 2, disc: 0, selfFear: 1, free: true }, mv(2)]] },
   zvonek: { name: 'Zvoneček duchů', slot: 'ruka', tier: 3, rare: true, cards: [
     ['Přivolání', { t: 'summon', kind: 'ohnik', dmg: 2, mod: 2, move: 5, rounds: 99, selfFear: 1 }, mv(3)],
     ['Rozkaz', { t: 'summonact', free: true }, mv(3)],
-    ['Ozvěna duší', { t: 'attack', range: 3, dmg: 1, mod: 2, perSummon: 'dmg' }, mv(3)]] },
+    ['Ozvěna duší', { t: 'attack', range: 3, dmg: 2, mod: 2, perSummon: 'dmg', ignoreEv: true }, mv(3)]] },
   perove: { name: 'Pérové boty', slot: 'nohy', tier: 2, cards: [
     ['Skok', { t: 'leapswap', range: 2, stun: true }, mv(4)],
-    ['Dupák', { t: 'attack', range: 1, dmg: 2, mod: 1, perStep: 'dmg' }, mv(3)],
-    ['Odraz', { t: 'blink', range: 3, advNext: true }, mv(5)]] },
+    ['Dupák', { t: 'attack', range: 1, dmg: 2, mod: 2, perStep: 'dmg' }, mv(3)],
+    ['Odraz', { t: 'blink', range: 4, advNext: true, free: true }, mv(5)]] },
   harpuna: { name: 'Harpunomet', slot: 'obourucni', tier: 2, cards: [
     ['Harpuna', { t: 'attack', range: 5, dmg: 3, mod: 1, pullHit: 2 }, mv(3)],
     ['Průstřel', { t: 'attack', range: 6, dmg: 3, mod: 2, pierce: true, ignoreAr: true }, mv(3)],
-    ['Navijak', { t: 'nudge', range: 5, n: 3 }, mv(3)],
+    ['Navijak', { t: 'nudge', range: 5, n: 3, free: true }, mv(3)],
     ['Znehybnění', { t: 'rootone', range: 3, n: 2 }, mv(2)]] },
   paklice: { name: 'Sada paklíčů', slot: 'ruka', tier: 1, cards: [
-    ['Paklíč', { t: 'pry', mod: 0, adv: true }, SE],
-    ['Lampička', { t: 'light' }, mv(3)],
-    ['Nástražná past', { t: 'htrap', range: 2, dmg: 2, root: true }, mv(3)]] },
+    ['Paklíč', { t: 'pry', mod: 1, adv: true, advNext: true, free: true }, mv(3)],
+    ['Lampička do očí', { t: 'flash', range: 3, light: true }, mv(3)],
+    ['Nástražná past', { t: 'htrap', range: 2, dmg: 3, root: true }, mv(3)]] },
   jed: { name: 'Lahvička jedu', slot: 'telo', tier: 1, cards: [
-    ['Jed na čepel', { t: 'venom' }, mv(3)],
-    ['Jedová šipka', { t: 'attack', range: 4, dmg: 1, mod: 2, poison: 2 }, mv(3)],
-    ['Protijed', { t: 'antidote', heal: 1 }, mv(3)]] },
+    ['Jed na čepel', { t: 'venom', free: true }, mv(3)],
+    ['Jedová šipka', { t: 'attack', range: 4, dmg: 2, mod: 2, poison: 2 }, mv(3)],
+    ['Protijed', { t: 'antidote', heal: 2, free: true }, mv(3)]] },
   lehke: { name: 'Lehké boty', slot: 'nohy', tier: 1, cards: [
-    ['Úskok', { t: 'phase', evade: 2 }, mv(3)],
-    ['Kličkování', { t: 'evade', n: 2 }, mv(4)],
-    ['Sprint', { t: 'sprint', free: true }, mv(3)]] },
+    ['Úskok', { t: 'phase', evade: 2, draw: 1, free: true }, mv(3)],
+    ['Kličkování', { t: 'evade', n: 3, free: true }, mv(4)],
+    ['Sprint', { t: 'sprint', free: true, advNext: true }, mv(3)]] },
   // v59: léčivá výbava
   kropenka: { name: 'Kropenka se svěcenou vodou', slot: 'ruka', tier: 1, cards: [
-    ['Pokropení', { t: 'heal', range: 2, n: 2, fear: 1 }, mv(3)],
-    ['Svěcená rosa', { t: 'cleanse', range: 2, n: 1, heal: 1 }, mv(3)],
-    ['Kapka na čelo', { t: 'heal', range: 1, n: 1, free: true }, mv(2)]] },
+    ['Pokropení', { t: 'heal', range: 2, n: 3, fear: 1, free: true }, mv(3)],
+    ['Svěcená rosa', { t: 'attack', range: 2, dmg: 2, mod: 2, holy: true, dmgGhost: 2, ignoreEv: true }, mv(3)],
+    ['Kapka na čelo', { t: 'heal', range: 1, n: 2, fear: 1, free: true }, mv(2)]] },
   // v96: léčivá výbava mimo zbraně (hlava, nohy, tělo)
   kukla: { name: 'Bylinkářská kukla', slot: 'hlava', tier: 1, cards: [
     ['Bylinný odvar', { t: 'heal', range: 0, n: 2, self: true, free: true }, mv(3)],
-    ['Vonné byliny', { t: 'heal', range: 1, n: 1, cure: true }, mv(3)],
-    ['Klidný dech', { t: 'selfcalm', fear: 2, armor: 0 }, mv(2)]] },
+    ['Vonné byliny', { t: 'heal', range: 1, n: 2, cure: true, free: true }, mv(3)],
+    ['Klidný dech', { t: 'selfcalm', fear: 3, armor: 1, free: true }, mv(2)]] },
   poutnik: { name: 'Poutnické boty', slot: 'nohy', tier: 1, cards: [
-    ['Ke zraněnému', { t: 'heal', range: 2, n: 2 }, mv(5)],
-    ['Odpočinek na cestě', { t: 'heal', range: 0, n: 1, fear: 1, self: true, free: true }, mv(4)],
-    ['Druhý vítr', { t: 'heal', range: 2, n: 1, all: true }, mv(3)]] },
+    ['Ke zraněnému', { t: 'heal', range: 2, n: 3 }, mv(5)],
+    ['Odpočinek na cestě', { t: 'heal', range: 0, n: 2, fear: 1, self: true, free: true }, mv(4)],
+    ['Druhý vítr', { t: 'heal', range: 2, n: 2, all: true }, mv(3)]] },
   kabatec: { name: 'Kabátec polního chirurga', slot: 'telo', tier: 3, cards: [
-    ['Šití ran', { t: 'heal', range: 1, n: 4 }, mv(3)],
-    ['Třídění raněných', { t: 'heal', range: 2, n: 2, all: true }, mv(2)],
-    ['Postavit na nohy', { t: 'raise', range: 2, half: true, armor: 1 }, mv(3)]] },
+    ['Šití ran', { t: 'heal', range: 1, n: 4, free: true }, mv(3)],
+    ['Třídění raněných', { t: 'heal', range: 2, n: 3, all: true }, mv(2)],
+    ['Postavit na nohy', { t: 'raise', range: 2, half: true, armor: 1, free: true }, mv(3)]] },
   kape: { name: 'Kápě milosrdné sestry', slot: 'hlava', tier: 2, cards: [
-    ['Milosrdenství', { t: 'heal', range: 2, n: 2, bless: true }, mv(3)],
-    ['Tichá modlitba', { t: 'cleanse', range: 2, n: 2, heal: 1 }, SE],
-    ['Bdění u lože', { t: 'raise', range: 2, half: true, heal: 1 }, mv(3)]] },
+    ['Milosrdenství', { t: 'heal', range: 2, n: 3, bless: true, free: true }, mv(3)],
+    ['Tichá modlitba', { t: 'cleanse', range: 2, n: 2, heal: 2, free: true }, { t: 'search' }],
+    ['Bdění u lože', { t: 'raise', range: 2, half: true, heal: 2, free: true }, mv(3)]] },
   nositka: { name: 'Saniťácká nosítka', slot: 'obourucni', tier: 3, cards: [
-    ['Odnést z boje', { t: 'raise', range: 1, half: true, heal: 3 }, mv(3)],
-    ['Polní lazaret', { t: 'heal', range: 2, n: 3, all: true }, mv(2)],
-    ['Opři se o mě', { t: 'heal', range: 1, n: 3 }, mv(4)],
-    ['Vynést raněné', { t: 'raise', range: 3, half: true, armor: 1 }, mv(3)]] },
+    ['Odnést z boje', { t: 'raise', range: 1, half: true, heal: 3, free: true }, mv(3)],
+    ['Polní lazaret', { t: 'heal', range: 2, n: 3, all: true, free: true }, mv(2)],
+    ['Opři se o mě', { t: 'heal', range: 1, n: 4, free: true }, mv(4)],
+    ['Vynést raněné', { t: 'raise', range: 3, half: true, armor: 1, free: true }, mv(3)]] },
   // amulety: pasivní schopnost, žádné karty
   zajic: { name: 'Zaječí tlapka', slot: 'trinket', tier: 1, passive: 'Jednou za kolo: když tvůj útok mine, hoď znovu.', cards: [] },
   medailon: { name: 'Medailon odvahy', slot: 'trinket', tier: 1, passive: 'Odvaha +1.', cards: [] },
@@ -4251,8 +4251,9 @@ const grpUp = t => (GRP_UP && GRP_UP[t]) || {};
 // Elita navíc (kampaň): +1 elita k základní sestavě (skupina je o 1 větší)
 // v93: bossfight bez elit – skupiny (kromě bosse) nemají elitu a jsou o ni menší
 let NOELITE = false; const noEl = t => NOELITE && !MDEF[t].boss && !MDEF[t].lieutenant && !MDEF[t].object;
-const groupSize = t => 1 + MDEF[t].minions[NH] + (MDEF[t].lieutenant || MDEF[t].object ? 0 : (grpUp(t).plus || 0) + (grpUp(t).elite || 0)) - (noEl(t) ? 1 : 0);
-const maxElites = t => noEl(t) ? 0 : MDEF[t].lieutenant ? 0 : 1 + (grpUp(t).elite || 0);
+const groupSize = t => 1 + MDEF[t].minions[NH] + (MDEF[t].lieutenant || MDEF[t].object ? 0 : (grpUp(t).plus || 0)) - (noEl(t) ? 1 : 0);
+// v196: „Elita navíc“ povýší jednoho přisluhovače na elitu (skupina nemá figurku navíc)
+const maxElites = t => noEl(t) ? 0 : MDEF[t].lieutenant ? 0 : Math.min(1 + (grpUp(t).elite || 0), 1 + MDEF[t].minions[NH] + (grpUp(t).plus || 0));
 const eliteFull = (G, t) => G.monsters.filter(m => m.type === t && m.elite).length >= maxElites(t);
 const stats = m => { const o = Object.assign({}, MDEF[m.type].base, m.elite ? (MDEF[m.type].elite || {}) : {}, m.ov || {}); const g = grpUp(m.type), u = g.hp; if (o.hp && !MDEF[m.type].object) { if (u) o.hp += u * D.grpHpPer(m.type); o.hp += (m.elite ? g.hpE : g.hpN) || 0; } return o; };
 const mdef = m => m.def || MDEF[m.type];
@@ -4287,6 +4288,7 @@ function describe(s) {
   if (s.dmgFly) t += '; proti létajícím +' + s.dmgFly + ' dmg';
   if (s.stunGround) t += '; zásah omráčí nelétající cíl';
   if (s.noDarkAtk) t += '; tvé útoky tento tah nemají postih za Tmu';
+  if (s.combo) t += '. Tvůj další útok v tomto kole' + (s.combo.mod ? ' +' + s.combo.mod + ' k útoku' : '') + (s.combo.mod && s.combo.dmg ? ' a' : '') + (s.combo.dmg ? ' +' + s.combo.dmg + ' zranění' : '');
   if (s.advNext) t += s.advKeep ? '. Tvůj příští útok má výhodu' : '. Tvůj příští útok v tomto kole má výhodu';
   if (s.freeIfAdj) t += '. Nestojí akci, když vedle tebe stojí monstrum';
   return t;
@@ -4443,7 +4445,8 @@ function newGame(opts) {
       const lo = (o.loadouts || {})[d.id];
       const eqs = (lo && lo.equip) || [];
       const deck = shuffle(buildDeck(d, lo).map(c => { const x = Object.assign({}, c, { uid: uid() }); return x; }));
-      return { id: d.id, def: d, name: d.name, hp: d.hp, maxHp: d.hp, courage: d.courage + (eqs.includes('medailon') ? 1 : 0), fear: 0, pos: HERO_START[i].slice(),
+      const hpB = abilHp(lo);
+      return { id: d.id, def: d, name: d.name, hp: d.hp + hpB, maxHp: d.hp + hpB, courage: d.courage + (eqs.includes('medailon') ? 1 : 0), fear: 0, pos: HERO_START[i].slice(),
         deck, hand: [], discard: [], removed: [], downed: false, escaped: false, acted: false, keys: [], lantern: false,
         plays: 0, shotgunLocked: false, guardUsed: false };
     }),
@@ -4463,7 +4466,7 @@ function newGame(opts) {
   G.heroes.forEach(h => draw(G, h, 5));
   // nezahrané nálezy z minulých scénářů (kampaň) jsou hned v ruce
   G.heroes.forEach(h => { const lo = (o.loadouts || {})[h.id]; for (const id of (lo && lo.loot) || []) if (D.LOOT[id]) h.hand.push(Object.assign({}, D.LOOT[id], { uid: uid() })); });
-  for (let i = 0; i < 3 + ((o.olStart && o.olStart.card) || 0); i++) olDraw(G); // v172: Dům začíná se 3 kartami (+ vylepšení z kampaně)
+  for (let i = 0; i < 2 + ((o.olStart && o.olStart.card) || 0); i++) olDraw(G); // v196: Dům začíná se 2 kartami (+ vylepšení z kampaně)
   return G;
 }
 // v60: načtená (uložená) hra převezme aktuální data: karty lovců se znovu sestaví ze šablon (podle id předmětu / schopnosti
@@ -4500,7 +4503,7 @@ function rehydrate(G) {
     if (def) {
       h.def = def; h.name = def.name;
       const lo = G.loadouts && G.loadouts[h.id], eqs = (lo && lo.equip) || [];
-      const mx = def.hp, dHp = mx - (h.maxHp || mx);
+      const mx = def.hp + abilHp(lo), dHp = mx - (h.maxHp || mx);
       if (dHp) { h.maxHp = mx; if (!h.downed) h.hp = Math.max(1, Math.min(mx, h.hp + dHp)); }
       h.hp = Math.min(h.hp, h.maxHp);
       h.courage = def.courage + (eqs.includes('medailon') ? 1 : 0);
@@ -4576,6 +4579,9 @@ const ATK_TYPES = new Set(['attack', 'lunge', 'charge', 'sweep', 'swapatk', 'cro
 const isMarked = (G, m) => (m.markedUntil || -1) >= G.round;
 // negativní stav = stav s ikonkou nad figurkou (oslabení, označení, přišpendlení, omráčení, odzbrojení, jed, krvácení, nevýhoda, ignor armoru…)
 function negStatus(G, m) { return !!((m.disUntil || -1) >= G.round || m.disNext || m.stunned || m.rooted || m.disarmed || weakOf(G, m) > 0 || isMarked(G, m) || (m.poison || 0) > 0 || (m.bleed || 0) > 0 || isPierced(G, m) || saltAt(G, m.pos)); }
+// v196: každá koupená úroveň schopnosti v kampani = +1 max. zdraví lovce
+const ABIL_HP = 1;
+function abilHp(lo) { const a = (lo && lo.abil) || {}; return ABIL_HP * Object.values(a).reduce((n, v) => n + String(v || '').length, 0); }
 function posStatus(G, o) { return heroArmor(G, o) > 0 || !!buffOf(G, o) || evadeOf(G, o) > 0 || !!(o.haste && o.haste.round === G.round) || (o.advNext || 0) >= G.round || o.advRound === G.round || heroInvisible(G, o) || o.phaseRound === G.round || !!(o.anchor && o.anchor.round === G.round) || !!(o.cover && o.cover.round === G.round); }
 const summonsOf = (G, h) => (G.summons || []).filter(x => x.owner === h.id);
 const SUMMON_NAMES = { mec: 'Létající meč', ohnik: 'Bludný ohník' };
@@ -5162,6 +5168,7 @@ function attackInfo(G, h, m, spec, extraMod) {
   const cap = spec.uncapped ? 99 : 3;
   if (h.momentum && h.momentum.round === G.round && h.stepsTurn) { const mo = h.momentum, per = mo.per || 1, n = Math.min(mo.max || 99, Math.floor(h.stepsTurn / per)); if (n) mods.push({ label: 'rozběh', v: n * (mo.amt || 1) }); if (mo.dmgToo) xdmg += mo.per ? n : Math.floor(Math.min(6, h.stepsTurn) / 2); }
   if (spec.perArmor) add(spec.perArmor, Math.min(cap, heroArmor(G, h)), 'armor');
+  if (h.combo && h.combo.round === G.round) { if (h.combo.mod) mods.push({ label: 'combo', v: h.combo.mod }); xdmg += h.combo.dmg || 0; }
   if (spec.stillBonus && still) { if (spec.stillBonus.mod) mods.push({ label: 'z místa', v: spec.stillBonus.mod }); xdmg += spec.stillBonus.dmg || 0; }
   if (h.anchor && h.anchor.round === G.round && still && melee) { if (h.anchor.mod) mods.push({ label: 'kotva', v: h.anchor.mod }); xdmg += h.anchor.dmg || 0; }
   if (still && melee && hasPassive(G, h, 'prezka')) xdmg += 1;
@@ -6211,7 +6218,8 @@ async function heroTurn(G, h, C, ui) {
         const free = !c.panic && !hs.cost2 && (hs.free || freeAdj || clock);
         if (clock) h.clockUsed = true;
         h.plays += c.panic ? 1 : hs.cost2 ? 2 : free ? 0 : 1;
-        if (ATK_TYPES.has(hs.t)) { h.atkCards = (h.atkCards || 0) + 1; if (hadAdv && h.advSpent) h.advNext = 0; }
+        if (ATK_TYPES.has(hs.t)) { h.atkCards = (h.atkCards || 0) + 1; if (hadAdv && h.advSpent) h.advNext = 0; h.combo = null; }
+        if (hs.combo) { h.combo = { round: G.round, mod: hs.combo.mod || 0, dmg: hs.combo.dmg || 0 }; log(G, h.name + ': další útok v tomto kole ' + (hs.combo.mod ? '+' + hs.combo.mod + ' k útoku' : '') + (hs.combo.dmg ? ' +' + hs.combo.dmg + ' zranění' : '') + '.'); }
         h.advSpent = false;
         if (hs.advNext) h.advNext = hs.advKeep ? ADV_KEEP : G.round;
         if (hs.noDarkAtk) h.noDarkAtkRound = G.round;
@@ -9456,12 +9464,12 @@ function upgradeOl(st, id, to) {
 const COMP = { heroEss: 2, heroXp: 1, olXp: 1, olGold: 1 };
 // v172: ceny podle hodnoty v Hrozbě (návrat přisluhovače = 3, elity = 6); Dům za kampaň vydělá zhruba 12–15 esence, všechno stojí 26
 const GRP_UPS = [
-  { k: 'card', name: 'Karta do začátku', costs: [2, 3], max: 2, text: '+1 karta Domu v ruce na začátku scénáře (základ 3).' },
+  { k: 'card', name: 'Karta do začátku', costs: [2, 3], max: 2, text: '+1 karta Domu v ruce na začátku scénáře (základ 2).' },
   { k: 'threat', name: 'Hrozba do začátku', costs: [1, 1], max: 2, text: '+1 Hrozba na začátku scénáře.' },
   { k: 'hpN', name: 'Zocelení přisluhovačů', costs: [3, 4], max: 2, text: '+1 zdraví každému přisluhovači.' },
   { k: 'hpE', name: 'Zocelení elit', costs: [1, 2], max: 2, text: '+1 zdraví každé elitě.' },
   { k: 'plus', name: 'Posila', costs: [4], max: 1, text: '+1 přisluhovač v každé skupině.' },
-  { k: 'elite', name: 'Elita navíc', costs: [6], max: 1, text: '+1 elita v každé skupině.' },
+  { k: 'elite', name: 'Elita navíc', costs: [6], max: 1, text: 'V každé skupině se jeden přisluhovač povýší na elitu.' },
 ];
 const upgradableGroups = () => Object.keys(D.MDEF).filter(t => { const d = D.MDEF[t]; return !d.object && !d.hidden && !d.part && !d.lieutenant && !d.boss && !d.obelisk; });
 // skupiny, které se dají nasadit ve zbývajících (neodehraných) scénářích kampaně
@@ -9485,7 +9493,12 @@ function buyGroupUp(st, k) {
 // bot Domu: šetří a kupuje v pořadí posila > elita > zocelení přisluhovačů > karta > zocelení elit > Hrozba
 function botGold(st) {
   let guard = 0;
-  while (guard++ < 8) { const k = ['plus', 'elite', 'hpN', 'card', 'hpE', 'threat'].find(x => grpCost(st, x) != null); if (!k || grpCan(st, k)) break; buyGroupUp(st, k); }
+  // v196: na vylepšení, které do konce kampaně nestihne našetřit, nečeká – koupí další v pořadí
+  const left = Math.max(0, LEN - (st.played || []).length) * 1.5;
+  while (guard++ < 8) {
+    const k = ['plus', 'elite', 'hpN', 'card', 'hpE', 'threat'].find(x => grpCost(st, x) != null && grpCost(st, x) <= (st.ol.gold || 0) + left);
+    if (!k || grpCan(st, k)) break; buyGroupUp(st, k);
+  }
 }
 // bot Domu: karty vylepšuje cíleně – drží si 4 oblíbené karty a ty prohlubuje do konce stromu
 function botOlCards(st) {
@@ -9555,6 +9568,28 @@ function botShopBuild(st) {
       for (const h of Object.keys(st.heroes)) { if (forbid(id, h) || !free(id, h)) continue; const v = gearScore(id, h) * 10 + price(id) - (got[h] || 0) * 60; /* rozložit nákupy mezi lovce */ if (v > bv) { bv = v; best = { id, h }; } }
     if (!best) break;
     buy(st, best.id, best.h); got[best.h] = (got[best.h] || 0) + 1;
+  }
+  // v196: plné sloty – lepší předmět (vyšší úroveň) nahradí slabší a starý se prodá
+  const tier = id => id ? (D.EQUIP[id].tier || 0) : -1;
+  guard = 0;
+  while (guard++ < 6) {
+    let best = null, bv = 0;
+    for (const id of (st.shop || []).filter(id => price(id) <= st.esence)) {
+      const e = D.EQUIP[id];
+      for (const h of Object.keys(st.heroes)) {
+        if (forbid(id, h)) continue; const eq = st.heroes[h].equip;
+        let slot = e.slot, old;
+        if (e.slot === 'ruka') { slot = tier(eq.ruka1) <= tier(eq.ruka2) ? 'ruka1' : 'ruka2'; old = D.EQUIP[eq[slot]] && D.EQUIP[eq[slot]].slot === 'obourucni' ? Math.max(tier(eq.ruka1), tier(eq.ruka2)) : tier(eq[slot]); }
+        else if (e.slot === 'obourucni') old = Math.max(tier(eq.ruka1), tier(eq.ruka2));
+        else old = tier(eq[slot]);
+        const gain = tier(id) - old; if (gain <= 0) continue;
+        if (gearScore(id, h) <= 1 && gain < 2) continue; const v = gain * 10 + gearScore(id, h) * 1.5; if (v > bv) { bv = v; best = { id, h, slot }; }
+      }
+    }
+    if (!best) break;
+    const before = st.chest.length;
+    if (buy(st, best.id, best.h, best.slot)) break;
+    for (const old of st.chest.slice(before)) sell(st, old);
   }
 }
 function botUpgrade(st, side) {
@@ -17986,8 +18021,9 @@ function initFullscreen() {
 }
 // tlačítka zvuku: v liště hry i v hlavním menu (v61) ukazují stejný stav
 // v190: verze a change log v hlavním menu
-const GAME_VER = 'v195';
+const GAME_VER = 'v196';
 const CHANGELOG = [
+  ['v196 · 24. 11.', ['Kampaň: každá koupená úroveň schopnosti dává lovci +1 max. zdraví (vidíš ho u lovce v táboře).', 'Posílené předměty: žádný kupovaný předmět už není slabší než startovní výbava a s úrovní sílí rychleji. Pět karet má navíc efekt „tvůj další útok v tomto kole je silnější“: Hod dýkou, Hák halapartny, Zuřivý řev, Zamířit a Svaté světlo.', 'Dům začíná scénář se 2 kartami místo 3 (za sraženého lovce si kartu dál lízne).', 'Elita navíc už nepřidává figurku: v každé skupině povýší jednoho přisluhovače na elitu.', 'Boti v táboře: lovci nahrazují slabší výbavu lepší a starou prodají; Dům nečeká na vylepšení, které by do konce kampaně nenašetřil.']],
   ['v195 · 24. 11.', ['Bludiště: boti plánují cestu s ohledem na keře – zarostlý keř berou jako cestu, která se příští kolo otevře, otevřený živý průchod jako riziko; nezůstávají stát na poli, kde může vyrůst keř.', 'Divoký hon: dva lovci strkají hajného do pasti, třetí se předem postaví k další pasti, ke které hajný míří.', 'Krvavý ples: dokud se hrabě neodhalí, boti víc čistí sál od jeho hostů.', 'Kampaň: boti lovců nakupují podle buildu (Ashford zbroj a štít, Wren zbraně na dálku a pohyb, Ilona sůl, kyvadlo a podpora), nákupy rozkládají mezi všechny a vylepšují hlavně svůj hlavní strom schopností.']],
   ['v194 · 23. 11.', ['Boti lovců: pořadí tahů podle ohrožení (kdo je sám u monster, které ještě nehrály, jde první; Ilona první, když kontrolou zachrání situaci), padlí čekají na pomoc.', 'Boti lovců: role – Ashford vepředu kryje ostatní, Wren drží odstup, Ilona vzadu, ale na dosah; sůl a poutání míří na skupiny, které ještě nehrály; oheň nehází na letce ani na spojence.', 'Boti lovců: útočí přednostně na nehrané skupiny a monstra v cestě; zvedání kamaráda až po jistém zabití u něj; lootují jen po cestě; Panika: 1 nevadí, se 3 kartami přednost, se 4 hned.', 'Obelisky: boti rychle odkrývají místnosti, než najdou všechny 4 (už „netuší“, kde jsou).', 'Dům: Zlé oko a Závoj hraje po prvním lovci (výjimečně po druhém), nikdy na konci kola; nejdřív aktivuje skupiny, kterým hrozí smrt; nestoupá k lovci, na kterého nemůže zaútočit (pokud neblokuje); víc se soustředí na osamocené a zraněné lovce; hlídá truhlu s klíčem i tu s falešným (blaf).']],
   ['v193 · 23. 11.', ['Divoký hon: oznámení „Měsíc zakryly mraky“ / „Měsíc vyšel zpoza mraků“ před proměnou.', 'Havrani a krkavci: útok −2, nálet +1 za každé pole vzdušnou čarou (kolem zdí) od začátku aktivace, bez limitu.', 'Přišpendlení a omráčení platí i na hajného; vlkodlak se ohání drápy, ne výstřelem.', 'Animace karty Odhal.', 'Štítek Tmy v nepravidelných místnostech u správného pole.']],
@@ -18229,7 +18265,7 @@ function campHeroesB(st) {
   bcStyle();
   const list = campHeroList(); if (!S.campHero || !list.some(h => h.id === S.campHero)) S.campHero = list[0].id;
   const h = C.HEROES.find(x => x.id === S.campHero), hs = st.heroes[h.id], shop = Camp.rollShop(st), buyFor = S.campBuy;
-  const tabs = `<nav class="bs-heroes">${list.map(x => { const xs = st.heroes[x.id], ups = C.ABIL[x.id].filter(ab => Camp.nextVariants(xs.abil[ab.key] || '').length && Camp.upCost(xs.abil[ab.key] || '') <= xs.xp).length; return `<button class="bs-ht${x.id === h.id ? ' on' : ''}" data-hsel="${x.id}" style="--c:${HERO_COLORS[x.id]}">${heroPortrait(x.id)}<span><b>${esc(x.name)}</b><small>${esc(x.archetype)}</small></span><i class="bs-xp">${i80('xp')}${xs.xp} xp</i>${ups ? `<em class="bs-dot" title="Může vylepšit">${ups}</em>` : ''}</button>`; }).join('')}${list.length < C.HEROES.length ? '<span class="bs-own">Upravuješ jen svého lovce.</span>' : ''}</nav>`;
+  const tabs = `<nav class="bs-heroes">${list.map(x => { const xs = st.heroes[x.id], ups = C.ABIL[x.id].filter(ab => Camp.nextVariants(xs.abil[ab.key] || '').length && Camp.upCost(xs.abil[ab.key] || '') <= xs.xp).length; return `<button class="bs-ht${x.id === h.id ? ' on' : ''}" data-hsel="${x.id}" style="--c:${HERO_COLORS[x.id]}">${heroPortrait(x.id)}<span><b>${esc(x.name)}</b><small>${esc(x.archetype)}</small></span><i class="bs-xp">${i80('xp')}${xs.xp} xp · ♥ ${x.hp + Object.values(xs.abil || {}).reduce((n, v) => n + String(v || '').length, 0)}</i>${ups ? `<em class="bs-dot" title="Může vylepšit">${ups}</em>` : ''}</button>`; }).join('')}${list.length < C.HEROES.length ? '<span class="bs-own">Upravuješ jen svého lovce.</span>' : ''}</nav>`;
   const gear = `<section class="bs-col bs-gear cp-hero" data-hero="${h.id}" style="--c:${HERO_COLORS[h.id]}"><h3>Výbava</h3>${paperDollHTML(hs.equip, { slotAttr: true, hero: h.id, sel: S.campInspect && S.campInspect.hero === h.id ? S.campInspect.id : null })}
     <div class="bag" data-drop='${JSON.stringify({ where: 'bag', hero: h.id })}'><span class="bag-h">${A.icon('satchel')} Batoh ${hs.bag.length}/${Camp.BAG}</span>${hs.bag.map((id, i) => `<span class="bagi" draggable="true" data-src='${JSON.stringify({ where: 'bag', hero: h.id, idx: i })}' aria-label="${esc(C.EQUIP[id].name)}">${itemPic(id)}<small>${esc(C.EQUIP[id].name)}</small></span>`).join('')}${hs.bag.length < Camp.BAG ? '<span class="bag-empty">přetáhni sem</span>' : ''}</div>
     <p class="bs-hint">Předměty přetahuj mezi výbavou, batohem a truhlou. Klik na předmět ukáže jeho karty.</p>${campScenDetHTML(Camp.scenById(st.next), 'Další scénář')}</section>`;
@@ -18245,7 +18281,7 @@ function campHeroesB(st) {
 function campHeroesHTML(st) {
   if (buiOn()) return campHeroesB(st);
   const shop = Camp.rollShop(st), buyFor = S.campBuy;
-  const party = `<section class="cp-party">${C.HEROES.map(h => { const hs = st.heroes[h.id]; return `<div class="cp-hero" data-hero="${h.id}" style="--c:${HERO_COLORS[h.id]}"><div class="cp-hh">${heroPortrait(h.id)}<div><b>${esc(h.name)}</b><small>${esc(h.archetype)}</small></div><span class="xp">${hs.xp} xp</span></div>
+  const party = `<section class="cp-party">${C.HEROES.map(h => { const hs = st.heroes[h.id]; return `<div class="cp-hero" data-hero="${h.id}" style="--c:${HERO_COLORS[h.id]}"><div class="cp-hh">${heroPortrait(h.id)}<div><b>${esc(h.name)}</b><small>${esc(h.archetype)}</small></div><span class="xp">${hs.xp} xp · ♥ ${h.hp + Object.values(hs.abil || {}).reduce((n, v) => n + String(v || '').length, 0)}</span></div>
       ${paperDollHTML(hs.equip, { slotAttr: true, hero: h.id, sel: S.campInspect && S.campInspect.hero === h.id ? S.campInspect.id : null })}
       <div class="bag" data-drop='${JSON.stringify({ where: 'bag', hero: h.id })}'><span class="bag-h">${A.icon('satchel')} Batoh ${hs.bag.length}/${Camp.BAG}</span>${hs.bag.map((id, i) => `<span class="bagi" draggable="true" data-src='${JSON.stringify({ where: 'bag', hero: h.id, idx: i })}' aria-label="${esc(C.EQUIP[id].name)}">${itemPic(id)}<small>${esc(C.EQUIP[id].name)}</small></span>`).join('')}${hs.bag.length < Camp.BAG ? '<span class="bag-empty">přetáhni sem</span>' : ''}</div>
       <div class="cp-abil">${C.ABIL[h.id].map(ab => { const cur = hs.abil[ab.key] || ''; return `<div class="ab-row"><p class="ab-name">${esc(ab.cat)} · <b class="ab-cur" data-pv="${cur}">${esc(ab.tree[cur][0])}</b> <small>úr. ${C.levelOf(cur)}</small></p><div class="ab-next">${treeMiniHTML(ab.tree, cur, hs.xp, `data-up="${h.id}|${ab.key}" data-v`)}</div></div>`; }).join('')}</div></div>`; }).join('')}</section>`;
