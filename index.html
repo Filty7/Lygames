@@ -4,10 +4,10 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Lygames – hry Tomáše Lygy</title>
-<meta name="description" content="Hry do prohlížeče od Tomáše Lygy. Půlnoc na Blackmooru, Hlubina, Desert Fever, To je život, Underdeck a Válka růží – zdarma, bez instalace, na počítači, mobilu i s ovladačem.">
+<meta name="description" content="Hry do prohlížeče od Tomáše Lygy. Půlnoc na Blackmooru, Hlubina, To je život, Underdeck a Desert Fever – zdarma, bez instalace, na počítači, mobilu i s ovladačem.">
 <meta property="og:title" content="Lygames – hry Tomáše Lygy">
 <meta property="og:description" content="Karetní, taktické a online hry do prohlížeče. Zdarma, bez instalace.">
-<meta property="og:image" content="https://lygames.cz/img/blackmoor.jpg?v=1">
+<meta property="og:image" content="https://lygames.cz/img/blackmoor.jpg?v=2">
 <meta property="og:url" content="https://lygames.cz/">
 <meta name="theme-color" content="#09090B">
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
@@ -63,7 +63,7 @@ img{max-width:100%}
 .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,360px),1fr));gap:28px 20px}
 .tile{display:flex;flex-direction:column;gap:14px;scroll-margin-top:24px}
 .tile-media{position:relative;display:block;aspect-ratio:16/9;border-radius:8px;overflow:hidden;background:#1A1A1E;text-decoration:none;transition:transform .25s ease,box-shadow .25s ease}
-.tile-media img{width:100%;height:100%;object-fit:cover;object-position:center 30%;display:block;transition:filter .25s}
+.tile-media img{width:100%;height:100%;object-fit:cover;object-position:center 35%;display:block;transition:filter .25s}
 .tile-media::after{content:"";position:absolute;inset:0;background:linear-gradient(0deg,rgba(9,9,11,.92) 0,rgba(9,9,11,0) 58%)}
 .tile-media:hover{transform:scale(1.025);box-shadow:0 24px 60px rgba(0,0,0,.7)}
 .tile-media:hover img{filter:brightness(1.08)}
@@ -147,7 +147,7 @@ footer .wrap{display:flex;flex-wrap:wrap;justify-content:space-between;gap:12px;
 
 <main>
 <section class="hero" aria-labelledby="hero-h">
-<img class="hero-img" src="img/blackmoor.jpg?v=1" width="840" height="630" alt="Záběr ze hry Půlnoc na Blackmooru: lovci duchů v chodbě panství">
+<img class="hero-img" src="img/blackmoor.jpg?v=2" width="1920" height="1080" alt="Záběr ze hry Půlnoc na Blackmooru: tři lovci duchů v chodbě panství, nad nimi bludné oči">
 <div class="wrap hero-body">
 <div class="hero-tags"><span class="new">NOVINKA</span><span>TAKTICKÁ HRA · 1 PROTI 3 · ONLINE · ALFA</span></div>
 <h1 id="hero-h">Půlnoc na Blackmooru</h1>
@@ -160,11 +160,11 @@ footer .wrap{display:flex;flex-wrap:wrap;justify-content:space-between;gap:12px;
 </section>
 
 <section class="wrap row" id="hry" aria-labelledby="row1">
-<div class="row-head"><h2 id="row1">Hraj online s přáteli</h2><span>Založ hru, pošli kód a hrajte každý ze svého počítače.</span></div>
+<div class="row-head"><h2 id="row1">Hry</h2><span>Zdarma a bez instalace. Online hry: založ hru, pošli kód a hrajte každý ze svého počítače.</span></div>
 <div class="grid">
 <article class="tile" id="hra-pulnoc-na-blackmooru">
 <a class="tile-media" href="hry/pulnoc-na-blackmooru/" aria-label="Hrát Půlnoc na Blackmooru">
-<img loading="lazy" width="840" height="630" src="img/blackmoor.jpg?v=1" alt="Lovci duchů v chodbě panství bojují s přízraky, vlevo zahraná karta a hod kostkou">
+<img loading="lazy" width="1920" height="1080" src="img/blackmoor.jpg?v=2" alt="Tři lovci duchů v chodbě panství, nad nimi bludné oči a truhla s klíčem">
 <span class="badge alfa">ALFA · ONLINE</span><span class="tile-title">Půlnoc na Blackmooru</span><span class="tile-play" aria-hidden="true"><svg viewBox="0 0 16 16"><path d="M5 3 L13 8 L5 13 Z" fill="currentColor"/></svg></span>
 </a>
 <div class="tile-body">
@@ -190,26 +190,6 @@ footer .wrap{display:flex;flex-wrap:wrap;justify-content:space-between;gap:12px;
 <a class="btn btn-play" href="hry/hlubina-online/"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M4 2.5 L13 8 L4 13.5 Z" fill="currentColor"/></svg>Hrát</a>
 </div>
 </article>
-<article class="tile" id="hra-desert-fever">
-<a class="tile-media" href="hry/desert-fever/" aria-label="Hrát Desert Fever">
-<img loading="lazy" width="840" height="630" src="img/desert-fever.jpg?v=1" alt="Chromový nápis Desert Fever nad dunami při západu slunce, v dálce bivak a tři rallye auta">
-<span class="badge alfa">ALFA · ONLINE</span><span class="tile-title">Desert Fever</span><span class="tile-play" aria-hidden="true"><svg viewBox="0 0 16 16"><path d="M5 3 L13 8 L5 13 Z" fill="currentColor"/></svg></span>
-</a>
-<div class="tile-body">
-<p class="kicker">MANAŽER RALLYE · PIXEL ART</p>
-<p class="desc">Vedeš tým pouštní rallye. Nakoupíš auto a&nbsp;lidi, v&nbsp;bivaku hlídáš čas, opravy a&nbsp;únavu posádky a&nbsp;v&nbsp;etapě držíš rychlost na hraně: kdo moc riskuje, končí na střeše nebo v&nbsp;písku.</p>
-<p class="meta">1 hráč proti 29 týmům · až 10 hráčů online</p>
-<ul class="plat" aria-label="Kde hrát"><li class="ok"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2.5" y="4" width="19" height="12.5" rx="1.5"/><path d="M8.5 20.5h7M12 16.5v4"/></svg><span><b>PC</b> doporučeno</span></li><li class="no"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="6.5" y="2.5" width="11" height="19" rx="2"/><path d="M11 18.5h2"/></svg><span><b>Mobil</b> nedoporučeno</span></li></ul>
-<details class="more"><summary>Více o hře</summary><p>Hra je ve fázi alfa testování: vyvážení i&nbsp;rozhraní se ještě mění. Online multiplayer je v&nbsp;betě: založ hru, pošli kód a&nbsp;draftujte týmy proti sobě.</p></details>
-<a class="btn btn-play" href="hry/desert-fever/"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M4 2.5 L13 8 L4 13.5 Z" fill="currentColor"/></svg>Hrát</a>
-</div>
-</article>
-</div>
-</section>
-
-<section class="wrap row" aria-labelledby="row2">
-<div class="row-head"><h2 id="row2">Sólo a proti botům</h2><span>Kdykoliv, na chvilku i na celý večer.</span></div>
-<div class="grid">
 <article class="tile" id="hra-to-je-zivot">
 <a class="tile-media" href="hry/to-je-zivot/" aria-label="Hrát To je život">
 <img loading="lazy" width="1200" height="900" src="img/to-je-zivot.jpg?v=3" alt="Podzimní vesnice, rodina, karty v kalendáři dne a nabídky na obloze">
@@ -236,21 +216,23 @@ footer .wrap{display:flex;flex-wrap:wrap;justify-content:space-between;gap:12px;
 <a class="btn btn-play" href="hry/underdeck/"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M4 2.5 L13 8 L4 13.5 Z" fill="currentColor"/></svg>Hrát</a>
 </div>
 </article>
-<article class="tile" id="hra-valka-ruzi">
-<a class="tile-media" href="hry/valka-ruzi/" aria-label="Hrát Válka růží">
-<img loading="lazy" width="1200" height="900" src="img/valka-ruzi.jpg?v=3" alt="Druhé kolo, vyložené karty soupeřů, hrdina Edward a karty v ruce">
-<span class="tile-title">Válka růží</span><span class="tile-play" aria-hidden="true"><svg viewBox="0 0 16 16"><path d="M5 3 L13 8 L5 13 Z" fill="currentColor"/></svg></span>
+<article class="tile" id="hra-desert-fever">
+<a class="tile-media" href="hry/desert-fever/" aria-label="Hrát Desert Fever">
+<img loading="lazy" width="840" height="630" src="img/desert-fever.jpg?v=1" alt="Chromový nápis Desert Fever nad dunami při západu slunce, v dálce bivak a tři rallye auta">
+<span class="badge alfa">ALFA · ONLINE</span><span class="tile-title">Desert Fever</span><span class="tile-play" aria-hidden="true"><svg viewBox="0 0 16 16"><path d="M5 3 L13 8 L5 13 Z" fill="currentColor"/></svg></span>
 </a>
 <div class="tile-body">
-<p class="kicker">KARETNÍ STRATEGIE</p>
-<p class="desc">Šlechtické rody, úplatky a&nbsp;hrdinové z&nbsp;doby válek růží. Přízeň si koupíš, vybojuješ, nebo ukradneš.</p>
-<p class="meta">3–4 hráči · hra proti botům</p>
-<ul class="plat" aria-label="Kde hrát"><li class="ok"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2.5" y="4" width="19" height="12.5" rx="1.5"/><path d="M8.5 20.5h7M12 16.5v4"/></svg><span><b>PC</b> doporučeno</span></li><li class="mid"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="6.5" y="2.5" width="11" height="19" rx="2"/><path d="M11 18.5h2"/></svg><span><b>Mobil</b> hratelné</span></li></ul>
-<a class="btn btn-play" href="hry/valka-ruzi/"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M4 2.5 L13 8 L4 13.5 Z" fill="currentColor"/></svg>Hrát</a>
+<p class="kicker">MANAŽER RALLYE · PIXEL ART</p>
+<p class="desc">Vedeš tým pouštní rallye. Nakoupíš auto a&nbsp;lidi, v&nbsp;bivaku hlídáš čas, opravy a&nbsp;únavu posádky a&nbsp;v&nbsp;etapě držíš rychlost na hraně: kdo moc riskuje, končí na střeše nebo v&nbsp;písku.</p>
+<p class="meta">1 hráč proti 29 týmům · až 10 hráčů online</p>
+<ul class="plat" aria-label="Kde hrát"><li class="ok"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2.5" y="4" width="19" height="12.5" rx="1.5"/><path d="M8.5 20.5h7M12 16.5v4"/></svg><span><b>PC</b> doporučeno</span></li><li class="no"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="6.5" y="2.5" width="11" height="19" rx="2"/><path d="M11 18.5h2"/></svg><span><b>Mobil</b> nedoporučeno</span></li></ul>
+<details class="more"><summary>Více o hře</summary><p>Hra je ve fázi alfa testování: vyvážení i&nbsp;rozhraní se ještě mění. Online multiplayer je v&nbsp;betě: založ hru, pošli kód a&nbsp;draftujte týmy proti sobě.</p></details>
+<a class="btn btn-play" href="hry/desert-fever/"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M4 2.5 L13 8 L4 13.5 Z" fill="currentColor"/></svg>Hrát</a>
 </div>
 </article>
 </div>
 </section>
+<!-- Válka růží zůstává na webu (hry/valka-ruzi/), jen se v seznamu nezobrazuje. -->
 
 <section class="perks" aria-label="Proč Lygames">
 <div class="wrap">
