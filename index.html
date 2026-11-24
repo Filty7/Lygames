@@ -45,7 +45,9 @@ img{max-width:100%}
 .hero-tags{display:flex;flex-wrap:wrap;align-items:center;gap:10px 14px;font-size:13px;font-weight:700;letter-spacing:.14em}
 .hero-tags .new{background:var(--acc);color:var(--bg);padding:5px 10px;border-radius:4px}
 .hero-tags span:last-child{opacity:.82}
-.hero h1{margin:0;font-family:var(--display);font-weight:800;font-size:clamp(60px,9.6vw,146px);line-height:.86;letter-spacing:.01em;text-transform:uppercase;max-width:9ch}
+.hero h1{margin:0;font-family:var(--display);font-weight:800;line-height:.86;letter-spacing:.01em;text-transform:uppercase;display:flex;flex-direction:column;gap:.06em}
+.h-pre{font-size:clamp(30px,4.2vw,64px);letter-spacing:.08em;color:#DCD7CE}
+.h-main{font-size:clamp(60px,10.5vw,164px)}
 .hero p{margin:0;max-width:540px;font-size:clamp(17px,1.6vw,20px);color:#DCD7CE}
 .hero-btns{display:flex;flex-wrap:wrap;gap:12px;margin-top:6px}
 .btn{display:inline-flex;align-items:center;justify-content:center;gap:10px;min-height:52px;padding:0 28px;border-radius:6px;font-weight:800;font-size:16px;text-decoration:none;transition:background .15s,filter .15s}
@@ -78,7 +80,8 @@ img{max-width:100%}
 .tile-body{display:flex;flex-direction:column;gap:8px;padding:0 2px;flex:1}
 .tile-body p{margin:0}
 .kicker{font-size:12.5px;font-weight:800;letter-spacing:.1em;color:var(--mute)}
-.desc{color:var(--soft);font-size:16px}
+.sub{font-size:14px;font-weight:600;color:var(--acc);margin-top:-6px!important}
+.desc{color:var(--soft);font-size:16px;margin-top:4px!important;margin-bottom:4px!important}
 .meta{font-size:14px;color:var(--mute)}
 .plat{list-style:none;margin:4px 0 0;padding:0;display:flex;flex-wrap:wrap;gap:6px}
 .plat li{display:inline-flex;align-items:center;gap:6px;padding:4px 9px 4px 7px;border:1px solid;border-radius:999px;font-size:12.5px;line-height:1.2}
@@ -126,7 +129,8 @@ footer .wrap{display:flex;flex-wrap:wrap;justify-content:space-between;gap:12px;
   .hero-img{position:relative;width:100%;height:auto;aspect-ratio:4/3;z-index:-2;
     -webkit-mask-image:linear-gradient(0deg,transparent 0,#000 45%);mask-image:linear-gradient(0deg,transparent 0,#000 45%)}
   .hero::after{background:linear-gradient(180deg,rgba(9,9,11,.9) 0,rgba(9,9,11,0) 26%)}
-  .hero h1{font-size:clamp(40px,11.5vw,80px);max-width:none}
+  .h-main{font-size:clamp(40px,11.5vw,90px)}
+  .h-pre{font-size:clamp(24px,7vw,40px)}
   .hero-body{padding-top:0;margin-top:-56px;padding-bottom:48px;gap:18px}
   .tile-play{opacity:1;transform:none;width:36px;height:36px}
 }
@@ -149,9 +153,9 @@ footer .wrap{display:flex;flex-wrap:wrap;justify-content:space-between;gap:12px;
 <section class="hero" aria-labelledby="hero-h">
 <img class="hero-img" src="img/blackmoor.jpg?v=2" width="1920" height="1080" alt="Záběr ze hry Půlnoc na Blackmooru: tři lovci duchů v chodbě panství, nad nimi bludné oči">
 <div class="wrap hero-body">
-<div class="hero-tags"><span class="new">NOVINKA</span><span>TAKTICKÁ HRA · 1 PROTI 3 · ONLINE · ALFA</span></div>
-<h1 id="hero-h">Půlnoc na Blackmooru</h1>
-<p>Tři lovci duchů uvízli v&nbsp;domě, který ožil. Dvanáct kol do půlnoci, kampaň o&nbsp;čtyřech scénářích.</p>
+<div class="hero-tags"><span class="new">NOVINKA</span><span>TAKTICKÁ HRA 1V3 · SÓLO NEBO ONLINE · ALFA</span></div>
+<h1 id="hero-h"><span class="h-pre">Půlnoc na</span><span class="h-main">Blackmooru</span></h1>
+<p>Tři lovci duchů uvízli v&nbsp;domě, který ožil.<br>Taktická karetní asymetrická kampaň 3v1 pro 1–4 hráče.</p>
 <div class="hero-btns">
 <a class="btn btn-light" href="hry/pulnoc-na-blackmooru/"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M4 2.5 L13 8 L4 13.5 Z" fill="currentColor"/></svg>Hrát</a>
 <a class="btn btn-glass" href="#hra-pulnoc-na-blackmooru"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><circle cx="8" cy="8" r="6.5"/><path d="M8 7 V11.5 M8 4.5 V5"/></svg>O hře</a>
@@ -168,11 +172,9 @@ footer .wrap{display:flex;flex-wrap:wrap;justify-content:space-between;gap:12px;
 <span class="badge alfa">ALFA · ONLINE</span><span class="tile-title">Půlnoc na Blackmooru</span><span class="tile-play" aria-hidden="true"><svg viewBox="0 0 16 16"><path d="M5 3 L13 8 L5 13 Z" fill="currentColor"/></svg></span>
 </a>
 <div class="tile-body">
-<p class="kicker">TAKTICKÁ HRA · 1 PROTI 3</p>
-<p class="desc">Tři lovci duchů uvízli v&nbsp;domě, který ožil. Lovci hrají kartami a&nbsp;výbavou, Dům ovládá monstra a&nbsp;karty hrůzy. Dvanáct kol do půlnoci, kampaň o&nbsp;čtyřech scénářích.</p>
-<p class="meta">1 hráč proti botům · ideálně 2–4 hráči online</p>
+<p class="kicker">TAKTICKÁ HRA 1V3</p><p class="sub">Sólo nebo online</p>
+<p class="desc">Tři lovci duchů uvízli v&nbsp;domě, který ožil.<br>Hraj za lovce, nebo za dům.<br>Unikátní scénáře, výbava i&nbsp;schopnosti.<br>Hraj sólo nebo online s&nbsp;kamarády.</p>
 <ul class="plat" aria-label="Kde hrát"><li class="ok"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2.5" y="4" width="19" height="12.5" rx="1.5"/><path d="M8.5 20.5h7M12 16.5v4"/></svg><span><b>PC</b> doporučeno</span></li><li class="no"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="6.5" y="2.5" width="11" height="19" rx="2"/><path d="M11 18.5h2"/></svg><span><b>Mobil</b> nedoporučeno</span></li></ul>
-<details class="more"><summary>Více o hře</summary><p>Hra je ve fázi alfa testování: pravidla i&nbsp;vyvážení se ještě mění. Založ hru, pošli ostatním kód a&nbsp;hrajte každý ze svého počítače.</p></details>
 <a class="btn btn-play" href="hry/pulnoc-na-blackmooru/"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M4 2.5 L13 8 L4 13.5 Z" fill="currentColor"/></svg>Hrát</a>
 </div>
 </article>
@@ -182,11 +184,9 @@ footer .wrap{display:flex;flex-wrap:wrap;justify-content:space-between;gap:12px;
 <span class="badge beta">BETA · ONLINE</span><span class="tile-title">Hlubina</span><span class="tile-play" aria-hidden="true"><svg viewBox="0 0 16 16"><path d="M5 3 L13 8 L5 13 Z" fill="currentColor"/></svg></span>
 </a>
 <div class="tile-body">
-<p class="kicker">KOOPERATIVNÍ ROGUELIKE</p>
-<p class="desc">Sestup do opuštěné podzemní laboratoře inspirovaný deskovou hrou SubTerra. Odhaluj chodby, hlídej stoupající vodu a&nbsp;najdi zařízení, které probudí portál ven.</p>
-<p class="meta">1 hráč · 2–4 hráči u&nbsp;jedné obrazovky · 2–4 hráči online (beta)</p>
+<p class="kicker">KOOPERATIVNÍ ROGUELIKE</p><p class="sub">Tahová strategie</p>
+<p class="desc">Skupina vědců sestupuje do zničené laboratoře.<br>Prozkoumej ji a&nbsp;uteč napříč 15 scénáři.<br>Náročná hra, která chyby neodpouští.<br>Hraj sólo nebo online s&nbsp;kamarády.</p>
 <ul class="plat" aria-label="Kde hrát"><li class="ok"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2.5" y="4" width="19" height="12.5" rx="1.5"/><path d="M8.5 20.5h7M12 16.5v4"/></svg><span><b>PC</b> doporučeno</span></li><li class="no"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="6.5" y="2.5" width="11" height="19" rx="2"/><path d="M11 18.5h2"/></svg><span><b>Mobil</b> nedoporučeno</span></li><li class="ok"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 7.5h10a4.5 4.5 0 0 1 4.4 5.4l-.9 4.4a2.6 2.6 0 0 1-4.5 1.2L14.4 16H9.6l-1.6 2.5a2.6 2.6 0 0 1-4.5-1.2l-.9-4.4A4.5 4.5 0 0 1 7 7.5z"/><path d="M7.5 11v3M6 12.5h3"/><circle cx="15.5" cy="11.5" r=".6" fill="currentColor"/><circle cx="17.5" cy="13.5" r=".6" fill="currentColor"/></svg><span><b>Ovladač</b> podporováno</span></li></ul>
-<details class="more"><summary>Více o hře</summary><p>Nově i&nbsp;online: založ hru, pošli kamarádům kód a&nbsp;hrajte každý ze svého počítače. Online multiplayer je zatím v&nbsp;testování.</p></details>
 <a class="btn btn-play" href="hry/hlubina-online/"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M4 2.5 L13 8 L4 13.5 Z" fill="currentColor"/></svg>Hrát</a>
 </div>
 </article>
@@ -196,9 +196,8 @@ footer .wrap{display:flex;flex-wrap:wrap;justify-content:space-between;gap:12px;
 <span class="tile-title">To je život</span><span class="tile-play" aria-hidden="true"><svg viewBox="0 0 16 16"><path d="M5 3 L13 8 L5 13 Z" fill="currentColor"/></svg></span>
 </a>
 <div class="tile-body">
-<p class="kicker">SIMULACE ŽIVOTA</p>
-<p class="desc">Narodíš se do náhodné rodiny. Máš ambice, sny i&nbsp;starosti. Pracuj s&nbsp;časem, který ti byl dán, a&nbsp;prožij zcela unikátní život.</p>
-<p class="meta">1 hráč · karty · klidné tempo</p>
+<p class="kicker">ODPOČINKOVÁ PŘÍBĚHOVKA</p><p class="sub">Žij si svůj unikátní život</p>
+<p class="desc">Na začátku hry se narodíš.<br>Příležitosti přicházejí a&nbsp;odcházejí.<br>Tvá rozhodnutí ovlivňují další možnosti.<br>Časový management práce, kamarádů a&nbsp;zábavy.</p>
 <ul class="plat" aria-label="Kde hrát"><li class="ok"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2.5" y="4" width="19" height="12.5" rx="1.5"/><path d="M8.5 20.5h7M12 16.5v4"/></svg><span><b>PC</b> doporučeno</span></li><li class="mid"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="6.5" y="2.5" width="11" height="19" rx="2"/><path d="M11 18.5h2"/></svg><span><b>Mobil</b> hratelné</span></li></ul>
 <a class="btn btn-play" href="hry/to-je-zivot/"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M4 2.5 L13 8 L4 13.5 Z" fill="currentColor"/></svg>Hrát</a>
 </div>
@@ -209,9 +208,8 @@ footer .wrap{display:flex;flex-wrap:wrap;justify-content:space-between;gap:12px;
 <span class="tile-title">Underdeck</span><span class="tile-play" aria-hidden="true"><svg viewBox="0 0 16 16"><path d="M5 3 L13 8 L5 13 Z" fill="currentColor"/></svg></span>
 </a>
 <div class="tile-body">
-<p class="kicker">KARETNÍ ROGUELIKE</p>
-<p class="desc">Karetní sestup do podzemí inspirovaný sólovou karetní hrou Scoundrel. Vylepšuj balíček, hledej kombinace a&nbsp;prolízej se až na konec.</p>
-<p class="meta">1 hráč · dungeon · krátké partie</p>
+<p class="kicker">KARETNÍ ROGUELIKE</p><p class="sub">Deckbuilding</p>
+<p class="desc">Vydej se do podsvětí monster.<br>Sestav si balíček a&nbsp;probojuj se na konec.<br>Postaveno na mechanice hry Scoundrel.</p>
 <ul class="plat" aria-label="Kde hrát"><li class="ok"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2.5" y="4" width="19" height="12.5" rx="1.5"/><path d="M8.5 20.5h7M12 16.5v4"/></svg><span><b>PC</b> doporučeno</span></li><li class="ok"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="6.5" y="2.5" width="11" height="19" rx="2"/><path d="M11 18.5h2"/></svg><span><b>Mobil</b> doporučeno</span></li></ul>
 <a class="btn btn-play" href="hry/underdeck/"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M4 2.5 L13 8 L4 13.5 Z" fill="currentColor"/></svg>Hrát</a>
 </div>
@@ -222,11 +220,9 @@ footer .wrap{display:flex;flex-wrap:wrap;justify-content:space-between;gap:12px;
 <span class="badge alfa">ALFA · ONLINE</span><span class="tile-title">Desert Fever</span><span class="tile-play" aria-hidden="true"><svg viewBox="0 0 16 16"><path d="M5 3 L13 8 L5 13 Z" fill="currentColor"/></svg></span>
 </a>
 <div class="tile-body">
-<p class="kicker">MANAŽER RALLYE · PIXEL ART</p>
-<p class="desc">Vedeš tým pouštní rallye. Nakoupíš auto a&nbsp;lidi, v&nbsp;bivaku hlídáš čas, opravy a&nbsp;únavu posádky a&nbsp;v&nbsp;etapě držíš rychlost na hraně: kdo moc riskuje, končí na střeše nebo v&nbsp;písku.</p>
-<p class="meta">1 hráč proti 29 týmům · až 10 hráčů online</p>
+<p class="kicker">RALLY MANAGER</p>
+<p class="desc">Sestav si tým na dvoutýdenní závod.<br>Managuj spánek, energii, opravy a&nbsp;upgrady auta.<br>Závoď v&nbsp;jednotlivých etapách.<br>Hraj sólo nebo online s&nbsp;kamarády.</p>
 <ul class="plat" aria-label="Kde hrát"><li class="ok"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2.5" y="4" width="19" height="12.5" rx="1.5"/><path d="M8.5 20.5h7M12 16.5v4"/></svg><span><b>PC</b> doporučeno</span></li><li class="no"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="6.5" y="2.5" width="11" height="19" rx="2"/><path d="M11 18.5h2"/></svg><span><b>Mobil</b> nedoporučeno</span></li></ul>
-<details class="more"><summary>Více o hře</summary><p>Hra je ve fázi alfa testování: vyvážení i&nbsp;rozhraní se ještě mění. Online multiplayer je v&nbsp;betě: založ hru, pošli kód a&nbsp;draftujte týmy proti sobě.</p></details>
 <a class="btn btn-play" href="hry/desert-fever/"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M4 2.5 L13 8 L4 13.5 Z" fill="currentColor"/></svg>Hrát</a>
 </div>
 </article>
