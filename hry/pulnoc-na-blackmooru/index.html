@@ -8090,6 +8090,17 @@ function huntGoals(G, h) {
   const H = G.hunt, w = bossOf(G); if (!w) return [];
   const arm = H.traps.filter(t => t.armed);
   if (H.human) {
+    // v195: dva nejbližší lovci strkají hajného, třetí se předem postaví k pasti, ke které hajný míří (příští odstrčení)
+    const lh = liveHeroes(G);
+    if (lh.length >= 3 && arm.length) {
+      const pushers = lh.slice().sort((a, b) => dist(a.pos, w.pos) - dist(b.pos, w.pos)).slice(0, 2);
+      if (!pushers.includes(h)) {
+        const nt = arm.slice().sort((a, b) => dist(a.hex, w.pos) - dist(b.hex, w.pos));
+        const t = nt.find(t => dist(t.hex, w.pos) > 1) || nt[0];
+        const pre = neighbors(t.hex).filter(x => roomOf(x) && !isBlock(x) && linkOK(x, t.hex) && dist(x, w.pos) >= dist(t.hex, w.pos));
+        if (pre.length) return pre;
+      }
+    }
     // stoupni si za hajného tak, aby ho odstrčení dostalo do pasti (přímka o 1–3)
     const out = [];
     for (const t of arm) for (const n of neighbors(w.pos)) {
@@ -8253,7 +8264,9 @@ function goalMap(G, goals) {
       if (eq(nb, C.EXIT) && !G.exitUnlocked) continue;
       let cost = C.isRough(cur) ? 2 : 1;
       const d = C.doorAt(G, nb); if (d && d.state === 'locked') cost += 4; if (d && d.state === 'closed') cost += 1;
-      if (d && ((d.exit && d.state !== 'open') || C.isImpass(d))) continue;
+      // v195: bludiště – zarostlý keř se příští kolo otevře (cesta přes něj = čekání), otevřený může zarůst (riziko)
+      if (d && d.living && !OFF.has('maze')) { if (d.state === 'grown') cost += 5; else cost += 1; }
+      else if (d && ((d.exit && d.state !== 'open') || C.isImpass(d))) continue;
       if (G.fireFront != null) { if (C.frontBurning(G, nb)) cost += 6; else if (C.xcOf(nb) <= G.fireFront + (G.fireStep || 2)) cost += 1; }
       const m = C.monsterAt(G, nb); if (m && C.visibleToHeroes(G, m)) cost += 3;
       const nc = cc + cost;
@@ -8524,6 +8537,10 @@ const isReaction = c => c.pri && c.pri.t === 'react';
 // poziční preference lovců (nižší = lepší)
 function wrenOld(G, h, hx, vis) { let b = 0; const cf = h.hand.find(c => c.pri && c.pri.t === 'crossfire'); if (cf && C.crossPairs(G, Object.assign({}, h, { pos: hx }), cf.pri.range).length) b -= 2.5; if (vis.some(m => dist(m.pos, hx) <= 3 && !vis.some(o => o !== m && dist(o.pos, m.pos) === 1))) b -= 0.2; return b; }
 function posBonus(G, h, hx) {
+  if (G.scen.goal === 'maze' && !OFF.has('maze')) { const d = C.doorAt(G, hx); if (d && d.living && d.state !== 'grown') return -0.8 + posBonus0(G, h, hx); }
+  return posBonus0(G, h, hx);
+}
+function posBonus0(G, h, hx) {
   const vis = G.monsters.filter(m => C.visibleToHeroes(G, m) && !MDEF[m.type].object && !m.dormant);
   const hasMelee = h.hand.some(c => c.pri && ((c.pri.t === 'attack' && c.pri.range === 1) || ['sweep', 'swapatk', 'charge', 'lunge'].includes(c.pri.t)));
   let b = 0;
@@ -8831,6 +8848,7 @@ const heroBot = {
           if (!OFF.has('tgt') && pendingGrp(G, t.m) && C.isAwake(G, t.m)) v += 0.6 * t.chance; // v194: skupina, která ještě tento kolo hraje = skutečná hrozba
           if (!OFF.has('tgt')) { const gm = heroGoalMapC(G, h), here = gm.get(K(h.pos)), at = gm.get(K(t.m.pos)); if (here != null && at != null && at < here && dist(t.m.pos, h.pos) <= 3) v += 0.5 * t.chance; } // překáží v cestě k cíli
           if (t.m.boss) v += (G.scen.goal === 'ball' || G.scen.goal === 'comb' ? 2.2 : 1.2) * t.chance;
+          else if (G.scen.goal === 'ball' && G.ball && !G.ball.revealed && !OFF.has('ball')) v += 0.5 * t.chance; // v195: než se hrabě odhalí, prořídnout jeho hosty
           if (MDEF[t.m.type].retaliate && dist(h.pos, t.m.pos) === 1) v -= 0.25 + (t.m.elite ? 0.35 : 0) + (h.fear >= h.courage - 1 ? 0.6 : 0);
           if (MDEF[t.m.type].guardAdj) v += 0.35 * G.monsters.filter(o => o !== t.m && dist(o.pos, t.m.pos) === 1).length * t.chance;
           if (v > bv) { bv = v; best = t; } }
@@ -9504,8 +9522,16 @@ const playedN = st => (st.played || []).length;
 // vítěz kampaně: kdo vyhrál víc scénářů, při shodě remíza
 const winner = st => { const s = st.score || scoreOf(st.history || []); return s.heroes > s.ol ? 'heroes' : s.ol > s.heroes ? 'ol' : 'draw'; };
 
+// v195: buildy botů – každý lovec kupuje výbavu podle své role a vylepšuje hlavně jeden strom schopností
+const BUILD = {
+  ashford: { abil: ['stoj', 'zurivost', 'basta'], gear: ['stit', 'kyrys', 'templar', 'paveza', 'okovane', 'maska', 'prilba', 'halapartna', 'mec', 'sekera', 'savle', 'medaile', 'prezka', 'jizva'] },
+  wren: { abil: ['dalka', 'pohyb', 'pozice'], gear: ['puska', 'revolver', 'derringer', 'brokovnice', 'okulary', 'dalekohled', 'lehke', 'perove', 'holinky', 'plast', 'nabijecka', 'harpuna', 'dyka', 'kamera', 'hodinky'] },
+  varga: { abil: ['kletby', 'pozehnani', 'panika'], gear: ['sul', 'kyvadlo', 'krucifix', 'kropenka', 'breviar', 'lucerna2', 'zvonek', 'vesta', 'kabatec', 'lekarnicka', 'kape', 'kukla', 'poutnik', 'hul', 'ruzenec', 'medailon', 'lebka'] },
+};
+const gearScore = (id, h) => { const b = BUILD[h]; if (!b) return 1; const i = b.gear.indexOf(id); return i < 0 ? 1 : 20 - i; };
 // boti mezi scénáři: lovci kupují do prázdných slotů, pak vylepšují; Dům vylepšuje karty
 function botShop(st) {
+  if (st.botBuild !== false) return botShopBuild(st);
   rollShop(st);
   let guard = 0;
   while (guard++ < 10) {
@@ -9519,7 +9545,30 @@ function botShop(st) {
     if (!done) break;
   }
 }
+function botShopBuild(st) {
+  rollShop(st);
+  const free = (id, h) => { const slot = D.EQUIP[id].slot, eq = st.heroes[h].equip; return slot === 'ruka' ? (!eq.ruka1 || !eq.ruka2) : slot === 'obourucni' ? (!eq.ruka1 && !eq.ruka2) : !eq[slot]; };
+  let guard = 0; const got = {};
+  while (guard++ < 10) {
+    let best = null, bv = 0;
+    for (const id of (st.shop || []).filter(id => price(id) <= st.esence))
+      for (const h of Object.keys(st.heroes)) { if (forbid(id, h) || !free(id, h)) continue; const v = gearScore(id, h) * 10 + price(id) - (got[h] || 0) * 60; /* rozložit nákupy mezi lovce */ if (v > bv) { bv = v; best = { id, h }; } }
+    if (!best) break;
+    buy(st, best.id, best.h); got[best.h] = (got[best.h] || 0) + 1;
+  }
+}
 function botUpgrade(st, side) {
+  if (side === 'heroes' && st.botBuild !== false) { for (const id of Object.keys(st.heroes)) {
+    const hs = st.heroes[id], order = (BUILD[id] && BUILD[id].abil) || D.ABIL[id].map(a => a.key); let g = 0;
+    while (g++ < 6) {
+      const opts = D.ABIL[id].map(ab => ({ key: ab.key, cur: hs.abil[ab.key] || '' })).filter(o => nextVariants(o.cur).length && upCost(o.cur) <= hs.xp);
+      if (!opts.length) break;
+      // hlavní strom nejdřív; když na něj nestačí XP, šetří (pokud ho jde ještě prohlubovat)
+      const main = order.map(k => D.ABIL[id].find(a => a.key === k)).filter(Boolean).map(ab => ({ key: ab.key, cur: hs.abil[ab.key] || '' })).find(o => nextVariants(o.cur).length);
+      const o = main && opts.find(x => x.key === main.key) || (!main || upCost(main.cur) > hs.xp + 2 ? opts.sort((a, b) => order.indexOf(a.key) - order.indexOf(b.key))[0] : null);
+      if (!o) break;
+      const vs = nextVariants(o.cur); upgradeHero(st, id, o.key, vs[Math.floor(rnd() * vs.length)]);
+    } } return; }
   if (side === 'heroes') for (const id of Object.keys(st.heroes)) {
     const hs = st.heroes[id]; let g = 0;
     while (g++ < 6) {
@@ -17937,8 +17986,9 @@ function initFullscreen() {
 }
 // tlačítka zvuku: v liště hry i v hlavním menu (v61) ukazují stejný stav
 // v190: verze a change log v hlavním menu
-const GAME_VER = 'v194';
+const GAME_VER = 'v195';
 const CHANGELOG = [
+  ['v195 · 24. 11.', ['Bludiště: boti plánují cestu s ohledem na keře – zarostlý keř berou jako cestu, která se příští kolo otevře, otevřený živý průchod jako riziko; nezůstávají stát na poli, kde může vyrůst keř.', 'Divoký hon: dva lovci strkají hajného do pasti, třetí se předem postaví k další pasti, ke které hajný míří.', 'Krvavý ples: dokud se hrabě neodhalí, boti víc čistí sál od jeho hostů.', 'Kampaň: boti lovců nakupují podle buildu (Ashford zbroj a štít, Wren zbraně na dálku a pohyb, Ilona sůl, kyvadlo a podpora), nákupy rozkládají mezi všechny a vylepšují hlavně svůj hlavní strom schopností.']],
   ['v194 · 23. 11.', ['Boti lovců: pořadí tahů podle ohrožení (kdo je sám u monster, které ještě nehrály, jde první; Ilona první, když kontrolou zachrání situaci), padlí čekají na pomoc.', 'Boti lovců: role – Ashford vepředu kryje ostatní, Wren drží odstup, Ilona vzadu, ale na dosah; sůl a poutání míří na skupiny, které ještě nehrály; oheň nehází na letce ani na spojence.', 'Boti lovců: útočí přednostně na nehrané skupiny a monstra v cestě; zvedání kamaráda až po jistém zabití u něj; lootují jen po cestě; Panika: 1 nevadí, se 3 kartami přednost, se 4 hned.', 'Obelisky: boti rychle odkrývají místnosti, než najdou všechny 4 (už „netuší“, kde jsou).', 'Dům: Zlé oko a Závoj hraje po prvním lovci (výjimečně po druhém), nikdy na konci kola; nejdřív aktivuje skupiny, kterým hrozí smrt; nestoupá k lovci, na kterého nemůže zaútočit (pokud neblokuje); víc se soustředí na osamocené a zraněné lovce; hlídá truhlu s klíčem i tu s falešným (blaf).']],
   ['v193 · 23. 11.', ['Divoký hon: oznámení „Měsíc zakryly mraky“ / „Měsíc vyšel zpoza mraků“ před proměnou.', 'Havrani a krkavci: útok −2, nálet +1 za každé pole vzdušnou čarou (kolem zdí) od začátku aktivace, bez limitu.', 'Přišpendlení a omráčení platí i na hajného; vlkodlak se ohání drápy, ne výstřelem.', 'Animace karty Odhal.', 'Štítek Tmy v nepravidelných místnostech u správného pole.']],
   ['v192 · 23. 11.', ['Lovec, který vstane na poli s monstrem, se postaví na volné sousední pole (vybírá zvedající, nebo on sám).', 'Divoký hon: vlkodlak pohyb 2, zranění 2, útok +1.']],
