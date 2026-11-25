@@ -9403,7 +9403,7 @@ function rollShop(st, force) {
   // v172: pestřejší nabídka – každý předmět z jiného slotu (pokud to jde) a dříve nabízené mají menší šanci
   const own = owned(st), pool = D.SHOP_POOL.filter(k => !own.has(k)), seen = st.seen || (st.seen = {});
   // v198: čím dál v kampani, tím častěji vzácnější předměty (běžné se nabízejí pořád, jen méně)
-  const prog = Math.min(1, (st.played || []).length / (LEN - 1)), tierW = t => t <= 1 ? 3 - 2 * prog : t === 2 ? 1.5 + 0.5 * prog : 0.5 + 2 * prog;
+  const prog = Math.min(1, (st.played || []).length / (LEN - 1)), tierW = t => t <= 1 ? 3 - 2 * prog : t === 2 ? 1.5 + 0.5 * prog : 0.8 + 3.2 * prog;
   const w = k => tierW(D.EQUIP[k].tier || 1) / (1 + 1.5 * (seen[k] || 0)), slotOf = k => D.EQUIP[k].slot;
   const pick = [], p = pool.slice();
   const draw = list => { const tot = list.reduce((a, k) => a + w(k), 0); let r = rnd() * tot; for (const k of list) { r -= w(k); if (r <= 0) return k; } return list[list.length - 1]; };
@@ -18031,8 +18031,9 @@ function initFullscreen() {
 }
 // tlačítka zvuku: v liště hry i v hlavním menu (v61) ukazují stejný stav
 // v190: verze a change log v hlavním menu
-const GAME_VER = 'v198';
+const GAME_VER = 'v199';
 const CHANGELOG = [
+  ['v199 · 25. 11.', ['Obchod: předměty 3. úrovně se nabízejí častěji – na začátku kampaně zhruba v 10 % případů, uprostřed ve 24 %, ke konci ve 36 %.']],
   ['v198 · 24. 11.', ['Obchod v táboře: čím dál v kampani, tím častěji nabízí vzácnější předměty. Na začátku je předmět 3. úrovně v nabídce zhruba v 6 % případů, ke konci kampaně ve 27 %; běžné předměty se nabízejí pořád, jen méně často.']],
   ['v197 · 24. 11.', ['Kompenzace v kampani roste s počtem proher v řadě: 2. prohra = úroveň 1 (lovci +2 esence a +1 xp každý, Dům +1 xp a +1 temná esence), 3. prohra = úroveň 2 (dvojnásobek), 4. a další = úroveň 3 (trojnásobek). Výhra počítadlo vynuluje.', 'Úroveň 3 navíc dá bonus na příští scénář: lovci Odhodlání (v prvním kole 6 karet v ruce), Dům Zuřivost (karta a Hrozba navíc na začátku).']],
   ['v196 · 24. 11.', ['Kampaň: každá koupená úroveň schopnosti dává lovci +1 max. zdraví (vidíš ho u lovce v táboře).', 'Posílené předměty: žádný kupovaný předmět už není slabší než startovní výbava a s úrovní sílí rychleji. Pět karet má navíc efekt „tvůj další útok v tomto kole je silnější“: Hod dýkou, Hák halapartny, Zuřivý řev, Zamířit a Svaté světlo.', 'Dům začíná scénář se 2 kartami místo 3 (za sraženého lovce si kartu dál lízne).', 'Elita navíc už nepřidává figurku: v každé skupině povýší jednoho přisluhovače na elitu.', 'Boti v táboře: lovci nahrazují slabší výbavu lepší a starou prodají; Dům nečeká na vylepšení, které by do konce kampaně nenašetřil.']],
