@@ -398,7 +398,7 @@ body.busy .bsigc { animation-play-state: paused; }
 @media (prefers-reduced-motion: reduce) { .bsigc { animation: none !important; } }
 .boccE { opacity: 0; transition: transform .26s ease-in-out, opacity .3s; }
 .l-xray { pointer-events: none; } .l-xray * { pointer-events: none !important; }
-.xray { opacity: 0; transition: opacity .3s; } .xray.on { opacity: .66; }
+.xray { opacity: 0; transition: opacity .3s; } .xray.on { opacity: .66; } .xray.xr-spot.on { opacity: .3; }
 .boccE.on { opacity: 1; }
 .l-depth .bocc-on, .l-depth .bocc-on * { pointer-events: none !important; }
 @media (prefers-reduced-motion: reduce) { .blglint { display: none; } .blhalo, .bsigp, .benvm .mv-b { animation: none !important; } }
@@ -636,7 +636,7 @@ svg.bglow .hov.onfig { fill-opacity: 0; stroke-opacity: .35; filter: none; }
 .winban.h b { color: #9fc8ff; text-shadow: 0 0 22px #4a8aff88; } .winban.o b { color: #ff8a70; text-shadow: 0 0 22px #ff3a2a88; }
 .winban small { display: block; margin-top: 8px; font-size: 17px; color: var(--paper); opacity: .85; }
 @keyframes winIn { from { opacity: 0; transform: translateY(-50%) scale(1.08); } to { opacity: 1; transform: translateY(-50%) scale(1); } }
-.furn .ang-pd { display: none; } .furn.awoken .ang-st { display: none; } .furn.awoken .ang-pd { display: inline; }
+.furn .ang-pd { display: none; } .furn.awoken .ang-st { display: none; } .furn.awoken .ang-pd { display: inline; } .furn.gone .ang-pd { display: none; } .furn.hollow .ang-st { opacity: .55; filter: grayscale(1); }
 .furn .ang-evil { opacity: 0; filter: blur(5px); } .furn.corrupt .ang-evil { opacity: .45; animation: angEvil 2.4s ease-in-out infinite alternate; }
 @keyframes angEvil { from { opacity: .25; } to { opacity: .55; } }
 .obbeam { pointer-events: none; mix-blend-mode: screen; }
@@ -4004,8 +4004,8 @@ const SCENARIOS = [
     lootPool: ['svice', 'pochoden', 'sirky', 'lucerna', 'svice', 'obvazy'],
     tokens: ['loot', 'loot', 'loot', 'loot', 'trap'], setup: ['tokens', 'angels', 'locks', 'buy', 'place'], locks: 1,
     short: 'Probuďte tři strážné anděly z pěti soch.',
-    blurb: 'Pod zbořeným klášterem leží krypta zapomenutého řádu, který se modlil ke strážným andělům. V každé síni stojí jejich socha mezi vyhaslými svícemi a jen prasklinami v klenbě sem padá měsíc. Dům dva anděly nahlodal a celé podzemí tone ve tmě.',
-    goalShort: 'Probudit 3 strážné anděly (vedle sochy, 1 pohyb). Dva z pěti jsou zkažení: ožijí jako padlý anděl na straně Domu. Celé podzemí je ve Tmě, dobrý anděl svou místnost natrvalo rozsvítí a bojuje za lovce.',
+    blurb: 'Pod zbořeným klášterem leží krypta zapomenutého řádu, který se modlil ke strážným andělům. V každé síni stojí jejich socha mezi vyhaslými svícemi a jen prasklinami v klenbě sem padá měsíc. Dům jednoho anděla nahlodal, druhou sochu vykradl a celé podzemí tone ve tmě.',
+    goalShort: 'Probudit 3 strážné anděly prohledáním soch. Jedna z pěti je zkažená: ožije jako padlý anděl na straně Domu a síň zhasne. Jedna je prázdná a jen se rozpadne. Celé podzemí je ve Tmě; dobrý anděl svou síň rozsvítí (Dům ji může znovu zhasnout) a bojuje za lovce.',
     mapNote: 'krypta 6 síní · sochy v hlubinách síní · všude Tma' },
   { id: 'oltar', n: 5, map: 'klaster', name: 'Krvavý oltář', goal: 'altar', cats: ['kobka', 'sal'], need: 3, pourThreat: 1, budgetBonus: -1,
     tokens: ['loot', 'trap', 'loot', 'trap', 'loot'], setup: ['tokens', 'locks', 'buy', 'place', 'curse'], locks: 2,
@@ -4203,6 +4203,8 @@ function useMap(id) {
 }
 // spojení přes zdi (bez ohledu na stav dveří)
 // v192: vzdušná vzdálenost (let havrana) – nejkratší cesta po hrací ploše, která nevede skrz zdi
+// v200: bonus za pohyb (Wren) = vzdušná vzdálenost od pole, kde lovec začal tah (jako nálet havranů)
+const runDist = h => h.turnFrom ? flyDist(h.turnFrom, h.pos) : (h.stepsTurn || 0);
 function flyDist(a, b) { if (eq(a, b)) return 0; const seen = new Set([K(a)]); let fr = [a], d = 0;
   while (fr.length && d < 40) { d++; const nx = []; for (const c of fr) for (const n of neighbors(c)) { const k = K(n); if (seen.has(k) || !isPlayable(n) || !linkOK(c, n)) continue; if (eq(n, b)) return d; seen.add(k); nx.push(n); } fr = nx; }
   return dist(a, b); }
@@ -4267,7 +4269,7 @@ function describe(s) {
   const cap = s.uncapped ? '' : ' (max 3)';
   if (s.perArmor && s.t !== 'react') t += '; ' + per(s.perArmor, 'každý tvůj armor' + cap);
   if (s.stillBonus) t += '; když ses v tomto tahu nepohnul: ' + [s.stillBonus.mod ? '+' + s.stillBonus.mod + ' k útoku' : '', s.stillBonus.dmg ? '+' + s.stillBonus.dmg + ' dmg' : ''].filter(Boolean).join(' a ');
-  if (s.perStep) t += '; ' + per(s.perStep, 'každé pole ušlé v tomto tahu' + cap);
+  if (s.perStep) t += '; ' + per(s.perStep, 'každé pole, o které ses v tomto tahu vzdálil od místa, kde jsi tah začal' + cap);
   if (s.perDist) t += '; ' + per(s.perDist, 'každá 2 pole vzdálenosti cíle' + cap);
   if (s.bleed) t += ', krvácení ' + (s.bleed === true ? 1 : s.bleed) + (s.bleedFirst ? ' (jen první zásah)' : '');
   if (s.vsLone) t += '; proti monstru, které nesousedí s jiným monstrem: ' + [s.vsLone.mod ? '+' + s.vsLone.mod + ' k útoku' : '', s.vsLone.dmg ? '+' + s.vsLone.dmg + ' dmg' : ''].filter(Boolean).join(' a ');
@@ -4319,8 +4321,8 @@ function describe0(s) {
   if (s.t === 'react' && s.kind === 'guard' && s.perArmor) return 'Reakce: −' + s.dmg + ' zranění a −1 za každý tvůj armor' + (s.fear ? ', −' + s.fear + ' Strach' : '') + ' tobě' + (s.ally ? ' nebo lovci do ' + s.ally : '') + (s.counter ? '; pak protiútok ' + s.counter.dmg + ' dmg +1 za armor' : '');
   if (s.t === 'heal' && (s.x2 || s.bless)) return (s.all ? (s.range >= 90 ? 'Všichni lovci kdekoli' : 'Lovci do ' + s.range + ' (i ty)') : 'Lovec do ' + s.range + ' (i ty)') + ' vyléčí ' + s.n + (s.x2 ? ' (dvojnásob, má-li pozitivní stav: armor, přípravu, únik…)' : '') + (s.fear ? ' a −' + s.fear + ' Strach' : '') + (s.bless ? '; dostane do konce kola +1 k útokům a +1 armor' : '') + (s.guide ? '; pak má příští útok s výhodou' + (s.armor ? ' a +' + s.armor + ' armor do konce kola' : '') : '') + '; ležícího zvedne';
   if (s.t === 'buff' && (s.stillAdv || s.lifesteal || s.selfDmg || s.through)) return 'Do konce kola +' + s.mod + ' k útokům a +' + s.dmg + ' dmg' + (s.range ? '; dosah útoků na dálku +' + s.range : '') + (s.through ? '; střílíš skrz figurky' : '') + (s.stillAdv ? '; dokud se v tomto kole nepohneš, útoky mají výhodu' : '') + (s.crit9 ? '; kritik už na 9' : '') + (s.lifesteal ? '; zásahy tě vyléčí o zranění, které projde' : '');
-  if (s.t === 'momentum' && s.per) return 'Do konce tahu: +' + (s.amt || 1) + ' k útokům' + (s.dmgToo ? ' a +1 dmg' : '') + ' za ' + (s.per === 2 ? 'každá 2 ušlá pole' : 'každé ušlé pole') + ' (bez stropu, počítá se i pohyb před zahráním)';
-  if (s.t === 'momentum' && (s.dmgToo || s.evade)) return 'Do konce tahu: +1 k útokům za každé ušlé pole (max +' + s.max + ')' + (s.dmgToo ? ' a +1 dmg za každá 2 pole' : '') + (s.evade ? '; únik ' + s.evade : '');
+  if (s.t === 'momentum' && s.per) return 'Do konce tahu: +' + (s.amt || 1) + ' k útokům' + (s.dmgToo ? ' a +1 dmg' : '') + ' za ' + (s.per === 2 ? 'každá 2 pole od místa, kde jsi začal tah' : 'každé pole od místa, kde jsi začal tah') + ' (bez stropu, počítá se i pohyb před zahráním)';
+  if (s.t === 'momentum' && (s.dmgToo || s.evade)) return 'Do konce tahu: +1 k útokům za každé pole od místa, kde jsi začal tah (max +' + s.max + ')' + (s.dmgToo ? ' a +1 dmg za každá 2 pole' : '') + (s.evade ? '; únik ' + s.evade : '');
   if (s.t === 'haste' && s.trample) return 'Do konce kola +' + s.n + ' ke každému pohybu a pohybuješ se skrz nepřátele; každé monstrum, kterým projdeš, utrží ' + s.trample.dmg + ' a je Označené';
   if (s.t === 'pry' && s.adv) return 'Vypáčení zamčených dveří s výhodou' + (s.mod ? ', ' + sgn(s.mod) : '');
   switch (s.t) {
@@ -4338,7 +4340,7 @@ function describe0(s) {
       return t;
     }
     case 'move': return s.n + ' pohyb' + (s.phase ? ' skrz nepřátele' : '') + (s.quiet ? ', nespouštíš pasti a nebudíš monstra' : '') + (s.noDarkFear ? ', Tma ti tento tah nedá Strach' : '');
-    case 'momentum': return 'Do konce tahu: +1 k útokům za každé pole, které jsi v tomto tahu ušel (max +' + s.max + ', počítá se i pohyb před zahráním)';
+    case 'momentum': return 'Do konce tahu: +1 k útokům za každé pole, o které ses v tomto tahu vzdálil od místa, kde jsi tah začal (max +' + s.max + ')';
     case 'charge': return 'Náraz: až ' + s.n + ' polí v přímce k prvnímu monstru, útok ' + s.dmg + ' dmg ' + sgn(s.mod) + ', zásah ho odstrčí o ' + s.push + ' (narazí-li, je omráčen)';
     case 'swapatk': return 'Útok na sousední monstrum, ' + s.dmg + ' dmg ' + sgn(s.mod) + '; pak si s ním prohoď místo';
     case 'crossfire': return 'Útok dosah ' + s.range + ', ' + s.dmg + ' dmg ' + sgn(s.mod) + '. Křížová palba: stojíš-li mezi dvěma monstry v jedné přímce, zaútočíš na obě s +' + s.cross + (s.stun ? ' a zásah omráčí' : '');
@@ -4595,8 +4597,11 @@ function visibleToHeroes(G, m) {
   if (G.seeAllRound === G.round) return true;
   return false;
 }
-function isAwake(G, m) { if (mdef(m).object || m.auto || m.down || m.restRound === G.round) return false; if ((G.scen.wakeAll || MAP.wakeAll) && G.round >= (G.scen.wakeAll || MAP.wakeAll)) return true; if (MAP.revealAll) return m.awake || G.round >= (G.scen.wakeRound || MAP.wakeRound || 1); if (MAP.wakeDist && !m.awake) return hexRevealed(G, m.pos) && m.quiet !== G.round && (roomOf(m.pos) && G.heroes.some(h => !h.escaped && (roomOf(h.pos) === roomOf(m.pos) || dist(h.pos, m.pos) <= MAP.wakeDist))); return m.awake || (hexRevealed(G, m.pos) && m.quiet !== G.round); }
-function standable(G, h) { return !!roomOf(h) && !isBlock(h) && !heroAt(G, h) && !monsterAt(G, h) && !saltAt(G, h); }
+function isAwake(G, m) { if (mdef(m).object || m.auto || m.down || m.restRound === G.round) return false; if ((G.scen.wakeAll || MAP.wakeAll) && G.round >= (G.scen.wakeAll || MAP.wakeAll)) return true; if (MAP.revealAll) return m.awake || G.round >= (G.scen.wakeRound || MAP.wakeRound || 1); // v200: skupina se probudí, jakmile lovci kohokoli z ní uvidí (dveře patří oběma místnostem); kdo jednou procitl, už neusne
+  if (m.awake) return true; if (m.quiet === G.round) return false;
+  const seen = hexRevealed(G, m.pos) || G.monsters.some(o => o !== m && o.type === m.type && !o.dormant && o.quiet !== G.round && hexRevealed(G, o.pos));
+  if (seen) m.awake = true; return seen; }
+function standable(G, h) { return !!roomOf(h) && !isBlock(h) && !heroAt(G, h) && !monsterAt(G, h) && !saltAt(G, h) && !summonAt(G, h); } // v200: ani na spojenci (anděl, přivolaný ohník)
 const obeliskIn = (G, kind, room) => !!room && G.monsters.some(m => mdef(m).obelisk === kind && roomOf(m.pos) === room);
 function isDark(G, hex) {
   if (frontBurning(G, hex)) return false; // oheň ruší Tmu
@@ -4836,7 +4841,8 @@ function revealRoom(G, room, quiet) {
   const fresh = [];
   for (const r of zoneOf(room)) if (!G.revealed.has(r)) { G.revealed.add(r); fresh.push(r); }
   if (fresh.length) {
-    const woke = quiet || MAP.wakeDist ? [] : G.monsters.filter(m => fresh.includes(roomOf(m.pos)) && !mdef(m).object);
+    const seenT = new Set(quiet ? [] : G.monsters.filter(m => fresh.includes(roomOf(m.pos)) && !mdef(m).object && !m.auto).map(m => m.type)); // v200: celá skupina, jakmile ji lovci uvidí
+    const woke = G.monsters.filter(m => seenT.has(m.type) && !m.awake && !m.dormant);
     woke.forEach(m => m.awake = true);
     if (quiet) G.monsters.filter(m => fresh.includes(roomOf(m.pos))).forEach(m => m.quiet = G.round);
     log(G, 'Odkryto: ' + fresh.map(r => ROOMS[r]).join(', ') + (woke.length ? '. Probouzí se: ' + [...new Set(woke.map(m => MDEF[m.type].name))].join(', ') + '.' : '.'));
@@ -4919,7 +4925,6 @@ function moveOptions(G, h, points, phase) {
     if (o.downed && o.keys.length) inter.push({ kind: 'take', cost: 1, target: o, hex: o.pos });
   }
   if (isBossGoal(G)) bossInter(G, h, points).forEach(x => inter.push(x));
-  if (G.angels && points >= ANGEL_COST) adjAngels(G, h).forEach(a => inter.push({ kind: 'angel', cost: ANGEL_COST, statue: a, hex: a.hex }));
   return { reach, inter };
 }
 // vrací počet kroků a důvod zastavení: door / trap / bump / exit / null
@@ -4982,7 +4987,6 @@ async function executeWalk(G, h, path, ui) {
   return { steps, spent, why: null };
 }
 const sfxHint = (G, name) => { if (G.fx) G.fx.push({ t: 'sfx', name }); };
-const tokenName = t => t === 'fake' ? TOKENS.key : (TOKENS[t] || 'nic');
 // lovcova past: monstrum, které vstoupí, je přišpendlené / utrží zranění; vrací true, když se pohyb zastaví
 async function enterHeroTrap(G, m, hex, ui) {
   const t = G.htraps.find(x => eq(x.hex, hex)); if (!t || trapImmune(m)) return false;
@@ -5018,6 +5022,7 @@ async function igniteHit(G, hex, ui, hit) {
   if (hh && !(hit && hit.has(hh))) { if (hit) hit.add(hh); await enterFire(G, hh, hex, ui, false, 'stojí v plamenech', 'self'); }
 }
 async function doSearch(G, h, s, C, ui) {
+  if (s.angel) { const a = G.angels.statues.find(x => x.id === s.angel); if (a) await awakenAngel(G, h, a, C, ui); return; }
   const t = s.resolved ? null : s.token;
   s.resolved = true;
   if (G.scen.goal === 'cleanse') {
@@ -5168,13 +5173,13 @@ function attackInfo(G, h, m, spec, extraMod) {
   let xdmg = 0;
   const add = (k, n, lab) => { if (!n) return; if (k === 'mod' || k === 'both') mods.push({ label: lab, v: n }); if (k === 'dmg' || k === 'both') xdmg += n; };
   const cap = spec.uncapped ? 99 : 3;
-  if (h.momentum && h.momentum.round === G.round && h.stepsTurn) { const mo = h.momentum, per = mo.per || 1, n = Math.min(mo.max || 99, Math.floor(h.stepsTurn / per)); if (n) mods.push({ label: 'rozběh', v: n * (mo.amt || 1) }); if (mo.dmgToo) xdmg += mo.per ? n : Math.floor(Math.min(6, h.stepsTurn) / 2); }
+  if (h.momentum && h.momentum.round === G.round && runDist(h)) { const mo = h.momentum, per = mo.per || 1, n = Math.min(mo.max || 99, Math.floor(runDist(h) / per)); if (n) mods.push({ label: 'rozběh', v: n * (mo.amt || 1) }); if (mo.dmgToo) xdmg += mo.per ? n : Math.floor(Math.min(6, h.stepsTurn) / 2); }
   if (spec.perArmor) add(spec.perArmor, Math.min(cap, heroArmor(G, h)), 'armor');
   if (h.combo && h.combo.round === G.round) { if (h.combo.mod) mods.push({ label: 'combo', v: h.combo.mod }); xdmg += h.combo.dmg || 0; }
   if (spec.stillBonus && still) { if (spec.stillBonus.mod) mods.push({ label: 'z místa', v: spec.stillBonus.mod }); xdmg += spec.stillBonus.dmg || 0; }
   if (h.anchor && h.anchor.round === G.round && still && melee) { if (h.anchor.mod) mods.push({ label: 'kotva', v: h.anchor.mod }); xdmg += h.anchor.dmg || 0; }
   if (still && melee && hasPassive(G, h, 'prezka')) xdmg += 1;
-  if (spec.perStep) add(spec.perStep, Math.min(cap, h.stepsTurn || 0), 'za běhu');
+  if (spec.perStep) add(spec.perStep, Math.min(cap, runDist(h)), 'za běhu');
   if (spec.perDist) add(spec.perDist, spec.uncapped ? Math.floor(d / 2) : Math.min(cap, Math.floor((d - 1) / 2)), 'vzdálenost');
   if (d >= 4 && hasPassive(G, h, 'nabijecka')) xdmg += 1;
   // Voják (Ashford): +1 k útoku, když s ním sousedí ještě jiné monstrum než cíl
@@ -5446,7 +5451,7 @@ const rootAreaHexes = (G, h, range) => ROOM_HEXES.filter(x => hexRevealed(G, x) 
 const pulseMonsters = (G, h, range) => G.monsters.filter(m => !mdef(m).object && visibleToHeroes(G, m) && dist(m.pos, h.pos) <= range);
 const hookTargets = (G, h, range) => G.monsters.filter(m => visibleToHeroes(G, m) && dist(m.pos, h.pos) <= range && dist(m.pos, h.pos) > 1 && los(G, h.pos, m.pos) && neighbors(m.pos).some(x => standable(G, x) && linkOK(x, m.pos)));
 const adjMonsters = (G, h) => G.monsters.filter(m => visibleToHeroes(G, m) && canStrike(G, h.pos, m.pos, 1));
-const spotsWithin = (G, h, range) => h.eyeRound === G.round ? [] : range > 1 ? G.spots.filter(s => !s.searched && dist(h.pos, s.hex) <= range && hexRevealed(G, s.hex)) : adjSpots(G, h);
+const spotsWithin = (G, h, range) => h.eyeRound === G.round ? [] : (range > 1 ? G.spots.filter(s => !s.searched && dist(h.pos, s.hex) <= range && hexRevealed(G, s.hex)) : adjSpots(G, h)).concat(angelSpots(G, h, range || 1));
 const monstersInSight = (G, h, range) => G.monsters.filter(m => !mdef(m).object && visibleToHeroes(G, m) && targetableMonster(G, m) && dist(m.pos, h.pos) <= range && los(G, h.pos, m.pos, true));
 const htrapHexes = (G, h, range) => ROOM_HEXES.filter(x => hexRevealed(G, x) && dist(x, h.pos) <= range && !isBlock(x) && !monsterAt(G, x) && !heroAt(G, x) && !G.htraps.some(t => eq(t.hex, x)));
 function blinkHexes(G, h, range) {
@@ -6165,7 +6170,7 @@ async function summonsAct(G, h, ui) {
 // ---------- tah lovce ----------
 async function heroTurn(G, h, C, ui) {
   h.plays = 0; h.shotgunLocked = false; G.active = { side: 'heroes', hero: h.id };
-  h.movedTurn = false; h.stepsTurn = 0; h.momentum = null; h.clockUsed = false; h.atkCards = 0; h.advTurn = 0; h.firstMoveDone = false; h.trampled = [];
+  h.movedTurn = false; h.stepsTurn = 0; h.turnFrom = h.pos.slice(); h.momentum = null; h.clockUsed = false; h.atkCards = 0; h.advTurn = 0; h.firstMoveDone = false; h.trampled = [];
   if (!h.downed && !h.escaped && hasPassive(G, h, 'medaile')) addArmor(G, h, 1); h.invis = false; if (h.evade && h.evade.long && h.evade.round < G.round) h.evade = null; else if (h.evade) h.evade.long = false;
   const iced = !h.downed && obeliskIn(G, 'ice', roomOf(h.pos));
   if (iced) log(G, 'Ledový obelisk: ' + h.name + ' má tento tah o akci méně.');
@@ -6277,7 +6282,7 @@ function monsterReach(G, m, points, passHeroes) {
     return out;
   });
   // létající i přízraky smí projít, ale skončit musí na volném průchozím poli (ne ve zdi ani v nábytku)
-  for (const k of [...reach.keys()]) { const hx = unK(k), dr = doorAt(G, hx); if (monsterAt(G, hx) || heroAt(G, hx) || isBlock(hx) || !isPlayable(hx) || (dr && (dr.exit || isImpass(dr)))) reach.delete(k); }
+  for (const k of [...reach.keys()]) { const hx = unK(k), dr = doorAt(G, hx); if (monsterAt(G, hx) || heroAt(G, hx) || summonAt(G, hx) || isBlock(hx) || !isPlayable(hx) || (dr && (dr.exit || isImpass(dr)))) reach.delete(k); }
   return reach;
 }
 function monsterTargets(G, m) {
@@ -6308,7 +6313,6 @@ function monsterAttackInfo(G, m, h) {
   if (d.dive && m.diveFrom) { const v = flyDist(m.diveFrom, m.pos); if (v > 0) mods.push({ label: 'nálet', v }); } // v192: vzdušná vzdálenost od začátku aktivace, bez limitu
   if (d.terror && h.fear >= 2) mods.push({ label: 'teror', v: d.terror });
   if (d.swarm) { const n = Math.min(3, G.monsters.filter(o => o !== m && o.type === m.type && dist(o.pos, h.pos) === 1).length); if (n) mods.push({ label: 'smečka', v: n }); }
-  const darkHere = isDark(G, m.pos) || isDark(G, h.pos);
   const plus = (G.comb && m.boss && G.comb.holder === h.id) || (d.darkAdv && isDark(G, h.pos)) || (zonesOf(m.pos).some(r => G.darkAtk.has(r)) && isDark(G, m.pos)) || (d.packAdv && G.monsters.some(o => o !== m && o.type === m.type && dist(o.pos, h.pos) === 1));
   const minus = (s.range > 1 && dist(m.pos, h.pos) === 1) || saltAt(G, h.pos) || holyAt(h.pos) || (m.disUntil || -1) >= G.round || !!m.disNext;
   const sum = mods.reduce((a, x) => a + x.v, 0), adv = advOf(plus, minus);
@@ -6580,9 +6584,7 @@ function olBuyCard(G) {
 }
 const aliveOf = (G, t) => G.monsters.filter(m => m.type === t).length;
 function trapCands(G) { return ROOM_HEXES.filter(x => standable(G, x) && !G.traps.has(K(x)) && !SPAWN_DEFS.some(s => eq(s.hex, x))); }
-const ownedMinionTypes = G => Object.keys(G.groups).filter(t => !MDEF[t].lieutenant && !MDEF[t].object);
 const mirrorHexes = G => MIRRORS.filter(x => !(G.brokenMirrors && G.brokenMirrors.includes(K(x))));
-const monstersAtMirrors = G => G.monsters.filter(m => !mdef(m).object && !MDEF[m.type].lieutenant && mirrorHexes(G).some(x => dist(x, m.pos) <= 1));
 const adjRooms = r => [...new Set(DOOR_DEFS.filter(d => d.rooms.includes(r)).flatMap(d => d.rooms))].filter(x => x !== r);
 // dosah Prohození podle varianty (AB = kdekoli)
 const PROH_RANGE = { '': 6, A: 8, AA: 8, AB: 99, B: 6, BA: 6, BB: 10 };
@@ -6636,7 +6638,6 @@ function spawnNear(G, type, near, elite, awake) {
   const m = makeMonster(type, hexes[0], elite, awake);
   G.monsters.push(m); return m;
 }
-const cardValue = c => c.panic ? -1 : (c.pri.t === 'attack' ? c.pri.dmg + (c.pri.mod || 0) : c.pri.t === 'react' ? 3 : 2) + (c.single ? 3 : 0);
 // odhoď n náhodných karet z ruky (ne Paniku – ta by lovcům pomohla)
 function olDiscardRandom(G, h, n) { const out = []; for (let i = 0; i < n; i++) { const cs = h.hand.filter(y => !y.panic); if (!cs.length) break; const x = pickR(cs); h.hand = h.hand.filter(y => y !== x); h.discard.push(x); out.push(x); } return out; }
 // prokletí n náhodných karet v ruce (Ztráta B větev): do konce příštího tahu lovce; zahrání = 1 zranění
@@ -6998,7 +6999,7 @@ function setupStatus(G) {
   st.curse = G.curse || (G.scen.setup && !G.scen.setup.includes('curse')) ? null : 'Vyber místnost pro Tmu.'; // v179: scénář bez kroku Tmy (bludiště) nezačíná ve Tmě
   if (G.scen.goal === 'maze') st.exit = (G.realExits || []).length >= Math.min(MAZE_OPEN, mazeExits(G).length) ? null : 'Vyber dvě branky, které budou otevřené.';
   if (G.scen.goal === 'comb') st.exit = G.comb && G.comb.real != null ? null : 'Vyber, který hrob je pravý.';
-  if (G.angels) st.angels = G.angels.statues.filter(a => a.corrupt).length < ANGEL_CORRUPT ? 'Zkaž ještě ' + (ANGEL_CORRUPT - G.angels.statues.filter(a => a.corrupt).length) + ' sochy.' : null;
+  if (G.angels) { const c = G.angels.statues.filter(a => a.corrupt).length, e = G.angels.statues.filter(a => a.empty).length; st.angels = c < ANGEL_CORRUPT || e < ANGEL_EMPTY ? 'Klikáním na sochy urči jednu zkaženou' + (c < ANGEL_CORRUPT ? '' : ' ✓') + ' a jednu prázdnou' + (e < ANGEL_EMPTY ? '' : ' ✓') + '.' : null; }
   if (G.scen.goal === 'ball') st.exit = G.ball && G.ball.count != null ? null : 'Vyber, který tanečník je Hrabě.';
   if (G.obel) { const n = G.monsters.filter(m => mdef(m).obelisk).length, need = (G.scen.obelisks || []).length; st.obelisks = n < need ? 'Postav obelisky: ' + n + ' z ' + need + '.' : obelPoolLeft(G) > 0 ? 'Rozděl ještě ' + obelPoolLeft(G) + ' zdraví.' : null; }
   return st;
@@ -7022,19 +7023,26 @@ function setupScenario(G) {
   if (G.scen.maxRound) G.maxRound = G.scen.maxRound;
   if (G.scen.goal === 'altar') { G.altar = { n: 0 }; G.levers = {}; }
   if (G.scen.goal === 'maze') { G.realExit = null; G.realExits = []; G.exitFound = null; G.tried = 0; }
-  if (G.scen.goal === 'angels') G.angels = { statues: (MAP.angelStatues || []).map(a => ({ id: a.id, hex: a.hex.slice(), room: a.room, corrupt: false, awake: false })), lit: [], woke: 0, evilRound: 0 };
+  if (G.scen.goal === 'angels') G.angels = { statues: (MAP.angelStatues || []).map(a => ({ id: a.id, hex: a.hex.slice(), room: a.room, corrupt: false, empty: false, awake: false })), lit: [], woke: 0, evilRound: 0 };
   if (G.scen.goal === 'fire') { G.fireFront = (MAP.fire && MAP.fire.start) || 1.5; G.fireStep = G.scen.fireStep || 2; }
   if (G.scen.goal === 'dawn') G.candles = CANDLES.map(c => ({ id: c.id, hex: c.hex.slice(), lit: true, hp: G.scen.candleHp || 1 }));
   bossInit(G);
 }
 
 // ---------- v172: Probuzení andělů (sc. 4) ----------
-const ANGEL_COST = 1, ANGEL_CORRUPT = 2;
+// v200: sochy se probouzejí prohledáním; Dům před hrou určí 1 zkaženou (padlý anděl) a 1 prázdnou (jen se rozpadne), zbylé 3 jsou dobré
+const ANGEL_COST = 1, ANGEL_CORRUPT = 1, ANGEL_EMPTY = 1;
 const adjAngels = (G, h) => G.angels.statues.filter(a => !a.awake && dist(h.pos, a.hex) === 1 && zonesOf(h.pos).includes(a.room));
+// sochy jako místa k prohledání (karty s prohledáním); dosah 1 = soused ve stejné síni
+const angelSpots = (G, h, range) => !G.angels ? [] : G.angels.statues.filter(a => !a.awake && (range > 1 ? dist(h.pos, a.hex) <= range && hexRevealed(G, a.hex) : dist(h.pos, a.hex) === 1 && (zonesOf(h.pos).includes(a.room) || linkOK(h.pos, a.hex))))
+  .map(a => ({ hex: a.hex, name: 'Socha anděla', angel: a.id }));
+// klik Domu při přípravě: obyčejná → zkažená → prázdná → obyčejná (stav, který je už vyčerpaný, se přeskočí)
 function setAngelCorrupt(G, id) {
   const a = G.angels && G.angels.statues.find(x => x.id === id); if (!a) return 'Tohle není socha.';
-  if (!a.corrupt && G.angels.statues.filter(x => x.corrupt).length >= ANGEL_CORRUPT) return 'Zkažené můžou být jen dvě sochy.';
-  a.corrupt = !a.corrupt; return null;
+  const nC = G.angels.statues.filter(x => x.corrupt && x !== a).length, nE = G.angels.statues.filter(x => x.empty && x !== a).length;
+  const cur = a.corrupt ? 1 : a.empty ? 2 : 0;
+  for (let i = 1; i <= 3; i++) { const nx = (cur + i) % 3; if (nx === 1 && nC >= ANGEL_CORRUPT) continue; if (nx === 2 && nE >= ANGEL_EMPTY) continue; a.corrupt = nx === 1; a.empty = nx === 2; return null; }
+  return null;
 }
 const angelAllies = G => (G.summons || []).filter(z => z.angel);
 function angelFreeNear(G, hex) {
@@ -7045,19 +7053,26 @@ function angelFreeNear(G, hex) {
 async function awakenAngel(G, h, a, C, ui) {
   if (a.awake) return;
   a.awake = true;
-  const pos = angelFreeNear(G, a.hex) || h.pos;
-  if (G.fx) G.fx.push({ t: 'angel', at: a.hex.slice(), corrupt: a.corrupt });
+  if (G.fx) G.fx.push({ t: 'angel', at: a.hex.slice(), corrupt: a.corrupt, empty: a.empty });
+  if (a.empty) { // v200: prázdná socha se jen rozpadne
+    log(G, h.name + ' prohledává sochu anděla, ale je prázdná – rozpadá se v prach.');
+    await ui.anim({ type: 'float', at: a.hex, text: 'Socha se rozpadla', cls: 'info' }); return;
+  }
+  // v200: anděl procitne přímo na místě sochy (socha zmizí); kdyby tam něco stálo, na nejbližším volném poli
+  FURN_GONE.add(K(a.hex));
+  const pos = standable(G, a.hex) && !summonAt(G, a.hex) ? a.hex.slice() : (angelFreeNear(G, a.hex) || h.pos);
   if (!a.corrupt) {
     G.angels.woke++; G.progress = G.angels.woke;
-    if (!G.angels.lit.includes(a.room)) G.angels.lit.push(a.room);
-    lightRooms(G, [a.room]);
+    lightRooms(G, [a.room]); // v200: rozsvítí síň v tu chvíli (Dům ji později může znovu zhasnout)
     G.summons = G.summons || [];
     G.summons.push({ uid: uid(), owner: 'angel', angel: true, kind: 'monster', type: 'andel', name: 'Strážný anděl', pos: pos.slice(), hp: 5, maxHp: 5, armor: 1, dmg: 2, mod: 1, move: 3, until: 999 });
-    log(G, h.name + ' probouzí sochu: strážný anděl procitá a místnost ' + ROOMS[a.room] + ' zalije světlo (' + G.angels.woke + ' z ' + (G.scen.need || 3) + ').');
+    log(G, h.name + ' prohledává sochu: strážný anděl procitá a síň ' + ROOMS[a.room] + ' zalije světlo (' + G.angels.woke + ' z ' + (G.scen.need || 3) + ').');
     await ui.anim({ type: 'float', at: a.hex, text: 'Anděl procitl!', cls: 'good' });
   } else {
     const m = makeMonster('andel_zly', pos, false, true); m.auto = true; m.noRespawn = true; G.monsters.push(m);
-    log(G, h.name + ' probouzí sochu, ale je zkažená: padlý anděl se obrací proti lovcům!');
+    // v200: padlý anděl síň v tu chvíli zhasne (pokud už nebyla temná)
+    G.darkCancelled.delete(a.room); G.angels.lit = G.angels.lit.filter(r => r !== a.room);
+    log(G, h.name + ' prohledává sochu, ale je zkažená: padlý anděl se obrací proti lovcům a síň ' + ROOMS[a.room] + ' pohltí tma!');
     await ui.anim({ type: 'float', at: a.hex, text: 'Zkažená socha!', cls: 'dmg' });
   }
   await ui.anim({ type: 'reveal' });
@@ -7093,7 +7108,8 @@ async function angelStep(G, u, isM, ui, targets) {
   return null;
 }
 function angelRoll(G, from, to, mod, evasion) {
-  const mods = [{ label: 'útok', v: mod }].concat(evasion ? [{ label: 'únik', v: -evasion }] : []).concat(isDark(G, from) || isDark(G, to) ? [{ label: 'tma', v: -2 }] : []);
+  const evil = G.monsters.some(m => m.type === 'andel_zly' && eq(m.pos, from)); // v200: padlého anděla Tma neomezuje
+  const mods = [{ label: 'útok', v: mod }].concat(evasion ? [{ label: 'únik', v: -evasion }] : []).concat(!evil && (isDark(G, from) || isDark(G, to)) ? [{ label: 'tma', v: -2 }] : []);
   return Object.assign(rollCheck(mods, 10, 0), { mods });
 }
 async function hitAngel(G, z, dmgBase, mod, from, who, ui) {
@@ -7358,7 +7374,6 @@ const scenAllowed = (G, t) => !(G.groups[t] && G.groups[t].free) && !MDEF[t].obj
 const isGrabbed = (G, h) => !!(h.grabbedBy && G.monsters.some(m => m.uid === h.grabbedBy));
 const griefed = (G, h) => G.monsters.some(m => mdef(m).auraGrief && dist(m.pos, h.pos) <= mdef(m).auraGrief);
 const slimeAt = (G, hex) => (G.slime || []).some(x => eq(x.hex, hex));
-const gooAt = (G, hex) => (G.goo || []).some(x => eq(x.hex, hex));
 const graveAt = (G, hex) => (G.graves || []).find(x => eq(x.hex, hex));
 const isHeld = (G, h) => !!(h.rooted || (h.rootedNext && h.rootedNext >= G.round) || isGrabbed(G, h));
 function graveNeed(G, g) {
@@ -7608,7 +7623,7 @@ function endRound(G) {
   if (G.creep && G.creep.left > 0) { const dark = [...G.tempDark].filter(r => G.darkExp.has(r)); const cand = [...new Set(dark.flatMap(adjRooms))].filter(r => !G.tempDark.has(r) && G.revealed.has(r)); if (cand.length) { const r = pickR(cand); G.tempDark.add(r); G.darkCancelled.delete(r); G.darkExp.set(r, G.round); G.creep.left--; log(G, 'Tma se plíží do místnosti ' + ROOMS[r] + '.'); } }
   for (const [r, until] of [...G.darkExp]) if (until < G.round) { G.darkExp.delete(r); G.tempDark.delete(r); G.darkSlow.delete(r); G.darkAtk.delete(r); }
   if (typeof onRoundEnd === 'function') onRoundEnd(G);
-  G.heroes.forEach(h => { h.acted = false; h.guardUsed = false; });
+  G.heroes.forEach(h => { h.acted = false; h.guardUsed = false; h.plays = 0; }); // v200: nový počet karet hned na začátku kola (aktivace přetažením karty už nehlásí „zahrál jsi všechny“)
   G.summons = (G.summons || []).filter(z => z.until >= G.round);
   G.activated = new Set();
   log(G, '=== Kolo ' + G.round + ' z ' + G.maxRound + ' ===');
@@ -7668,7 +7683,7 @@ const liveHeroes = G => G.heroes.filter(h => !h.downed && !h.escaped && !h.lost)
 const bossOf = G => G.monsters.find(m => m.boss);
 const npcOf = (G, t) => G.monsters.find(m => m.type === t);
 const isNpc = m => !!(MDEF[m.type] && MDEF[m.type].npc);
-function syncGone(G) { FURN_GONE.clear(); for (const k of ((G && G.hunt && G.hunt.gone) || [])) FURN_GONE.add(k); }
+function syncGone(G) { FURN_GONE.clear(); for (const k of ((G && G.hunt && G.hunt.gone) || [])) FURN_GONE.add(k); if (G && G.angels) for (const a of G.angels.statues) if (a.awake && !a.empty) FURN_GONE.add(K(a.hex)); }
 function givePanic(G, h, why) {
   if (!h || h.downed || h.escaped || h.lost) return;
   h.hand.push(Object.assign({}, PANIC, { uid: uid() }));
@@ -7681,7 +7696,6 @@ function rotHex(c, h, k) {
   for (let i = 0, n = ((k % 6) + 6) % 6; i < n; i++) v = [-v[2], -v[0], -v[1]];
   return fromCube(C0[0] + v[0], C0[1] + v[1], C0[2] + v[2]);
 }
-function mirHex(c, h) { const C0 = toCube(c), H = toCube(h); return fromCube(C0[0] + (H[0] - C0[0]), C0[1] + (H[2] - C0[2]), C0[2] + (H[1] - C0[1])); }
 function makeBoss(G, type, hex, name, hp, defOv, ov) {
   const m = makeMonster(type, hex, true, true);
   m.boss = true; m.noRespawn = true; m.nm = name; m.ov = Object.assign({ hp }, ov || {}); m.hp = hp;
@@ -8231,7 +8245,7 @@ function bossVisible(G, m) {
 
 API = {
   D, CATS, PRICE, SHOP_POOL, ABIL, UPCOST, levelOf, OL_VAR, olName, olText, SCENARIOS, OL_DECK, evadeOf,
-  hasPassive, describeBoost, setAngelCorrupt, adjAngels, angelAllies, ANGEL_CORRUPT, ANGEL_COST, SUMMON_NAMES, summonsAct, summonsOf, negStatus, posStatus, isMarked, setSeed, random, d10, shuffle, pickR, COLS, ROWS, NH, ROOM_DEFS, ROOMS, DOOR_DEFS, EXIT, SPOT_DEFS, FURN_DEFS, SPAWN_DEFS, MIRRORS, HERO_START,
+  hasPassive, describeBoost, setAngelCorrupt, adjAngels, angelSpots, angelAllies, ANGEL_CORRUPT, ANGEL_EMPTY, ANGEL_COST, SUMMON_NAMES, summonsAct, summonsOf, negStatus, posStatus, isMarked, setSeed, random, d10, shuffle, pickR, COLS, ROWS, NH, ROOM_DEFS, ROOMS, DOOR_DEFS, EXIT, SPOT_DEFS, FURN_DEFS, SPAWN_DEFS, MIRRORS, HERO_START,
   TOKENS, TOKEN_ORDER, respawnLabel, respawnBase, tokType, chainNext, EQUIP, SLOTS, buildDeck, respawnCost, heroArmor, isWallHex, WALL_HEXES, WATER, LANTERN, grenadeTargets, RESPAWN_SAFE, THREAT_PER_ROUND, THREAT_LATE_ROUND, THREAT_LATE, threatFor, MONSTER_ROOMS, CURSE_ROOMS, LOCKABLE, SETUP_BANNED, GOLD, MDEF, HEROES, OL_CARDS, PANIC,
   saltable, K, unK, eq, xcOf, roomOf, zonesOf, isPlayable, inHouse, furnAt, isBlock, isRough, dist, neighbors, ALL_HEXES, ROOM_HEXES, linkOK,
   sightEdge, los, canStrike, chanceFor, stats, mname, groupSize, aliveOf, setGrpUp, grpUp, maxElites, drawLoot,
@@ -8247,7 +8261,7 @@ API = {
   useMap, MAPS, isFence, blocksSight, OBELISK_SITES, MAP, OUTDOOR,
   isRealExit, MAZE_OPEN, olSwapDraw, LEVERS, HOLY, holyAt, FOUNTAIN, ALTAR, CANDLES, EXIT_DOORS, adjLevers, adjExits, adjCandles, setRealExit, mazeExits, isImpass, mazeLinked, frontBurning, fireAt, isBars, exitDoorAt, LEVER_COST, canStillEscape, purgeWater, candleGuarded,
   bossGoals, isBossGoal, bossOf, ballDo, ballRoundStart, BALL_DANCES, BALL_PHASES, BALL_PHASE_HP, BALL_MASK_HP, TRAP_KINDS, laneHexes, setBallCount, grpNeed, ballDancers, setHuntTrap, huntArm, huntTrapAt, huntLine, HUNT_TRAPS, HUNT_CLOUDS, HUNT_PUSH, sewWater, sewLevelOf, combSees, combSense, combHolder, setRealGrave, combZoneHas, combZoneR, COMB_ZONE, onParquet, furnGone: h => FURN_GONE.has(K(h)), HUNT_CATCH, SEW_NEED, BALL_BRIDES_LOSE, BALL_BRIDE_EVERY, isNpc, rotHex,
-  _heroTurn: heroTurn, _monsterAttack: monsterAttack, _heroMove: heroMove, _checkWin: checkWin, _activateGroup: activateGroup, _endRound: endRound, _mazeShift: mazeShift, __mazeOpenExit: mazeOpenExit, _huntKeeperDrift: huntKeeperDrift, _huntWolfAct: huntWolfAct, mazeHeroPaths, _awakenAngel: awakenAngel, _angelsAct: angelsAct, _freeRespawn: freeRespawn, _damageHero: damageHero,
+  _doSearch: doSearch, runDist, spotsWithin, revealRoom, _heroTurn: heroTurn, _monsterAttack: monsterAttack, _heroMove: heroMove, _checkWin: checkWin, _activateGroup: activateGroup, _endRound: endRound, _mazeShift: mazeShift, __mazeOpenExit: mazeOpenExit, _huntKeeperDrift: huntKeeperDrift, _huntWolfAct: huntWolfAct, mazeHeroPaths, _awakenAngel: awakenAngel, _angelsAct: angelsAct, _freeRespawn: freeRespawn, _damageHero: damageHero,
 };
 function syncApi() { Object.assign(API, { LEVERS, HOLY, FOUNTAIN, ALTAR, CANDLES, EXIT_DOORS, CRYPTS, MAP, COLS, ROWS, ROOM_DEFS, ROOMS, DOOR_DEFS, EXIT, EXIT_ROOM, SPOT_DEFS, FURN_DEFS, SPAWN_DEFS, MIRRORS, HERO_START, WALL_HEXES, ALL_HEXES, ROOM_HEXES, MONSTER_ROOMS, CURSE_ROOMS, LOCKABLE, SETUP_BANNED, CIRCLES, OBELISK_SITES, OUTDOOR }); }
 syncApi();
@@ -8662,7 +8676,7 @@ const heroBot = {
     const se0 = h.hand.find(c => c.sec.t === 'search' && !C.cannotPlay(G, h, c, 'sec'));
     const clBlock = G.scen.goal === 'cleanse' && G.spots.some(sp => !sp.searched && dist(sp.hex, h.pos) <= 2 && G.monsters.some(m => !MDEF[m.type].object && !m.dormant && dist(m.pos, sp.hex) <= 2 && roomOf(m.pos) === roomOf(sp.hex))) && G.monsters.some(m => C.visibleToHeroes(G, m) && dist(m.pos, h.pos) <= 4);
     // v194: lootování jen „po cestě“ – když vedle nestojí nehrané monstrum (u hledacích scénářů je hledání cíl)
-    const searchGoal = ['escape', 'cleanse'].includes(G.scen.goal) && !G.exitUnlocked;
+    const searchGoal = (['escape', 'cleanse'].includes(G.scen.goal) && !G.exitUnlocked) || (G.angels && C.angelSpots(G, h, 1).length > 0); // v200: sochy se probouzejí prohledáním
     const adjPend = liveMon(G).some(m => pendingGrp(G, m) && C.isAwake(G, m) && dist(m.pos, h.pos) <= 1);
     if (se0 && !clBlock && (searchGoal || !adjPend || OFF.has('srch'))) return { type: 'play', uid: se0.uid, half: 'sec' };
     if (h.keys.length && dist(h.pos, C.EXIT) === 1) { const mvc = h.hand.filter(c => moveValue(c) > 0).sort((a, b) => moveValue(a) - moveValue(b))[0]; if (mvc) return { type: 'play', uid: mvc.uid, half: 'sec' }; }
@@ -8864,7 +8878,7 @@ const heroBot = {
           if (v > bv) { bv = v; best = t; } }
         return bv > 0.05 ? best : (req.optional ? null : best);
       }
-      case 'spot': return c.find(s => s.token === 'key' && s.peeked) || c[0];
+      case 'spot': return c.find(s => s.angel) || c.find(s => s.token === 'key' && s.peeked) || c[0];
       case 'hand': { const v = x => cardAttackValue(G, h, x) + moveValue(x) * 0.15 + (isReaction(x) ? 0.6 : 0) + (x.scenWater ? 20 : 0); return c.slice().sort((a, b) => v(a) - v(b))[0]; }
       case 'discard': return c.slice().sort((a, b) => (isReaction(b) - isReaction(a)) || moveValue(b) - moveValue(a))[0];
       case 'hero': return c.slice().sort((a, b) => (b.downed - a.downed) || ((b.maxHp - b.hp) - (a.maxHp - a.hp)) || (b.fear - a.fear))[0];
@@ -8910,7 +8924,6 @@ const heroBot = {
 };
 
 // ---------- Dům ----------
-const PRESETS = [['sluha', 'krysy', 'zbroj'], ['sluha', 'polt', 'vdova'], ['krysy', 'zbroj', 'vdova'], ['sluha', 'krysy', 'polt'], ['polt', 'krysy', 'vdova'], ['zbroj', 'sluha', 'krysy']];
 // rozdělená příprava Domu: každou část jde vylosovat zvlášť (UI: „náhodně tento krok“)
 function setupAllowed(G, pool) {
   const allowedAll = Object.keys(C.MDEF).filter(t => C.scenAllowed(G, t));
@@ -8924,12 +8937,11 @@ function clearSetupPart(G, part) {
   else if (part === 'place') G.monsters.filter(m => !MDEF[m.type].object && !(G.groups[m.type] && G.groups[m.type].free)).slice().forEach(m => C.removeMonster(G, m.uid));
   else if (part === 'buy') { clearSetupPart(G, 'place'); Object.keys(G.groups).filter(t => !G.groups[t].free).forEach(t => C.toggleGroup(G, t)); }
   else if (part === 'curse') G.curse = null;
-  else if (part === 'angels' && G.angels) G.angels.statues.forEach(a => { a.corrupt = false; });
+  else if (part === 'angels' && G.angels) G.angels.statues.forEach(a => { a.corrupt = false; a.empty = false; });
   else if (part === 'exit') { G.realExit = null; G.realExits = []; if (G.comb) G.comb.real = null; if (G.hunt) G.hunt.traps.forEach(t => { t.pick = false; }); }
 }
 // rozmístění žetonů hledání: pasti blíž startu lovců (vyprázdní jim první akce), nálezy (loot) co nejhlouběji v domě,
 // scénářové žetony (svíce, relikvie, falešný klíč) náhodně uprostřed
-const upVal = (G, t) => { const u = (G.grpUp || {})[t] || {}; return (u.hp || 0) + (u.hpN || 0) + .5 * (u.hpE || 0) + 2 * (u.plus || 0) + 3 * (u.elite || 0); };
 function placeTokensSmart(G, toks, taken) {
   const start = G.heroes[0].pos;
   const free = C.shuffle(G.spots.filter(s => !taken.includes(s.id))).sort((a, b) => C.dist(a.hex, start) - C.dist(b.hex, start));
@@ -8996,9 +9008,10 @@ function botSetupPart(G, part, pool) {
   }
   else if (part === 'angels' && G.angels) {
     // v172: zkaž 2 sochy – spíš ty blíž ke startu lovců (narazí na ně dřív), s trochou náhody
-    G.angels.statues.forEach(a => { a.corrupt = false; });
+    // v200: jedna zkažená (spíš blíž ke startu lovců) a jedna prázdná (náhodně ze zbylých)
+    G.angels.statues.forEach(a => { a.corrupt = false; a.empty = false; });
     const st = G.heroes[0].pos, v = G.angels.statues.map(a => ({ a, v: -dist(a.hex, st) + C.random() * 8 })).sort((x, y) => y.v - x.v);
-    v.slice(0, C.ANGEL_CORRUPT).forEach(x => C.setAngelCorrupt(G, x.a.id));
+    v[0].a.corrupt = true; const rest = v.slice(1); rest[Math.floor(C.random() * rest.length)].a.empty = true;
   }
   else if (part === 'exit' && G.scen.goal === 'maze') {
     // pravá branka: nejdál od středu (cesta), při shodě náhodně
@@ -12932,7 +12945,6 @@ function e8NorthDecor(R, xa, xb, yb) {
   return out.join('');
 }
 // v96b: pixelový oheň – 4 snímky plamene se střídají (CSS), za frontou spáleniště s doutnajícími troskami
-const e8Flame = (pre, sc, dx, dy, ph) => `<g class="e8fl" style="--ph:${(-ph).toFixed(2)}s">` + [0, 1, 2, 3].map(i => `<g class="e8f e8f${i}">${envImg(pre + i, dx, dy, sc)}</g>`).join('') + '</g>';
 function e8FireHex(h, front) {
   const r = hsh(h[0] * 5 + 1, h[1] * 3 + 2), r2 = hsh(h[0] * 11 + 3, h[1] * 7 + 5), ph = r * .56, blk = C.isBlock(h);
   if (front) return bFireSVG(h[0] * 7 + h[1] * 13); // v96c: stejný oheň jako u schopností (strašák, dynamit…)
@@ -13667,8 +13679,9 @@ function betaSprite(ent) { const B = BetaArt, k = B.K; return `<g class="bh"><im
 const isBetaHero = t => !!(t && t.kind === 'h' && t.beta);
 const betaBase = t => (t.sig && t.sig.endsWith('down') ? 'down' : 'idle');
 // nastaví pózu; ms = jak dlouho držet (škáluje se rychlostí animací), bez ms drží do další pózy / bReset
-function bPose(t, pose, ms) {
+function bPose(t, pose, ms, force) {
   if (!isBetaHero(t)) return;
+  if (t.sig === 'bdown' && !force) return; // v200: ležící lovec se kvůli Strachu/Panice během pádu nezvedá
   const img = t.fig.querySelector('.bh-img'); if (!img) return;
   clearTimeout(t.bpT); clearTimeout(t.bwT);
   img.setAttribute('href', betaFrame(t.id.slice(2), pose)); t.bpose = pose; bAttach(t, pose); // v61c: světlo předmětu
@@ -13679,7 +13692,7 @@ function bCls(node, cls, ms) { if (!node) return; node.classList.remove(cls); no
 // pád k zemi a vstávání: přechod mezi stojícím a ležícím spritem
 function betaSigChange(t, old, sig) {
   const bh = () => t.fig.querySelector('.bh');
-  if (old === 'bup' && sig === 'bdown') { bPose(t, 'hurt'); t.bpT = setTimeout(() => { bReset(t); bCls(bh(), 'b-fall', 600); const p = t.pos; if (p) { const [x, y] = px(p); particles(x, y - 4, 8, '#6a5a4a', 12, 4, 1.3, 600); setTimeout(() => bDeathFx(t, 'red', false), dur(300)); } }, dur(240)); }
+  if (old === 'bup' && sig === 'bdown') { bPose(t, 'hurt', 0, true); t.bpT = setTimeout(() => { bReset(t); bCls(bh(), 'b-fall', 600); const p = t.pos; if (p) { const [x, y] = px(p); particles(x, y - 4, 8, '#6a5a4a', 12, 4, 1.3, 600); setTimeout(() => bDeathFx(t, 'red', false), dur(300)); } }, dur(240)); }
   else if (old === 'bdown' && sig === 'bup') { bPose(t, 'loot'); t.bpT = setTimeout(() => { bReset(t); bCls(bh(), 'b-rise', 650); }, dur(320)); }
 }
 // ---------- v61d: beta grafika monster scénáře 1 (BetaMon z betamon.js) ----------
@@ -13706,7 +13719,8 @@ function bmSprite(ent) {
   const cls = 'bm bm-' + ty + (BM_GHOST.has(ty) ? ' bm-ghost' : '') + (BM_HOVER.has(ty) ? ' bm-hover' : '') + (el ? ' bm-e' : '');
   const aura = ty === 'upir' && el ? `<ellipse class="bm-aura" cx="0" cy="${(-H * .48).toFixed(1)}" rx="${(H * .42).toFixed(1)}" ry="${(H * .62).toFixed(1)}" fill="url(#bg-red)"/>` : '';
   const vis = D.eye ? `<g class="bm-visor" transform="translate(${(D.eye[0] * k).toFixed(1)},${(D.eye[1] * k).toFixed(1)})"><circle r="${el ? 3.2 : 2.6}" fill="url(#bg-green)"/><rect x="-1.3" y="-.3" width="2.6" height=".6" fill="#d8ffb8"/></g>` : '';
-  return `<g class="${cls}" data-p="idle" style="--bmh:${(-H).toFixed(1)}px">${aura}<g class="bm-a"><image class="bm-img px" href="${D.f.idle}" x="${(o[0] * k).toFixed(1)}" y="${(o[1] * k).toFixed(1)}" width="${(o[2] * k).toFixed(1)}" height="${(o[3] * k).toFixed(1)}"${v.f ? ` style="filter:${v.f}"` : ''}/>${vis}</g></g>`;
+  const oy = ty === 'andel' ? 5 : 0; // v200: strážný anděl stál moc vysoko
+  return `<g class="${cls}" data-p="idle" style="--bmh:${(-H).toFixed(1)}px">${aura}<g class="bm-a"><image class="bm-img px" href="${D.f.idle}" x="${(o[0] * k).toFixed(1)}" y="${(o[1] * k + oy).toFixed(1)}" width="${(o[2] * k).toFixed(1)}" height="${(o[3] * k).toFixed(1)}"${v.f ? ` style="filter:${v.f}"` : ''}/>${vis}</g></g>`;
 }
 function bmInit(t, ent) { // po výměně spritu (ensureTok)
   const on = bmHas(bmTy(ent)); t.bm = on; t.fig.classList.toggle('bmon', on); t.fig.classList.toggle('bm-g', on && BM_GHOST.has(bmTy(ent))); clearTimeout(t.twT); clearTimeout(t.bpT); clearTimeout(t.bwT); t.bpose = null;
@@ -14054,7 +14068,6 @@ function bDecalAt(x, y, kind, pal = 'red', o = {}) {
   S.decalV = (S.decalV || 0) + 1;
   renderDecals();
 }
-function bDecalHex(hex, kind, pal, o = {}) { const [x, y] = px(hex); bDecalAt(x + bR(-9, 9), y + 2 + bR(-4, 4), kind, pal, o); }
 // materiál figurky: red (krev), green (míza/sliz), ghost (svítící prach), none (kosti, sláma, papír, porcelán), oil (zbroj)
 const B_MAT = { slimak: 'green', kvety: 'green', sluha: 'ghost', polt: 'ghost', banshee: 'ghost', kapela: 'ghost', vdova: 'ghost', zbroj: 'oil', kostlivci: 'none', mury: 'none', strasaci: 'none', grimoar: 'none', panenky: 'none' };
 function bMat(m) { if (!m) return 'red'; const d = C.MDEF[m.type]; if (d.object) return 'none'; if (B_MAT[m.type]) return B_MAT[m.type]; if (d.ghost || d.elusive || d.invisible) return 'ghost'; return 'red'; }
@@ -14353,13 +14366,6 @@ function fxHidden(n) {
   if (n.closest('.door') && n.closest('.v-open, .v-closed, .v-locked')) { const dg = n.closest('.door'), v = n.closest('.v-open, .v-closed, .v-locked'); return getComputedStyle(v).display === 'none'; }
   return false;
 }
-function fxHiddenOld(n) {
-  for (; n && n !== svg && n.nodeType === 1; n = n.parentNode) {
-    const cs = getComputedStyle(n);
-    if (cs.display === 'none' || cs.visibility === 'hidden' || +cs.opacity === 0) return true;
-  }
-  return false;
-}
 function fxSync() {
   if (!fxSvg) return;
   for (const L of fxLinks) { const h = fxHidden(L.ph); if (L.h !== h) { L.h = h; L.w.style.display = h ? 'none' : ''; } }
@@ -14396,7 +14402,7 @@ function xrayG() { let g = svg.querySelector('.l-xray'); if (!g) { g = sv('g', {
 function xraySet(key, nodes) {
   let u = xrayU.get(key);
   if (!nodes) { if (u) { u.classList.remove('on'); const uu = u; clearTimeout(uu._t); uu._t = setTimeout(() => { if (!uu.classList.contains('on')) { uu.remove(); if (xrayU.get(key) === uu) xrayU.delete(key); } }, 400); } return; }
-  if (!u || !u.isConnected) { u = sv('g', { class: 'xray' }); xrayG().appendChild(u); xrayU.set(key, u); }
+  if (!u || !u.isConnected) { u = sv('g', { class: 'xray' + (key.startsWith('spot:') ? ' xr-spot' : '') }); xrayG().appendChild(u); xrayU.set(key, u); } // v200: nálezy za zdí méně výrazně
   clearTimeout(u._t);
   const ids = nodes.filter(Boolean).map(n => { if (!n.id) n.id = 'xr' + (++xrayN); return n.id; }).join(',');
   if (u.dataset.ids !== ids) { u.dataset.ids = ids; u.innerHTML = ids.split(',').map(i => `<use href="#${i}"/>`).join(''); }
@@ -14564,7 +14570,7 @@ function badgesFor(kind, ent) {
     if (ent.taunt) b.push(BADGE('taunt', HERO_COLORS[ent.taunt] || '#d79e48', '', 'b-taunt'));
     if (C.isInvisible(G, ent) && !C.visibleToHeroes(G, ent) && !heroView()) b.push(BADGE('eyeoff', '#d6b8f4', '', 'b-inv'));
     if (ent.down) b.push(BADGE('zzz', '#ff8a8a', '', 'b-zzz'));
-    else if (!C.isAwake(G, ent) && G.phase !== 'setup' && !C.MDEF[ent.type].npc && !(G.hunt && ent.boss) && !C.MDEF[ent.type].object) b.push(BADGE('zzz', '#a8b4d0', '', 'b-zzz'));
+    else if (!C.isAwake(G, ent) && !ent.auto && G.phase !== 'setup' && !C.MDEF[ent.type].npc && !(G.hunt && ent.boss) && !C.MDEF[ent.type].object) b.push(BADGE('zzz', '#a8b4d0', '', 'b-zzz'));
     else if (ent.actedRound === G.round && !(G.active && G.active.monster === ent.uid) && !(G.hunt && ent.boss)) b.push(BADGE('hourglass', '#a59b8f', '', 'b-done'));
     if (G.hunt && ent.boss && !ent.human && G.hunt.dealt && G.phase !== 'setup') b.push(BADGE('jaws', '#ff7a5a', '', 'b-fangs')); // v99: už zranil – do konce kola zůstane vlkem
   }
@@ -14652,7 +14658,7 @@ function renderMap() {
   for (const r of G.cleansed || []) { if (!roomVisible(r)) continue; const R0 = C.ROOM_DEFS.find(x => x.id === r), x0 = wx(R0.k0), y0 = wy(R0.y0), w = wx(R0.k1) - x0; ov += `<rect x="${x0}" y="${y0}" width="${w}" height="${wy(R0.y1) - y0}" class="cleansed"/><text x="${x0 + 10}" y="${y0 + 16}" class="clean-lbl">OČIŠTĚNO</text>`; }
   for (const g of G.goo || []) { if (!fxVis(g.hex)) continue; const [x, y] = px(g.hex); ov += `<g class="goo"><path d="${hexPts(x, y, SIZE - 2)}" fill="#5a6a1a" fill-opacity=".38" stroke="#9ab030" stroke-opacity=".55" stroke-width="1.2" stroke-dasharray="3 2"/><ellipse cx="${x - 4}" cy="${y + 2}" rx="8" ry="${8 * KY}" fill="#8a9a2a" opacity=".45"/><ellipse cx="${x + 6}" cy="${y - 3}" rx="3.4" ry="${3.4 * KY}" fill="#c8d860" opacity=".5"/><circle cx="${x + 2}" cy="${y + 5}" r="1.6" fill="#c8d860" opacity=".6"/></g>`; }
   for (const sl of G.slime || []) { if (!fxVis(sl.hex)) continue; const [x, y] = px(sl.hex); ov += `<g class="slime"><path d="${hexPts(x, y, SIZE - 3)}" fill="#7fae3a" fill-opacity=".28" stroke="#a8d860" stroke-opacity=".5" stroke-width="1"/><ellipse cx="${x - 5}" cy="${y + 1}" rx="7" ry="${7 * KY}" fill="#b8e070" opacity=".35"/><ellipse cx="${x + 7}" cy="${y - 2}" rx="4" ry="${4 * KY}" fill="#d8f090" opacity=".4"/></g>`; }
-  for (const g of G.graves || []) { if (!roomVisible(C.roomOf(g.hex))) continue; const [x, y] = px(g.hex), need = C.graveNeed(G, g); if (betaOn() && typeof BetaMon !== 'undefined' && BetaMon.grave) { ov += `<g class="grave bgrave"><path d="${hexPts(x, y, SIZE - 2)}" class="grave-hex"/><circle cx="${x}" cy="${y}" r="18" fill="url(#ag-glowR)" opacity=".45" class="glow-pulse"/><image href="${BetaMon.grave}" x="${x - 19}" y="${(y - 17 * KY - 3).toFixed(1)}" width="38" height="${(38 * 87 / 98).toFixed(1)}" class="px" style="image-rendering:pixelated"/><g class="bgrave-n" transform="translate(${x},${(y + 1).toFixed(1)})"><path d="M-9 -6.5h18l2 2v9l-2 2h-18l-2 -2v-9z" fill="#0c0606" fill-opacity=".82" stroke="#6a1a12" stroke-width=".8"/><text y="2.6" text-anchor="middle">${need}+</text></g></g>`; continue; } ov += `<g class="grave"><path d="${hexPts(x, y, SIZE - 2)}" class="grave-hex"/><ellipse cx="${x}" cy="${y + 1}" rx="13" ry="${13 * KY}" fill="#120806" stroke="#3a1a10" stroke-width="1.2"/><path d="M${x - 10} ${y + 2}q4 -5 9 -2q5 -4 11 1" fill="none" stroke="#6a4a32" stroke-width="1.4"/><path d="M${x - 3} ${y - 1}l1 -7l2 1l1 -3l2 2l1 -2l1 9" fill="#d8d0b8" stroke="#1a1410" stroke-width=".6" class="grave-hand"/><circle cx="${x}" cy="${y}" r="17" fill="url(#ag-glowR)" opacity=".35" class="glow-pulse"/><text x="${x}" y="${y - 12}" text-anchor="middle" class="grave-n">${need}+</text></g>`; }
+  for (const g of G.graves || []) { if (!roomVisible(C.roomOf(g.hex))) continue; const [x, y] = px(g.hex); ov += graveSVG(G, g, x, y); }
   for (const t of G.htraps || []) { if (!roomVisible(C.roomOf(t.hex))) continue; const [x, y] = px(t.hex); ov += `<g class="htrap"><path d="${hexPts(x, y, SIZE - 7)}" fill="none" stroke="#8fd8c8" stroke-width="1.2" stroke-dasharray="2 2"/><path d="M${x - 6} ${y}l3 -3l3 3l3 -3l3 3" fill="none" stroke="#c9d3dc" stroke-width="1.4"/><circle cx="${x}" cy="${y + 1}" r="1.6" fill="#8fd8c8"/></g>`; }
   if (G.fireFront != null) {
     // postupující oheň: spálená pole, hořící fronta a pole, která chytnou na konci kola
@@ -14668,11 +14674,11 @@ function renderMap() {
   if (!hv) for (const k of G.traps) { const [x, y] = px(C.unK(k)); ov += `<g class="trap"><path d="M${x - 9} ${y - 2}l5 2l3 -3l4 4l6 -2" fill="none" stroke="#cf5b45" stroke-width="1.4"/><path d="${hexPts(x, y, SIZE - 6)}" fill="none" stroke="#cf5b45" stroke-width=".9" stroke-dasharray="2 2"/></g>`; }
   if (G.scen && C.isBossGoal && C.isBossGoal(G)) { ov += bossFX(G); bossTop(G); } else if (gBoss && gBoss._s) { gBoss._s = ''; gBoss.innerHTML = ''; }
   if (gOver._s !== ov) { gOver._s = ov; gOver.innerHTML = ov; }
-  const fk = G.fire.filter(f => roomVisible(C.roomOf(f.hex))).map(f => C.K(f.hex)).join(';');
+  const fk = G.fire.filter(f => roomVisible(C.roomOf(f.hex))).map(f => C.K(f.hex) + (C.graveAt && C.graveAt(G, f.hex) ? 'g' + C.graveNeed(G, C.graveAt(G, f.hex)) : '')).join(';');
   if (gDepth._fk !== fk) {
     gDepth._fk = fk;
     gDepth.querySelectorAll('.flames').forEach(n => n.remove());
-    for (const f of G.fire) { if (!fxVis(f.hex)) continue; const [x, y] = px(f.hex); const inDoor = !C.roomOf(f.hex); const g = sv('g', { class: 'flames' + (inDoor ? ' fdoor' : ''), transform: `translate(${x},${y + (inDoor ? 4 : 0)})` }, betaOn() ? bFireSVG(x * 7 + y * 13) : flameSVG()); g._z = y + (inDoor ? 30 : 0.3); placeInDepth(g); }
+    for (const f of G.fire) { if (!fxVis(f.hex)) continue; const [x, y] = px(f.hex); const inDoor = !C.roomOf(f.hex); const g = sv('g', { class: 'flames' + (inDoor ? ' fdoor' : ''), transform: `translate(${x},${y + (inDoor ? 4 : 0)})` }, (betaOn() ? bFireSVG(x * 7 + y * 13) : flameSVG()) + (C.graveAt(G, f.hex) ? graveSVG(G, C.graveAt(G, f.hex), 0, 0) : '')); g._z = y + (inDoor ? 30 : 0.3); placeInDepth(g); }
   }
   renderScenObjs(G);
   renderSpots();
@@ -14704,7 +14710,7 @@ function renderMap() {
     t.fig.classList.toggle('ghostly', !!C.MDEF[m.type].invisible);
     t.fig.classList.toggle('done', m.actedRound === G.round && !(G.active && G.active.monster === m.uid) && !(G.hunt && m.boss));
     t.fig.classList.toggle('active', !!(G.active && G.active.monster === m.uid)); t.lab.classList.toggle('act', !!(G.active && G.active.monster === m.uid));
-    t.fig.classList.toggle('sleeping', !C.isAwake(G, m) && G.phase !== 'setup' && !(G.hunt && m.boss));
+    t.fig.classList.toggle('sleeping', !C.isAwake(G, m) && !m.auto && G.phase !== 'setup' && !(G.hunt && m.boss));
     t.fig.classList.toggle('indark', roomDark(G, C.roomOf(m.pos)) && hv);
     { const pt = t.lab.querySelector('.pl-t'), pf = t.lab.querySelector('.pl-fill'), w = (16 * Math.max(0, m.hp) / (m.maxHp || st.hp)).toFixed(1); // v179: přepsat jen při změně
       if (pt.textContent !== String(m.hp)) pt.textContent = m.hp; if (pf.getAttribute('width') !== w) pf.setAttribute('width', w); }
@@ -14717,7 +14723,8 @@ function renderMap() {
     t.fig.style.setProperty('--c', HERO_COLORS[z.owner] || '#8fd8c8'); t.lab.style.setProperty('--c', HERO_COLORS[z.owner] || '#8fd8c8');
     t.fig.classList.toggle('fog', !roomVisible(C.roomOf(z.pos))); t.lab.classList.toggle('fog', !roomVisible(C.roomOf(z.pos)));
     const left = Math.max(0, z.until - G.round + 1);
-    t.lab.querySelector('.pl-t').textContent = z.angel ? z.hp + '♥' : left + '⧗'; // v172: strážný anděl ukazuje zdraví
+    t.lab.querySelector('.pl-t').textContent = z.angel ? z.hp : left + '⧗'; // v172: strážný anděl ukazuje zdraví (v200: bez srdíčka, jako ostatní)
+    if (z.angel) renderBadges(t, [BADGE('shield', '#dfe6ec', z.armor || 1, 'b-ar')].concat(z.actedRound === G.round ? [BADGE('hourglass', '#a59b8f', '', 'b-done')] : [])); // v200: štít jako u padlého anděla
     t.lab.querySelector('.pl-fill').setAttribute('width', (16 * Math.min(1, z.angel ? z.hp / (z.maxHp || 5) : left / 3)).toFixed(1));
     if (!t.anim && (!t.pos || !C.eq(t.pos, z.pos))) setTokPos(t, z.pos);
   }
@@ -14728,6 +14735,8 @@ function renderMap() {
   envOccSoon(); // v63d
   fxPos(); fxSync(); // v65
 }
+// v200: hrob se kreslí i do vrstvy hloubky nad plameny (v ohni byl schovaný)
+function graveSVG(G, g, x, y) { const need = C.graveNeed(G, g); if (betaOn() && typeof BetaMon !== 'undefined' && BetaMon.grave) { return `<g class="grave bgrave"><path d="${hexPts(x, y, SIZE - 2)}" class="grave-hex"/><circle cx="${x}" cy="${y}" r="18" fill="url(#ag-glowR)" opacity=".45" class="glow-pulse"/><image href="${BetaMon.grave}" x="${x - 19}" y="${(y - 17 * KY - 3).toFixed(1)}" width="38" height="${(38 * 87 / 98).toFixed(1)}" class="px" style="image-rendering:pixelated"/><g class="bgrave-n" transform="translate(${x},${(y + 1).toFixed(1)})"><path d="M-9 -6.5h18l2 2v9l-2 2h-18l-2 -2v-9z" fill="#0c0606" fill-opacity=".82" stroke="#6a1a12" stroke-width=".8"/><text y="2.6" text-anchor="middle">${need}+</text></g></g>`; } return `<g class="grave"><path d="${hexPts(x, y, SIZE - 2)}" class="grave-hex"/><ellipse cx="${x}" cy="${y + 1}" rx="13" ry="${13 * KY}" fill="#120806" stroke="#3a1a10" stroke-width="1.2"/><path d="M${x - 10} ${y + 2}q4 -5 9 -2q5 -4 11 1" fill="none" stroke="#6a4a32" stroke-width="1.4"/><path d="M${x - 3} ${y - 1}l1 -7l2 1l1 -3l2 2l1 -2l1 9" fill="#d8d0b8" stroke="#1a1410" stroke-width=".6" class="grave-hand"/><circle cx="${x}" cy="${y}" r="17" fill="url(#ag-glowR)" opacity=".35" class="glow-pulse"/><text x="${x}" y="${y - 12}" text-anchor="middle" class="grave-n">${need}+</text></g>`;  }
 // v67 beta: pixelový oheň přes celý hex (doom-fire, generuje se jednou do pruhu snímků) a textura rozsypané soli
 const BFIRE_N = 10, BFIRE_W = 84;
 let bFireURL = null, bSaltURL = null;
@@ -14846,7 +14855,7 @@ function renderScenObjs(G) {
 function angelDecor() { // v172: probuzené sochy = prázdný podstavec; Domu se zkažené jemně podbarví
   const G = S.G; if (!G || !G.angels || !svg) return;
   const hm = houseMine() || G.phase === 'over';
-  for (const a of G.angels.statues) { const g = svg.querySelector(`.furn[data-k="${C.K(a.hex)}"]`); if (!g) continue; g.classList.toggle('awoken', a.awake); g.classList.toggle('corrupt', !a.awake && a.corrupt && hm); }
+  for (const a of G.angels.statues) { const g = svg.querySelector(`.furn[data-k="${C.K(a.hex)}"]`); if (!g) continue; g.classList.toggle('awoken', a.awake); g.classList.toggle('gone', a.awake && !a.empty); g.classList.toggle('corrupt', !a.awake && a.corrupt && hm); g.classList.toggle('hollow', !a.awake && a.empty && hm); }
 }
 function renderSpots() {
   angelDecor();
@@ -15122,7 +15131,7 @@ const STEP_DEF = {
   buy: { label: 'Kup skupiny monster', help: 'Za temnou esenci kupuješ celou skupinu: elitu a přisluhovače podle počtu lovců.' },
   place: { label: 'Rozmísti monstra', help: 'Vyber skupinu a klikej na pole. Jedna skupina, jedna místnost. První figurka je elita. Kliknutím na figurku ji vrátíš.' },
   exit: { label: 'Vyber dvě otevřené branky', help: 'Klikni na dvě ze čtyř branek na okraji bludiště. Ty budou otevřené, zbylé zavřené. Lovci je uvidí. Až jednou z nich projde lovec, navždy se zavře a ty otevřeš jinou – otevřené jsou vždy dvě.' },
-  angels: { label: 'Zkaž dvě sochy', help: 'Klikni na dvě z pěti soch andělů. Lovci nepoznají, které jsou zkažené: když je probudí, ožije padlý anděl na tvé straně.' },
+  angels: { label: 'Zkaž a vykraď sochy', help: 'Klikáním na sochu přepínáš: obyčejná → zkažená (rudý kruh) → prázdná (žlutý kruh). Urči jednu zkaženou a jednu prázdnou. Lovci je nepoznají: zkažená ožije jako padlý anděl na tvé straně, prázdná se jen rozpadne.' },
   curse: { label: 'Prokleji místnost', help: 'Klikni na místnost, kde bude Tma: lovci mají −2 k útokům do ní i z ní a kdo v ní skončí tah, dostane 1 Strach (dokud ji nerozsvítí).' },
   done: { label: 'Začni hru', help: 'Zkontroluj přípravu. Až bude vše hotové, pusť lovce dovnitř.' },
 };
@@ -15142,7 +15151,7 @@ function setupHighlights() {
   else if (st === 'exit' && G.hunt) G.hunt.traps.forEach(t => hlRing(t.hex, t.pick ? 'ring-sel' : 'ring-act'));
   else if (st === 'exit' && G.comb) G.comb.graves.forEach((g, i) => hlRing(g, G.comb.real === i ? 'ring-sel' : 'ring-act'));
   else if (st === 'exit') C.mazeExits(G).forEach(d => hlRing(d.hex, C.isRealExit(G, d.id) ? 'ring-sel' : 'ring-act'));
-  else if (st === 'angels' && G.angels) G.angels.statues.forEach(a => hlRing(a.hex, a.corrupt ? 'ring-atk' : 'ring-act'));
+  else if (st === 'angels' && G.angels) G.angels.statues.forEach(a => hlRing(a.hex, a.corrupt ? 'ring-atk' : a.empty ? 'ring-sel' : 'ring-act'));
 }
 function nextMissingToken() { const G = S.G; return C.missingTokens(G)[0] || S.setup.tok; }
 function nextGroup() { const G = S.G; return Object.keys(G.groups).find(t => !G.groups[t].free && C.aliveOf(G, t) < C.groupSize(t)) || null; }
@@ -15563,7 +15572,7 @@ async function bWaveRings(hex, color, n = 3, rad = 3) {
   }
   await sleep(dur(500));
 }
-async function screenFlash(color = '#fff6e0', ms = 380) { const f = el('div', { class: 'scrflash' }); f.style.background = color; $('#mapover').appendChild(f); await animate(f, [{ opacity: .8 }, { opacity: 0 }], ms); f.remove(); }
+async function screenFlash(color = '#fff6e0', ms = 380, peak = .8) { const f = el('div', { class: 'scrflash' }); f.style.background = color; $('#mapover').appendChild(f); await animate(f, [{ opacity: peak }, { opacity: 0 }], ms); f.remove(); }
 
 // ---------- animace událostí jádra ----------
 const UIF = {
@@ -16014,7 +16023,7 @@ async function drainFx() {
       else if (e.t === 'mirrorbreak') { sfx('crash'); shake(1.6); const [x, y] = px(e.at); particles(x, y - 30, 22, '#d8e8f4', 26, 18, 1.4, 900); render(); await sleep(dur(500)); }
       else if (e.t === 'summon') { sfx('spell'); const [x, y] = px(e.at); particles(x, y - 10, 16, '#c890ff', 14, 30, 1.3, 1100); await sleep(dur(300)); }
       else if (e.t === 'sfx') sfx(e.name);
-      else if (e.t === 'angel') { render(); sfx(e.corrupt ? 'crash' : 'spell'); const [x, y] = px(e.at); particles(x, y - 30, 30, e.corrupt ? '#ff3a2a' : '#ffe6a0', 22, 30, 1.5, 1100); if (!e.corrupt) shake(.6); await sleep(dur(500)); }
+      else if (e.t === 'angel') { render(); sfx(e.corrupt || e.empty ? 'crash' : 'spell'); const [x, y] = px(e.at); particles(x, y - 30, e.empty ? 22 : 30, e.empty ? '#9a9286' : e.corrupt ? '#ff3a2a' : '#ffe6a0', 22, 30, 1.5, 1100); if (!e.corrupt && !e.empty) shake(.6); await sleep(dur(500)); }
       else if (e.t === 'obelbreak') { render(); sfx('crash'); shake(1.8); const [x, y] = px(e.at); particles(x, y - 26, 26, { dark: '#9a6ae8', pain: '#ff6a4a', ice: '#bfefff', hunger: '#b0e060' }[e.kind] || '#c890ff', 26, 24, 1.5, 1000); await sleep(dur(500)); }
       else if (e.t === 'beam') { // v172: obelisk se rozzáří, paprsky vystřelí z run a na chvíli osvítí okolí
         sfx('spell'); const [x0, y0] = px(e.from), sx = x0 + 2, sy = y0 - 40, g = sv('g', { class: 'obbeam' });
@@ -16284,7 +16293,7 @@ async function rollAnim(ev) {
     await sleep(dur(800));
   } else if (ev.hit) {
     if (st.kind === 'melee') { if (st.fx === 'claw' || st.fx === 'bite') claw(ev.at, tl * .55, st.color || (st.fx === 'bite' ? '#f4f0e8' : '#cfeee8')); else slash(ev.at, tl * .55, st.color, st.big || ev.crit); }
-    if (ev.crit) screenFlash('#ffe8c0', 260);
+    if (ev.crit) screenFlash('#ffe8c0', 220, .28); // v200: kritický zásah jen jemně problikne
     const dmg = ev.dmg || 0;
     const kind = ev.enemy ? 'blood' : bloodKind(G, ev.at);
     if (dmg > 0 && betaOn()) { // v61c: krev podle zranění a materiálu (netělesná monstra z lovce krev nevyrazí)
@@ -16376,16 +16385,6 @@ function render() {
   followActive();
 }
 // v72: překrývající se figurky – ta vpředu je částečně průhledná (vidět i tu za ní)
-function tokOverlap() {
-  const G = S.G; if (!G || !svg) return;
-  const L = [];
-  for (const h of G.heroes) if (!h.escaped) { const t = toks.get('h:' + h.id); if (t) L.push([t, px(h.pos), t.h || 50]); }
-  for (const m of G.monsters) { const t = toks.get('m:' + m.uid); if (t && !C.MDEF[m.type].object && monsterShown(m)) L.push([t, px(m.pos), t.h || 46]); }
-  for (const [t, [x, y]] of L) {
-    const on = L.some(([u, [x2, y2], h2]) => u !== t && y > y2 + .5 && y - y2 < h2 * .9 && Math.abs(x - x2) < 30);
-    t.fig.classList.toggle('ovl', on);
-  }
-}
 // v72: výkon – všechny nekonečné (ambientní) CSS animace běží v jednom společném taktu (12 snímků/s),
 // takže se mapa překresluje jen 12× za sekundu místo při každém snímku každé animace zvlášť
 // Nastavení „Efekty prostředí“: full = 12 snímků/s, low = 6 snímků/s bez sněžení, off = prostředí na mapě stojí
@@ -16393,6 +16392,8 @@ const FX_KEY = 'bm_fx', fxMode = () => { try { return localStorage.getItem(FX_KE
 let ambSnow = null, ambIv = null;
 function ambTick() {
   if (document.hidden) return;
+  // v200: během zoomu/posunu mapy a chvíli po něm se ambientní animace nepřekreslují – mapa se nepřerastruje dvakrát (blikání)
+  if (S.zoomT || (S.pan && S.pan.moved) || (S.zoomHold || 0) > performance.now()) return;
   const now = document.timeline.currentTime, off = fxMode() === 'off';
   for (const a of document.getAnimations()) {
     if (!(a instanceof CSSAnimation) || a.effect.getTiming().iterations !== Infinity) continue;
@@ -16483,7 +16484,7 @@ function applyZoom(keepCenter) {
   if ($('#zoomlbl')) $('#zoomlbl').textContent = Math.round(S.zoom * 100) + ' %';
   fxPos();
 }
-function setZoom(z) { S.zoom = Math.min(3, Math.max(1, Math.round(z * 4) / 4)); applyZoom(true); }
+function setZoom(z) { S.zoom = Math.min(3, Math.max(1, Math.round(z * 4) / 4)); S.zoomHold = performance.now() + 450; applyZoom(true); }
 function centerOn(hex, smooth) {
   const wrap = $('#mapwrap'); if (!svg) return false;
   const k = svg.clientWidth / VW, [x, y0] = px(hex), y = y0 - 22;
@@ -16516,7 +16517,7 @@ function initPanZoom() {
     clearTimeout(S.zoomTm);
     S.zoomTm = setTimeout(() => { const P = S.zoomP; S.zoom = S.zoomT; S.zoomT = 0;
       for (const el of [svg, fxSvg]) if (el) { el.style.transform = ''; el.style.transformOrigin = ''; if (el === svg) el.style.willChange = ''; }
-      applyZoom(false); wrap.scrollLeft = S.padX + P.fx * svg.clientWidth - P.mx; wrap.scrollTop = S.padY + P.fy * svg.clientHeight - P.my; }, 160);
+      applyZoom(false); wrap.scrollLeft = S.padX + P.fx * svg.clientWidth - P.mx; wrap.scrollTop = S.padY + P.fy * svg.clientHeight - P.my; S.zoomHold = performance.now() + 450; }, 160);
   }, { passive: false });
   // v90: prostřední tlačítko = znamení (zablokujeme i automatické posouvání prohlížeče)
   wrap.addEventListener('mousedown', e => { if (e.button !== 1) return; e.preventDefault(); if (e.target.closest('svg')) markPlace(e); });
@@ -16584,10 +16585,6 @@ function buiApply(G) {
 }
 // v71: deník úkolu – papírek vlevo nahoře s postupem scénáře (klik = sbalit)
 // ---------------- v82: boss fighty – překryvy mapy, události, úkoly ----------------
-const B_ARR = ['→', '↘', '↓', '↙', '←', '↖', '↑', '↗'];
-const bDir = (dx, dy) => B_ARR[((Math.round(Math.atan2(dy, dx) / (Math.PI / 4)) % 8) + 8) % 8];
-const bDirW = ['na východ', 'na jihovýchod', 'na jih', 'na jihozápad', 'na západ', 'na severozápad', 'na sever', 'na severovýchod'];
-const bDirWord = (dx, dy) => bDirW[((Math.round(Math.atan2(dy, dx) / (Math.PI / 4)) % 8) + 8) % 8];
 let gBoss = null;
 // vrstva nad figurkami (mlha, čísla tanečníků, šipka hřebenu)
 function bossTop(G) {
@@ -16741,12 +16738,6 @@ function buiQuest(G) {
 // v71: lehké sněžení v popředí (scénář na hřbitově)
 // v72: místo plátna dvě vrstvy s dlaždicí vloček posouvané jen transformací (kompozitor, žádné překreslování)
 let bSnowTile = null;
-function bSnowMk(seed, n, big) {
-  const W = 256, H = 256, cv = document.createElement('canvas'); cv.width = W; cv.height = H; const g = cv.getContext('2d'); let s = seed;
-  const r = () => (s = (s * 16807) % 2147483647) / 2147483647;
-  for (let i = 0; i < n; i++) { const x = Math.floor(r() * W), y = Math.floor(r() * H), a = (.3 + r() * .5).toFixed(2), z = big && r() < .35 ? 2 : 1; g.fillStyle = `rgba(232,240,252,${a})`; g.fillRect(x, y, z, z); }
-  return cv.toDataURL();
-}
 function bSnow(G) {
   const on = G && C.MAP && G.scen && G.scen.map === 'hrbitov' && !reduced && fxMode() === 'full' && buiOn();
   let w = $('#bsnow');
@@ -17158,8 +17149,6 @@ const SLOT_IC = { hlava: 'helmet', ruka: 'sword', obourucni: 'axe', telo: 'cuira
 const ROLE_IC = { 'rváč': 'taunt', 'mystička': 'pendulum', mechanik: 'crowbar' };
 function cardKind(c) { return c.panic ? 'panic' : c.cursed ? 'cursed' : c.scenWater ? 'single scenw' : c.single ? 'single' : c.ability ? 'ability' : 'equip'; }
 const roleOf = c => (c.itemName.split('· ')[1] || '').trim();
-const chipS = (ic, v, cls, tip) => `<span class="cs ${cls || ''}" ${tip ? `title="${esc(tip)}"` : ''}>${A.icon(ic)}${v !== '' && v !== undefined ? `<b>${v}</b>` : ''}</span>`;
-const fxI = (ic, tip, v) => `<span class="cf" title="${esc(tip)}">${A.icon(ic)}${v !== undefined ? `<b>${v}</b>` : ''}</span>`;
 const LN_ = (ic, lbl, val, cls, tip) => `<div class="cl ${cls || ''}" ${tip ? `title="${esc(tip)}"` : ''}>${CI(ic)}<span>${lbl}</span>${val !== undefined && val !== '' ? `<b>${val}</b>` : ''}</div>`;
 function artIc(s, c) {
   const it = c.item;
@@ -17869,7 +17858,7 @@ const GOAL_H = {
   obelisks: { story: 'V hájovně stojí čtyři pohanské obelisky. Dokud stojí, les patří Domu.', goal: 'Rozbijte všechny obelisky.',
     how: ['Obelisk má armor 1. Kolik má zdraví, rozhodl Dům.', 'Každý působí na svou místnost: Tma, paprsek bolesti na konci tahu, led (o akci méně) a hlad (léčí monstra, +1 Hrozba).', 'V nábytku je schované kladivo.'] },
   angels: { story: 'Pod klášterem spí pět kamenných andělů, kteří kdysi katakomby zapečetili. Dům dva z nich nahlodal a celé podzemí tone ve tmě.', goal: 'Probuďte tři strážné anděly.',
-    how: ['Celé podzemí je ve Tmě: útoky do ní i z ní mají −2 a kdo v ní skončí tah, dostane Strach. Světla z nálezů (svíce, pochodeň, sirky) ji v místnosti zruší.', 'Sochu probudíš, když stojíš vedle ní (1 pohyb). Dobrý anděl natrvalo rozsvítí svou místnost a bojuje za vás: na začátku každého kola jde k nejbližšímu monstru a udeří (pohyb 3, když nedojde, jde podruhé; útok +1 za 2, 5 zdraví, armor 1).', 'Dvě sochy z pěti jsou zkažené (vybral je Dům) a nedá se to poznat. Ožijí jako padlý anděl se stejnými hodnotami, který hraje za Dům na začátku jeho prvního tahu v kole.', 'Monstrum, které v aktivaci na nikoho nezaútočí a stojí vedle strážného anděla, udeří do něj. Když anděl padne, nic se neděje – probuzený už se počítá.'] },
+    how: ['Celé podzemí je ve Tmě: útoky do ní i z ní mají −2 a kdo v ní skončí tah, dostane Strach. Světla z nálezů (svíce, pochodeň, sirky) ji v místnosti zruší.', 'Sochu probudíš prohledáním (karta s prohledáním, stojíš vedle sochy). Anděl procitne přímo na jejím místě. Dobrý anděl v tu chvíli rozsvítí svou síň (Dům ji může později znovu zhasnout) a bojuje za vás: na začátku každého kola jde k nejbližšímu monstru a udeří (pohyb 3, když nedojde, jde podruhé; útok +1 za 2, 5 zdraví, armor 1).', 'Jedna socha z pěti je zkažená a jedna prázdná (vybral je Dům) a nedá se to poznat. Zkažená ožije jako padlý anděl se stejnými hodnotami, síň v tu chvíli zhasne a anděl hraje za Dům na začátku jeho prvního tahu v kole; Tma ho neomezuje. Prázdná se jen rozpadne.', 'Monstrum, které v aktivaci na nikoho nezaútočí a stojí vedle strážného anděla, udeří do něj. Když anděl padne, nic se neděje – probuzený už se počítá.'] },
   cleanse: { story: 'Pod klášterem leží katakomby a kletba z nich prosakuje nahoru.', goal: 'Očistěte 5 ze 6 relikviářů.',
     how: ['Očista = prohledat relikviář. Když v jeho místnosti stojí do 2 polí od něj monstrum, selže.', 'Katakomby jsou propojené průchody. Monstra spí, dokud se k nim nepřiblížíte na 5 polí nebo nevstoupíte do jejich místnosti.', 'V jednom z nich je schovaná relikvie: silné kopí se třemi kartami, které vám zůstane.'] },
   altar: { story: 'V opuštěném klášteře sv. Benedikta krvácí oltář a mrtví mniši se vracejí z hrobek.', goal: 'Vylijte na Krvavý oltář třikrát svěcenou vodu.',
@@ -17906,7 +17895,7 @@ const BRIEF_S = {
   escape: ['Seance se zvrtla a dům vás nepustí ven.', 'Najděte pravý klíč a utečte hlavními dveřmi. Stačí dva.', ['Jeden z klíčů je falešný.', 'Kořist hledej v nábytku se značkou.']],
   circles: ['Na hřbitově u sv. Jiljí bloudí duše, které nemohou odejít.', 'Nasbírejte 6 vyvolání.', ['Svítí vždy jen jeden kruh. Začni v něm tah a získáš vyvolání.', 'Krypty propojují hřbitov.']],
   obelisks: ['Čtyři pohanské obelisky drží les v moci Domu.', 'Rozbijte všechny obelisky.', ['Každý obelisk trápí svou místnost.', 'V nábytku je schované kladivo.']],
-  angels: ['Pod klášterem spí pět kamenných andělů.', 'Probuďte tři strážné anděly.', ['Dva z pěti jsou zkažení – nepoznáš je.', 'Všude je Tma, dobrý anděl rozsvítí místnost.']],
+  angels: ['Pod klášterem spí pět kamenných andělů.', 'Probuďte tři strážné anděly.', ['Jeden z pěti je zkažený, jedna socha je prázdná – nepoznáš je.', 'Sochy probudíš prohledáním. Všude je Tma, dobrý anděl rozsvítí síň.']],
   cleanse: ['Kletba prosakuje z katakomb pod klášterem.', 'Očistěte 5 relikviářů.', ['Monstrum do 2 polí od relikviáře očistu překazí.']],
   altar: ['Oltář v klášteře sv. Benedikta krvácí.', 'Třikrát vylijte svěcenou vodu na Krvavý oltář.', ['Vodu nabereš u Svěcené kašny.', 'Páka I u kašny, páka II v troskách presbytáře.', 'Obě mříže = rovná cesta středem, skoro o polovinu kratší.', 'Když nositel padne, voda se rozlije.']],
   maze: ['Živé bludiště se za vámi zavřelo.', 'Utečte otevřenými brankami. Stačí dva.', ['Každou brankou projde jen jeden lovec.', 'Každé kolo zaroste 3 ze 20 živých průchodů.', 'Cesta ven vždy existuje.']],
@@ -18031,8 +18020,9 @@ function initFullscreen() {
 }
 // tlačítka zvuku: v liště hry i v hlavním menu (v61) ukazují stejný stav
 // v190: verze a change log v hlavním menu
-const GAME_VER = 'v199';
+const GAME_VER = 'v200';
 const CHANGELOG = [
+  ['v200 · 28. 11.', ['Probuzení andělů: sochu probudíš prohledáním (karta s prohledáním) a anděl procitne přímo na jejím místě. Dům určí jednu zkaženou a jednu prázdnou sochu (prázdná se jen rozpadne), zbylé tři jsou dobré.', 'Dobrý anděl síň v tu chvíli rozsvítí, padlý ji zhasne – ani jedno už neplatí natrvalo. Padlý anděl se probouzí rovnou bdělý a Tma ho neomezuje.', 'Strážný anděl stojí na hexu níž, má štít s armorem a zdraví bez srdíčka; na spojence (anděla) už nikdo nevstoupí.', 'Monstra: skupina se probudí, jakmile kohokoli z ní uvidíte (i přes dveře do další místnosti), a už neusne.', 'Thomas Wren: bonusy za pohyb se počítají jako vzdálenost od pole, kde začal tah (jako nálet havranů).', 'Hroby padlých kostlivců jsou vidět i v ohni; nálezy za zdí jsou méně výrazné; slabší záblesk kritického zásahu.', 'Lovec, který leží, se během pádu nezvedá kvůli Strachu nebo Panice; aktivace lovce přetažením karty už nehlásí „zahrál jsi všechny karty“.', 'Výkon: během zoomu a posunu mapy se zastaví ambientní animace (méně blikání), odstraněno přes 20 nepoužívaných funkcí.']],
   ['v199 · 25. 11.', ['Obchod: předměty 3. úrovně se nabízejí častěji – na začátku kampaně zhruba v 10 % případů, uprostřed ve 24 %, ke konci ve 36 %.']],
   ['v198 · 24. 11.', ['Obchod v táboře: čím dál v kampani, tím častěji nabízí vzácnější předměty. Na začátku je předmět 3. úrovně v nabídce zhruba v 6 % případů, ke konci kampaně ve 27 %; běžné předměty se nabízejí pořád, jen méně často.']],
   ['v197 · 24. 11.', ['Kompenzace v kampani roste s počtem proher v řadě: 2. prohra = úroveň 1 (lovci +2 esence a +1 xp každý, Dům +1 xp a +1 temná esence), 3. prohra = úroveň 2 (dvojnásobek), 4. a další = úroveň 3 (trojnásobek). Výhra počítadlo vynuluje.', 'Úroveň 3 navíc dá bonus na příští scénář: lovci Odhodlání (v prvním kole 6 karet v ruce), Dům Zuřivost (karta a Hrozba navíc na začátku).']],
@@ -18206,19 +18196,6 @@ function heroDetailHTML(h) {
 }
 
 // ---------- obrazovka kampaně mezi scénáři ----------
-const SCEN = () => C.SCENARIOS;
-function treeHTML(nodes, cur, xp, attr, previewFn) {
-  // nodes: { '': [name,...], A, B, AA, AB, BA, BB } nebo {'' : name, ...}
-  const nm = v => Array.isArray(nodes[v]) ? nodes[v][0] : nodes[v];
-  const on = v => cur === v || (cur || '').startsWith(v) && v.length <= (cur || '').length;
-  const can = v => Camp.nextVariants(cur || '').includes(v) && Camp.upCost(cur || '') <= xp;
-  const avail = v => Camp.nextVariants(cur || '').includes(v);
-  const node = v => `<button class="tn${on(v) ? ' on' : ''}${can(v) ? ' can' : ''}${avail(v) && !can(v) ? ' poor' : ''}" ${can(v) ? `${attr}="${v}"` : ''} ${previewFn ? `data-pv="${v}"` : ''}><b>${esc(nm(v))}</b><small>${v || 'základ'}${avail(v) ? ' · ' + Camp.upCost(cur || '') + ' xp' : ''}</small></button>`;
-  // jen dosavadní cesta + varianty, na které jde vylepšit teď
-  const c0 = cur || '', path = [''].concat(c0.length >= 1 ? [c0[0]] : [], c0.length >= 2 ? [c0] : []);
-  const nxt = Camp.nextVariants(c0);
-  return `<div class="tree slim"><div class="tpath">${path.map(node).join('<i class="tarr">›</i>')}</div>${nxt.length ? `<i class="tarr">›</i><div class="tcol">${nxt.map(node).join('')}</div>` : '<small class="tmax">nejvyšší úroveň</small>'}</div>`;
-}
 // v61: kompaktní strom vylepšení – jen aktuální úroveň a varianty, na které jde vylepšit teď
 function treeMiniHTML(nodes, cur, xp, attr, noCost) {
   const nm = v => Array.isArray(nodes[v]) ? nodes[v][0] : nodes[v];
@@ -18316,7 +18293,6 @@ function campGrpHTML(st) {
     <div class="gup-list">${Camp.GRP_UPS.map(row).join('')}</div>
     ${nextT.length ? `<div class="gup-next"><span>Skupiny pro další scénář:</span>${nextT.map(t => `<span class="gup-t" title="${esc(C.MDEF[t].name)}">${monPortrait(t)}</span>`).join('')}</div>` : ''}${campScenDetHTML(nx, 'Další scénář')}</section>`;
 }
-const grpUpText = (t, u) => u.text;
 const grpBadge = (t, g) => [g.hp ? '+' + g.hp * C.D.grpHpPer(t) + ' zdraví' : '', g.hpN ? '+' + g.hpN + ' zdraví přisluhovačům' : '', g.hpE ? '+' + g.hpE + ' zdraví elitám' : '', g.plus ? '+' + g.plus + ' přisluhovač' + (g.plus > 1 ? 'i' : '') : '', g.elite ? '+' + g.elite + ' elita' : ''].filter(Boolean).join(' · ');
 function campOlHTML(st) {
   return `<div class="cp-olgrid">${campGrpHTML(st)}<section class="cp-olc"><div class="cp-h"><h3>Karty Domu</h3><span class="ess">${st.ol.xp} xp</span><span class="ess o">${A.icon('threat')} 3 sloty skupin</span></div>
@@ -18332,12 +18308,6 @@ function campScoreHTML(st, big) {
   return `<div class="cp-score${big ? ' big' : ''}" aria-label="Skóre kampaně: lovci ${sc.heroes}, Dům ${sc.ol}"><span class="h">${A.icon('ally')}Lovci <b>${sc.heroes}</b></span><i>:</i><span class="o"><b>${sc.ol}</b> Dům${A.icon('threat')}</span></div>`;
 }
 // průběh kampaně: odehrané v pořadí (s výsledkem), vybraný další, zbývající
-function campProgHTML(st) {
-  const done = (st.history || []).map((x, i) => { const sc = Camp.scenById(x.id); return `<span class="done${x.win ? ' won' : ''}">${i + 1}. ${esc(sc ? sc.name : x.id)} · ${resTxt(x.win)}</span>`; });
-  const nx = Camp.scenById(st.next); if (nx) done.push(`<span class="cur">${done.length + 1}. ${esc(nx.name)} · další</span>`);
-  const left = Camp.LEN - done.length; if (left > 0) done.push(`<span>zbývá ${nScen(left)}</span>`);
-  return `<div class="cp-prog">${done.join('')}</div>`;
-}
 function mapInfo(sc) {
   if (sc.mapNote) return sc.mapNote;
   const M = typeof MapData !== 'undefined' ? MapData.MAPS[sc.map] : null; if (!M) return '';
@@ -18762,10 +18732,6 @@ async function mmAction(a) {
   if (a === 'leave') { if (NETS.conn) NETS.conn.send({ t: 'bye', from: Net.myId }); netReset(); return mmGo('multi'); }
 }
 // v61b: přepnutí beta grafiky (hlavní menu i Menu ve hře); zapnutí ukáže upozornění
-function betaWarn() {
-  const w = el('div', { class: 'betawarn', role: 'dialog', 'aria-modal': 'true' }, `<div class="dialog"><p>Tato grafika je stále ve fázi testování.</p><button class="btn primary" id="betaok">OK</button></div>`);
-  document.body.appendChild(w); const ok = w.querySelector('#betaok'); ok.addEventListener('click', () => w.remove()); ok.focus();
-}
 // v96: přepnutí na pracovní (alfa) grafiku chce potvrzení
 function alphaConfirm() {
   return new Promise(res => {
